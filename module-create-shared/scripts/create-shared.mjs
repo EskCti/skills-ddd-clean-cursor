@@ -125,6 +125,24 @@ async function installRootDependencies(rootDir) {
   await runCommand("npm", ["install"], rootDir);
 }
 
+async function listFrontendAndBackendPackageJsonPaths({
+  rootDir,
+  frontendAppPath,
+  backendAppPath,
+}) {
+  const appPaths = [...new Set([frontendAppPath, backendAppPath])];
+  const packageJsonPaths = [];
+
+  for (const appPath of appPaths) {
+    const packageJsonPath = path.join(rootDir, appPath, "package.json");
+    if (await exists(packageJsonPath)) {
+      packageJsonPaths.push(packageJsonPath);
+    }
+  }
+
+  return packageJsonPaths;
+}
+
 async function listWorkspacePackageJsonPaths(rootDir) {
   const roots = ["apps", "packages"];
   const results = [];
@@ -146,26 +164,63 @@ async function listWorkspacePackageJsonPaths(rootDir) {
   return results;
 }
 
-async function ensureSharedDependencyAcrossWorkspace({
+async function ensureSharedDependencyOnFrontendAndBackend({
   rootDir,
   sharedPackageName,
+  frontendAppPath,
+  backendAppPath,
 }) {
-  const packageJsonPaths = await listWorkspacePackageJsonPaths(rootDir);
-  let changedCount = 0;
+  const targetPackageJsonPaths = await listFrontendAndBackendPackageJsonPaths({
+    rootDir,
+    frontendAppPath,
+    backendAppPath,
+  });
+  const targetPackageJsonSet = new Set(
+    targetPackageJsonPaths.map((packageJsonPath) => path.resolve(packageJsonPath)),
+  );
+  const workspacePackageJsonPaths = await listWorkspacePackageJsonPaths(rootDir);
 
-  for (const packageJsonPath of packageJsonPaths) {
+  let changedCount = 0;
+  let addedOrUpdatedCount = 0;
+  let removedCount = 0;
+
+  for (const packageJsonPath of workspacePackageJsonPaths) {
     const pkg = await readJson(packageJsonPath);
     if (pkg.name === sharedPackageName) continue;
 
-    pkg.dependencies = pkg.dependencies ?? {};
-    if (pkg.dependencies[sharedPackageName] === "*") continue;
+    const isTargetPackage = targetPackageJsonSet.has(path.resolve(packageJsonPath));
+    const deps = pkg.dependencies ?? {};
+    const hasSharedDependency = sharedPackageName in deps;
 
-    pkg.dependencies[sharedPackageName] = "*";
+    if (isTargetPackage) {
+      if (deps[sharedPackageName] === "*") continue;
+
+      pkg.dependencies = deps;
+      pkg.dependencies[sharedPackageName] = "*";
+      await writeJson(packageJsonPath, pkg);
+      changedCount += 1;
+      addedOrUpdatedCount += 1;
+      continue;
+    }
+
+    if (!hasSharedDependency) continue;
+
+    delete deps[sharedPackageName];
+    if (Object.keys(deps).length === 0) {
+      delete pkg.dependencies;
+    } else {
+      pkg.dependencies = deps;
+    }
     await writeJson(packageJsonPath, pkg);
     changedCount += 1;
+    removedCount += 1;
   }
 
-  return changedCount;
+  return {
+    changedCount,
+    addedOrUpdatedCount,
+    removedCount,
+  };
 }
 
 async function main() {
@@ -184,7 +239,7 @@ async function main() {
     const { scope: scopeArg, force, runTests, target } = parseArgs(
       process.argv.slice(2),
     );
-    const { packagesDir, sharedModule } = await resolveSkillPaths(rootDir);
+    const { packagesDir, sharedModule, config } = await resolveSkillPaths(rootDir);
     const defaultTargetDir = path.join(packagesDir, sharedModule);
     const targetDir = target
       ? resolveTarget(rootDir, target)
@@ -232,20 +287,26 @@ async function main() {
 
     const shouldInstallRoot = targetDir === defaultTargetDir;
     if (shouldInstallRoot) {
-      const dependencyChanges = await ensureSharedDependencyAcrossWorkspace({
+      const dependencyChanges = await ensureSharedDependencyOnFrontendAndBackend({
         rootDir,
         sharedPackageName: pkg.name,
+        frontendAppPath: config.defaults.frontendAppPath,
+        backendAppPath: config.defaults.backendAppPath,
       });
-      if (dependencyChanges > 0) {
+      if (dependencyChanges.changedCount > 0) {
         console.log(
-          `Added workspace dependency "${pkg.name}: *" to ${dependencyChanges} package.json file(s).`,
+          `Synchronized dependency "${pkg.name}: *" on frontend/backend (updated: ${dependencyChanges.addedOrUpdatedCount}, removed from non-targets: ${dependencyChanges.removedCount}).`,
         );
         logger.step(
-          `Dependência "${pkg.name}: *" adicionada em ${dependencyChanges} package.json do workspace.`,
+          `Dependência "${pkg.name}: *" sincronizada em frontend/backend (atualizados: ${dependencyChanges.addedOrUpdatedCount}, removidos fora do alvo: ${dependencyChanges.removedCount}).`,
         );
       } else {
-        console.log(`Workspace dependencies already reference "${pkg.name}: *".`);
-        logger.step(`Dependência "${pkg.name}: *" já estava aplicada no workspace.`);
+        console.log(
+          `Frontend/backend dependencies already synchronized for "${pkg.name}: *".`,
+        );
+        logger.step(
+          `Dependência "${pkg.name}: *" já estava sincronizada para frontend/backend.`,
+        );
       }
 
       await installRootDependencies(rootDir);

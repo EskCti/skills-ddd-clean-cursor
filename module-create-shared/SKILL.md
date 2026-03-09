@@ -16,7 +16,7 @@ O namespace e diretórios padrão devem ser resolvidos por configuração global
 1. Executar `node scripts/create-shared.mjs`.
 2. Namespace é resolvido por precedência: `--scope` > `POUPIG_NAMESPACE`/`SKILLS_NAMESPACE` > `skills.config.local.json` > `skills.config.json` > fallback do template.
 3. Se o diretório já existir, usar `--force` para sobrescrever.
-4. Antes do `npm install`, adicionar `"@<namespace>/shared": "*"` em `dependencies` de todos os `package.json` de `apps/*` e `packages/*` (exceto o próprio módulo shared).
+4. Antes do `npm install`, adicionar `"@<namespace>/shared": "*"` em `dependencies` apenas dos `package.json` de frontend e backend (conforme `frontendAppPath` e `backendAppPath` no config).
 5. Após gerar em `<sharedModulePath>`, executar `npm install` na raiz do projeto para atualizar as dependências do workspace.
 6. Opcionalmente executar testes do pacote com `--run-tests`.
 7. Conferir estrutura final em `<sharedModulePath>`.

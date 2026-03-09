@@ -365,7 +365,6 @@ async function ensureTurboRoot(rootDir, scope) {
     ".npmrc",
     "packages/eslint-config/package.json",
     "packages/typescript-config/package.json",
-    "packages/ui/package.json",
   ];
   const missingTurboPaths = [];
   for (const relativePath of requiredTurboPaths) {
@@ -654,6 +653,40 @@ function isLikelyTurboDefaultAppPackage(pkg, appLeaf) {
   return name.endsWith(`/${appLeaf}`) || appLeaf === "docs" || appLeaf === "web";
 }
 
+function isLikelyTurboDefaultUiPackage(pkg) {
+  if (!pkg || typeof pkg !== "object") return false;
+  if (!pkg.scripts || typeof pkg.scripts !== "object") return false;
+  if (!pkg.devDependencies || typeof pkg.devDependencies !== "object") return false;
+  if (!pkg.dependencies || typeof pkg.dependencies !== "object") return false;
+
+  const name = typeof pkg.name === "string" ? pkg.name : "";
+  const hasUiName = name.endsWith("/ui");
+  const hasCheckTypesScript = "check-types" in pkg.scripts;
+  const hasGenerateComponentScript =
+    typeof pkg.scripts["generate:component"] === "string" &&
+    pkg.scripts["generate:component"].includes("turbo gen react-component");
+  const hasReactDeps =
+    "react" in pkg.dependencies &&
+    "react-dom" in pkg.dependencies;
+  const hasEslintConfig = hasDependencySuffix(
+    pkg.devDependencies,
+    "/eslint-config",
+  );
+  const hasTsConfig = hasDependencySuffix(
+    pkg.devDependencies,
+    "/typescript-config",
+  );
+
+  return (
+    hasUiName &&
+    hasCheckTypesScript &&
+    hasGenerateComponentScript &&
+    hasReactDeps &&
+    hasEslintConfig &&
+    hasTsConfig
+  );
+}
+
 async function removeDefaultTurboApps({
   rootDir,
   frontendPath,
@@ -687,6 +720,20 @@ async function removeDefaultTurboApps({
   }
 
   return removed;
+}
+
+async function removeDefaultTurboPackages({ rootDir }) {
+  const candidate = "packages/ui";
+  const candidateDir = path.join(rootDir, candidate);
+  const packageJsonPath = path.join(candidateDir, "package.json");
+  if (!(await pathExists(packageJsonPath))) return [];
+
+  const pkg = await readJson(packageJsonPath);
+  if (!isLikelyTurboDefaultUiPackage(pkg)) return [];
+
+  console.log(`Removing unused Turbo default package at ${candidate}.`);
+  await fs.rm(candidateDir, { recursive: true, force: true });
+  return [candidate];
 }
 
 async function ensureFrontendApp({
@@ -1035,16 +1082,21 @@ async function main() {
       frontendPath,
       backendPath,
     });
-    if (removedDefaultApps.length > 0) {
+    const removedDefaultPackages = await removeDefaultTurboPackages({ rootDir });
+    const removedDefaultProjects = [
+      ...removedDefaultApps,
+      ...removedDefaultPackages,
+    ];
+    if (removedDefaultProjects.length > 0) {
       console.log(
-        `Removed default Turbo apps before app bootstrap: ${removedDefaultApps.join(", ")}`,
+        `Removed default Turbo template projects before app bootstrap: ${removedDefaultProjects.join(", ")}`,
       );
       logger.step(
-        `Apps padrão do Turbo removidos antes do bootstrap: ${removedDefaultApps.join(", ")}.`,
+        `Projetos padrão do Turbo removidos antes do bootstrap: ${removedDefaultProjects.join(", ")}.`,
       );
     } else {
-      console.log("No default Turbo apps needed removal.");
-      logger.step("Nenhum app padrão do Turbo precisou ser removido.");
+      console.log("No default Turbo template projects needed removal.");
+      logger.step("Nenhum projeto padrão do Turbo precisou ser removido.");
     }
 
     const frontendCreated = await ensureFrontendApp({
