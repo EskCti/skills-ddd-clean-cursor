@@ -1,4 +1,0 @@
-interface:
-  display_name: "DTO"
-  short_description: "Criar DTOs no padrão do projeto"
-  default_prompt: "Crie ou revise DTOs de entrada/saída e de query CQRS, com tipagem adequada ao consumo e sem vazar entidade/ORM."

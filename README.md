@@ -29,17 +29,18 @@ As skills deste repositório seguem estes pilares:
 
 Principais skills disponíveis neste repositório:
 
-- `project-init`: inicialização de monorepo com TurboRepo (web + backend)
-- `module-create` e `module-create-shared`: scaffolding de módulos/pacotes
-- `entity`: modelagem de entidades de domínio
-- `value-object`: criação de objetos de valor
-- `domain-service`: regras de domínio transversais
-- `use-case`: orquestração de regras de aplicação
-- `dto`: contratos de entrada/saída e projeções
-- `repository`: contratos e implementações de persistência
-- `prisma`: schema/migrações/adapters Prisma
-- `query-cqrs`: consultas de leitura no padrão CQRS
-- `controller`: camada HTTP/NestJS
+- `config-project`: inicialização de monorepo com TurboRepo (web + backend)
+- `config-module` e `config-module-shared`: scaffolding de módulos/pacotes
+- `config-prisma`: setup inicial e padronização de Prisma no backend
+- `core-entity`: modelagem de entidades de domínio
+- `core-value-object`: criação de objetos de valor
+- `core-domain-service`: regras de domínio transversais
+- `core-use-case`: orquestração de regras de aplicação
+- `core-dto`: contratos de entrada/saída e projeções
+- `core-repository`: contratos e implementações de persistência
+- `backend-prisma-data`: schema/migrações/adapters Prisma
+- `core-query-cqrs`: consultas de leitura no padrão CQRS
+- `backend-controller`: camada HTTP/NestJS
 
 Também existem skills utilitárias para fluxo OpenSpec:
 
@@ -117,8 +118,8 @@ git commit -m "chore(skills): aponta para nova versão"
 
 O repositório possui configuração padrão em:
 
-- `config/skills.config.json`
-- `config/skills.config.example.json`
+- `.env/skills.config.json`
+- `.env/skills.config.example.json`
 
 Use esses arquivos para alinhar namespace e convenções de scaffolding entre projetos.
 
@@ -132,6 +133,10 @@ Parâmetros principais disponíveis hoje:
 - `backendPort`: porta padrão da app backend
 - `frontendApiUrlEnvVar`: nome da env var de URL de API no frontend
 - `backendPortEnvVar`: nome da env var de porta no backend
+
+Convenção global de nomenclatura:
+
+- `.agents/skills/utils/naming-convention.md`
 
 ## Benefícios esperados
 

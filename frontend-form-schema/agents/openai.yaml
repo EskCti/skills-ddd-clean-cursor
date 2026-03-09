@@ -1,0 +1,4 @@
+interface:
+  display_name: "Frontend Form Schema"
+  short_description: "Criar forms e schemas no padrão web"
+  default_prompt: "Crie ou revise forms React Hook Form e schemas de validação no padrão do projeto usando v (shared-web), com tipagem inferida e tratamento de erro."

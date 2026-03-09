@@ -1,4 +1,0 @@
-interface:
-  display_name: "Domain Service"
-  short_description: "Criar serviços de domínio em core"
-  default_prompt: "Crie ou revise um serviço de domínio no padrão do projeto, restrito a arquivos em *core/*, com regras puras e testes."

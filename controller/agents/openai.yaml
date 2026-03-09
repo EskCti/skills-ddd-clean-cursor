@@ -1,4 +1,0 @@
-interface:
-  display_name: "Controller"
-  short_description: "Criar controllers Nest no padrão do projeto"
-  default_prompt: "Crie ou revise controllers HTTP do backend no padrão do projeto, com guards/permissões, chamada de use cases e mapeamento correto de erros para status HTTP."

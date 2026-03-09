@@ -1,4 +1,0 @@
-interface:
-  display_name: "Query CQRS"
-  short_description: "Criar queries de leitura no padrão CQRS"
-  default_prompt: "Crie ou revise queries CQRS de leitura, com DTOs orientados ao consumo e separação clara de comandos."

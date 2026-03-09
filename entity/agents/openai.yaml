@@ -1,4 +1,0 @@
-interface:
-  display_name: "Entity"
-  short_description: "Criar entidades no padrão Pharmacore"
-  default_prompt: "Crie ou revise uma entidade de domínio seguindo o padrão do projeto (Entity/Result), com invariantes, validação e testes." 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Config Prisma"
+  short_description: "Inicializar Prisma e banco no backend"
+  default_prompt: "Inicialize e padronize Prisma no backend NestJS com seed em prisma/seed/main.ts, docker-compose compatível com DATABASE_URL do .env, schema modular por módulo e DbModule + PrismaService."

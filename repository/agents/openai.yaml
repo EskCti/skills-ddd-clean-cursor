@@ -1,4 +1,0 @@
-interface:
-  display_name: "Repository"
-  short_description: "Criar repositórios no padrão Pharmacore"
-  default_prompt: "Crie ou revise contratos e implementações de repository no padrão do projeto, com Result, mapeamento de entidade e separação de queries CQRS."

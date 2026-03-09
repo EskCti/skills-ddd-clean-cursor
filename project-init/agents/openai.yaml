@@ -1,4 +1,0 @@
-interface:
-  display_name: "Project Init"
-  short_description: "Inicializar frontend/backend em monorepo turbo com parâmetros"
-  default_prompt: "Inicialize (ou continue) um TurboRepo idempotente no diretório atual usando create-turbo para reconciliar a estrutura padrão, removendo primeiro os apps padrão do Turbo (apps/docs e apps/web) antes de criar frontend/backend customizados, aplicando namespace do skills.config.json sem sobrescrever arquivos já corretos."
