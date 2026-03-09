@@ -7,6 +7,7 @@ import {
   resolveNamespace,
   resolveSkillPaths,
 } from "../../shared/resolve-skill-config.mjs";
+import { createSkillRunLogger } from "../../shared/skill-run-log.mjs";
 
 function usage() {
   console.log(`Usage:
@@ -78,108 +79,121 @@ function stringifyJson(obj) {
 }
 
 async function main() {
-  const {
-    moduleName,
-    scope: scopeArg,
-    force,
-  } = parseArgs(process.argv.slice(2));
-
-  if (!moduleName) {
-    usage();
-    process.exit(1);
-  }
-
-  if (!validateModuleName(moduleName)) {
-    throw new Error(
-      `Invalid module name '${moduleName}'. Use lowercase letters, numbers and hyphens.`,
-    );
-  }
-
   const scriptDir = path.dirname(fileURLToPath(import.meta.url));
   const rootDir = path.resolve(scriptDir, "../../../..");
-  const { packagesDir, sharedModule, sharedPackageJsonPath } =
-    await resolveSkillPaths(rootDir);
-  const targetDir = path.join(packagesDir, moduleName);
-
-  let sharedScopeFromPackage = "";
-  try {
-    const sharedPkg = await readJson(sharedPackageJsonPath);
-    const sharedName = sharedPkg?.name;
-    if (typeof sharedName === "string" && sharedName.includes("/")) {
-      sharedScopeFromPackage = sharedName.split("/")[0];
-    }
-  } catch (error) {
-    if (error && error.code !== "ENOENT") {
-      throw new Error(
-        `Invalid shared package file at ${sharedPackageJsonPath}: ${error.message}`,
-      );
-    }
-  }
-
-  const { scope } = await resolveNamespace({
+  const logger = await createSkillRunLogger({
     rootDir,
-    cliScope: scopeArg,
-    fallbackScope: sharedScopeFromPackage,
+    skillName: "module-create",
+    commandArgs: process.argv.slice(2),
   });
 
-  const packageName = `${scope}/${moduleName}`;
-  const sharedDependency = `${scope}/${sharedModule}`;
-
   try {
-    await fs.access(targetDir);
-    if (!force) {
+    const {
+      moduleName,
+      scope: scopeArg,
+      force,
+    } = parseArgs(process.argv.slice(2));
+
+    if (!moduleName) {
+      usage();
+      logger.step("Comando sem nome de módulo. Encerrado após exibir help.");
+      await logger.success();
+      process.exit(1);
+    }
+
+    if (!validateModuleName(moduleName)) {
       throw new Error(
-        `Directory already exists: ${targetDir}. Use --force to overwrite.`,
+        `Invalid module name '${moduleName}'. Use lowercase letters, numbers and hyphens.`,
       );
     }
-    await fs.rm(targetDir, { recursive: true, force: true });
-  } catch (error) {
-    if (error && error.code !== "ENOENT") {
-      throw error;
+
+    logger.step(`Nome do módulo validado: ${moduleName}.`);
+
+    const { packagesDir, sharedModule, sharedPackageJsonPath } =
+      await resolveSkillPaths(rootDir);
+    const targetDir = path.join(packagesDir, moduleName);
+
+    let sharedScopeFromPackage = "";
+    try {
+      const sharedPkg = await readJson(sharedPackageJsonPath);
+      const sharedName = sharedPkg?.name;
+      if (typeof sharedName === "string" && sharedName.includes("/")) {
+        sharedScopeFromPackage = sharedName.split("/")[0];
+      }
+    } catch (error) {
+      if (error && error.code !== "ENOENT") {
+        throw new Error(
+          `Invalid shared package file at ${sharedPackageJsonPath}: ${error.message}`,
+        );
+      }
     }
-  }
 
-  const packageJson = {
-    name: packageName,
-    version: "0.1.0",
-    main: "dist/index.js",
-    types: "dist/index.d.ts",
-    exports: {
-      ".": {
-        import: "./dist/index.js",
-        require: "./dist/index.js",
-        types: "./dist/index.d.ts",
+    const { scope } = await resolveNamespace({
+      rootDir,
+      cliScope: scopeArg,
+      fallbackScope: sharedScopeFromPackage,
+    });
+    logger.step(`Namespace resolvido: ${scope}.`);
+
+    const packageName = `${scope}/${moduleName}`;
+    const sharedDependency = `${scope}/${sharedModule}`;
+
+    try {
+      await fs.access(targetDir);
+      if (!force) {
+        throw new Error(
+          `Directory already exists: ${targetDir}. Use --force to overwrite.`,
+        );
+      }
+      await fs.rm(targetDir, { recursive: true, force: true });
+      logger.step(`Diretório existente removido com --force: ${targetDir}.`);
+    } catch (error) {
+      if (error && error.code !== "ENOENT") {
+        throw error;
+      }
+    }
+
+    const packageJson = {
+      name: packageName,
+      version: "0.1.0",
+      main: "dist/index.js",
+      types: "dist/index.d.ts",
+      exports: {
+        ".": {
+          import: "./dist/index.js",
+          require: "./dist/index.js",
+          types: "./dist/index.d.ts",
+        },
       },
-    },
-    scripts: {
-      dev: "tsc --watch",
-      build: "tsc",
-      test: "jest --coverage",
-      "test:watch": "jest --watchAll",
-    },
-    dependencies: {
-      [sharedDependency]: "*",
-      "eslint-config": "*",
-    },
-    devDependencies: {
-      "@types/jest": "^30.0.0",
-      jest: "^30.2.0",
-      "ts-jest": "^29.4.5",
-    },
-  };
+      scripts: {
+        dev: "tsc --watch",
+        build: "tsc",
+        test: "jest --coverage",
+        "test:watch": "jest --watchAll",
+      },
+      dependencies: {
+        [sharedDependency]: "*",
+        "eslint-config": "*",
+      },
+      devDependencies: {
+        "@types/jest": "^30.0.0",
+        jest: "^30.2.0",
+        "ts-jest": "^29.4.5",
+      },
+    };
 
-  const tsconfigJson = {
-    extends: "../typescript-config/base.json",
-    compilerOptions: {
-      rootDir: "src",
-      outDir: "./dist",
-      declaration: true,
-    },
-    include: ["src"],
-    exclude: ["dist", "build", "node_modules"],
-  };
+    const tsconfigJson = {
+      extends: "../typescript-config/base.json",
+      compilerOptions: {
+        rootDir: "src",
+        outDir: "./dist",
+        declaration: true,
+      },
+      include: ["src"],
+      exclude: ["dist", "build", "node_modules"],
+    };
 
-  const jestConfig = `import type { Config } from "jest";
+    const jestConfig = `import type { Config } from "jest";
 
 const config: Config = {
 \tverbose: true,
@@ -190,12 +204,12 @@ const config: Config = {
 export default config;
 `;
 
-  const indexTs = `export function sum(a: number, b: number): number {
+    const indexTs = `export function sum(a: number, b: number): number {
   return a + b;
 }
 `;
 
-  const indexTest = `import { sum } from "../src";
+    const indexTest = `import { sum } from "../src";
 
 describe("sum", () => {
   it("adds two numbers", () => {
@@ -204,23 +218,35 @@ describe("sum", () => {
 });
 `;
 
-  await fs.mkdir(path.join(targetDir, "src"), { recursive: true });
-  await fs.mkdir(path.join(targetDir, "test"), { recursive: true });
+    await fs.mkdir(path.join(targetDir, "src"), { recursive: true });
+    await fs.mkdir(path.join(targetDir, "test"), { recursive: true });
 
-  await writeFile(
-    path.join(targetDir, "package.json"),
-    stringifyJson(packageJson),
-  );
-  await writeFile(
-    path.join(targetDir, "tsconfig.json"),
-    stringifyJson(tsconfigJson),
-  );
-  await writeFile(path.join(targetDir, "jest.config.ts"), jestConfig);
-  await writeFile(path.join(targetDir, "src", "index.ts"), indexTs);
-  await writeFile(path.join(targetDir, "test", "index.test.ts"), indexTest);
+    await writeFile(
+      path.join(targetDir, "package.json"),
+      stringifyJson(packageJson),
+    );
+    logger.step(`criou arquivo: ${path.join(targetDir, "package.json")}`);
+    await writeFile(
+      path.join(targetDir, "tsconfig.json"),
+      stringifyJson(tsconfigJson),
+    );
+    logger.step(`criou arquivo: ${path.join(targetDir, "tsconfig.json")}`);
+    await writeFile(path.join(targetDir, "jest.config.ts"), jestConfig);
+    logger.step(`criou arquivo: ${path.join(targetDir, "jest.config.ts")}`);
+    await writeFile(path.join(targetDir, "src", "index.ts"), indexTs);
+    logger.step(`criou arquivo: ${path.join(targetDir, "src", "index.ts")}`);
+    await writeFile(path.join(targetDir, "test", "index.test.ts"), indexTest);
+    logger.step(`criou arquivo: ${path.join(targetDir, "test", "index.test.ts")}`);
+    logger.step(`Estrutura base criada em ${targetDir}.`);
+    logger.step(`Dependência compartilhada configurada: ${sharedDependency}.`);
 
-  console.log(`Created module at: ${targetDir}`);
-  console.log(`Package name: ${packageName}`);
+    console.log(`Created module at: ${targetDir}`);
+    console.log(`Package name: ${packageName}`);
+    await logger.success();
+  } catch (error) {
+    await logger.failure(error);
+    throw error;
+  }
 }
 
 main().catch((error) => {

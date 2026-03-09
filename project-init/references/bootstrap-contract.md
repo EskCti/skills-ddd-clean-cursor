@@ -9,6 +9,7 @@ Padronizar o bootstrap de um monorepo TurboRepo para:
 
 Com defaults obtidos de `skills.config.json`:
 
+- `namespace` (padrão: `@poupig`)
 - `frontendAppPath` (padrão: `apps/web`)
 - `backendAppPath` (padrão: `apps/backend`)
 - `frontendPort` (padrão: `3000`)
@@ -18,19 +19,36 @@ Com defaults obtidos de `skills.config.json`:
 
 ## Steps Applied
 
-1. Remover `<frontendAppPath>` e `<backendAppPath>`.
-2. Criar `<frontendAppPath>` com `npx create-next-app@latest <frontendName> --yes --use-npm`.
-3. Criar `<backendAppPath>` com `nest new <backendName> --skip-git --package-manager npm` (ou fallback via `npx @nestjs/cli@latest`).
-4. Instalar:
+1. Detectar ausência/incompletude da estrutura Turbo na pasta atual e, quando necessário, executar `npx create-turbo@latest` para gerar o template oficial.
+2. Reconciliar no repositório atual apenas arquivos/pastas ausentes vindos do template Turbo (sem sobrescrever arquivos já existentes), incluindo:
+   - `.gitignore`
+   - `.npmrc`
+   - `packages/eslint-config`
+   - `packages/typescript-config`
+   - `packages/ui`
+   - demais estruturas padrão faltantes
+   - se `.git` já existir no root, rodar scaffold com `--no-git` para evitar recriação de repositório git
+3. Antes de criar os apps customizados, remover os apps padrão do Turbo (`apps/docs` e `apps/web`) quando detectados como template original.
+4. Criar `<frontendAppPath>` com `npx create-next-app@latest <frontendName> --yes --use-npm` somente se o app Next.js ainda não existir.
+5. Criar `<backendAppPath>` com `nest new <backendName> --skip-git --package-manager npm` (ou fallback via `npx @nestjs/cli@latest`) somente se o app NestJS ainda não existir.
+6. Garantir `name` de todos os projetos do workspace (`apps/*` e `packages/*`) com namespace:
+   - frontend: `<namespace>/<frontendName>`
+   - backend: `<namespace>/<backendName>`
+7. Instalar apenas dependências faltantes:
+   - root: `turbo` (dev dependency)
    - root: `ts-node` (dev dependency)
    - backend: `dotenv`
-5. Atualizar `package.json` root:
+8. Atualizar `package.json` root:
+   - `name` preenchido (default: `<namespace>/workspace`)
    - `scripts.test = "turbo run test"`
+   - `private = true`
+   - `workspaces` contendo `apps/*` e `packages/*`
+   - `devDependencies.turbo` presente
    - `devDependencies.ts-node` presente
-6. Atualizar `turbo.json`:
+9. Atualizar `turbo.json`:
    - `tasks.test.cache = false`
    - `tasks.build.outputs` contendo `dist/**`
-7. Criar env files:
+10. Atualizar env files via upsert (preservando chaves extras):
    - `<frontendAppPath>/.env` e `.env.example` com:
      - `<frontendApiUrlEnvVar>=http://localhost:<backendPort>`
      - `PORT=<frontendPort>`
@@ -38,12 +56,13 @@ Com defaults obtidos de `skills.config.json`:
      - `<backendPortEnvVar>=<backendPort>`
      - `DATABASE_URL`
      - `JWT_SECRET`
-8. Reescrever `<backendAppPath>/src/main.ts` com:
+11. Atualizar `<backendAppPath>/src/main.ts` de forma incremental com:
    - `app.enableCors()`
    - leitura de `process.env.<backendPortEnvVar>` (default `<backendPort>`)
    - `import "dotenv/config"`
 
 ## Notes
 
-- O script é destrutivo para os caminhos configurados em `<frontendAppPath>` e `<backendAppPath>`.
-- O projeto deve já estar inicializado como TurboRepo antes da execução.
+- O script é idempotente: ao executar novamente, ele pula etapas já atendidas.
+- O script só remove automaticamente diretórios existentes quando detectar que são os apps padrão originais do Turbo (`apps/docs` e `apps/web`).
+- Se um diretório de frontend/backend já existir mas não corresponder ao tipo esperado (Next/Nest), o processo falha para evitar sobrescrita acidental.

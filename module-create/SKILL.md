@@ -18,6 +18,7 @@ O namespace e diretórios padrão devem ser resolvidos por configuração global
 3. Namespace é resolvido por precedência: `--scope` > `POUPIG_NAMESPACE`/`SKILLS_NAMESPACE` > `skills.config.local.json` > `skills.config.json` > fallback automático.
 4. Conferir a estrutura criada em `<dirname(sharedModulePath)>/<module-name>`.
 5. Confirmar que o módulo contém função `sum` e teste `index.test.ts`.
+6. Registrar execução em `.log/skills.log` com título da skill e lista simples dos comandos/ações relevantes (sem timestamps e sem status), garantindo `.log/` no `.gitignore`.
 
 ## Commands
 
@@ -64,3 +65,4 @@ Consultar `references/module-template.md` para o contrato completo dos arquivos 
 - Arquivo versionado: `skills.config.json` (`.agents/skills/config`, `.cloud/skills/config` ou `config/`)
 - Override local (gitignored): `skills.config.local.json` no mesmo diretório da configuração principal
 - Exemplo local: `skills.config.local.example.json` no mesmo diretório da configuração principal
+- Log local de execução: `.log/skills.log` (não versionado; `.log/` é adicionado ao `.gitignore` automaticamente, sem metadados extras).

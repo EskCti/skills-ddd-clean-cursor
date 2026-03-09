@@ -13,51 +13,57 @@ O namespace e diretórios padrão devem ser resolvidos por configuração global
 
 ## Workflow
 
-1. Executar `node scripts/createShared.mjs`.
+1. Executar `node scripts/create-shared.mjs`.
 2. Namespace é resolvido por precedência: `--scope` > `POUPIG_NAMESPACE`/`SKILLS_NAMESPACE` > `skills.config.local.json` > `skills.config.json` > fallback do template.
 3. Se o diretório já existir, usar `--force` para sobrescrever.
-4. Opcionalmente executar testes do pacote com `--run-tests`.
-5. Conferir estrutura final em `<sharedModulePath>`.
+4. Antes do `npm install`, adicionar `"@<namespace>/shared": "*"` em `dependencies` de todos os `package.json` de `apps/*` e `packages/*` (exceto o próprio módulo shared).
+5. Após gerar em `<sharedModulePath>`, executar `npm install` na raiz do projeto para atualizar as dependências do workspace.
+6. Opcionalmente executar testes do pacote com `--run-tests`.
+7. Conferir estrutura final em `<sharedModulePath>`.
+8. Registrar execução em `.log/skills.log` com título da skill e lista simples dos comandos/ações relevantes (sem timestamps e sem status), garantindo `.log/` no `.gitignore`.
 
 ## Commands
 
 Criar/recriar `<sharedModulePath>` no namespace padrão do template:
 
 ```bash
-node .agents/skills/module-create-shared/scripts/createShared.mjs
+node .agents/skills/module-create-shared/scripts/create-shared.mjs
 ```
+
+> Esse comando executa `npm install` na raiz automaticamente após criar o módulo shared.
 
 > Se o repositório estiver em `.cloud/skills`, ajuste o caminho do comando.
 
 Definir namespace explícito:
 
 ```bash
-node .agents/skills/module-create-shared/scripts/createShared.mjs --scope @poupig
+node .agents/skills/module-create-shared/scripts/create-shared.mjs --scope @poupig
 ```
 
 Sobrescrever o diretório existente de `<sharedModulePath>`:
 
 ```bash
-node .agents/skills/module-create-shared/scripts/createShared.mjs --force
+node .agents/skills/module-create-shared/scripts/create-shared.mjs --force
 ```
 
 Criar e executar os testes do pacote shared:
 
 ```bash
-node .agents/skills/module-create-shared/scripts/createShared.mjs --force --run-tests
+node .agents/skills/module-create-shared/scripts/create-shared.mjs --force --run-tests
 ```
 
 Definir namespace por variável de ambiente:
 
 ```bash
-POUPIG_NAMESPACE=@poupig node .agents/skills/module-create-shared/scripts/createShared.mjs --force
+POUPIG_NAMESPACE=@poupig node .agents/skills/module-create-shared/scripts/create-shared.mjs --force
 ```
 
 ## Resources
 
-- `scripts/createShared.mjs`: gerador determinístico cross-platform.
+- `scripts/create-shared.mjs`: gerador determinístico cross-platform.
 - `assets/shared-template`: template completo do módulo shared (código + testes + configs).
 - `references/shared-template-contract.md`: contrato dos artefatos gerados.
+- Log local de execução: `.log/skills.log` (não versionado; `.log/` é adicionado ao `.gitignore` automaticamente, sem metadados extras).
 
 ## Shared Config
 
