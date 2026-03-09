@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Init"
+  short_description: "Inicializar frontend/backend em monorepo turbo com parâmetros"
+  default_prompt: "Inicialize um TurboRepo recriando frontend e backend (Next.js + NestJS sem git) com base em frontendAppPath/backendAppPath no skills.config.json, aplicando ajustes em package.json/turbo.json e configurando .env/.env.example."

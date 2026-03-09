@@ -1,0 +1,4 @@
+interface:
+  display_name: "Module Create Shared"
+  short_description: "Inicializar módulo shared completo"
+  default_prompt: "Crie ou recrie o módulo packages/shared completo usando node .agents/skills/module-create-shared/scripts/createShared.mjs, incluindo src/base, src/db, src/dto, src/vo e toda a suíte de testes."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Value Object"
+  short_description: "Criar Value Objects conforme o padrão do projeto"
+  default_prompt: "Crie ou revise um Value Object seguindo o padrão do projeto (ValueObject/Result), com validação, normalização e create/tryCreate."

@@ -1,0 +1,9 @@
+skills.config.json
+node_modules/
+dist/
+build/
+coverage/
+*.log
+*.tmp
+.DS_Store
+.env

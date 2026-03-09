@@ -1,0 +1,4 @@
+interface:
+  display_name: "Prisma"
+  short_description: "Modelar e manter Prisma no padrão do projeto"
+  default_prompt: "Crie ou revise schema, migrações, seeds e adapters Prisma no padrão do backend, com mapeamento correto para domínio e queries."

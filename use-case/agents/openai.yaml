@@ -1,0 +1,4 @@
+interface:
+  display_name: "Use Case"
+  short_description: "Criar casos de uso no padrão Pharmacore"
+  default_prompt: "Crie ou revise um caso de uso seguindo o padrão do projeto (UseCase/Result), com orquestração de entidades, providers e testes."

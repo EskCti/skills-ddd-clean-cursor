@@ -1,0 +1,4 @@
+interface:
+  display_name: "Module Create"
+  short_description: "Criar módulo padrão em packages"
+  default_prompt: "Crie um novo módulo em packages usando node .agents/skills/module-create/scripts/create-module.mjs e gere package.json, tsconfig, jest.config, src/index.ts com sum e test/index.test.ts."
