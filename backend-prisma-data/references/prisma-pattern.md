@@ -70,4 +70,4 @@
 
 ## Referência Global
 
-- Convenção de nomenclatura compartilhada: `../../utils/naming-convention.md`
+- Convenção de nomenclatura compartilhada: `../../skills-standards.md`

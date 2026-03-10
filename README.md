@@ -30,7 +30,7 @@ As skills deste repositório seguem estes pilares:
 Principais skills disponíveis neste repositório:
 
 - `config-project`: inicialização de monorepo com TurboRepo (web + backend)
-- `config-new-module` e `config-shared-core`: scaffolding de módulos/pacotes
+- `config-new-module`, `config-shared-core` e `config-shared-web`: scaffolding de módulos/pacotes e shell web compartilhado
 - `config-prisma`: setup inicial e padronização de Prisma no backend
 - `core-entity`: modelagem de entidades de domínio
 - `core-value-object`: criação de objetos de valor
@@ -134,9 +134,9 @@ Parâmetros principais disponíveis hoje:
 - `frontendApiUrlEnvVar`: nome da env var de URL de API no frontend
 - `backendPortEnvVar`: nome da env var de porta no backend
 
-Convenção global de nomenclatura:
+Convenção global de nomenclatura e padrões gerais:
 
-- `.agents/skills/utils/naming-convention.md`
+- `.agents/skills/skills-standards.md`
 
 ## Benefícios esperados
 

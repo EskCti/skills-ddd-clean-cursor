@@ -72,3 +72,7 @@ node .agents/skills/config-project/scripts/project-init.mjs --scope @poupig
 - `scripts/project-init.mjs`: script principal de bootstrap.
 - `references/bootstrap-contract.md`: contrato dos arquivos e alterações que o bootstrap aplica.
 - Log local de execução: `.log/skills.log` (não versionado; `.log/` é adicionado ao `.gitignore` automaticamente, sem metadados extras).
+
+## Global Standards
+
+- Consultar `../skills-standards.md` para padroes globais de nomenclatura e convencoes gerais entre skills.

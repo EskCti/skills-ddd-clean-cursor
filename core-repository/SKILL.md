@@ -34,4 +34,8 @@ Aplicar o padrão de repositório para escrita e leitura de entidades de domíni
 ## References
 
 Consultar `references/repository-pattern.md` para contratos, exemplos de implementação e checklist.
-Consultar `../utils/naming-convention.md` para convenção global de nomenclatura.
+Consultar `../skills-standards.md` para convenção global de nomenclatura.
+
+## Global Standards
+
+- Consultar `../skills-standards.md` para padroes globais de nomenclatura e convencoes gerais entre skills.

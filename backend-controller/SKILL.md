@@ -31,4 +31,8 @@ Aplicar o padrão de controller como camada de entrada HTTP: receber request, va
 ## References
 
 Consultar `references/controller-pattern.md` para exemplos reais, checklist e armadilhas.
-Consultar `../utils/naming-convention.md` para convenção global de nomenclatura.
+Consultar `../skills-standards.md` para convenção global de nomenclatura.
+
+## Global Standards
+
+- Consultar `../skills-standards.md` para padroes globais de nomenclatura e convencoes gerais entre skills.

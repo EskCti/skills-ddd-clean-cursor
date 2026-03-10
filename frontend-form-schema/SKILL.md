@@ -30,3 +30,7 @@ Aplicar o padrão de formulários do projeto com React Hook Form + validator `v`
 ## References
 
 Consultar `references/form-schema-pattern.md` para exemplos concretos, checklist e armadilhas.
+
+## Global Standards
+
+- Consultar `../skills-standards.md` para padroes globais de nomenclatura e convencoes gerais entre skills.

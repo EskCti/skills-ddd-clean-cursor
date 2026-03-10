@@ -70,3 +70,7 @@ POUPIG_NAMESPACE=@poupig node .agents/skills/config-shared-core/scripts/create-s
 - Arquivo versionado: `skills.config.json` (`.agents/skills/.env`, `.cloud/skills/.env` ou `.env/`)
 - Override local (gitignored): `skills.config.local.json` no mesmo diretório da configuração principal
 - Exemplo local: `skills.config.local.example.json` no mesmo diretório da configuração principal
+
+## Global Standards
+
+- Consultar `../skills-standards.md` para padroes globais de nomenclatura e convencoes gerais entre skills.

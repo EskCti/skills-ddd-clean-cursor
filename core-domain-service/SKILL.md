@@ -30,4 +30,8 @@ Aplicar o padrão de serviço de domínio para encapsular regras que não perten
 ## References
 
 Consultar `references/domain-service-pattern.md` para critérios de fronteira, exemplos reais e checklist de implementação/testes.
-Consultar `../utils/naming-convention.md` para convenção global de nomenclatura.
+Consultar `../skills-standards.md` para convenção global de nomenclatura.
+
+## Global Standards
+
+- Consultar `../skills-standards.md` para padroes globais de nomenclatura e convencoes gerais entre skills.

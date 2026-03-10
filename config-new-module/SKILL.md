@@ -81,7 +81,7 @@ O script deve gerar exatamente:
 
 - Pastas: sempre minúsculas em kebab-case.
 - Arquivos: sempre minúsculos em kebab-case, com sufixo de tipo no nome (ex.: `branch.controller.ts`, `branch.module.ts`, `branch-dashboard.component.tsx`, `dashboard.page.tsx`).
-- Convenção global compartilhada: `../utils/naming-convention.md`.
+- Convenção global compartilhada: `../skills-standards.md`.
 
 Consultar `references/module-template.md` para o contrato completo dos arquivos gerados.
 
@@ -91,3 +91,7 @@ Consultar `references/module-template.md` para o contrato completo dos arquivos 
 - Override local (gitignored): `skills.config.local.json` no mesmo diretório da configuração principal
 - Exemplo local: `skills.config.local.example.json` no mesmo diretório da configuração principal
 - Log local de execução: `.log/skills.log` (não versionado; `.log/` é adicionado ao `.gitignore` automaticamente, sem metadados extras).
+
+## Global Standards
+
+- Consultar `../skills-standards.md` para padroes globais de nomenclatura e convencoes gerais entre skills.

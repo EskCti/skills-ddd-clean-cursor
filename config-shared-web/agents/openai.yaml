@@ -1,0 +1,4 @@
+interface:
+  display_name: "Config Shared Web"
+  short_description: "Bootstrap web shared admin shell com shadcn"
+  default_prompt: "Configure o app web com shadcn/ui, ícones, grupos de rotas public/private e camada src/shared com template admin responsivo."

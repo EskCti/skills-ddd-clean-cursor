@@ -42,5 +42,9 @@ Executar setup determinístico do Prisma no `apps/backend`, com seed entrypoint,
 - O script é idempotente: pode ser executado várias vezes sem duplicar estrutura.
 - O script instala usando o nome real do workspace lido de `apps/backend/package.json` (fallback: `apps/backend`).
 - Após criar modelos reais, remover `prisma/models/bootstrap.model.prisma` e gerar nova migration.
-- Seguir convenção global em `../utils/naming-convention.md`.
+- Seguir convenção global em `../skills-standards.md`.
 - Consultar `references/prisma-init-checklist.md` para checklist operacional.
+
+## Global Standards
+
+- Consultar `../skills-standards.md` para padroes globais de nomenclatura e convencoes gerais entre skills.

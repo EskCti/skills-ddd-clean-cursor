@@ -33,4 +33,8 @@ Aplicar o padrão de consultas de leitura desacopladas dos comandos, retornando 
 ## References
 
 Consultar `references/query-cqrs-pattern.md` para exemplos reais, checklist e critérios de modelagem de DTO.
-Consultar `../utils/naming-convention.md` para convenção global de nomenclatura.
+Consultar `../skills-standards.md` para convenção global de nomenclatura.
+
+## Global Standards
+
+- Consultar `../skills-standards.md` para padroes globais de nomenclatura e convencoes gerais entre skills.

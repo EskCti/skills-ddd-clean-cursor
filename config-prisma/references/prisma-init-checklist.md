@@ -69,4 +69,4 @@ node .agents/skills/config-prisma/scripts/init-prisma-backend.js --apply --modul
 - Atualizar adapters `*.prisma.ts` para mapear domínio/DTO
 - Remover `prisma/models/bootstrap.model.prisma` após entrada dos modelos reais e gerar migration de substituição
 - Em rebootstrap de projetos antigos, o script corrige automaticamente `prisma/seed/main.ts` legado quando detecta imports de `generated/prisma` ou `cid`.
-- Seguir convenção global em `../../utils/naming-convention.md`.
+- Seguir convenção global em `../../skills-standards.md`.
