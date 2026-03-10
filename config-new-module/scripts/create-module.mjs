@@ -186,7 +186,7 @@ async function main() {
   const rootDir = path.resolve(scriptDir, "../../../..");
   const logger = await createSkillRunLogger({
     rootDir,
-    skillName: "config-module",
+    skillName: "config-new-module",
     commandArgs: process.argv.slice(2),
   });
 

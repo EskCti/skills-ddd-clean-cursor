@@ -19,7 +19,7 @@ Não depende de geração dinâmica de código via LLM e não depende de shell e
 ## Command
 
 ```bash
-node .agents/skills/config-module-shared/scripts/create-shared.mjs [--scope @poupig] [--force] [--run-tests]
+node .agents/skills/config-shared-core/scripts/create-shared.mjs [--scope @poupig] [--force] [--run-tests]
 ```
 
 > Se o repositório estiver em `.cloud/skills`, ajuste o caminho do comando.

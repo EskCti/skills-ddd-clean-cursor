@@ -230,7 +230,7 @@ async function main() {
   const rootDir = path.resolve(skillDir, "../../..");
   const logger = await createSkillRunLogger({
     rootDir,
-    skillName: "config-module-shared",
+    skillName: "config-shared-core",
     commandArgs: process.argv.slice(2),
   });
 

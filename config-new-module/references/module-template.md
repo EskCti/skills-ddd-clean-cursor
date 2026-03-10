@@ -77,4 +77,4 @@ Gerar um módulo novo de forma determinística em três áreas do monorepo:
 - Sem `--scope`, usar a precedência de configuração global da skill.
 - `--force` permite sobrescrever os diretórios de package/backend/frontend do módulo.
 - Seguir convenção global em `../../utils/naming-convention.md`.
-- Comando recomendado (cross-platform): `node .agents/skills/config-module/scripts/create-module.mjs <module-name>` (ou ajuste para `.cloud/skills` quando aplicável).
+- Comando recomendado (cross-platform): `node .agents/skills/config-new-module/scripts/create-module.mjs <module-name>` (ou ajuste para `.cloud/skills` quando aplicável).

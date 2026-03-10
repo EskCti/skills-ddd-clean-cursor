@@ -1,9 +1,9 @@
 ---
-name: config-module-shared
+name: config-shared-core
 description: Inicializar o módulo `packages/shared` completo de forma determinística no padrão do projeto Poupig, incluindo estrutura de código (`src/base`, `src/db`, `src/dto`, `src/vo`, `src/index.ts`) e testes (`test/base`, `test/vo`, `test/data`). Usar quando o pedido envolver bootstrap do pacote shared, recriação do shared em novo projeto, reset da base compartilhada ou scaffolding completo do core compartilhado com configs (`package.json`, `tsconfig.json`, `jest.config.ts`).
 ---
 
-# Config Module Shared
+# Config Shared Core
 
 ## Overview
 
@@ -27,7 +27,7 @@ O namespace e diretórios padrão devem ser resolvidos por configuração global
 Criar/recriar `<sharedModulePath>` no namespace padrão do template:
 
 ```bash
-node .agents/skills/config-module-shared/scripts/create-shared.mjs
+node .agents/skills/config-shared-core/scripts/create-shared.mjs
 ```
 
 > Esse comando executa `npm install` na raiz automaticamente após criar o módulo shared.
@@ -37,25 +37,25 @@ node .agents/skills/config-module-shared/scripts/create-shared.mjs
 Definir namespace explícito:
 
 ```bash
-node .agents/skills/config-module-shared/scripts/create-shared.mjs --scope @poupig
+node .agents/skills/config-shared-core/scripts/create-shared.mjs --scope @poupig
 ```
 
 Sobrescrever o diretório existente de `<sharedModulePath>`:
 
 ```bash
-node .agents/skills/config-module-shared/scripts/create-shared.mjs --force
+node .agents/skills/config-shared-core/scripts/create-shared.mjs --force
 ```
 
 Criar e executar os testes do pacote shared:
 
 ```bash
-node .agents/skills/config-module-shared/scripts/create-shared.mjs --force --run-tests
+node .agents/skills/config-shared-core/scripts/create-shared.mjs --force --run-tests
 ```
 
 Definir namespace por variável de ambiente:
 
 ```bash
-POUPIG_NAMESPACE=@poupig node .agents/skills/config-module-shared/scripts/create-shared.mjs --force
+POUPIG_NAMESPACE=@poupig node .agents/skills/config-shared-core/scripts/create-shared.mjs --force
 ```
 
 ## Resources

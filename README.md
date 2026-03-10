@@ -30,7 +30,7 @@ As skills deste repositório seguem estes pilares:
 Principais skills disponíveis neste repositório:
 
 - `config-project`: inicialização de monorepo com TurboRepo (web + backend)
-- `config-module` e `config-module-shared`: scaffolding de módulos/pacotes
+- `config-new-module` e `config-shared-core`: scaffolding de módulos/pacotes
 - `config-prisma`: setup inicial e padronização de Prisma no backend
 - `core-entity`: modelagem de entidades de domínio
 - `core-value-object`: criação de objetos de valor

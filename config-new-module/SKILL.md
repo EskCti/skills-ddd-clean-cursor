@@ -1,9 +1,9 @@
 ---
-name: config-module
+name: config-new-module
 description: Criar um novo módulo de forma determinística no padrão do projeto Poupig, gerando scaffold em `packages/*`, `apps/backend/src/modules/*` e `apps/web` (modules + rota principal). Usar quando o pedido envolver criação de módulo full-stack no monorepo com package TypeScript, módulo NestJS e dashboard inicial no web.
 ---
 
-# Config Module
+# Config New Module
 
 ## Overview
 
@@ -36,7 +36,7 @@ O namespace e diretórios padrão devem ser resolvidos por configuração global
 Criar módulo no namespace padrão do projeto:
 
 ```bash
-node .agents/skills/config-module/scripts/create-module.mjs <module-name>
+node .agents/skills/config-new-module/scripts/create-module.mjs <module-name>
 ```
 
 > Se o repositório estiver em `.cloud/skills`, ajuste o caminho do comando.
@@ -44,19 +44,19 @@ node .agents/skills/config-module/scripts/create-module.mjs <module-name>
 Definir namespace por variável de ambiente:
 
 ```bash
-POUPIG_NAMESPACE=@poupig node .agents/skills/config-module/scripts/create-module.mjs <module-name>
+POUPIG_NAMESPACE=@poupig node .agents/skills/config-new-module/scripts/create-module.mjs <module-name>
 ```
 
 Criar módulo com namespace explícito:
 
 ```bash
-node .agents/skills/config-module/scripts/create-module.mjs <module-name> --scope @poupig
+node .agents/skills/config-new-module/scripts/create-module.mjs <module-name> --scope @poupig
 ```
 
 Sobrescrever diretório existente:
 
 ```bash
-node .agents/skills/config-module/scripts/create-module.mjs <module-name> --force
+node .agents/skills/config-new-module/scripts/create-module.mjs <module-name> --force
 ```
 
 ## Output Contract
