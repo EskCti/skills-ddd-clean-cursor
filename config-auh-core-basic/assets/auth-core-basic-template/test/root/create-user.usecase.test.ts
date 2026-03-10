@@ -2,11 +2,11 @@ import { Result } from "__SHARED_PACKAGE_NAME__";
 import {
 	CreateUserUseCase,
 	Password,
-	PasswordProvider,
+	PasswordCryptoProvider,
 	PasswordRepository,
-	PasswordStatus,
 	User,
 	UserErrors,
+	UserExistsQuery,
 	UserRepository,
 } from "../../src";
 
@@ -27,10 +27,15 @@ const mockPassRepo: jest.Mocked<PasswordRepository> = {
 	update: jest.fn(),
 	delete: jest.fn(),
 	findById: jest.fn(),
-	findByUserId: jest.fn(),
+	findActiveByUserId: jest.fn(),
+	findRecentByUserId: jest.fn(),
 };
 
-const mockPasswordProvider: jest.Mocked<PasswordProvider> = {
+const mockUserExistsQuery: jest.Mocked<UserExistsQuery> = {
+	execute: jest.fn(),
+};
+
+const mockPasswordCryptoProvider: jest.Mocked<PasswordCryptoProvider> = {
 	hash: jest.fn(),
 	compare: jest.fn(),
 };
@@ -49,11 +54,34 @@ describe("CreateUserUseCase", () => {
 		useCase = new CreateUserUseCase(
 			mockUserRepo,
 			mockPassRepo,
-			mockPasswordProvider,
+			mockUserExistsQuery,
+			mockPasswordCryptoProvider,
 		);
 	});
 
 	test("should fail when email already exists", async () => {
+		mockUserExistsQuery.execute.mockResolvedValue(Result.ok(true));
+
+		const result = await useCase.execute(validInput);
+
+		expect(result.isFailure).toBe(true);
+		expect(result.errors?.[0]).toBe(UserErrors.EMAIL_ALREADY_EXISTS);
+		expect(mockUserExistsQuery.execute).toHaveBeenCalledWith({
+			email: validInput.email,
+		});
+	});
+
+	test("should propagate error from user exists query", async () => {
+		mockUserExistsQuery.execute.mockResolvedValue(Result.fail("DB_ERROR"));
+
+		const result = await useCase.execute(validInput);
+
+		expect(result.isFailure).toBe(true);
+		expect(result.errors?.[0]).toBe("DB_ERROR");
+	});
+
+	test("should create user successfully", async () => {
+		mockUserExistsQuery.execute.mockResolvedValue(Result.ok(false));
 		mockUserRepo.findByEmail.mockResolvedValue(
 			Result.ok(
 				User.create({
@@ -63,41 +91,12 @@ describe("CreateUserUseCase", () => {
 				}),
 			),
 		);
-
-		const result = await useCase.execute(validInput);
-
-		expect(result.isFailure).toBe(true);
-		expect(result.errors?.[0]).toBe(UserErrors.EMAIL_ALREADY_EXISTS);
-	});
-
-	test("should propagate non-NOT_FOUND error from findByEmail", async () => {
-		mockUserRepo.findByEmail.mockResolvedValue(Result.fail("DB_ERROR"));
-
-		const result = await useCase.execute(validInput);
-
-		expect(result.isFailure).toBe(true);
-		expect(result.errors?.[0]).toBe("DB_ERROR");
-	});
-
-	test("should create user successfully", async () => {
-		mockUserRepo.findByEmail
-			.mockResolvedValueOnce(Result.fail(UserErrors.NOT_FOUND))
-			.mockResolvedValueOnce(
-				Result.ok(
-					User.create({
-						id: USER_ID,
-						name: validInput.name,
-						email: validInput.email,
-					}),
-				),
-			);
-		mockPasswordProvider.hash.mockResolvedValue(HASHED_PASSWORD);
+		mockPasswordCryptoProvider.hash.mockResolvedValue(HASHED_PASSWORD);
 		mockUserRepo.create.mockResolvedValue(Result.ok());
 		mockPassRepo.create.mockResolvedValue(
 			Result.ok(
 				Password.create({
 					content: HASHED_PASSWORD,
-					status: PasswordStatus.ACTIVE,
 				}),
 			),
 		);
@@ -105,7 +104,76 @@ describe("CreateUserUseCase", () => {
 		const result = await useCase.execute(validInput);
 
 		expect(result.isOk).toBe(true);
-		expect(mockPasswordProvider.hash).toHaveBeenCalledWith(validInput.password);
+		expect(mockPasswordCryptoProvider.hash).toHaveBeenCalledWith(validInput.password);
 		expect(mockPassRepo.create).toHaveBeenCalledTimes(1);
+	});
+
+	test("should fail when password entity creation fails", async () => {
+		mockUserExistsQuery.execute.mockResolvedValue(Result.ok(false));
+		mockPasswordCryptoProvider.hash.mockResolvedValue("invalid-hash");
+
+		const result = await useCase.execute(validInput);
+
+		expect(result.isFailure).toBe(true);
+		expect(mockUserRepo.create).not.toHaveBeenCalled();
+		expect(mockPassRepo.create).not.toHaveBeenCalled();
+	});
+
+	test("should fail when user entity creation fails", async () => {
+		mockUserExistsQuery.execute.mockResolvedValue(Result.ok(false));
+		mockPasswordCryptoProvider.hash.mockResolvedValue(HASHED_PASSWORD);
+
+		const result = await useCase.execute({
+			...validInput,
+			name: "",
+		});
+
+		expect(result.isFailure).toBe(true);
+		expect(mockUserRepo.create).not.toHaveBeenCalled();
+		expect(mockPassRepo.create).not.toHaveBeenCalled();
+	});
+
+	test("should fail when user repository create fails", async () => {
+		mockUserExistsQuery.execute.mockResolvedValue(Result.ok(false));
+		mockPasswordCryptoProvider.hash.mockResolvedValue(HASHED_PASSWORD);
+		mockUserRepo.create.mockResolvedValue(Result.fail("CREATE_USER_ERROR"));
+
+		const result = await useCase.execute(validInput);
+
+		expect(result.isFailure).toBe(true);
+		expect(result.errors?.[0]).toBe("CREATE_USER_ERROR");
+	});
+
+	test("should fail when created user cannot be reloaded", async () => {
+		mockUserExistsQuery.execute.mockResolvedValue(Result.ok(false));
+		mockUserRepo.findByEmail.mockResolvedValue(Result.fail("RELOAD_USER_ERROR"));
+		mockPasswordCryptoProvider.hash.mockResolvedValue(HASHED_PASSWORD);
+		mockUserRepo.create.mockResolvedValue(Result.ok());
+
+		const result = await useCase.execute(validInput);
+
+		expect(result.isFailure).toBe(true);
+		expect(result.errors?.[0]).toBe("RELOAD_USER_ERROR");
+	});
+
+	test("should fail when password repository create fails", async () => {
+		mockUserExistsQuery.execute.mockResolvedValue(Result.ok(false));
+		mockUserRepo.findByEmail.mockResolvedValue(
+			Result.ok(
+				User.create({
+					id: USER_ID,
+					name: validInput.name,
+					email: validInput.email,
+				}),
+			),
+		);
+		mockPasswordCryptoProvider.hash.mockResolvedValue(HASHED_PASSWORD);
+		mockUserRepo.create.mockResolvedValue(Result.ok());
+		mockPassRepo.create.mockResolvedValue(Result.fail("CREATE_PASSWORD_ERROR"));
+
+		const result = await useCase.execute(validInput);
+
+		expect(result.isFailure).toBe(true);
+		expect(result.errors?.[0]).toBe("CREATE_PASSWORD_ERROR");
 	});
 });

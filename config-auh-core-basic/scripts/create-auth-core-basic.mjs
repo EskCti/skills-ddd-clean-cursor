@@ -98,17 +98,82 @@ function resolveTarget(rootDir, targetArg) {
     : path.resolve(rootDir, targetArg);
 }
 
-function resolveDefaultAuthCoreTarget({ rootDir, sharedModulePathRelative, packagesDir }) {
-  const normalized = sharedModulePathRelative.replace(/\\/g, "/");
-  const segments = normalized.split("/").filter(Boolean);
-  const sharedIndex = segments.indexOf("shared");
+function normalizeWorkspacePatterns(workspaces) {
+  if (Array.isArray(workspaces)) return workspaces;
+  if (
+    workspaces &&
+    typeof workspaces === "object" &&
+    Array.isArray(workspaces.packages)
+  ) {
+    return workspaces.packages;
+  }
+  return [];
+}
 
-  if (sharedIndex >= 0) {
-    const baseSegments = segments.slice(0, sharedIndex);
-    return path.join(rootDir, ...baseSegments, "auth", "core");
+function normalizePattern(pattern) {
+  if (typeof pattern !== "string") return "";
+  const normalized = pattern.trim().replace(/\\/g, "/");
+  if (!normalized) return "";
+  return normalized.replace(/^\.\//, "").replace(/\/+$/, "");
+}
+
+async function resolveWorkspacePatterns(rootDir) {
+  const rootPackageJsonPath = path.join(rootDir, "package.json");
+  if (!(await exists(rootPackageJsonPath))) return [];
+
+  try {
+    const rootPkg = await readJson(rootPackageJsonPath);
+    return normalizeWorkspacePatterns(rootPkg.workspaces)
+      .map((pattern) => normalizePattern(pattern))
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+async function resolveDefaultAuthCoreTarget({
+  rootDir,
+  packagesDir,
+  packagesDirRelative,
+}) {
+  const relativePackagesDir = normalizePattern(
+    packagesDirRelative || path.relative(rootDir, packagesDir),
+  );
+  const workspaceBase = relativePackagesDir || ".";
+  const directPattern = normalizePattern(
+    path.posix.join(workspaceBase, "*"),
+  );
+  const nestedPattern = normalizePattern(
+    path.posix.join(workspaceBase, "*/*"),
+  );
+
+  const [workspacePatterns, directPackageExists, nestedPackageExists] =
+    await Promise.all([
+      resolveWorkspacePatterns(rootDir),
+      exists(path.join(packagesDir, "auth", "package.json")),
+      exists(path.join(packagesDir, "auth", "core", "package.json")),
+    ]);
+
+  const hasDirectWorkspace = workspacePatterns.includes(directPattern);
+  const hasNestedWorkspace = workspacePatterns.includes(nestedPattern);
+
+  if (hasDirectWorkspace && !hasNestedWorkspace) {
+    return path.join(packagesDir, "auth");
   }
 
-  return path.join(packagesDir, "auth", "core");
+  if (hasNestedWorkspace && !hasDirectWorkspace) {
+    return path.join(packagesDir, "auth", "core");
+  }
+
+  if (directPackageExists && !nestedPackageExists) {
+    return path.join(packagesDir, "auth");
+  }
+
+  if (nestedPackageExists && !directPackageExists) {
+    return path.join(packagesDir, "auth", "core");
+  }
+
+  return path.join(packagesDir, "auth");
 }
 
 function runCommand(cmd, args, cwd) {
@@ -158,6 +223,30 @@ async function replaceTokenRecursively({
   }
 }
 
+function toPosixPath(value) {
+  return value.replace(/\\/g, "/");
+}
+
+async function updateTsConfigExtends({
+  targetDir,
+  packagesDir,
+}) {
+  const tsconfigPath = path.join(targetDir, "tsconfig.json");
+  if (!(await exists(tsconfigPath))) return null;
+
+  const tsconfig = await readJson(tsconfigPath);
+  const typescriptBasePath = path.join(packagesDir, "typescript-config", "base.json");
+  let extendsPath = toPosixPath(path.relative(targetDir, typescriptBasePath));
+
+  if (!extendsPath.startsWith(".")) {
+    extendsPath = `./${extendsPath}`;
+  }
+
+  tsconfig.extends = extendsPath;
+  await writeJson(tsconfigPath, tsconfig);
+  return extendsPath;
+}
+
 async function main() {
   const scriptDir = path.dirname(fileURLToPath(import.meta.url));
   const skillDir = path.resolve(scriptDir, "..");
@@ -178,14 +267,14 @@ async function main() {
 
     const {
       packagesDir,
+      packagesDirRelative,
       sharedModule,
-      sharedModulePathRelative,
       sharedPackageJsonPath,
     } = await resolveSkillPaths(rootDir);
-    const defaultTargetDir = resolveDefaultAuthCoreTarget({
+    const defaultTargetDir = await resolveDefaultAuthCoreTarget({
       rootDir,
-      sharedModulePathRelative,
       packagesDir,
+      packagesDirRelative,
     });
     const targetDir = target
       ? resolveTarget(rootDir, target)
@@ -210,7 +299,15 @@ async function main() {
 
     await fs.mkdir(path.dirname(targetDir), { recursive: true });
     await fs.cp(templateDir, targetDir, { recursive: true });
-    logger.step("Template do módulo auth/core básico copiado para o diretório alvo.");
+    logger.step("Template do módulo auth básico copiado para o diretório alvo.");
+
+    const tsconfigExtendsPath = await updateTsConfigExtends({
+      targetDir,
+      packagesDir,
+    });
+    if (tsconfigExtendsPath) {
+      logger.step(`tsconfig.extends ajustado para ${tsconfigExtendsPath}.`);
+    }
 
     const pkg = await readJson(targetPackageJsonPath);
     const templateScope =

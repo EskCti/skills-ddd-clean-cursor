@@ -1,5 +1,5 @@
 import { Result, UseCase } from "__SHARED_PACKAGE_NAME__";
-import { PasswordErrors, PasswordProvider } from "../../password";
+import { PasswordErrors, PasswordCryptoProvider } from "../../password";
 import { UserProps } from "../model";
 import { FindPasswordHashQuery, UserRepository } from "../provider";
 
@@ -14,7 +14,7 @@ export class LoginUseCase implements UseCase<LoginIn, LoginOut> {
 	constructor(
 		private readonly repo: UserRepository,
 		private readonly findPassHash: FindPasswordHashQuery,
-		private readonly passwordProvider: PasswordProvider,
+		private readonly passwordCryptoProvider: PasswordCryptoProvider,
 	) {}
 
 	async execute(input: LoginIn): Promise<Result<LoginOut>> {
@@ -24,7 +24,7 @@ export class LoginUseCase implements UseCase<LoginIn, LoginOut> {
 		const passResult = await this.findPassHash.execute(userResult.instance.id);
 		if (passResult.isFailure) return passResult.withFail;
 
-		const isSamePass = await this.passwordProvider.compare(
+		const isSamePass = await this.passwordCryptoProvider.compare(
 			input.password,
 			passResult.instance.hash,
 		);

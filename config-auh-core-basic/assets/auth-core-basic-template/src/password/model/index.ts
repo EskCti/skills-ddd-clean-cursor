@@ -1,2 +1,2 @@
-export * from "./password-status.enum";
 export * from "./password.entity";
+export * from "./password-change-policy.service";

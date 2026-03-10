@@ -1,38 +1,44 @@
 ---
 name: config-auh-core-basic
-description: Criar/recriar o módulo `packages/auth/core` básico de forma determinística no padrão Pharmacore, com foco em `user`, `password` e `root` (casos de uso comuns), incluindo código e testes unitários. Usar quando o pedido envolver bootstrap/rebootstrap do auth core mínimo, sem perfil e sem permissões, com `Password` validando `HashPassword`.
+description: Criar/recriar o módulo de autenticação básico de forma determinística no padrão Pharmacore, refletindo o estado atual do pacote `auth` com foco em `user`, `password` e `application`, incluindo código e testes unitários. A skill detecta automaticamente se o monorepo usa pacotes diretos (`packages/*`) ou aninhados (`packages/*/*`) e cria no caminho correto (`packages/auth` ou `packages/auth/core`). Usar quando o pedido envolver bootstrap/rebootstrap do auth core mínimo, sem perfil e sem permissões, com `Password` validando `HashPassword` e política de troca de senha centralizada em serviço de domínio.
 ---
 
 # Config Auh Core Basic
 
 ## Overview
 
-Criar ou recriar o pacote no caminho padrão `packages/auth/core` com template versionado na própria skill.
-Executar o script Node da skill para gerar estrutura mínima de autenticação com foco em usuário, senha e casos de uso de root.
+Criar ou recriar o pacote no caminho padrão detectado automaticamente com template versionado na própria skill.
+O alvo padrão será:
+- `packages/auth` quando o monorepo estiver configurado com pacotes diretos (`packages/*`)
+- `packages/auth/core` quando o monorepo estiver configurado com pacotes aninhados (`packages/*/*`)
+
+A detecção considera primeiro `workspaces` do `package.json` raiz e, em caso de ambiguidade, a estrutura existente no disco.
+Executar o script Node da skill para gerar estrutura mínima de autenticação com foco em usuário, senha e casos de uso de aplicação.
 O namespace e diretórios padrão devem ser resolvidos por configuração global compartilhada em `skills.config.json` (`.agents/skills/.env`, `.cloud/skills/.env` ou `.env/`).
 
 A implementação gerada é determinística e inclui:
 - `user` (entidade, providers e use cases básicos)
-- `password` (entidade, providers e use case de troca de senha)
-- `root` (caso de uso `create-user`)
+- `password` (entidade, providers e use case de troca de senha com política de reuso/força)
+- `application` (query `user-exists` e use case `create-user`)
 - suíte de testes unitários dos fluxos principais
 
 Correção obrigatória do modelo:
-- `Password` valida hash criptografado via `HashPassword`.
-- Não usar `StrongPassword` dentro de `Password`.
+- `Password` valida hash criptografado via `HashPassword` (somente hash).
+- Não usar `StrongPassword` dentro de `Password`; validação de força ocorre em `PasswordChangePolicyService`.
+- `ChangePasswordUseCase` depende de `UserExistsQuery`, `PasswordRepository.findRecentByUserId` e `PasswordCryptoProvider`.
 
 ## Workflow
 
 1. Executar `node scripts/create-auth-core-basic.mjs`.
 2. Namespace é resolvido por precedência: `--scope` > `POUPIG_NAMESPACE`/`SKILLS_NAMESPACE` > `skills.config.local.json` > `skills.config.json` > fallback do template.
 3. Se o diretório já existir, usar `--force` para sobrescrever.
-4. Após gerar em `packages/auth/core`, confirmar estrutura de `src/` e `test/` do módulo básico.
+4. Após gerar no alvo detectado (`packages/auth` ou `packages/auth/core`), confirmar estrutura de `src/` e `test/` conforme contrato atual do módulo.
 5. Opcionalmente executar testes do pacote com `--run-tests`.
 6. Registrar execução em `.log/skills.log` com título da skill e lista simples dos comandos/ações relevantes (sem timestamps e sem status), garantindo `.log/` no `.gitignore`.
 
 ## Commands
 
-Criar/recriar `packages/auth/core` no namespace padrão:
+Criar/recriar no alvo padrão detectado no namespace padrão:
 
 ```bash
 node .agents/skills/config-auh-core-basic/scripts/create-auth-core-basic.mjs
@@ -65,7 +71,7 @@ POUPIG_NAMESPACE=@poupig node .agents/skills/config-auh-core-basic/scripts/creat
 ## Resources
 
 - `scripts/create-auth-core-basic.mjs`: gerador determinístico cross-platform.
-- `assets/auth-core-basic-template`: template completo do auth core básico (código + testes + configs).
+- `assets/auth-core-basic-template`: template completo do auth core básico no estado atual (código + testes + configs).
 - `references/auth-core-basic-template-contract.md`: contrato dos artefatos gerados.
 - Log local de execução: `.log/skills.log` (não versionado; `.log/` é adicionado ao `.gitignore` automaticamente, sem metadados extras).
 
@@ -77,7 +83,7 @@ POUPIG_NAMESPACE=@poupig node .agents/skills/config-auh-core-basic/scripts/creat
 
 ## Output Contract
 
-A skill deve gerar exatamente a estrutura descrita em `references/auth-core-basic-template-contract.md`, sem incluir `permission`, `role`, `audit`, `oauth` ou use cases de perfil.
+A skill deve gerar exatamente a estrutura descrita em `references/auth-core-basic-template-contract.md`, mantendo o layout atual (`src/application` no lugar de `src/root`) e sem incluir `permission`, `role`, `audit`, `oauth` ou use cases de perfil.
 
 ## Global Standards
 

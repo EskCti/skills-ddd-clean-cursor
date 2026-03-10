@@ -1,11 +1,11 @@
 import { Result, UseCase } from "__SHARED_PACKAGE_NAME__";
+import { UserExistsQuery } from "../provider";
 import {
 	Password,
-	PasswordProvider,
+	PasswordCryptoProvider,
 	PasswordRepository,
-	PasswordStatus,
-} from "../password";
-import { User, UserErrors, UserRepository } from "../user";
+} from "../../password";
+import { User, UserErrors, UserRepository } from "../../user";
 
 export interface CreateUserIn {
 	name: string;
@@ -17,27 +17,25 @@ export class CreateUserUseCase implements UseCase<CreateUserIn, void> {
 	constructor(
 		private readonly userRepo: UserRepository,
 		private readonly passRepo: PasswordRepository,
-		private readonly passwordProvider: PasswordProvider,
+		private readonly userExistsQuery: UserExistsQuery,
+		private readonly passwordCryptoProvider: PasswordCryptoProvider,
 	) {}
 
 	async execute(data: CreateUserIn): Promise<Result<void>> {
-		const hasUser = await this.userRepo.findByEmail(data.email);
-		if (hasUser.isOk) {
+		const userExistsResult = await this.userExistsQuery.execute({
+			email: data.email,
+		});
+		if (userExistsResult.isFailure) {
+			return userExistsResult.withFail;
+		}
+
+		if (userExistsResult.instance) {
 			return Result.fail(UserErrors.EMAIL_ALREADY_EXISTS);
 		}
 
-		if (
-			hasUser.isFailure &&
-			!hasUser.errors?.includes(UserErrors.NOT_FOUND)
-		) {
-			return hasUser.withFail;
-		}
-
-		const hashedPassword = await this.passwordProvider.hash(data.password);
-		const passResult = Password.tryCreate({
-			content: hashedPassword,
-			status: PasswordStatus.ACTIVE,
-		});
+		const hashedPassword = await this.passwordCryptoProvider.hash(data.password);
+		
+		const passResult = Password.tryCreate({ content: hashedPassword });
 		if (passResult.isFailure) {
 			return passResult.withFail;
 		}

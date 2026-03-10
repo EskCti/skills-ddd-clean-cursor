@@ -1,7 +1,8 @@
-import { CrudRepository, Result } from "__SHARED_PACKAGE_NAME__";
+import { Result } from "__SHARED_PACKAGE_NAME__";
 import { Password } from "../model/password.entity";
 
-export interface PasswordRepository extends Omit<CrudRepository<Password>, "create"> {
-	create(password: Password, userId: string): Promise<Result<Password>>;
-	findByUserId(id: string): Promise<Result<Password>>;
+export interface PasswordRepository {
+	create(password: Password, userId: string): Promise<Result<void>>;
+	findActiveByUserId(id: string): Promise<Result<Password>>;
+	findRecentByUserId(id: string, limit: number): Promise<Result<Password[]>>;
 }

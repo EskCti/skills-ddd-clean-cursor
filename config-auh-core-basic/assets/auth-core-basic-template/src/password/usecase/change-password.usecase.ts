@@ -1,8 +1,11 @@
 import { Result, UseCase } from "__SHARED_PACKAGE_NAME__";
-import { UserRepository } from "../../user";
+import { UserExistsQuery } from "../../application";
+import {
+	Password,
+	PasswordChangePolicyService,
+} from "../model";
+import { PasswordRepository, PasswordCryptoProvider } from "../provider";
 import { PasswordErrors } from "../errors";
-import { Password, PasswordStatus } from "../model";
-import { PasswordRepository, PasswordProvider } from "../provider";
 
 export interface ChangePasswordIn {
 	userId: string;
@@ -13,52 +16,46 @@ export interface ChangePasswordIn {
 
 export class ChangePasswordUseCase implements UseCase<ChangePasswordIn, void> {
 	constructor(
-		private readonly userRepo: UserRepository,
 		private readonly passRepo: PasswordRepository,
-		private readonly passwordProvider: PasswordProvider,
+		private readonly userExistsQuery: UserExistsQuery,
+		private readonly passwordCryptoProvider: PasswordCryptoProvider,
 	) {}
 
 	async execute(input: ChangePasswordIn): Promise<Result<void>> {
-		if (input.newPassword !== input.confirmPassword) {
-			return Result.fail(PasswordErrors.MISMATCH);
-		}
-
-		const userResult = await this.userRepo.findById(input.userId);
-		if (userResult.isFailure) {
-			return userResult.withFail;
-		}
-
-		const oldPassResult = await this.passRepo.findByUserId(input.userId);
-		if (oldPassResult.isFailure) {
-			return oldPassResult.withFail;
-		}
-
-		const oldPass = oldPassResult.instance;
-		const isSamePass = await this.passwordProvider.compare(
-			input.oldPassword,
-			oldPass.content,
-		);
-		if (!isSamePass) {
-			return Result.fail(PasswordErrors.MISMATCH);
-		}
-
-		const deactivatedPassResult = oldPass.deactivate();
-		if (deactivatedPassResult.isFailure) {
-			return deactivatedPassResult.withFail;
-		}
-
-		const updateResult = await this.passRepo.update(
-			deactivatedPassResult.instance,
-		);
-		if (updateResult.isFailure) {
-			return updateResult.withFail;
-		}
-
-		const hashedPassword = await this.passwordProvider.hash(input.newPassword);
-		const newPassResult = Password.tryCreate({
-			content: hashedPassword,
-			status: PasswordStatus.ACTIVE,
+		const userExistsResult = await this.userExistsQuery.execute({
+			id: input.userId,
 		});
+		if (userExistsResult.isFailure) {
+			return userExistsResult.withFail;
+		}
+
+		if (!userExistsResult.instance) {
+			return Result.fail(PasswordErrors.INVALID_USER);
+		}
+
+		const recentPasswordsResult = await this.passRepo.findRecentByUserId(
+			input.userId,
+			5,
+		);
+
+		if (recentPasswordsResult.isFailure) {
+			return recentPasswordsResult.withFail;
+		}
+
+		const passwordPolicyResult = await PasswordChangePolicyService.validate({
+			newPassword: input.newPassword,
+			confirmPassword: input.confirmPassword,
+			recentPasswords: recentPasswordsResult.instance,
+			passwordCryptoProvider: this.passwordCryptoProvider,
+		});
+
+		if (passwordPolicyResult.isFailure) {
+			return passwordPolicyResult.withFail;
+		}
+
+		const hashedPassword = await this.passwordCryptoProvider.hash(input.newPassword);
+		
+		const newPassResult = Password.tryCreate({ content: hashedPassword });
 
 		if (newPassResult.isFailure) {
 			return newPassResult.withFail;
@@ -68,10 +65,7 @@ export class ChangePasswordUseCase implements UseCase<ChangePasswordIn, void> {
 			newPassResult.instance,
 			input.userId,
 		);
-		if (createResult.isFailure) {
-			return createResult.withFail;
-		}
 
-		return Result.ok();
+		return createResult
 	}
 }

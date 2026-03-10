@@ -5,6 +5,7 @@ import {
   EntityProps,
   Result,
   PersonName,
+  URL,
 } from "__SHARED_PACKAGE_NAME__";
 
 export interface UserProps extends EntityProps {
@@ -16,18 +17,6 @@ export interface UserProps extends EntityProps {
 export class User extends Entity<User, UserProps> {
   private constructor(props: UserProps) {
     super(props);
-  }
-
-  get name(): string {
-    return this.props.name;
-  }
-
-  get email(): string {
-    return this.props.email;
-  }
-
-  get avatarUrl(): string | null | undefined {
-    return this.props.avatarUrl;
   }
 
   public static create(props: UserProps): User {
@@ -54,5 +43,29 @@ export class User extends Entity<User, UserProps> {
         email: email.instance.value,
       }),
     );
+  }
+
+  get name(): string {
+    return this.props.name;
+  }
+
+  get $name(): PersonName {
+    return PersonName.create(this.props.name);
+  }
+
+  get email(): string {
+    return this.props.email;
+  }
+
+  get $email(): Email {
+    return Email.create(this.props.email);
+  }
+
+  get avatarUrl(): string | null | undefined {
+    return this.props.avatarUrl;
+  }
+
+  get $avatarUrl(): URL | null {
+    return this.props.avatarUrl ? URL.create(this.props.avatarUrl) : null;
   }
 }

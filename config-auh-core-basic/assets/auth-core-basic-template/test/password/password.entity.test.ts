@@ -1,10 +1,9 @@
-import { Password, PasswordStatus } from "../../src";
+import { Password } from "../../src";
 
 describe("Password Entity", () => {
 	test("should fail for invalid hash format", () => {
 		const result = Password.tryCreate({
 			content: "plain-password",
-			status: PasswordStatus.ACTIVE,
 		});
 
 		expect(result.isFailure).toBe(true);
@@ -16,10 +15,8 @@ describe("Password Entity", () => {
 
 		const password = Password.create({
 			content: validHash,
-			status: PasswordStatus.ACTIVE,
 		});
 
 		expect(password.content).toBe(validHash);
-		expect(password.status).toBe(PasswordStatus.ACTIVE);
 	});
 });

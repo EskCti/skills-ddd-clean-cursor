@@ -1,146 +1,135 @@
+import { Result } from "__SHARED_PACKAGE_NAME__";
 import {
 	ChangePasswordIn,
 	ChangePasswordUseCase,
 	Password,
+	PasswordCryptoProvider,
 	PasswordErrors,
-	PasswordProvider,
 	PasswordRepository,
-	PasswordStatus,
-	User,
-	UserErrors,
-	UserRepository,
+	UserExistsQuery,
 } from "../../src";
-import { Result } from "__SHARED_PACKAGE_NAME__";
-
-const mockPasswordProvider: jest.Mocked<PasswordProvider> = {
-	hash: jest.fn(),
-	compare: jest.fn(),
-};
-
-const mockUserRepo: jest.Mocked<UserRepository> = {
-	create: jest.fn(),
-	update: jest.fn(),
-	delete: jest.fn(),
-	findById: jest.fn(),
-	findByEmail: jest.fn(),
-};
-
-const mockPassRepo: jest.Mocked<PasswordRepository> = {
-	create: jest.fn(),
-	update: jest.fn(),
-	delete: jest.fn(),
-	findById: jest.fn(),
-	findByUserId: jest.fn(),
-};
 
 const USER_ID = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11";
-const OLD_PLAIN_PASSWORD = "OldPassword123!";
 const NEW_PLAIN_PASSWORD = "NewPassword123!";
-const OLD_HASHED_PASSWORD =
+const VALID_HASH =
 	"$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy";
-const NEW_HASHED_PASSWORD =
+const ANOTHER_VALID_HASH =
 	"$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWx";
-
-const user = User.create({
-	id: USER_ID,
-	name: "Test User",
-	email: "test@example.com",
-});
 
 describe("ChangePasswordUseCase", () => {
 	let useCase: ChangePasswordUseCase;
-	let oldPasswordEntity: Password;
+	let mockPassRepo: jest.Mocked<PasswordRepository>;
+	let mockUserExistsQuery: jest.Mocked<UserExistsQuery>;
+	let mockPasswordCryptoProvider: jest.Mocked<PasswordCryptoProvider>;
+
+	const input: ChangePasswordIn = {
+		userId: USER_ID,
+		oldPassword: "OldPassword123!",
+		newPassword: NEW_PLAIN_PASSWORD,
+		confirmPassword: NEW_PLAIN_PASSWORD,
+	};
 
 	beforeEach(() => {
-		jest.clearAllMocks();
-
-		useCase = new ChangePasswordUseCase(
-			mockUserRepo,
-			mockPassRepo,
-			mockPasswordProvider,
-		);
-
-		oldPasswordEntity = Password.create({
-			content: OLD_HASHED_PASSWORD,
-			status: PasswordStatus.ACTIVE,
-		});
-
-		mockPasswordProvider.hash.mockResolvedValue(NEW_HASHED_PASSWORD);
-		mockPasswordProvider.compare.mockResolvedValue(true);
-	});
-
-	test("should change password successfully", async () => {
-		const input: ChangePasswordIn = {
-			userId: USER_ID,
-			oldPassword: OLD_PLAIN_PASSWORD,
-			newPassword: NEW_PLAIN_PASSWORD,
-			confirmPassword: NEW_PLAIN_PASSWORD,
+		mockPassRepo = {
+			create: jest.fn(),
+			findActiveByUserId: jest.fn(),
+			findRecentByUserId: jest.fn(),
 		};
 
-		mockUserRepo.findById.mockResolvedValue(Result.ok(user));
-		mockPassRepo.findByUserId.mockResolvedValue(Result.ok(oldPasswordEntity));
-		mockPassRepo.update.mockResolvedValue(Result.ok());
-		mockPassRepo.create.mockResolvedValue(
-			Result.ok(
-				Password.create({
-					content: NEW_HASHED_PASSWORD,
-					status: PasswordStatus.ACTIVE,
-				}),
-			),
+		mockUserExistsQuery = {
+			execute: jest.fn(),
+		};
+
+		mockPasswordCryptoProvider = {
+			hash: jest.fn(),
+			compare: jest.fn(),
+		};
+
+		useCase = new ChangePasswordUseCase(
+			mockPassRepo,
+			mockUserExistsQuery,
+			mockPasswordCryptoProvider,
+		);
+
+		mockUserExistsQuery.execute.mockResolvedValue(Result.ok(true));
+		mockPassRepo.findRecentByUserId.mockResolvedValue(
+			Result.ok([Password.create({ content: VALID_HASH })]),
+		);
+		mockPasswordCryptoProvider.compare.mockResolvedValue(false);
+		mockPasswordCryptoProvider.hash.mockResolvedValue(ANOTHER_VALID_HASH);
+		mockPassRepo.create.mockResolvedValue(Result.ok());
+	});
+
+	test("should propagate failure when userExistsQuery fails", async () => {
+		mockUserExistsQuery.execute.mockResolvedValue(Result.fail("USER_QUERY_ERROR"));
+
+		const result = await useCase.execute(input);
+
+		expect(result.isFailure).toBe(true);
+		expect(result.errors?.[0]).toBe("USER_QUERY_ERROR");
+		expect(mockPassRepo.findRecentByUserId).not.toHaveBeenCalled();
+	});
+
+	test("should fail with INVALID_USER when query returns false", async () => {
+		mockUserExistsQuery.execute.mockResolvedValue(Result.ok(false));
+
+		const result = await useCase.execute(input);
+
+		expect(result.isFailure).toBe(true);
+		expect(result.errors?.[0]).toBe(PasswordErrors.INVALID_USER);
+		expect(mockPassRepo.findRecentByUserId).not.toHaveBeenCalled();
+	});
+
+	test("should propagate failure when finding recent passwords fails", async () => {
+		mockPassRepo.findRecentByUserId.mockResolvedValue(
+			Result.fail("RECENT_PASSWORDS_ERROR"),
 		);
 
 		const result = await useCase.execute(input);
 
-		expect(result.isOk).toBe(true);
-		expect(mockPasswordProvider.hash).toHaveBeenCalledWith(NEW_PLAIN_PASSWORD);
+		expect(result.isFailure).toBe(true);
+		expect(result.errors?.[0]).toBe("RECENT_PASSWORDS_ERROR");
+		expect(mockPasswordCryptoProvider.hash).not.toHaveBeenCalled();
+	});
+
+	test("should fail when password policy validation fails", async () => {
+		const result = await useCase.execute({
+			...input,
+			confirmPassword: "MismatchPassword123!",
+		});
+
+		expect(result.isFailure).toBe(true);
+		expect(result.errors?.[0]).toBe(PasswordErrors.MISMATCH);
+		expect(mockPasswordCryptoProvider.hash).not.toHaveBeenCalled();
+		expect(mockPassRepo.create).not.toHaveBeenCalled();
+	});
+
+	test("should fail when hashed password cannot create Password entity", async () => {
+		mockPasswordCryptoProvider.hash.mockResolvedValue("invalid-hash");
+
+		const result = await useCase.execute(input);
+
+		expect(result.isFailure).toBe(true);
+		expect(mockPassRepo.create).not.toHaveBeenCalled();
+	});
+
+	test("should return create failure when persist new password fails", async () => {
+		mockPassRepo.create.mockResolvedValue(Result.fail("CREATE_PASSWORD_ERROR"));
+
+		const result = await useCase.execute(input);
+
+		expect(result.isFailure).toBe(true);
+		expect(result.errors?.[0]).toBe("CREATE_PASSWORD_ERROR");
 		expect(mockPassRepo.create).toHaveBeenCalledTimes(1);
 	});
 
-	test("should fail if new passwords do not match", async () => {
-		const input: ChangePasswordIn = {
-			userId: USER_ID,
-			oldPassword: OLD_PLAIN_PASSWORD,
-			newPassword: NEW_PLAIN_PASSWORD,
-			confirmPassword: "wrong-password",
-		};
-
+	test("should create password successfully", async () => {
 		const result = await useCase.execute(input);
 
-		expect(result.isFailure).toBe(true);
-		expect(result.errors?.[0]).toBe(PasswordErrors.MISMATCH);
-	});
-
-	test("should fail if user not found", async () => {
-		const input: ChangePasswordIn = {
-			userId: USER_ID,
-			oldPassword: OLD_PLAIN_PASSWORD,
-			newPassword: NEW_PLAIN_PASSWORD,
-			confirmPassword: NEW_PLAIN_PASSWORD,
-		};
-
-		mockUserRepo.findById.mockResolvedValue(Result.fail(UserErrors.NOT_FOUND));
-
-		const result = await useCase.execute(input);
-
-		expect(result.isFailure).toBe(true);
-		expect(result.errors?.[0]).toBe(UserErrors.NOT_FOUND);
-	});
-
-	test("should fail if old password does not match", async () => {
-		const input: ChangePasswordIn = {
-			userId: USER_ID,
-			oldPassword: "wrong-old-password",
-			newPassword: NEW_PLAIN_PASSWORD,
-			confirmPassword: NEW_PLAIN_PASSWORD,
-		};
-
-		mockUserRepo.findById.mockResolvedValue(Result.ok(user));
-		mockPassRepo.findByUserId.mockResolvedValue(Result.ok(oldPasswordEntity));
-		mockPasswordProvider.compare.mockResolvedValue(false);
-
-		const result = await useCase.execute(input);
-
-		expect(result.isFailure).toBe(true);
-		expect(result.errors?.[0]).toBe(PasswordErrors.MISMATCH);
+		expect(result.isOk).toBe(true);
+		expect(mockUserExistsQuery.execute).toHaveBeenCalledWith({ id: USER_ID });
+		expect(mockPassRepo.findRecentByUserId).toHaveBeenCalledWith(USER_ID, 5);
+		expect(mockPasswordCryptoProvider.hash).toHaveBeenCalledWith(NEW_PLAIN_PASSWORD);
+		expect(mockPassRepo.create).toHaveBeenCalledTimes(1);
 	});
 });

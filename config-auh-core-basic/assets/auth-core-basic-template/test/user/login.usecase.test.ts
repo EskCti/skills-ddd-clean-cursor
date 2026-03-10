@@ -2,7 +2,7 @@ import {
 	FindPasswordHashQuery,
 	LoginUseCase,
 	PasswordErrors,
-	PasswordProvider,
+	PasswordCryptoProvider,
 	User,
 	UserErrors,
 	UserRepository,
@@ -21,7 +21,7 @@ const mockFindPassHash: jest.Mocked<FindPasswordHashQuery> = {
 	execute: jest.fn(),
 };
 
-const mockPasswordProvider: jest.Mocked<PasswordProvider> = {
+const mockPasswordCryptoProvider: jest.Mocked<PasswordCryptoProvider> = {
 	hash: jest.fn(),
 	compare: jest.fn(),
 };
@@ -40,14 +40,14 @@ describe("LoginUseCase", () => {
 		useCase = new LoginUseCase(
 			mockUserRepo,
 			mockFindPassHash,
-			mockPasswordProvider,
+			mockPasswordCryptoProvider,
 		);
 	});
 
 	test("should login successfully", async () => {
 		mockUserRepo.findByEmail.mockResolvedValue(Result.ok(user));
 		mockFindPassHash.execute.mockResolvedValue(Result.ok({ hash: "hash" }));
-		mockPasswordProvider.compare.mockResolvedValue(true);
+		mockPasswordCryptoProvider.compare.mockResolvedValue(true);
 
 		const result = await useCase.execute({
 			email: "test@example.com",
@@ -73,7 +73,7 @@ describe("LoginUseCase", () => {
 	test("should fail when password does not match", async () => {
 		mockUserRepo.findByEmail.mockResolvedValue(Result.ok(user));
 		mockFindPassHash.execute.mockResolvedValue(Result.ok({ hash: "hash" }));
-		mockPasswordProvider.compare.mockResolvedValue(false);
+		mockPasswordCryptoProvider.compare.mockResolvedValue(false);
 
 		const result = await useCase.execute({
 			email: "test@example.com",
@@ -82,5 +82,19 @@ describe("LoginUseCase", () => {
 
 		expect(result.isFailure).toBe(true);
 		expect(result.errors?.[0]).toBe(PasswordErrors.MISMATCH);
+	});
+
+	test("should fail when password hash query fails", async () => {
+		mockUserRepo.findByEmail.mockResolvedValue(Result.ok(user));
+		mockFindPassHash.execute.mockResolvedValue(Result.fail("HASH_NOT_FOUND"));
+
+		const result = await useCase.execute({
+			email: "test@example.com",
+			password: "Password123!",
+		});
+
+		expect(result.isFailure).toBe(true);
+		expect(result.errors?.[0]).toBe("HASH_NOT_FOUND");
+		expect(mockPasswordCryptoProvider.compare).not.toHaveBeenCalled();
 	});
 });

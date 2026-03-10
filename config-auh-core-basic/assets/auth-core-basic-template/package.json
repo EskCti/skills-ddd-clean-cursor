@@ -17,8 +17,8 @@
     "test:watch": "jest --watchAll"
   },
   "dependencies": {
-    "__SHARED_PACKAGE_NAME__": "*",
-    "eslint-config": "*"
+    "eslint-config": "*",
+    "__SHARED_PACKAGE_NAME__": "*"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",

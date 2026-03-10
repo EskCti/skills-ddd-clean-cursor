@@ -2,10 +2,10 @@
 
 ## Goal
 
-Inicializar `packages/auth/core` com baseline determinístico mínimo para autenticação:
+Inicializar o módulo auth no caminho padrão detectado (`packages/auth` ou `packages/auth/core`) com baseline determinístico mínimo para autenticação:
 
 - configs do pacote (`package.json`, `tsconfig.json`, `jest.config.ts`)
-- código fonte (`src/user`, `src/password`, `src/root`, `src/index.ts`)
+- código fonte (`src/user`, `src/password`, `src/application`, `src/index.ts`)
 - testes (`test/user`, `test/password`, `test/root`)
 
 Sem escopo de geração:
@@ -19,15 +19,21 @@ Sem escopo de geração:
 
 - Nome do pacote: `<scope>/auth`
 - Dependência obrigatória de shared: `<scope>/<basename(sharedModulePath)>`
-- `Password` deve validar `HashPassword` (senha criptografada)
+- `Password` deve validar `HashPassword` (senha criptografada) e não possuir status/ativação interna
 - `Password` não deve validar `StrongPassword`
-- `CreateUserUseCase` deve persistir `User` e `Password` (hash)
-- `LoginUseCase` deve comparar senha via `PasswordProvider`
+- `PasswordChangePolicyService` deve validar:
+  - confirmação (`newPassword === confirmPassword`)
+  - força de senha (`StrongPassword`)
+  - reuso das últimas senhas por `PasswordCryptoProvider.compare`
+- `CreateUserUseCase` deve:
+  - validar existência prévia de usuário por `UserExistsQuery`
+  - persistir `User` e depois `Password` (hash) via `PasswordRepository.create`
+- `LoginUseCase` deve comparar senha via `PasswordCryptoProvider`
 - `ChangePasswordUseCase` deve:
-  - confirmar `newPassword === confirmPassword`
-  - validar usuário/senha antiga
-  - desativar senha antiga
-  - salvar nova senha hash
+  - validar usuário por `UserExistsQuery`
+  - buscar histórico recente por `PasswordRepository.findRecentByUserId`
+  - aplicar `PasswordChangePolicyService`
+  - salvar nova senha hash por `PasswordRepository.create`
 
 ## Command
 

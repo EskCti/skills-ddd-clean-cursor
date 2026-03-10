@@ -4,11 +4,9 @@ import {
 	HashPassword,
 	Result,
 } from "__SHARED_PACKAGE_NAME__";
-import { PasswordStatus } from "./password-status.enum";
 
 export interface PasswordProps extends EntityProps {
 	content: string;
-	status: PasswordStatus;
 }
 
 export class Password extends Entity<Password, PasswordProps> {
@@ -18,14 +16,6 @@ export class Password extends Entity<Password, PasswordProps> {
 
 	get content(): string {
 		return this.props.content;
-	}
-
-	get status(): PasswordStatus {
-		return this.props.status;
-	}
-
-	deactivate(): Result<Password> {
-		return this.cloneWith({ status: PasswordStatus.INACTIVE });
 	}
 
 	static create(props: PasswordProps): Password {
