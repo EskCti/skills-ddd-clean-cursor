@@ -961,6 +961,1368 @@ export {
 `,
   };
 
+  const extendedFiles = getExtendedFiles();
+  return { ...files, ...extendedFiles };
+}
+
+function getExtendedFiles() {
+  const files = {
+    "src/app/layout.tsx": `import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+import { Toaster } from "@/shared/components/ui/toaster";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "Poupig Web Shell",
+  description: "Base compartilhada para aplicacao administrativa",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body
+        className={[geistSans.variable, geistMono.variable, "dark", "bg-background text-foreground antialiased"].join(" ")}
+      >
+        {children}
+        <Toaster />
+      </body>
+    </html>
+  );
+}
+`,
+    "src/app/page.tsx": `import Link from "next/link";
+
+export default function HomePage() {
+  return (
+    <main className="min-h-screen bg-background text-foreground">
+      <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col justify-center gap-8 px-6 py-16">
+        <header className="space-y-3">
+          <h1 className="text-3xl font-semibold tracking-tight">Poupig Dashboard Starter</h1>
+          <p className="max-w-3xl text-muted-foreground">
+            Estrutura inicial preparada com shell administrativo, modulo de exemplos e componentes base para uma aplicacao dashboard.
+          </p>
+        </header>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <article className="rounded-lg border border-border bg-card p-5">
+            <h2 className="text-lg font-medium">Dashboard principal</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Acesso ao shell privado com visao geral da aplicacao.
+            </p>
+            <Link
+              href="/private"
+              className="mt-4 inline-flex rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+            >
+              Abrir dashboard
+            </Link>
+          </article>
+
+          <article className="rounded-lg border border-border bg-card p-5">
+            <h2 className="text-lg font-medium">Modulo Examples</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Catalogo com exemplos de formularios, botoes, tabelas, navegacao e widgets.
+            </p>
+            <Link
+              href="/example"
+              className="mt-4 inline-flex rounded-md border border-border px-4 py-2 text-sm font-medium"
+            >
+              Abrir exemplos
+            </Link>
+          </article>
+        </div>
+      </div>
+    </main>
+  );
+}
+`,
+    "src/app/(private)/layout.tsx": `"use client";
+
+import type { ComponentType } from "react";
+import Link from "next/link";
+import { Boxes, FlaskConical, LayoutDashboard } from "lucide-react";
+import { ShellProvider } from "@/shared/context/shell.context";
+import { useShell } from "@/shared/hooks/shell.hook";
+import { cn } from "@/shared/lib/class-name.util";
+import { AdminShell } from "@/shared/template/admin-shell.component";
+
+type MenuIcon = ComponentType<{ className?: string }>;
+
+type MenuItem = {
+  label: string;
+  href: string;
+  icon: MenuIcon;
+};
+
+const dashboardItem: MenuItem = {
+  label: "Dashboard",
+  href: "/private",
+  icon: LayoutDashboard,
+};
+
+const moduleItems: MenuItem[] = [
+  { label: "Examples", href: "/example", icon: FlaskConical },
+];
+
+function SidebarLink({
+  item,
+  collapsed,
+}: {
+  item: MenuItem;
+  collapsed: boolean;
+}) {
+  const Icon = item.icon;
+
+  return (
+    <Link
+      href={item.href}
+      aria-label={collapsed ? item.label : undefined}
+      className={cn(
+        "group relative flex h-10 items-center gap-3 rounded-md px-3 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
+        collapsed && "justify-center px-2",
+      )}
+    >
+      <Icon className="size-4 shrink-0" />
+      <span className={cn("truncate", collapsed && "sr-only")}>{item.label}</span>
+      {collapsed ? (
+        <span className="pointer-events-none absolute left-[calc(100%+10px)] top-1/2 z-50 hidden -translate-y-1/2 whitespace-nowrap rounded-md border border-border bg-popover px-2 py-1 text-xs text-popover-foreground shadow-md group-hover:block group-focus-visible:block">
+          {item.label}
+        </span>
+      ) : null}
+    </Link>
+  );
+}
+
+function PrivateSidebarMenu() {
+  const { isSidebarOpen, isMobile } = useShell();
+  const collapsed = !isMobile && !isSidebarOpen;
+
+  return (
+    <nav className="px-2 py-4">
+      <div className="space-y-1">
+        <SidebarLink item={dashboardItem} collapsed={collapsed} />
+      </div>
+
+      <div className="my-4 h-px bg-border" />
+
+      {!collapsed ? (
+        <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+          Modulos
+        </p>
+      ) : (
+        <p className="sr-only">Modulos</p>
+      )}
+
+      <div className="space-y-1">
+        {moduleItems.map((item) => (
+          <SidebarLink key={item.label} item={item} collapsed={collapsed} />
+        ))}
+      </div>
+    </nav>
+  );
+}
+
+export default function PrivateGroupLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <ShellProvider defaultOpen>
+      <AdminShell
+        sidebar={<PrivateSidebarMenu />}
+        logoIcon={<Boxes className="size-5" />}
+        logoText="Poupig"
+        userName="Admin"
+      >
+        {children}
+      </AdminShell>
+    </ShellProvider>
+  );
+}
+`,
+    "src/app/(private)/private/page.tsx": `import Link from "next/link";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+
+export default function PrivateDashboardPage() {
+  return (
+    <section className="space-y-6">
+      <header className="space-y-1">
+        <h1 className="text-2xl font-semibold tracking-tight">Dashboard principal</h1>
+        <p className="text-sm text-muted-foreground">
+          Entrada da area privada com atalhos para os modulos da aplicacao.
+        </p>
+      </header>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        {[
+          { label: "Usuarios", value: "1.240" },
+          { label: "Pedidos", value: "328" },
+          { label: "Conversao", value: "18,2%" },
+        ].map((item) => (
+          <article key={item.label} className="rounded-lg border border-border bg-card p-4">
+            <p className="text-sm text-muted-foreground">{item.label}</p>
+            <p className="mt-2 text-2xl font-semibold">{item.value}</p>
+          </article>
+        ))}
+      </div>
+
+      <article className="rounded-lg border border-border bg-card p-4 md:p-6">
+        <h2 className="text-lg font-medium">Busca rapida</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Exemplo de uso dos componentes compartilhados de formulario.
+        </p>
+
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+          <Input placeholder="Buscar por cliente, pedido ou email" className="sm:max-w-md" />
+          <Button>Pesquisar</Button>
+        </div>
+      </article>
+
+      <article className="rounded-lg border border-border bg-card p-4 md:p-6">
+        <h2 className="text-lg font-medium">Modulo examples</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Navegue por exemplos de formularios, botoes, tabelas, navegacao e widgets.
+        </p>
+        <Link
+          href="/example"
+          className="mt-4 inline-flex rounded-md border border-border px-4 py-2 text-sm font-medium"
+        >
+          Abrir modulo examples
+        </Link>
+      </article>
+    </section>
+  );
+}
+`,
+    "src/app/(private)/example/layout.tsx": `import { ExampleNavigation } from "@/modules/examples/components/example-navigation.component";
+
+export default function ExampleModuleLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="space-y-6">
+      <header className="space-y-1">
+        <h1 className="text-2xl font-semibold tracking-tight">Modulo Examples</h1>
+        <p className="text-sm text-muted-foreground">
+          Playground do design system para componentes e padroes de dashboard.
+        </p>
+      </header>
+
+      <div className="grid gap-5 lg:grid-cols-[260px_1fr]">
+        <aside className="rounded-lg border border-border bg-card p-3">
+          <ExampleNavigation />
+        </aside>
+        <div className="rounded-lg border border-border bg-card p-4 md:p-6">{children}</div>
+      </div>
+    </section>
+  );
+}
+`,
+    "src/app/(private)/example/page.tsx": `import { ExampleOverviewPage } from "@/modules/examples/pages/example-overview.page";
+
+export default function ExamplePage() {
+  return <ExampleOverviewPage />;
+}
+`,
+    "src/app/(private)/example/buttons/page.tsx": `import { ExampleButtonsPage } from "@/modules/examples/pages/example-buttons.page";
+
+export default function ExampleButtonsRoutePage() {
+  return <ExampleButtonsPage />;
+}
+`,
+    "src/app/(private)/example/forms/page.tsx": `import { ExampleFormsPage } from "@/modules/examples/pages/example-forms.page";
+
+export default function ExampleFormsRoutePage() {
+  return <ExampleFormsPage />;
+}
+`,
+    "src/app/(private)/example/tables/page.tsx": `import { ExampleTablesPage } from "@/modules/examples/pages/example-tables.page";
+
+export default function ExampleTablesRoutePage() {
+  return <ExampleTablesPage />;
+}
+`,
+    "src/app/(private)/example/widgets/page.tsx": `import { ExampleWidgetsPage } from "@/modules/examples/pages/example-widgets.page";
+
+export default function ExampleWidgetsRoutePage() {
+  return <ExampleWidgetsPage />;
+}
+`,
+    "src/modules/examples/index.ts": `export * from "./pages/example-overview.page";
+export * from "./pages/example-buttons.page";
+export * from "./pages/example-forms.page";
+export * from "./pages/example-tables.page";
+export * from "./pages/example-widgets.page";
+`,
+    "src/modules/examples/data/example-menu.data.ts": `export type ExampleMenuItem = {
+  id: "back" | "overview" | "buttons" | "forms" | "tables" | "widgets";
+  label: string;
+  href: string;
+  description: string;
+};
+
+export const exampleMenuItems: ExampleMenuItem[] = [
+  {
+    id: "back",
+    label: "Voltar ao dashboard",
+    href: "/private",
+    description: "Retorna para a tela principal da area privada",
+  },
+  {
+    id: "overview",
+    label: "Visao geral",
+    href: "/example",
+    description: "Resumo do modulo examples",
+  },
+  {
+    id: "buttons",
+    label: "Botoes e dialog",
+    href: "/example/buttons",
+    description: "Variacoes de botoes, dialog e toast",
+  },
+  {
+    id: "forms",
+    label: "Formularios",
+    href: "/example/forms",
+    description: "Campos, combobox, radio, checkbox e tabs",
+  },
+  {
+    id: "tables",
+    label: "Tabelas",
+    href: "/example/tables",
+    description: "Tabela com filtros e navegacao de paginas",
+  },
+  {
+    id: "widgets",
+    label: "Widgets",
+    href: "/example/widgets",
+    description: "Cards operacionais para dashboard",
+  },
+];
+`,
+    "src/modules/examples/components/example-navigation.component.tsx": `"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  ArrowLeft,
+  FormInput,
+  LayoutGrid,
+  MousePointerClick,
+  Rows3,
+  Table2,
+} from "lucide-react";
+import { exampleMenuItems } from "@/modules/examples/data/example-menu.data";
+import { cn } from "@/shared/lib/class-name.util";
+
+const iconById = {
+  back: ArrowLeft,
+  overview: LayoutGrid,
+  buttons: MousePointerClick,
+  forms: FormInput,
+  tables: Table2,
+  widgets: Rows3,
+} as const;
+
+export function ExampleNavigation() {
+  const pathname = usePathname();
+
+  return (
+    <nav className="space-y-1">
+      {exampleMenuItems.map((item) => {
+        const Icon = iconById[item.id];
+        const active =
+          pathname === item.href ||
+          (item.href !== "/example" && pathname.startsWith(item.href + "/"));
+
+        return (
+          <Link
+            key={item.id}
+            href={item.href}
+            className={cn(
+              "group block rounded-md border border-transparent px-3 py-2 transition-colors hover:bg-accent",
+              active && "border-border bg-accent",
+            )}
+          >
+            <span className="flex items-center gap-2 text-sm font-medium">
+              <Icon className="size-4 shrink-0" />
+              {item.label}
+            </span>
+            <span className="mt-1 block text-xs text-muted-foreground">
+              {item.description}
+            </span>
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+`,
+    "src/modules/examples/pages/example-overview.page.tsx": `import Link from "next/link";
+import { Badge } from "@/shared/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
+
+const blocks = [
+  {
+    title: "Formularios",
+    description: "Campos de texto, combobox, radio, checkbox e tabs.",
+    href: "/example/forms",
+  },
+  {
+    title: "Botoes e dialog",
+    description: "Botoes em variacoes, modal de dialogo e toasts.",
+    href: "/example/buttons",
+  },
+  {
+    title: "Tabelas",
+    description: "Tabela com filtros e navegacao de paginas.",
+    href: "/example/tables",
+  },
+  {
+    title: "Widgets",
+    description: "Cards e indicadores para paineis de monitoramento.",
+    href: "/example/widgets",
+  },
+];
+
+export function ExampleOverviewPage() {
+  return (
+    <div className="space-y-4">
+      <header className="space-y-2">
+        <Badge variant="secondary">Overview</Badge>
+        <h2 className="text-xl font-semibold">Guia inicial do modulo examples</h2>
+        <p className="text-sm text-muted-foreground">
+          Use esse modulo para acelerar novas telas e manter padroes visuais consistentes.
+        </p>
+      </header>
+
+      <div className="grid gap-3 md:grid-cols-2">
+        {blocks.map((block) => (
+          <Card key={block.title}>
+            <CardHeader>
+              <CardTitle className="text-base">{block.title}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground">
+              <p>{block.description}</p>
+              <Link href={block.href} className="font-medium text-primary">
+                Abrir secao
+              </Link>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+`,
+    "src/modules/examples/pages/example-buttons.page.tsx": `"use client";
+
+import { toast } from "sonner";
+import { Badge } from "@/shared/components/ui/badge";
+import { Button } from "@/shared/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/shared/components/ui/dialog";
+
+export function ExampleButtonsPage() {
+  return (
+    <div className="space-y-6">
+      <header className="space-y-2">
+        <Badge variant="secondary">Buttons</Badge>
+        <h2 className="text-xl font-semibold">Botoes, dialog e mensagens</h2>
+      </header>
+
+      <section className="space-y-3 rounded-lg border border-border p-4">
+        <h3 className="font-medium">Variacoes de botoes</h3>
+        <div className="flex flex-wrap gap-2">
+          <Button>Default</Button>
+          <Button variant="secondary">Secondary</Button>
+          <Button variant="outline">Outline</Button>
+          <Button variant="ghost">Ghost</Button>
+        </div>
+      </section>
+
+      <section className="space-y-3 rounded-lg border border-border p-4">
+        <h3 className="font-medium">Dialogo de confirmacao</h3>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline">Abrir dialog</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirmar publicacao</DialogTitle>
+              <DialogDescription>
+                Esta acao publica o conteudo no ambiente principal.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="secondary">Cancelar</Button>
+              <Button>Confirmar</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </section>
+
+      <section className="space-y-3 rounded-lg border border-border p-4">
+        <h3 className="font-medium">Mensagens (toast)</h3>
+        <Button
+          onClick={() =>
+            toast.success("Acao executada com sucesso", {
+              description: "Exemplo de notificacao no topo direito.",
+            })
+          }
+        >
+          Exibir mensagem
+        </Button>
+      </section>
+    </div>
+  );
+}
+`,
+    "src/modules/examples/pages/example-forms.page.tsx": `"use client";
+
+import { useState } from "react";
+import { Badge } from "@/shared/components/ui/badge";
+import { Button } from "@/shared/components/ui/button";
+import { Checkbox } from "@/shared/components/ui/checkbox";
+import { Combobox } from "@/shared/components/ui/combobox";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
+import { Textarea } from "@/shared/components/ui/textarea";
+
+const teamOptions = [
+  { label: "Financeiro", value: "financeiro" },
+  { label: "Operacoes", value: "operacoes" },
+  { label: "Suporte", value: "suporte" },
+  { label: "Produto", value: "produto" },
+];
+
+export function ExampleFormsPage() {
+  const [team, setTeam] = useState("financeiro");
+  const [channel, setChannel] = useState("email");
+  const [sendReport, setSendReport] = useState(true);
+
+  return (
+    <div className="space-y-6">
+      <header className="space-y-2">
+        <Badge variant="secondary">Forms</Badge>
+        <h2 className="text-xl font-semibold">Exemplos de formularios</h2>
+      </header>
+
+      <Tabs defaultValue="cadastro" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="cadastro">Cadastro</TabsTrigger>
+          <TabsTrigger value="preferencias">Preferencias</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="cadastro" className="space-y-4 rounded-lg border border-border p-4">
+          <div className="space-y-2">
+            <Label htmlFor="nome">Nome</Label>
+            <Input id="nome" placeholder="Ex.: Marina Costa" />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email">E-mail</Label>
+            <Input id="email" type="email" placeholder="marina@empresa.com" />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Equipe</Label>
+            <Combobox options={teamOptions} value={team} onChange={setTeam} placeholder="Selecione uma equipe" />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="observacao">Observacao</Label>
+            <Textarea id="observacao" placeholder="Descreva contexto adicional..." />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="preferencias" className="space-y-4 rounded-lg border border-border p-4">
+          <div className="space-y-3">
+            <Label>Canal principal</Label>
+            <RadioGroup value={channel} onValueChange={setChannel} className="space-y-2">
+              <div className="flex items-center gap-2">
+                <RadioGroupItem id="canal-email" value="email" />
+                <Label htmlFor="canal-email">Email</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <RadioGroupItem id="canal-whatsapp" value="whatsapp" />
+                <Label htmlFor="canal-whatsapp">WhatsApp</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="relatorio"
+              checked={sendReport}
+              onCheckedChange={(checked) => setSendReport(checked === true)}
+            />
+            <Label htmlFor="relatorio">Receber relatorio semanal automatico</Label>
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      <Button>Salvar configuracoes</Button>
+    </div>
+  );
+}
+`,
+    "src/modules/examples/pages/example-tables.page.tsx": `"use client";
+
+import { useMemo, useState } from "react";
+import { Badge } from "@/shared/components/ui/badge";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/shared/components/ui/table";
+
+const rows = [
+  { id: "PED-001", customer: "Ana Souza", status: "Pago", total: "R$ 320,00" },
+  { id: "PED-002", customer: "Lucas Lima", status: "Pendente", total: "R$ 89,00" },
+  { id: "PED-003", customer: "Aline Costa", status: "Pago", total: "R$ 1.240,00" },
+  { id: "PED-004", customer: "Tiago Alves", status: "Em analise", total: "R$ 420,00" },
+  { id: "PED-005", customer: "Julia Mendes", status: "Pago", total: "R$ 215,00" },
+  { id: "PED-006", customer: "Bruno Rocha", status: "Pendente", total: "R$ 560,00" },
+];
+
+export function ExampleTablesPage() {
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const pageSize = 3;
+
+  const filtered = useMemo(() => {
+    const normalized = search.trim().toLowerCase();
+    if (!normalized) return rows;
+    return rows.filter((item) =>
+      [item.id, item.customer, item.status].join(" ").toLowerCase().includes(normalized),
+    );
+  }, [search]);
+
+  const maxPage = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const currentPage = Math.min(page, maxPage);
+  const start = (currentPage - 1) * pageSize;
+  const paginated = filtered.slice(start, start + pageSize);
+
+  return (
+    <div className="space-y-5">
+      <header className="space-y-2">
+        <Badge variant="secondary">Tables</Badge>
+        <h2 className="text-xl font-semibold">Tabela com navegacao</h2>
+      </header>
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <Input
+          value={search}
+          onChange={(event) => {
+            setSearch(event.target.value);
+            setPage(1);
+          }}
+          placeholder="Filtrar por pedido, cliente ou status"
+          className="sm:max-w-sm"
+        />
+        <p className="text-xs text-muted-foreground">
+          Exibindo {paginated.length} de {filtered.length} itens
+        </p>
+      </div>
+
+      <div className="rounded-lg border border-border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Pedido</TableHead>
+              <TableHead>Cliente</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Total</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {paginated.map((item) => (
+              <TableRow key={item.id}>
+                <TableCell>{item.id}</TableCell>
+                <TableCell>{item.customer}</TableCell>
+                <TableCell>{item.status}</TableCell>
+                <TableCell className="text-right">{item.total}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <Button
+          variant="outline"
+          onClick={() => setPage((previous) => Math.max(1, previous - 1))}
+          disabled={currentPage === 1}
+        >
+          Pagina anterior
+        </Button>
+        <span className="text-sm text-muted-foreground">
+          Pagina {currentPage} de {maxPage}
+        </span>
+        <Button
+          variant="outline"
+          onClick={() => setPage((previous) => Math.min(maxPage, previous + 1))}
+          disabled={currentPage === maxPage}
+        >
+          Proxima pagina
+        </Button>
+      </div>
+    </div>
+  );
+}
+`,
+    "src/modules/examples/pages/example-widgets.page.tsx": `import { Badge } from "@/shared/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
+import { Separator } from "@/shared/components/ui/separator";
+
+const cards = [
+  { title: "Receita mensal", value: "R$ 124.520", variation: "+12,8%" },
+  { title: "Tickets abertos", value: "87", variation: "-4,2%" },
+  { title: "NPS", value: "71", variation: "+2,0 pts" },
+];
+
+const progress = [
+  { label: "Backoffice", value: 82 },
+  { label: "CRM", value: 63 },
+  { label: "Checkout", value: 91 },
+];
+
+export function ExampleWidgetsPage() {
+  return (
+    <div className="space-y-5">
+      <header className="space-y-2">
+        <Badge variant="secondary">Widgets</Badge>
+        <h2 className="text-xl font-semibold">Blocos para dashboard</h2>
+      </header>
+
+      <div className="grid gap-3 md:grid-cols-3">
+        {cards.map((card) => (
+          <Card key={card.title}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                {card.title}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-semibold">{card.value}</p>
+              <p className="text-xs text-emerald-500">{card.variation}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Progresso por modulo</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {progress.map((item) => (
+            <div key={item.label} className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span>{item.label}</span>
+                <span className="text-muted-foreground">{item.value}%</span>
+              </div>
+              <div className="h-2 rounded-full bg-muted">
+                <div className="h-2 rounded-full bg-primary" style={{ width: item.value + "%" }} />
+              </div>
+            </div>
+          ))}
+          <Separator />
+          <p className="text-xs text-muted-foreground">
+            Exemplo de widget composto para monitoramento de modulos.
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+`,
+    "src/shared/index.ts": `export * from "./components/ui/badge";
+export * from "./components/ui/button";
+export * from "./components/ui/card";
+export * from "./components/ui/checkbox";
+export * from "./components/ui/combobox";
+export * from "./components/ui/dialog";
+export * from "./components/ui/dropdown-menu";
+export * from "./components/ui/input";
+export * from "./components/ui/label";
+export * from "./components/ui/popover";
+export * from "./components/ui/radio-group";
+export * from "./components/ui/separator";
+export * from "./components/ui/sheet";
+export * from "./components/ui/table";
+export * from "./components/ui/tabs";
+export * from "./components/ui/textarea";
+export * from "./components/ui/toaster";
+export * from "./context/shell.context";
+export * from "./hooks/shell.hook";
+export * from "./template";
+`,
+    "src/shared/components/ui/badge.tsx": `import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/shared/lib/class-name.util";
+
+const badgeVariants = cva(
+  "inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium transition-colors",
+  {
+    variants: {
+      variant: {
+        default: "border-transparent bg-primary text-primary-foreground",
+        secondary: "border-transparent bg-secondary text-secondary-foreground",
+        outline: "text-foreground",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  },
+);
+
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
+
+export function Badge({ className, variant, ...props }: BadgeProps) {
+  return <div className={cn(badgeVariants({ variant }), className)} {...props} />;
+}
+`,
+    "src/shared/components/ui/card.tsx": `import * as React from "react";
+import { cn } from "@/shared/lib/class-name.util";
+
+const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn("rounded-lg border border-border bg-card text-card-foreground", className)}
+      {...props}
+    />
+  ),
+);
+Card.displayName = "Card";
+
+const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn("flex flex-col space-y-1.5 p-4", className)} {...props} />
+  ),
+);
+CardHeader.displayName = "CardHeader";
+
+const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
+  ({ className, ...props }, ref) => (
+    <h3 ref={ref} className={cn("font-semibold leading-none tracking-tight", className)} {...props} />
+  ),
+);
+CardTitle.displayName = "CardTitle";
+
+const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn("p-4 pt-0", className)} {...props} />
+  ),
+);
+CardContent.displayName = "CardContent";
+
+const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn("flex items-center p-4 pt-0", className)} {...props} />
+  ),
+);
+CardFooter.displayName = "CardFooter";
+
+export { Card, CardContent, CardFooter, CardHeader, CardTitle };
+`,
+    "src/shared/components/ui/label.tsx": `import * as React from "react";
+import * as LabelPrimitive from "@radix-ui/react-label";
+import { cn } from "@/shared/lib/class-name.util";
+
+const Label = React.forwardRef<
+  React.ElementRef<typeof LabelPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
+>(({ className, ...props }, ref) => (
+  <LabelPrimitive.Root
+    ref={ref}
+    className={cn("text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70", className)}
+    {...props}
+  />
+));
+Label.displayName = LabelPrimitive.Root.displayName;
+
+export { Label };
+`,
+    "src/shared/components/ui/textarea.tsx": `import * as React from "react";
+import { cn } from "@/shared/lib/class-name.util";
+
+export type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>;
+
+const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
+  ({ className, ...props }, ref) => {
+    return (
+      <textarea
+        className={cn(
+          "min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+          className,
+        )}
+        ref={ref}
+        {...props}
+      />
+    );
+  },
+);
+Textarea.displayName = "Textarea";
+
+export { Textarea };
+`,
+    "src/shared/components/ui/checkbox.tsx": `"use client";
+
+import * as React from "react";
+import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import { Check } from "lucide-react";
+import { cn } from "@/shared/lib/class-name.util";
+
+const Checkbox = React.forwardRef<
+  React.ElementRef<typeof CheckboxPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
+>(({ className, ...props }, ref) => (
+  <CheckboxPrimitive.Root
+    ref={ref}
+    className={cn(
+      "peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground",
+      className,
+    )}
+    {...props}
+  >
+    <CheckboxPrimitive.Indicator className="flex items-center justify-center text-current">
+      <Check className="h-3.5 w-3.5" />
+    </CheckboxPrimitive.Indicator>
+  </CheckboxPrimitive.Root>
+));
+Checkbox.displayName = CheckboxPrimitive.Root.displayName;
+
+export { Checkbox };
+`,
+    "src/shared/components/ui/radio-group.tsx": `"use client";
+
+import * as React from "react";
+import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
+import { Circle } from "lucide-react";
+import { cn } from "@/shared/lib/class-name.util";
+
+const RadioGroup = React.forwardRef<
+  React.ElementRef<typeof RadioGroupPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>
+>(({ className, ...props }, ref) => {
+  return <RadioGroupPrimitive.Root className={cn("grid gap-2", className)} {...props} ref={ref} />;
+});
+RadioGroup.displayName = RadioGroupPrimitive.Root.displayName;
+
+const RadioGroupItem = React.forwardRef<
+  React.ElementRef<typeof RadioGroupPrimitive.Item>,
+  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
+>(({ className, ...props }, ref) => {
+  return (
+    <RadioGroupPrimitive.Item
+      ref={ref}
+      className={cn(
+        "aspect-square h-4 w-4 rounded-full border border-primary text-primary ring-offset-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+        className,
+      )}
+      {...props}
+    >
+      <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
+        <Circle className="h-2.5 w-2.5 fill-current text-current" />
+      </RadioGroupPrimitive.Indicator>
+    </RadioGroupPrimitive.Item>
+  );
+});
+RadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName;
+
+export { RadioGroup, RadioGroupItem };
+`,
+    "src/shared/components/ui/tabs.tsx": `"use client";
+
+import * as React from "react";
+import * as TabsPrimitive from "@radix-ui/react-tabs";
+import { cn } from "@/shared/lib/class-name.util";
+
+const Tabs = TabsPrimitive.Root;
+
+const TabsList = React.forwardRef<
+  React.ElementRef<typeof TabsPrimitive.List>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
+>(({ className, ...props }, ref) => (
+  <TabsPrimitive.List
+    ref={ref}
+    className={cn("inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground", className)}
+    {...props}
+  />
+));
+TabsList.displayName = TabsPrimitive.List.displayName;
+
+const TabsTrigger = React.forwardRef<
+  React.ElementRef<typeof TabsPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
+>(({ className, ...props }, ref) => (
+  <TabsPrimitive.Trigger
+    ref={ref}
+    className={cn(
+      "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm",
+      className,
+    )}
+    {...props}
+  />
+));
+TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
+
+const TabsContent = React.forwardRef<
+  React.ElementRef<typeof TabsPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
+>(({ className, ...props }, ref) => (
+  <TabsPrimitive.Content
+    ref={ref}
+    className={cn("mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", className)}
+    {...props}
+  />
+));
+TabsContent.displayName = TabsPrimitive.Content.displayName;
+
+export { Tabs, TabsList, TabsTrigger, TabsContent };
+`,
+    "src/shared/components/ui/dialog.tsx": `"use client";
+
+import * as React from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { X } from "lucide-react";
+import { cn } from "@/shared/lib/class-name.util";
+
+const Dialog = DialogPrimitive.Root;
+const DialogTrigger = DialogPrimitive.Trigger;
+const DialogPortal = DialogPrimitive.Portal;
+const DialogClose = DialogPrimitive.Close;
+
+const DialogOverlay = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Overlay>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Overlay
+    ref={ref}
+    className={cn("fixed inset-0 z-50 bg-black/50", className)}
+    {...props}
+  />
+));
+DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
+
+const DialogContent = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
+>(({ className, children, ...props }, ref) => (
+  <DialogPortal>
+    <DialogOverlay />
+    <DialogPrimitive.Content
+      ref={ref}
+      className={cn(
+        "fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-lg border border-border bg-background p-6 shadow-lg duration-200",
+        className,
+      )}
+      {...props}
+    >
+      {children}
+      <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+        <X className="size-4" />
+        <span className="sr-only">Fechar</span>
+      </DialogClose>
+    </DialogPrimitive.Content>
+  </DialogPortal>
+));
+DialogContent.displayName = DialogPrimitive.Content.displayName;
+
+const DialogHeader = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={cn("flex flex-col space-y-1.5 text-center sm:text-left", className)} {...props} />
+);
+DialogHeader.displayName = "DialogHeader";
+
+const DialogFooter = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)} {...props} />
+);
+DialogFooter.displayName = "DialogFooter";
+
+const DialogTitle = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Title>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Title ref={ref} className={cn("text-lg font-semibold", className)} {...props} />
+));
+DialogTitle.displayName = DialogPrimitive.Title.displayName;
+
+const DialogDescription = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Description>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Description
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props}
+  />
+));
+DialogDescription.displayName = DialogPrimitive.Description.displayName;
+
+export {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+};
+`,
+    "src/shared/components/ui/separator.tsx": `import * as React from "react";
+import * as SeparatorPrimitive from "@radix-ui/react-separator";
+import { cn } from "@/shared/lib/class-name.util";
+
+const Separator = React.forwardRef<
+  React.ElementRef<typeof SeparatorPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof SeparatorPrimitive.Root>
+>(
+  (
+    { className, orientation = "horizontal", decorative = true, ...props },
+    ref,
+  ) => (
+    <SeparatorPrimitive.Root
+      ref={ref}
+      decorative={decorative}
+      orientation={orientation}
+      className={cn(
+        "shrink-0 bg-border",
+        orientation === "horizontal" ? "h-px w-full" : "h-full w-px",
+        className,
+      )}
+      {...props}
+    />
+  ),
+);
+Separator.displayName = SeparatorPrimitive.Root.displayName;
+
+export { Separator };
+`,
+    "src/shared/components/ui/table.tsx": `import * as React from "react";
+import { cn } from "@/shared/lib/class-name.util";
+
+const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
+  ({ className, ...props }, ref) => (
+    <div className="relative w-full overflow-auto">
+      <table ref={ref} className={cn("w-full caption-bottom text-sm", className)} {...props} />
+    </div>
+  ),
+);
+Table.displayName = "Table";
+
+const TableHeader = React.forwardRef<
+  HTMLTableSectionElement,
+  React.HTMLAttributes<HTMLTableSectionElement>
+>(({ className, ...props }, ref) => (
+  <thead ref={ref} className={cn("[&_tr]:border-b", className)} {...props} />
+));
+TableHeader.displayName = "TableHeader";
+
+const TableBody = React.forwardRef<
+  HTMLTableSectionElement,
+  React.HTMLAttributes<HTMLTableSectionElement>
+>(({ className, ...props }, ref) => (
+  <tbody ref={ref} className={cn("[&_tr:last-child]:border-0", className)} {...props} />
+));
+TableBody.displayName = "TableBody";
+
+const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTMLTableRowElement>>(
+  ({ className, ...props }, ref) => (
+    <tr
+      ref={ref}
+      className={cn("border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted", className)}
+      {...props}
+    />
+  ),
+);
+TableRow.displayName = "TableRow";
+
+const TableHead = React.forwardRef<HTMLTableCellElement, React.ThHTMLAttributes<HTMLTableCellElement>>(
+  ({ className, ...props }, ref) => (
+    <th
+      ref={ref}
+      className={cn("h-10 px-2 text-left align-middle font-medium text-muted-foreground", className)}
+      {...props}
+    />
+  ),
+);
+TableHead.displayName = "TableHead";
+
+const TableCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLAttributes<HTMLTableCellElement>>(
+  ({ className, ...props }, ref) => (
+    <td ref={ref} className={cn("p-2 align-middle", className)} {...props} />
+  ),
+);
+TableCell.displayName = "TableCell";
+
+export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell };
+`,
+    "src/shared/components/ui/popover.tsx": `"use client";
+
+import * as React from "react";
+import * as PopoverPrimitive from "@radix-ui/react-popover";
+import { cn } from "@/shared/lib/class-name.util";
+
+const Popover = PopoverPrimitive.Root;
+const PopoverTrigger = PopoverPrimitive.Trigger;
+
+const PopoverContent = React.forwardRef<
+  React.ElementRef<typeof PopoverPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
+>(({ className, align = "center", sideOffset = 8, ...props }, ref) => (
+  <PopoverPrimitive.Portal>
+    <PopoverPrimitive.Content
+      ref={ref}
+      align={align}
+      sideOffset={sideOffset}
+      className={cn(
+        "z-50 w-72 rounded-md border border-border bg-popover p-3 text-popover-foreground shadow-md outline-none",
+        className,
+      )}
+      {...props}
+    />
+  </PopoverPrimitive.Portal>
+));
+PopoverContent.displayName = PopoverPrimitive.Content.displayName;
+
+export { Popover, PopoverTrigger, PopoverContent };
+`,
+    "src/shared/components/ui/combobox.tsx": `"use client";
+
+import { useMemo, useState } from "react";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/shared/components/ui/popover";
+import { cn } from "@/shared/lib/class-name.util";
+
+type ComboboxOption = {
+  label: string;
+  value: string;
+};
+
+type ComboboxProps = {
+  options: ComboboxOption[];
+  value?: string;
+  onChange?: (value: string) => void;
+  placeholder?: string;
+  emptyText?: string;
+};
+
+export function Combobox({
+  options,
+  value,
+  onChange,
+  placeholder = "Selecionar...",
+  emptyText = "Nenhum item encontrado.",
+}: ComboboxProps) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const selected = options.find((option) => option.value === value);
+  const filtered = useMemo(() => {
+    const normalized = search.trim().toLowerCase();
+    if (!normalized) return options;
+    return options.filter((option) =>
+      [option.label, option.value].join(" ").toLowerCase().includes(normalized),
+    );
+  }, [options, search]);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" role="combobox" className="w-full justify-between">
+          {selected ? selected.label : placeholder}
+          <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-60" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-(--radix-popover-trigger-width) p-2">
+        <Input
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Filtrar..."
+          className="mb-2"
+        />
+        <div className="max-h-56 space-y-1 overflow-auto">
+          {filtered.length === 0 ? (
+            <p className="px-2 py-3 text-sm text-muted-foreground">{emptyText}</p>
+          ) : (
+            filtered.map((option) => (
+              <button
+                type="button"
+                key={option.value}
+                onClick={() => {
+                  onChange?.(option.value);
+                  setOpen(false);
+                }}
+                className={cn(
+                  "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-sm hover:bg-accent",
+                  option.value === value && "bg-accent",
+                )}
+              >
+                <span>{option.label}</span>
+                <Check className={cn("size-4", option.value === value ? "opacity-100" : "opacity-0")} />
+              </button>
+            ))
+          )}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+`,
+    "src/shared/components/ui/toaster.tsx": `"use client";
+
+import { Toaster as Sonner } from "sonner";
+
+export function Toaster() {
+  return <Sonner richColors position="top-right" closeButton />;
+}
+`,
+  };
+
   return files;
 }
 
@@ -970,9 +2332,16 @@ async function installDependencies({ rootDir, frontendAppPath, logger, dryRun })
     "clsx",
     "tailwind-merge",
     "lucide-react",
+    "sonner",
     "@radix-ui/react-slot",
     "@radix-ui/react-dropdown-menu",
     "@radix-ui/react-dialog",
+    "@radix-ui/react-checkbox",
+    "@radix-ui/react-label",
+    "@radix-ui/react-popover",
+    "@radix-ui/react-radio-group",
+    "@radix-ui/react-separator",
+    "@radix-ui/react-tabs",
   ];
 
   const shadcnDevDep = ["shadcn"];
