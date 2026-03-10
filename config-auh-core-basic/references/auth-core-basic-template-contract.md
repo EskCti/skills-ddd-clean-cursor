@@ -1,0 +1,53 @@
+# Auth Core Basic Template Contract
+
+## Goal
+
+Inicializar `packages/auth/core` com baseline determinístico mínimo para autenticação:
+
+- configs do pacote (`package.json`, `tsconfig.json`, `jest.config.ts`)
+- código fonte (`src/user`, `src/password`, `src/root`, `src/index.ts`)
+- testes (`test/user`, `test/password`, `test/root`)
+
+Sem escopo de geração:
+- `permission`
+- `role`
+- `audit`
+- `oauth`
+- casos de uso de perfil
+
+## Required Rules
+
+- Nome do pacote: `<scope>/auth`
+- Dependência obrigatória de shared: `<scope>/<basename(sharedModulePath)>`
+- `Password` deve validar `HashPassword` (senha criptografada)
+- `Password` não deve validar `StrongPassword`
+- `CreateUserUseCase` deve persistir `User` e `Password` (hash)
+- `LoginUseCase` deve comparar senha via `PasswordProvider`
+- `ChangePasswordUseCase` deve:
+  - confirmar `newPassword === confirmPassword`
+  - validar usuário/senha antiga
+  - desativar senha antiga
+  - salvar nova senha hash
+
+## Command
+
+```bash
+node .agents/skills/config-auh-core-basic/scripts/create-auth-core-basic.mjs [--scope @poupig] [--force] [--run-tests] [--target <path>]
+```
+
+## Namespace Resolution
+
+Se `--scope` não for informado, usar esta precedência:
+
+1. `POUPIG_NAMESPACE` ou `SKILLS_NAMESPACE`
+2. `skills.config.local.json` (em `.agents/skills/.env`, `.cloud/skills/.env` ou `.env/`)
+3. `skills.config.json` (em `.agents/skills/.env`, `.cloud/skills/.env` ou `.env/`)
+4. scope do template em `assets/auth-core-basic-template/package.json`
+
+## Deterministic Source
+
+O script usa exclusivamente:
+
+- `assets/auth-core-basic-template/**`
+
+Não depende de geração dinâmica de código via LLM e não depende de shell específico.

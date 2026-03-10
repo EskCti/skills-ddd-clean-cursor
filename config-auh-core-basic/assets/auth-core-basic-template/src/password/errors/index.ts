@@ -1,0 +1,4 @@
+export enum PasswordErrors {
+	MISMATCH = "PASSWORD_MISMATCH",
+	INVALID_FORMAT = "PASSWORD_INVALID_FORMAT",
+}

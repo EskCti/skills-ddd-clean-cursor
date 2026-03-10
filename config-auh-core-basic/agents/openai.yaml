@@ -1,0 +1,4 @@
+interface:
+  display_name: "Config Auh Core Basic"
+  short_description: "Criar módulo auth/core básico determinístico"
+  default_prompt: "Crie ou recrie packages/auth/core básico com node .agents/skills/config-auh-core-basic/scripts/create-auth-core-basic.mjs, gerando user/password/root + testes unitários, usando HashPassword no Password entity e namespace resolvido por configuração global da skill."

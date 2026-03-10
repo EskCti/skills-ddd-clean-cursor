@@ -1,0 +1,20 @@
+import { Result, UseCase } from "__SHARED_PACKAGE_NAME__";
+import { UserDTO } from "../dto";
+import { FindUserByIdQuery } from "../provider";
+
+export interface FindUserByIdOut extends UserDTO {}
+
+export class FindUserByIdUseCase
+	implements UseCase<string, FindUserByIdOut>
+{
+	constructor(private readonly findById: FindUserByIdQuery) {}
+
+	async execute(id: string): Promise<Result<FindUserByIdOut>> {
+		const userResult = await this.findById.execute(id);
+		if (userResult.isFailure) {
+			return userResult.withFail;
+		}
+
+		return Result.ok(userResult.instance);
+	}
+}
