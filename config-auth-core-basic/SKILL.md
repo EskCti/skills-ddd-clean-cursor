@@ -1,9 +1,9 @@
 ---
-name: config-auh-core-basic
+name: config-auth-core-basic
 description: Criar/recriar o módulo de autenticação básico de forma determinística no padrão Pharmacore, refletindo o estado atual do pacote `auth` com foco em `user`, `password` e `application`, incluindo código e testes unitários. A skill detecta automaticamente se o monorepo usa pacotes diretos (`packages/*`) ou aninhados (`packages/*/*`) e cria no caminho correto (`packages/auth` ou `packages/auth/core`). Usar quando o pedido envolver bootstrap/rebootstrap do auth core mínimo, sem perfil e sem permissões, com `Password` validando `HashPassword` e política de troca de senha centralizada em serviço de domínio.
 ---
 
-# Config Auh Core Basic
+# Config Auth Core Basic
 
 ## Overview
 
@@ -34,38 +34,46 @@ Correção obrigatória do modelo:
 3. Se o diretório já existir, usar `--force` para sobrescrever.
 4. Após gerar no alvo detectado (`packages/auth` ou `packages/auth/core`), confirmar estrutura de `src/` e `test/` conforme contrato atual do módulo.
 5. Opcionalmente executar testes do pacote com `--run-tests`.
-6. Registrar execução em `.log/skills.log` com título da skill e lista simples dos comandos/ações relevantes (sem timestamps e sem status), garantindo `.log/` no `.gitignore`.
+6. Sincronizar dependência do novo pacote auth no backend e frontend (`apps/backend/package.json` e `apps/web/package.json`), adicionando `<scope>/auth` em `dependencies` quando necessário.
+7. Executar `npm install` no root para atualizar lockfile e resolução das workspaces.
+8. Registrar execução em `.log/skills.log` com título da skill e lista simples dos comandos/ações relevantes (sem timestamps e sem status), garantindo `.log/` no `.gitignore`.
 
 ## Commands
 
 Criar/recriar no alvo padrão detectado no namespace padrão:
 
 ```bash
-node .agents/skills/config-auh-core-basic/scripts/create-auth-core-basic.mjs
+node .agents/skills/config-auth-core-basic/scripts/create-auth-core-basic.mjs
 ```
 
 Definir namespace explícito:
 
 ```bash
-node .agents/skills/config-auh-core-basic/scripts/create-auth-core-basic.mjs --scope @poupig
+node .agents/skills/config-auth-core-basic/scripts/create-auth-core-basic.mjs --scope @poupig
 ```
 
 Sobrescrever diretório existente:
 
 ```bash
-node .agents/skills/config-auh-core-basic/scripts/create-auth-core-basic.mjs --force
+node .agents/skills/config-auth-core-basic/scripts/create-auth-core-basic.mjs --force
 ```
 
 Criar e executar testes do pacote auth core:
 
 ```bash
-node .agents/skills/config-auh-core-basic/scripts/create-auth-core-basic.mjs --force --run-tests
+node .agents/skills/config-auth-core-basic/scripts/create-auth-core-basic.mjs --force --run-tests
+```
+
+Criar sem sincronizar apps e sem instalar dependências (modo avançado):
+
+```bash
+node .agents/skills/config-auth-core-basic/scripts/create-auth-core-basic.mjs --force --skip-apps-sync --skip-install
 ```
 
 Definir namespace por variável de ambiente:
 
 ```bash
-POUPIG_NAMESPACE=@poupig node .agents/skills/config-auh-core-basic/scripts/create-auth-core-basic.mjs --force
+POUPIG_NAMESPACE=@poupig node .agents/skills/config-auth-core-basic/scripts/create-auth-core-basic.mjs --force
 ```
 
 ## Resources
@@ -73,6 +81,7 @@ POUPIG_NAMESPACE=@poupig node .agents/skills/config-auh-core-basic/scripts/creat
 - `scripts/create-auth-core-basic.mjs`: gerador determinístico cross-platform.
 - `assets/auth-core-basic-template`: template completo do auth core básico no estado atual (código + testes + configs).
 - `references/auth-core-basic-template-contract.md`: contrato dos artefatos gerados.
+- sincronização automática de dependências em backend/frontend + `npm install` no root (desativável com flags de skip).
 - Log local de execução: `.log/skills.log` (não versionado; `.log/` é adicionado ao `.gitignore` automaticamente, sem metadados extras).
 
 ## Shared Config

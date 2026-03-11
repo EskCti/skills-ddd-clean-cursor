@@ -14,14 +14,15 @@ let activeRunLogger = null;
 
 function usage() {
   console.log(`Usage:
-  node create-auth-core-basic.mjs [--scope @namespace] [--force] [--run-tests] [--target <path>]
+  node create-auth-core-basic.mjs [--scope @namespace] [--force] [--run-tests] [--target <path>] [--skip-apps-sync] [--skip-install]
 
 Examples:
   node create-auth-core-basic.mjs
   node create-auth-core-basic.mjs --scope @poupig
   node create-auth-core-basic.mjs --force
   node create-auth-core-basic.mjs --force --run-tests
-  node create-auth-core-basic.mjs --target /tmp/auth-core-basic-template-test`);
+  node create-auth-core-basic.mjs --target /tmp/auth-core-basic-template-test
+  node create-auth-core-basic.mjs --skip-install`);
 }
 
 function parseArgs(argv) {
@@ -29,6 +30,8 @@ function parseArgs(argv) {
   let force = false;
   let runTests = false;
   let target = "";
+  let skipAppsSync = false;
+  let skipInstall = false;
 
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
@@ -45,6 +48,16 @@ function parseArgs(argv) {
 
     if (arg === "--run-tests") {
       runTests = true;
+      continue;
+    }
+
+    if (arg === "--skip-apps-sync") {
+      skipAppsSync = true;
+      continue;
+    }
+
+    if (arg === "--skip-install") {
+      skipInstall = true;
       continue;
     }
 
@@ -71,7 +84,14 @@ function parseArgs(argv) {
     throw new Error(`Unknown option: ${arg}`);
   }
 
-  return { scope, force, runTests, target };
+  return {
+    scope,
+    force,
+    runTests,
+    target,
+    skipAppsSync,
+    skipInstall,
+  };
 }
 
 async function readJson(filePath) {
@@ -191,6 +211,38 @@ function runCommand(cmd, args, cwd) {
   });
 }
 
+async function ensureDependencyInApp({
+  packageJsonPath,
+  dependencyName,
+  loggerLabel,
+}) {
+  if (!(await exists(packageJsonPath))) {
+    activeRunLogger?.step(`${loggerLabel} não encontrado: ${packageJsonPath}.`);
+    return false;
+  }
+
+  const packageJson = await readJson(packageJsonPath);
+  const dependencies = {
+    ...(packageJson.dependencies ?? {}),
+  };
+
+  if (dependencies[dependencyName] === "*") {
+    activeRunLogger?.step(
+      `${loggerLabel} já possui dependência ${dependencyName}@*.`,
+    );
+    return false;
+  }
+
+  dependencies[dependencyName] = "*";
+  packageJson.dependencies = dependencies;
+  await writeJson(packageJsonPath, packageJson);
+
+  activeRunLogger?.step(
+    `${loggerLabel} atualizado com dependência ${dependencyName}@*.`,
+  );
+  return true;
+}
+
 async function replaceTokenRecursively({
   targetDir,
   token,
@@ -254,14 +306,21 @@ async function main() {
   const rootDir = path.resolve(skillDir, "../../..");
   const logger = await createSkillRunLogger({
     rootDir,
-    skillName: "config-auh-core-basic",
+    skillName: "config-auth-core-basic",
     commandArgs: process.argv.slice(2),
   });
 
   try {
     activeRunLogger = logger;
 
-    const { scope: scopeArg, force, runTests, target } = parseArgs(
+    const {
+      scope: scopeArg,
+      force,
+      runTests,
+      target,
+      skipAppsSync,
+      skipInstall,
+    } = parseArgs(
       process.argv.slice(2),
     );
 
@@ -270,6 +329,7 @@ async function main() {
       packagesDirRelative,
       sharedModule,
       sharedPackageJsonPath,
+      config,
     } = await resolveSkillPaths(rootDir);
     const defaultTargetDir = await resolveDefaultAuthCoreTarget({
       rootDir,
@@ -354,6 +414,41 @@ async function main() {
     logger.step(`Nome do pacote atualizado para ${pkg.name}.`);
     logger.step(`Dependência shared configurada para ${sharedPackageName}.`);
 
+    let appsUpdated = false;
+    if (!skipAppsSync) {
+      const authDependencyName = pkg.name;
+      const backendPackageJsonPath = path.join(
+        rootDir,
+        config.defaults.backendAppPath,
+        "package.json",
+      );
+      const frontendPackageJsonPath = path.join(
+        rootDir,
+        config.defaults.frontendAppPath,
+        "package.json",
+      );
+
+      const [backendChanged, frontendChanged] = await Promise.all([
+        ensureDependencyInApp({
+          packageJsonPath: backendPackageJsonPath,
+          dependencyName: authDependencyName,
+          loggerLabel: "Backend",
+        }),
+        ensureDependencyInApp({
+          packageJsonPath: frontendPackageJsonPath,
+          dependencyName: authDependencyName,
+          loggerLabel: "Frontend",
+        }),
+      ]);
+
+      appsUpdated = backendChanged || frontendChanged;
+      if (!appsUpdated) {
+        logger.step("Dependências backend/frontend já estavam convergentes.");
+      }
+    } else {
+      logger.step("Sincronização de apps ignorada por --skip-apps-sync.");
+    }
+
     console.log(`Auth core basic module created at: ${targetDir}`);
     console.log(`Package name: ${pkg.name}`);
 
@@ -363,6 +458,14 @@ async function main() {
       logger.step(`Testes executados para ${pkg.name}.`);
     } else {
       logger.step("Execução de testes não solicitada.");
+    }
+
+    if (!skipInstall) {
+      console.log("Running npm install at repository root...");
+      await runCommand("npm", ["install"], rootDir);
+      logger.step("npm install executado no root para atualizar lock/dependências.");
+    } else {
+      logger.step("Instalação de dependências ignorada por --skip-install.");
     }
 
     await logger.success();

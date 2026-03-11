@@ -19,6 +19,10 @@ Sem escopo de geração:
 
 - Nome do pacote: `<scope>/auth`
 - Dependência obrigatória de shared: `<scope>/<basename(sharedModulePath)>`
+- Dependência `<scope>/auth` deve ser sincronizada em:
+  - `apps/backend/package.json` (`dependencies`)
+  - `apps/web/package.json` (`dependencies`)
+- Após sincronização, executar `npm install` no root do monorepo para atualizar resolução/workspaces.
 - `Password` deve validar `HashPassword` (senha criptografada) e não possuir status/ativação interna
 - `Password` não deve validar `StrongPassword`
 - `PasswordChangePolicyService` deve validar:
@@ -38,7 +42,7 @@ Sem escopo de geração:
 ## Command
 
 ```bash
-node .agents/skills/config-auh-core-basic/scripts/create-auth-core-basic.mjs [--scope @poupig] [--force] [--run-tests] [--target <path>]
+node .agents/skills/config-auth-core-basic/scripts/create-auth-core-basic.mjs [--scope @poupig] [--force] [--run-tests] [--target <path>] [--skip-apps-sync] [--skip-install]
 ```
 
 ## Namespace Resolution

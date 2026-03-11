@@ -1,0 +1,92 @@
+### Auth Module Integration Flow (RestClient)
+# Pré-requisitos:
+# 1) Backend rodando: npm --workspace apps/backend run start:dev
+# 2) Banco e migrações aplicadas
+
+@userVersion=1
+
+@baseUrl=http://localhost:4000
+@email=restclient+{{$userVersion}}@poupig.local
+@password=StrongPass1!
+@newPassword=StrongPass2!
+
+### 1) Registrar novo usuário
+# @name register
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Rest Client",
+  "email": "{{email}}",
+  "password": "{{password}}",
+  "confirmPassword": "{{password}}"
+}
+
+### 2) Login com senha inicial
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+### 
+@token={{login.response.body.$.token}}
+
+### 3) Obter perfil autenticado
+# @name me
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+@userId={{me.response.body.$.id}}
+
+### 4) Buscar usuário por ID
+# @name byId
+GET {{baseUrl}}/auth/users/{{userId}}
+Authorization: Bearer {{token}}
+
+### 5) Buscar usuário por email
+# @name byEmail
+GET {{baseUrl}}/auth/users/by-email?email={{email}}
+Authorization: Bearer {{token}}
+
+### 6) Trocar senha
+# @name changePassword
+PATCH {{baseUrl}}/auth/password/change
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "oldPassword": "{{password}}",
+  "newPassword": "{{newPassword}}",
+  "confirmPassword": "{{newPassword}}"
+}
+
+### 7) Login com senha antiga (esperado: 401)
+# @name loginOldPassword
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+### 8) Login com nova senha
+# @name loginWithNewPassword
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{newPassword}}"
+}
+
+@token2={{loginWithNewPassword.response.body.$.token}}
+
+### 9) Remover usuário criado (cleanup)
+# @name cleanupDeleteUser
+DELETE {{baseUrl}}/auth/users/{{userId}}
+Authorization: Bearer {{token2}}
