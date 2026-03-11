@@ -18,7 +18,7 @@ function usage() {
 
 Examples:
   node create-auth-core-basic.mjs
-  node create-auth-core-basic.mjs --scope @poupig
+  node create-auth-core-basic.mjs --scope @namespace
   node create-auth-core-basic.mjs --force
   node create-auth-core-basic.mjs --force --run-tests
   node create-auth-core-basic.mjs --target /tmp/auth-core-basic-template-test
@@ -373,7 +373,7 @@ async function main() {
     const templateScope =
       typeof pkg.name === "string" && pkg.name.includes("/")
         ? pkg.name.split("/")[0]
-        : "@poupig";
+        : "@namespace";
 
     const { scope } = await resolveNamespace({
       rootDir,

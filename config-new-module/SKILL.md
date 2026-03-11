@@ -1,6 +1,6 @@
 ---
 name: config-new-module
-description: Criar um novo módulo de forma determinística no padrão do projeto Poupig, gerando scaffold em `packages/*`, `apps/backend/src/modules/*` e `apps/web` (modules + rota principal). Usar quando o pedido envolver criação de módulo full-stack no monorepo com package TypeScript, módulo NestJS e dashboard inicial no web.
+description: Criar um novo módulo de forma determinística no padrão do projeto Workspace, gerando scaffold em `packages/*`, `apps/backend/src/modules/*` e `apps/web` (modules + rota principal). Usar quando o pedido envolver criação de módulo full-stack no monorepo com package TypeScript, módulo NestJS e dashboard inicial no web.
 ---
 
 # Config New Module
@@ -19,7 +19,7 @@ O namespace e diretórios padrão devem ser resolvidos por configuração global
 
 1. Ler o nome do módulo solicitado pelo usuário.
 2. Executar `node scripts/create-module.mjs <module-name>`.
-3. Namespace é resolvido por precedência: `--scope` > `POUPIG_NAMESPACE`/`SKILLS_NAMESPACE` > `skills.config.local.json` > `skills.config.json` > fallback automático.
+3. Namespace é resolvido por precedência: `--scope` > `PROJECT_NAMESPACE`/`SKILLS_NAMESPACE` > `skills.config.local.json` > `skills.config.json` > fallback automático.
 4. Conferir a estrutura criada em:
    - `<dirname(sharedModulePath)>/<module-name>`
    - `<backendAppPath>/src/modules/<module-name>`
@@ -44,13 +44,13 @@ node .agents/skills/config-new-module/scripts/create-module.mjs <module-name>
 Definir namespace por variável de ambiente:
 
 ```bash
-POUPIG_NAMESPACE=@poupig node .agents/skills/config-new-module/scripts/create-module.mjs <module-name>
+PROJECT_NAMESPACE=@namespace node .agents/skills/config-new-module/scripts/create-module.mjs <module-name>
 ```
 
 Criar módulo com namespace explícito:
 
 ```bash
-node .agents/skills/config-new-module/scripts/create-module.mjs <module-name> --scope @poupig
+node .agents/skills/config-new-module/scripts/create-module.mjs <module-name> --scope @namespace
 ```
 
 Sobrescrever diretório existente:

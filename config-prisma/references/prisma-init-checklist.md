@@ -1,4 +1,4 @@
-# Prisma Init Checklist (Pharmacore Backend)
+# Prisma Init Checklist (Genérico Backend)
 
 ## Objetivo
 

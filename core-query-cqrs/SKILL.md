@@ -1,6 +1,6 @@
 ---
 name: core-query-cqrs
-description: Criar, revisar ou orientar queries no padrão CQRS de leitura no Pharmacore. Usar quando o pedido envolver interfaces `*Query`, arquivos `*.query.ts`, use cases de leitura (`find-*`), projeções/DTOs para consumo da API/front, paginação/filtros/agregações e separação entre leitura (query) e escrita (repository/comando).
+description: Criar, revisar ou orientar queries no padrão CQRS de leitura no Genérico. Usar quando o pedido envolver interfaces `*Query`, arquivos `*.query.ts`, use cases de leitura (`find-*`), projeções/DTOs para consumo da API/front, paginação/filtros/agregações e separação entre leitura (query) e escrita (repository/comando).
 ---
 
 # Query CQRS

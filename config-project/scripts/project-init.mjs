@@ -22,7 +22,7 @@ Examples:
   node project-init.mjs --frontend-path apps/frontend --backend-path apps/api
   node project-init.mjs --frontend-path apps/web --backend-path services/backend
   node project-init.mjs --frontend-port 3100 --backend-port 4100
-  node project-init.mjs --scope @polpig
+  node project-init.mjs --scope @namespace
   node project-init.mjs --skip-global-nest`);
 }
 
@@ -359,7 +359,7 @@ async function scaffoldTurboStructureWithCreateTurbo(rootDir) {
 async function ensureTurboRoot(rootDir, scope) {
   const packagePath = path.join(rootDir, "package.json");
   const turboPath = path.join(rootDir, "turbo.json");
-  const repoName = `${scope || "@poupig"}/workspace`;
+  const repoName = `${scope || "@namespace"}/workspace`;
   const requiredTurboPaths = [
     ".gitignore",
     ".npmrc",

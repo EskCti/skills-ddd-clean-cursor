@@ -1,6 +1,6 @@
 ---
 name: config-shared-core
-description: Inicializar o módulo `packages/shared` completo de forma determinística no padrão do projeto Poupig, incluindo estrutura de código (`src/base`, `src/db`, `src/dto`, `src/vo`, `src/index.ts`) e testes (`test/base`, `test/vo`, `test/data`) com VO `HashPassword` para hashes bcrypt. Usar quando o pedido envolver bootstrap do pacote shared, recriação do shared em novo projeto, reset da base compartilhada ou scaffolding completo do core compartilhado com configs (`package.json`, `tsconfig.json`, `jest.config.ts`).
+description: Inicializar o módulo `packages/shared` completo de forma determinística no padrão do projeto Workspace, incluindo estrutura de código (`src/base`, `src/db`, `src/dto`, `src/vo`, `src/index.ts`) e testes (`test/base`, `test/vo`, `test/data`) com VO `HashPassword` para hashes bcrypt. Usar quando o pedido envolver bootstrap do pacote shared, recriação do shared em novo projeto, reset da base compartilhada ou scaffolding completo do core compartilhado com configs (`package.json`, `tsconfig.json`, `jest.config.ts`).
 ---
 
 # Config Shared Core
@@ -15,7 +15,7 @@ O template inclui obrigatoriamente o VO `HashPassword` (`src/vo/hash-password.vo
 ## Workflow
 
 1. Executar `node scripts/create-shared.mjs`.
-2. Namespace é resolvido por precedência: `--scope` > `POUPIG_NAMESPACE`/`SKILLS_NAMESPACE` > `skills.config.local.json` > `skills.config.json` > fallback do template.
+2. Namespace é resolvido por precedência: `--scope` > `PROJECT_NAMESPACE`/`SKILLS_NAMESPACE` > `skills.config.local.json` > `skills.config.json` > fallback do template.
 3. Se o diretório já existir, usar `--force` para sobrescrever.
 4. Antes do `npm install`, adicionar `"@<namespace>/shared": "*"` em `dependencies` apenas dos `package.json` de frontend e backend (conforme `frontendAppPath` e `backendAppPath` no config).
 5. Após gerar em `<sharedModulePath>`, executar `npm install` na raiz do projeto para atualizar as dependências do workspace.
@@ -38,7 +38,7 @@ node .agents/skills/config-shared-core/scripts/create-shared.mjs
 Definir namespace explícito:
 
 ```bash
-node .agents/skills/config-shared-core/scripts/create-shared.mjs --scope @poupig
+node .agents/skills/config-shared-core/scripts/create-shared.mjs --scope @namespace
 ```
 
 Sobrescrever o diretório existente de `<sharedModulePath>`:
@@ -56,7 +56,7 @@ node .agents/skills/config-shared-core/scripts/create-shared.mjs --force --run-t
 Definir namespace por variável de ambiente:
 
 ```bash
-POUPIG_NAMESPACE=@poupig node .agents/skills/config-shared-core/scripts/create-shared.mjs --force
+PROJECT_NAMESPACE=@namespace node .agents/skills/config-shared-core/scripts/create-shared.mjs --force
 ```
 
 ## Resources

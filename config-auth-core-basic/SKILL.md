@@ -1,6 +1,6 @@
 ---
 name: config-auth-core-basic
-description: Criar/recriar o módulo de autenticação básico de forma determinística no padrão Pharmacore, refletindo o estado atual do pacote `auth` com foco em `user`, `password` e `application`, incluindo código e testes unitários. A skill detecta automaticamente se o monorepo usa pacotes diretos (`packages/*`) ou aninhados (`packages/*/*`) e cria no caminho correto (`packages/auth` ou `packages/auth/core`). Usar quando o pedido envolver bootstrap/rebootstrap do auth core mínimo, sem perfil e sem permissões, com `Password` validando `HashPassword` e política de troca de senha centralizada em serviço de domínio.
+description: Criar/recriar o módulo de autenticação básico de forma determinística no padrão Genérico, refletindo o estado atual do pacote `auth` com foco em `user`, `password` e `application`, incluindo código e testes unitários. A skill detecta automaticamente se o monorepo usa pacotes diretos (`packages/*`) ou aninhados (`packages/*/*`) e cria no caminho correto (`packages/auth` ou `packages/auth/core`). Usar quando o pedido envolver bootstrap/rebootstrap do auth core mínimo, sem perfil e sem permissões, com `Password` validando `HashPassword` e política de troca de senha centralizada em serviço de domínio.
 ---
 
 # Config Auth Core Basic
@@ -30,7 +30,7 @@ Correção obrigatória do modelo:
 ## Workflow
 
 1. Executar `node scripts/create-auth-core-basic.mjs`.
-2. Namespace é resolvido por precedência: `--scope` > `POUPIG_NAMESPACE`/`SKILLS_NAMESPACE` > `skills.config.local.json` > `skills.config.json` > fallback do template.
+2. Namespace é resolvido por precedência: `--scope` > `PROJECT_NAMESPACE`/`SKILLS_NAMESPACE` > `skills.config.local.json` > `skills.config.json` > fallback do template.
 3. Se o diretório já existir, usar `--force` para sobrescrever.
 4. Após gerar no alvo detectado (`packages/auth` ou `packages/auth/core`), confirmar estrutura de `src/` e `test/` conforme contrato atual do módulo.
 5. Opcionalmente executar testes do pacote com `--run-tests`.
@@ -49,7 +49,7 @@ node .agents/skills/config-auth-core-basic/scripts/create-auth-core-basic.mjs
 Definir namespace explícito:
 
 ```bash
-node .agents/skills/config-auth-core-basic/scripts/create-auth-core-basic.mjs --scope @poupig
+node .agents/skills/config-auth-core-basic/scripts/create-auth-core-basic.mjs --scope @namespace
 ```
 
 Sobrescrever diretório existente:
@@ -73,7 +73,7 @@ node .agents/skills/config-auth-core-basic/scripts/create-auth-core-basic.mjs --
 Definir namespace por variável de ambiente:
 
 ```bash
-POUPIG_NAMESPACE=@poupig node .agents/skills/config-auth-core-basic/scripts/create-auth-core-basic.mjs --force
+PROJECT_NAMESPACE=@namespace node .agents/skills/config-auth-core-basic/scripts/create-auth-core-basic.mjs --force
 ```
 
 ## Resources

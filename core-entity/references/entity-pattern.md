@@ -1,4 +1,4 @@
-# Entity Pattern (Pharmacore)
+# Entity Pattern (Genérico)
 
 ## Paths
 
@@ -52,7 +52,7 @@
 ## Exemplo mínimo
 
 ```ts
-import { Entity, EntityProps, Id, Name, Result } from "@pharmacore/shared";
+import { Entity, EntityProps, Id, Name, Result } from "@namespace/shared";
 
 export interface ExampleProps extends EntityProps {
   name: string;

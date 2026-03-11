@@ -64,7 +64,7 @@ node .agents/skills/config-project/scripts/project-init.mjs \
 Sobrescrever namespace por CLI:
 
 ```bash
-node .agents/skills/config-project/scripts/project-init.mjs --scope @poupig
+node .agents/skills/config-project/scripts/project-init.mjs --scope @namespace
 ```
 
 ## Resources

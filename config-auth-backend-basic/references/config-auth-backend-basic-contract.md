@@ -45,7 +45,7 @@ Garantir que o backend tenha o módulo de autenticação básico funcional com i
 
 ## Regras de compatibilidade
 
-- Use cases devem vir de `@poupig/auth`.
+- Use cases devem vir de `@namespace/auth`.
 - Adapters Prisma devem respeitar contracts de `UserRepository`, `PasswordRepository` e queries do core.
 - `JwtAuthGuard` deve ser aplicado nos endpoints protegidos.
 - Seed de usuário padrão deve ser idempotente e ler dados de `default-users.json`.

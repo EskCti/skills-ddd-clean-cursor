@@ -1,4 +1,4 @@
-# Domain Service Pattern (Pharmacore)
+# Domain Service Pattern (Genérico)
 
 ## Escopo (fronteira)
 

@@ -1,4 +1,4 @@
-# Use Case Pattern (Pharmacore)
+# Use Case Pattern (Genérico)
 
 ## Paths
 
@@ -78,7 +78,7 @@
 ## Exemplo mínimo
 
 ```ts
-import { Result, UseCase } from "@pharmacore/shared";
+import { Result, UseCase } from "@namespace/shared";
 import { Thing } from "../model/thing.entity";
 import { ThingRepository } from "../provider/thing.repository";
 

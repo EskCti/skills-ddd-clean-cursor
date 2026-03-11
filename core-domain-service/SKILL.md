@@ -1,6 +1,6 @@
 ---
 name: core-domain-service
-description: Criar, revisar ou orientar a implementação de serviços de domínio no padrão Pharmacore, restritos ao núcleo de domínio (`*core/*`). Usar quando o pedido envolver "domain service", "serviço de domínio", arquivos `*.service.ts` em `packages/*/core/src/**`, políticas de domínio, cálculos/regras puras entre entidades e VOs, ou criação/ajuste de testes desses serviços.
+description: Criar, revisar ou orientar a implementação de serviços de domínio no padrão Genérico, restritos ao núcleo de domínio (`*core/*`). Usar quando o pedido envolver "domain service", "serviço de domínio", arquivos `*.service.ts` em `packages/*/core/src/**`, políticas de domínio, cálculos/regras puras entre entidades e VOs, ou criação/ajuste de testes desses serviços.
 ---
 
 # Domain Service

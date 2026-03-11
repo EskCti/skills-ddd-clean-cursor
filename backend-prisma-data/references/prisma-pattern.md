@@ -1,4 +1,4 @@
-# Prisma Pattern (Pharmacore)
+# Prisma Pattern (Genérico)
 
 ## Paths principais
 

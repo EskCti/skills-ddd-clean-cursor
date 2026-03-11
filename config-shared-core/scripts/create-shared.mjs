@@ -18,7 +18,7 @@ function usage() {
 
 Examples:
   node create-shared.mjs
-  node create-shared.mjs --scope @polpig
+  node create-shared.mjs --scope @namespace
   node create-shared.mjs --force
   node create-shared.mjs --force --run-tests
   node create-shared.mjs --target /tmp/shared-template-test`);
@@ -270,7 +270,7 @@ async function main() {
     const templateScope =
       typeof pkg.name === "string" && pkg.name.includes("/")
         ? pkg.name.split("/")[0]
-        : "@poupig";
+        : "@namespace";
     const { scope } = await resolveNamespace({
       rootDir,
       cliScope: scopeArg,

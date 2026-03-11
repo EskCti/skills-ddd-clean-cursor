@@ -1,6 +1,6 @@
 ---
 name: config-prisma
-description: "Inicializar e padronizar o Prisma no backend NestJS do Pharmacore com schema modular por domínio (`apps/backend/prisma/models/*.model.prisma`), entrypoint de seed em `apps/backend/prisma/seed/main.ts`, configuração de `prisma.config.ts`, Docker Compose do backend compatível com `DATABASE_URL` do `.env`, e criação/ajuste de `DbModule` + `PrismaService`. Usar quando o pedido envolver setup inicial de Prisma, onboarding de módulos com arquivo Prisma próprio ou rebootstrap da infraestrutura de banco no backend."
+description: "Inicializar e padronizar o Prisma no backend NestJS do Genérico com schema modular por domínio (`apps/backend/prisma/models/*.model.prisma`), entrypoint de seed em `apps/backend/prisma/seed/main.ts`, configuração de `prisma.config.ts`, Docker Compose do backend compatível com `DATABASE_URL` do `.env`, e criação/ajuste de `DbModule` + `PrismaService`. Usar quando o pedido envolver setup inicial de Prisma, onboarding de módulos com arquivo Prisma próprio ou rebootstrap da infraestrutura de banco no backend."
 ---
 
 # Config Prisma

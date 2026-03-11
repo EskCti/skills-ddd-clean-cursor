@@ -15,7 +15,7 @@ function usage() {
 
 Examples:
   node create-module.mjs billing
-  node create-module.mjs classification --scope @polpig
+  node create-module.mjs classification --scope @namespace
   node create-module.mjs payments --force`);
 }
 

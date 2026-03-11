@@ -19,7 +19,7 @@ const DEFAULT_DB = {
 };
 
 function printHelp() {
-  console.log(`Prisma init (Pharmacore)
+  console.log(`Prisma init (Genérico)
 
 Usage:
   node .agents/skills/config-prisma/scripts/init-prisma-backend.js [options]

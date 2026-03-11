@@ -40,7 +40,7 @@ Gerar um módulo novo de forma determinística em três áreas do monorepo:
 - O nome real do módulo shared é derivado de `basename(sharedModulePath)`.
 - Namespace por precedência:
   - `--scope`
-  - `POUPIG_NAMESPACE` ou `SKILLS_NAMESPACE`
+  - `PROJECT_NAMESPACE` ou `SKILLS_NAMESPACE`
   - `skills.config.local.json` (em `.agents/skills/.env`, `.cloud/skills/.env` ou `.env/`)
   - `skills.config.json` (em `.agents/skills/.env`, `.cloud/skills/.env` ou `.env/`)
   - fallback de `packages/shared/package.json`
@@ -73,7 +73,7 @@ Gerar um módulo novo de forma determinística em três áreas do monorepo:
 
 ## Notes
 
-- `--scope` permite forçar namespace explícito (`@polpig`, `@poupig`, etc.).
+- `--scope` permite forçar namespace explícito (ex.: `@namespace`, `@acme`).
 - Sem `--scope`, usar a precedência de configuração global da skill.
 - `--force` permite sobrescrever os diretórios de package/backend/frontend do módulo.
 - Seguir convenção global em `../../skills-standards.md`.

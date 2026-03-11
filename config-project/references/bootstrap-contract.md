@@ -9,7 +9,7 @@ Padronizar o bootstrap de um monorepo TurboRepo para:
 
 Com defaults obtidos de `skills.config.json`:
 
-- `namespace` (padrão: `@poupig`)
+- `namespace` (padrão: `@namespace`)
 - `frontendAppPath` (padrão: `apps/web`)
 - `backendAppPath` (padrão: `apps/backend`)
 - `frontendPort` (padrão: `3000`)

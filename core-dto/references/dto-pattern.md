@@ -1,4 +1,4 @@
-# DTO Pattern (Pharmacore)
+# DTO Pattern (Genérico)
 
 ## Tipos de DTO
 

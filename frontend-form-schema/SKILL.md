@@ -1,6 +1,6 @@
 ---
 name: frontend-form-schema
-description: "Criar, revisar ou orientar forms frontend e schemas de validação no padrão Pharmacore Web. Usar quando o pedido envolver componentes de formulário React Hook Form, arquivos `data/schemas/*`, validação com `v` (`@pharmacore/shared-web`), tipagem com `v.infer`, campos opcionais/refinamentos/arrays e integração de erro com componentes de form compartilhados."
+description: "Criar, revisar ou orientar forms frontend e schemas de validação no padrão Genérico Web. Usar quando o pedido envolver componentes de formulário React Hook Form, arquivos `data/schemas/*`, validação com `v` (`@namespace/shared-web`), tipagem com `v.infer`, campos opcionais/refinamentos/arrays e integração de erro com componentes de form compartilhados."
 ---
 
 # Frontend Form Schema
@@ -11,7 +11,7 @@ Aplicar o padrão de formulários do projeto com React Hook Form + validator `v`
 
 ## Guidelines
 
-- Preferir `v` (`@pharmacore/shared-web`) como padrão de schema/resolver.
+- Preferir `v` (`@namespace/shared-web`) como padrão de schema/resolver.
 - Definir schema com `v.defineObject`, arrays com `v.defineArray` e validação cruzada com `.refine`.
 - Tipar payload de formulário com `v.infer<typeof schema>`.
 - Integrar com RHF via `resolver: v.resolver(schema)`.

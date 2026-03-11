@@ -1,8 +1,8 @@
 [
   {
     "id": "0f7a95ef-d325-45f6-8526-6e64ea9df6bb",
-    "name": "Admin Poupig",
-    "email": "admin@poupig.local",
+    "name": "Admin Workspace",
+    "email": "admin@namespace.local",
     "password": "Admin@123",
     "avatarUrl": null
   }

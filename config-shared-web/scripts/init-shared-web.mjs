@@ -207,7 +207,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Poupig Web Shell",
+  title: "Workspace Web Shell",
   description: "Base compartilhada para aplicacao administrativa",
 };
 
@@ -233,7 +233,7 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-background text-foreground">
       <div className="mx-auto flex min-h-screen w-full max-w-4xl flex-col items-center justify-center gap-6 px-6 py-16 text-center">
-        <h1 className="text-3xl font-semibold tracking-tight">Poupig Shared Web</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">Workspace Shared Web</h1>
         <p className="max-w-2xl text-muted-foreground">
           Estrutura base configurada. Acesse as rotas de exemplo privada e publica.
         </p>
@@ -438,7 +438,7 @@ export default function PrivateGroupLayout({
       <AdminShell
         sidebar={<PrivateSidebarMenu />}
         logoIcon={<Boxes className="size-5" />}
-        logoText="Poupig"
+        logoText="Workspace"
         userName="Admin"
       >
         {children}
@@ -983,7 +983,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Poupig Web Shell",
+  title: "Workspace Web Shell",
   description: "Base compartilhada para aplicacao administrativa",
 };
 
@@ -1011,7 +1011,7 @@ export default function HomePage() {
     <main className="min-h-screen bg-background text-foreground">
       <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col justify-center gap-8 px-6 py-16">
         <header className="space-y-3">
-          <h1 className="text-3xl font-semibold tracking-tight">Poupig Dashboard Starter</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">Workspace Dashboard Starter</h1>
           <p className="max-w-3xl text-muted-foreground">
             Estrutura inicial preparada com shell administrativo, modulo de exemplos e componentes base para uma aplicacao dashboard.
           </p>
@@ -1145,7 +1145,7 @@ export default function PrivateGroupLayout({
       <AdminShell
         sidebar={<PrivateSidebarMenu />}
         logoIcon={<Boxes className="size-5" />}
-        logoText="Poupig"
+        logoText="Workspace"
         userName="Admin"
       >
         {children}

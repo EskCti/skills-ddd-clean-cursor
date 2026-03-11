@@ -6,7 +6,7 @@ import {
   PasswordRepository,
   UserErrors,
 } from '__AUTH_PACKAGE_NAME__';
-import { Result } from '@poupig/shared';
+import { Result } from '__SHARED_PACKAGE_NAME__';
 import { PrismaService } from '../../db/prisma.service';
 
 @Injectable()

@@ -1,4 +1,4 @@
-# Controller Pattern (Pharmacore)
+# Controller Pattern (Genérico)
 
 ## Paths de referência
 

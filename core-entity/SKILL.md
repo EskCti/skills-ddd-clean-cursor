@@ -1,6 +1,6 @@
 ---
 name: core-entity
-description: Criar, revisar ou orientar a implementação de Entidades de domínio no padrão Pharmacore. Usar quando o pedido envolver "entidade", "entity", arquivos `*.entity.ts`, modelagem de regras de negócio com `Entity`, validação com `Result`, composição com Value Objects/Entidades aninhadas, ou criação/ajuste de testes de entidade.
+description: Criar, revisar ou orientar a implementação de Entidades de domínio no padrão Genérico. Usar quando o pedido envolver "entidade", "entity", arquivos `*.entity.ts`, modelagem de regras de negócio com `Entity`, validação com `Result`, composição com Value Objects/Entidades aninhadas, ou criação/ajuste de testes de entidade.
 ---
 
 # Entity
@@ -12,7 +12,7 @@ Aplicar o padrão de Entidades do projeto com foco em identidade (`id`), invaria
 ## Guidelines
 
 - Ler `references/entity-pattern.md` antes de criar/alterar entidades.
-- Estender `Entity<Type, Props>` de `@pharmacore/shared` e manter construtor `private` ou `protected`.
+- Estender `Entity<Type, Props>` de `@namespace/shared` e manter construtor `private` ou `protected`.
 - Expor API consistente: `create` (throw) e `tryCreate` (`Result`).
 - Validar invariantes com VOs (`Id`, `Name`, `Text`, `Number`, `Sku`, etc.) e `Result.combine`.
 - Persistir no `props` apenas valores normalizados (`instance.value`, `instance.props` quando aplicável).

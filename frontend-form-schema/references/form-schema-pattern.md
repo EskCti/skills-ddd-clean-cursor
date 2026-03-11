@@ -1,4 +1,4 @@
-# Frontend Form + Schema Pattern (Pharmacore)
+# Frontend Form + Schema Pattern (Genérico)
 
 ## Paths de referência
 
@@ -18,7 +18,7 @@
 ## Padrão principal
 
 - Stack padrão:
-  - `react-hook-form` + `v` (`@pharmacore/shared-web`)
+  - `react-hook-form` + `v` (`@namespace/shared-web`)
 - Schema:
   - `v.defineObject({...})`
   - `v.defineArray(...)`

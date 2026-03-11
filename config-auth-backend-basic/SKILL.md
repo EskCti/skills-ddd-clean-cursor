@@ -1,13 +1,13 @@
 ---
 name: config-auth-backend-basic
-description: Criar/recriar de forma determinística o módulo de autenticação do backend NestJS com endpoints HTTP (register/login/me/usuários/senha), JWT com Passport, adapters Prisma compatíveis com `@poupig/auth`, modelo Prisma de auth, migration SQL inicial e seed JSON com usuário padrão. Usar quando o pedido envolver bootstrap/rebootstrap da camada backend auth completa no `apps/backend`.
+description: Criar/recriar de forma determinística o módulo de autenticação do backend NestJS com endpoints HTTP (register/login/me/usuários/senha), JWT com Passport, adapters Prisma compatíveis com `@namespace/auth`, modelo Prisma de auth, migration SQL inicial e seed JSON com usuário padrão. Usar quando o pedido envolver bootstrap/rebootstrap da camada backend auth completa no `apps/backend`.
 ---
 
 # Config Auth Backend Basic
 
 ## Overview
 
-Executar setup idempotente do módulo de autenticação backend no padrão Pharmacore, cobrindo:
+Executar setup idempotente do módulo de autenticação backend no padrão Genérico, cobrindo:
 
 - módulo NestJS simplificado em `apps/backend/src/modules/auth` com arquivos centrais:
   - `auth.controller.ts`
@@ -18,7 +18,7 @@ Executar setup idempotente do módulo de autenticação backend no padrão Pharm
   - `password.prisma.ts`
   - `providers/bcrypt.provider.ts`
 - endpoints de autenticação e usuário com `JwtAuthGuard`
-- integração com `@poupig/auth` (use cases, entidades e providers)
+- integração com `@namespace/auth` (use cases, entidades e providers)
 - implementação Prisma (repositories/queries + model `.prisma`)
 - migration inicial de auth
 - seed com usuário padrão em JSON
@@ -60,7 +60,7 @@ node .agents/skills/config-auth-backend-basic/scripts/init-config-auth-backend-b
 Forçar namespace fallback quando não for possível detectar pacote auth automaticamente:
 
 ```bash
-node .agents/skills/config-auth-backend-basic/scripts/init-config-auth-backend-basic.mjs --apply --scope @poupig
+node .agents/skills/config-auth-backend-basic/scripts/init-config-auth-backend-basic.mjs --apply --scope @namespace
 ```
 
 ## Resources
@@ -72,7 +72,7 @@ node .agents/skills/config-auth-backend-basic/scripts/init-config-auth-backend-b
 
 ## Output Contract
 
-A skill deve convergir o backend para o contrato descrito em `references/config-auth-backend-basic-contract.md`, mantendo compatibilidade com o core `@poupig/auth` e com execução repetível sem duplicação estrutural.
+A skill deve convergir o backend para o contrato descrito em `references/config-auth-backend-basic-contract.md`, mantendo compatibilidade com o core `@namespace/auth` e com execução repetível sem duplicação estrutural.
 
 ## Global Standards
 

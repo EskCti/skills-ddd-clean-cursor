@@ -1,4 +1,4 @@
-# Repository Pattern (Pharmacore)
+# Repository Pattern (Genérico)
 
 ## Paths
 

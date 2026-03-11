@@ -42,14 +42,14 @@ Sem escopo de geração:
 ## Command
 
 ```bash
-node .agents/skills/config-auth-core-basic/scripts/create-auth-core-basic.mjs [--scope @poupig] [--force] [--run-tests] [--target <path>] [--skip-apps-sync] [--skip-install]
+node .agents/skills/config-auth-core-basic/scripts/create-auth-core-basic.mjs [--scope @namespace] [--force] [--run-tests] [--target <path>] [--skip-apps-sync] [--skip-install]
 ```
 
 ## Namespace Resolution
 
 Se `--scope` não for informado, usar esta precedência:
 
-1. `POUPIG_NAMESPACE` ou `SKILLS_NAMESPACE`
+1. `PROJECT_NAMESPACE` ou `SKILLS_NAMESPACE`
 2. `skills.config.local.json` (em `.agents/skills/.env`, `.cloud/skills/.env` ou `.env/`)
 3. `skills.config.json` (em `.agents/skills/.env`, `.cloud/skills/.env` ou `.env/`)
 4. scope do template em `assets/auth-core-basic-template/package.json`

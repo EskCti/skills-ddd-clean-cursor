@@ -361,10 +361,24 @@ async function resolveAuthPackageName(rootDir, fallbackScope) {
   const { scope } = await resolveNamespace({
     rootDir,
     cliScope: fallbackScope,
-    fallbackScope: '@poupig',
+    fallbackScope: '@namespace',
   });
 
   return `${scope}/auth`;
+}
+
+function resolveSharedPackageNameFromAuth(authPackageName) {
+  if (typeof authPackageName !== 'string') {
+    return '@namespace/shared';
+  }
+
+  const slashIndex = authPackageName.indexOf('/');
+  if (slashIndex <= 0) {
+    return '@namespace/shared';
+  }
+
+  const scope = authPackageName.slice(0, slashIndex);
+  return `${scope}/shared`;
 }
 
 async function main() {
@@ -396,10 +410,13 @@ async function main() {
     }
 
     const authPackageName = await resolveAuthPackageName(rootDir, args.scope);
+    const sharedPackageName = resolveSharedPackageNameFromAuth(authPackageName);
     logger.step(`Pacote auth resolvido: ${authPackageName}.`);
+    logger.step(`Pacote shared resolvido: ${sharedPackageName}.`);
 
     await copyTemplate(templateDir, rootDir, {
       __AUTH_PACKAGE_NAME__: authPackageName,
+      __SHARED_PACKAGE_NAME__: sharedPackageName,
     }, options);
 
     await ensureBackendDependencies(

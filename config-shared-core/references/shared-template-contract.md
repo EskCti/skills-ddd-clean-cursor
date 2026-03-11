@@ -22,7 +22,7 @@ Não depende de geração dinâmica de código via LLM e não depende de shell e
 ## Command
 
 ```bash
-node .agents/skills/config-shared-core/scripts/create-shared.mjs [--scope @poupig] [--force] [--run-tests]
+node .agents/skills/config-shared-core/scripts/create-shared.mjs [--scope @namespace] [--force] [--run-tests]
 ```
 
 > Se o repositório estiver em `.cloud/skills`, ajuste o caminho do comando.
@@ -40,7 +40,7 @@ node .agents/skills/config-shared-core/scripts/create-shared.mjs [--scope @poupi
 
 Se `--scope` não for informado, usar esta precedência:
 
-1. `POUPIG_NAMESPACE` ou `SKILLS_NAMESPACE`
+1. `PROJECT_NAMESPACE` ou `SKILLS_NAMESPACE`
 2. `skills.config.local.json` (em `.agents/skills/.env`, `.cloud/skills/.env` ou `.env/`)
 3. `skills.config.json` (em `.agents/skills/.env`, `.cloud/skills/.env` ou `.env/`)
 4. scope do template em `assets/shared-template/package.json`

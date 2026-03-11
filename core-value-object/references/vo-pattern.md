@@ -1,4 +1,4 @@
-# VO Pattern (Pharmacore)
+# VO Pattern (Genérico)
 
 ## Paths
 

@@ -314,7 +314,7 @@ export async function resolveNamespace({
   }
 
   const env = normalizeScope(
-    process.env.POUPIG_NAMESPACE || process.env.SKILLS_NAMESPACE || "",
+    process.env.PROJECT_NAMESPACE || process.env.SKILLS_NAMESPACE || "",
   );
   if (env) {
     return { scope: env, source: "env" };
@@ -332,7 +332,7 @@ export async function resolveNamespace({
     return { scope: fallback, source: "fallback" };
   }
 
-  return { scope: "@poupig", source: "default" };
+  return { scope: "@namespace", source: "default" };
 }
 
 export { normalizeScope };

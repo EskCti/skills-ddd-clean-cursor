@@ -1,4 +1,4 @@
-# Query CQRS Pattern (Pharmacore)
+# Query CQRS Pattern (Genérico)
 
 ## Quando usar Query (CQRS)
 
