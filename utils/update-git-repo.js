@@ -22,7 +22,7 @@ const COMMIT_TYPES = [
 
 function printHelp() {
   console.log(`Uso:
-  node .agents/skills/utils/update.js [--dry-run] [--no-push]
+  node .agents/skills/utils/update-git-repo.js [--dry-run] [--no-push]
 
 Descricao:
   Cria commit padronizado no formato Conventional Commits
@@ -35,7 +35,7 @@ Opcoes:
   -h, --help  Exibe esta ajuda`);
 }
 
-function runGit(args, options = {}) {
+function runGitResult(args, options = {}) {
   const result = spawnSync('git', args, {
     encoding: 'utf8',
     stdio: options.stdio || 'pipe',
@@ -45,20 +45,47 @@ function runGit(args, options = {}) {
     throw result.error;
   }
 
+  return result;
+}
+
+function formatGitFailure(args, result) {
+  const stderr = (result.stderr || '').trim();
+  const stdoutText = (result.stdout || '').trim();
+  const details = stderr || stdoutText || `exit ${result.status}`;
+  const commandText = `git ${args.join(' ')}`;
+  return `Falha ao executar "${commandText}": ${details}`;
+}
+
+function createGitError(args, result) {
+  const error = new Error(formatGitFailure(args, result));
+  error.gitArgs = args;
+  error.gitStatus = result.status;
+  error.gitStdout = result.stdout || '';
+  error.gitStderr = result.stderr || '';
+  return error;
+}
+
+function printGitOutput(result) {
+  if (result.stdout) {
+    process.stdout.write(result.stdout);
+  }
+  if (result.stderr) {
+    process.stderr.write(result.stderr);
+  }
+}
+
+function runGit(args, options = {}) {
+  const result = runGitResult(args, options);
+
   if (result.status !== 0) {
-    const stderr = (result.stderr || '').trim();
-    const stdoutText = (result.stdout || '').trim();
-    const details = stderr || stdoutText || `exit ${result.status}`;
-    const commandText = `git ${args.join(' ')}`;
-    throw new Error(`Falha ao executar "${commandText}": ${details}`);
+    throw createGitError(args, result);
   }
 
   return (result.stdout || '').trim();
 }
 
 function runGitMaybe(args) {
-  const result = spawnSync('git', args, {
-    encoding: 'utf8',
+  const result = runGitResult(args, {
     stdio: 'pipe',
   });
 
@@ -158,10 +185,53 @@ function hasOriginRemote(repoRoot) {
 }
 
 function hasUpstreamBranch(repoRoot) {
-  const result = spawnSync('git', ['-C', repoRoot, 'rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'], {
+  const result = runGitResult(['-C', repoRoot, 'rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'], {
     stdio: 'pipe',
   });
   return result.status === 0;
+}
+
+function buildPushArgs(repoRoot, branch) {
+  const args = ['-C', repoRoot, 'push'];
+  if (!hasUpstreamBranch(repoRoot)) {
+    args.push('-u', 'origin', branch);
+  }
+  return args;
+}
+
+function isNonFastForwardPushRejection(result) {
+  const text = `${result.stdout || ''}\n${result.stderr || ''}`.toLowerCase();
+  return (
+    text.includes('non-fast-forward') ||
+    text.includes('fetch first') ||
+    text.includes('updates were rejected because the remote contains work that you do not have locally') ||
+    text.includes('failed to push some refs')
+  );
+}
+
+function syncWithRemoteUsingRebase({ repoRoot, branch, dryRun }) {
+  const pullArgs = ['-C', repoRoot, 'pull', '--rebase', '--autostash', 'origin', branch];
+
+  if (dryRun) {
+    console.log(`[dry-run] git ${pullArgs.join(' ')}`);
+    return;
+  }
+
+  const pullResult = runGitResult(pullArgs, { stdio: 'pipe' });
+  printGitOutput(pullResult);
+
+  if (pullResult.status !== 0) {
+    const abortResult = runGitResult(['-C', repoRoot, 'rebase', '--abort'], { stdio: 'pipe' });
+    if (abortResult.status === 0) {
+      console.log('Rebase abortado automaticamente apos falha de sincronizacao.');
+    }
+
+    const baseMessage = formatGitFailure(pullArgs, pullResult);
+    throw new Error(
+      `${baseMessage}\n` +
+        'Nao foi possivel sincronizar automaticamente com o remoto. Resolva conflitos manualmente e tente o push novamente.',
+    );
+  }
 }
 
 function commitRepo({ repoRoot, messageHeader, dryRun }) {
@@ -183,11 +253,7 @@ function commitRepo({ repoRoot, messageHeader, dryRun }) {
 
 function pushRepo({ repoRoot, branch, dryRun }) {
   if (dryRun) {
-    if (hasUpstreamBranch(repoRoot)) {
-      console.log(`[dry-run] git -C "${repoRoot}" push`);
-    } else {
-      console.log(`[dry-run] git -C "${repoRoot}" push -u origin "${branch}"`);
-    }
+    console.log(`[dry-run] git ${buildPushArgs(repoRoot, branch).join(' ')}`);
     return;
   }
 
@@ -195,11 +261,21 @@ function pushRepo({ repoRoot, branch, dryRun }) {
     throw new Error('Repositorio de skills nao possui remoto "origin" configurado.');
   }
 
-  const pushArgs = ['-C', repoRoot, 'push'];
-  if (!hasUpstreamBranch(repoRoot)) {
-    pushArgs.push('-u', 'origin', branch);
+  const pushArgs = buildPushArgs(repoRoot, branch);
+  const pushResult = runGitResult(pushArgs, { stdio: 'pipe' });
+  printGitOutput(pushResult);
+
+  if (pushResult.status === 0) {
+    return;
   }
-  runGit(pushArgs, { stdio: 'inherit' });
+
+  if (isNonFastForwardPushRejection(pushResult)) {
+    const nonFastForwardError = createGitError(pushArgs, pushResult);
+    nonFastForwardError.code = 'PUSH_NON_FAST_FORWARD';
+    throw nonFastForwardError;
+  }
+
+  throw createGitError(pushArgs, pushResult);
 }
 
 async function main() {
@@ -262,11 +338,44 @@ async function main() {
       return;
     }
 
-    pushRepo({
-      repoRoot,
-      branch: currentBranch,
-      dryRun,
-    });
+    try {
+      pushRepo({
+        repoRoot,
+        branch: currentBranch,
+        dryRun,
+      });
+    } catch (error) {
+      if (!(error && error.code === 'PUSH_NON_FAST_FORWARD')) {
+        throw error;
+      }
+
+      const shouldSync = await askYesNo(
+        rl,
+        'Push rejeitado por divergir do remoto. Tentar sincronizar com "git pull --rebase" e reenviar automaticamente?',
+        true,
+      );
+
+      if (!shouldSync) {
+        throw new Error(
+          'Push rejeitado por non-fast-forward. Sincronize o repositorio de skills com o remoto e execute o push novamente.',
+        );
+      }
+
+      console.log('\nSincronizando branch local com o remoto...');
+      syncWithRemoteUsingRebase({
+        repoRoot,
+        branch: currentBranch,
+        dryRun,
+      });
+
+      console.log('Sincronizacao concluida. Tentando push novamente...');
+      pushRepo({
+        repoRoot,
+        branch: currentBranch,
+        dryRun,
+      });
+    }
+
     console.log('Push no repositorio de skills concluido.');
   } finally {
     rl.close();
