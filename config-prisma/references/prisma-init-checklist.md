@@ -49,7 +49,7 @@ node .agents/skills/config-prisma/scripts/init-prisma-backend.js --apply --modul
 - `apps/backend/src/db/db.module.ts`
 - `apps/backend/src/db/prisma.service.ts`
 - `apps/backend/src/app.module.ts`
-- `apps/backend/generated/prisma/client.ts` (gerado por `prisma generate`)
+- `apps/backend/prisma/generated/client.ts` (gerado por `prisma generate`)
 
 ## Regra de escopo desta skill
 

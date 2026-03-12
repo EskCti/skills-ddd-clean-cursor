@@ -396,7 +396,8 @@ function renderSchemaPrisma() {
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "./generated"
+  moduleFormat = "cjs"
 }
 
 datasource db {
@@ -407,7 +408,7 @@ datasource db {
 function renderSeedMainTs() {
   return `import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '../../generated/prisma/client';
+import { PrismaClient } from '../generated/client';
 
 type SeedTask = (prisma: PrismaClient) => Promise<void>;
 
@@ -447,6 +448,8 @@ function shouldReplaceLegacySeedMain(content) {
     content.includes('from "@prisma/client"') ||
     content.includes("from '../generated/prisma/client'") ||
     content.includes('from "../generated/prisma/client"') ||
+    content.includes("from '../../generated/prisma/client'") ||
+    content.includes('from "../../generated/prisma/client"') ||
     content.includes('type CidLoader =') ||
     content.includes('const loaders: CidLoader[]')
   );
@@ -455,7 +458,7 @@ function shouldReplaceLegacySeedMain(content) {
 function renderPrismaService() {
   return `import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '../../generated/prisma/client';
+import { PrismaClient } from '../../prisma/generated/client';
 
 @Injectable()
 export class PrismaService implements OnModuleInit, OnModuleDestroy {
