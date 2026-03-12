@@ -5,4 +5,4 @@ import { FindByIdRepository } from './find-by-id.repository';
 import { UpdateRepository } from './update.repository';
 
 export interface CrudRepository<T extends Entity<any, any>>
-  extends CreateRepository<T>, UpdateRepository<T>, FindByIdRepository<T>, DeleteRepository<T> {}
+  extends CreateRepository<T>, UpdateRepository<T>, FindByIdRepository<T>, DeleteRepository {}

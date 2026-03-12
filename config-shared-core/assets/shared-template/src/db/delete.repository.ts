@@ -1,5 +1,6 @@
-import { Entity, Result } from '../base';
+import { Result } from '../base';
+import { TransactionContext } from './transaction.manager';
 
-export interface DeleteRepository<T extends Entity<any, any>> {
-  delete(id: string): Promise<Result<void>>;
+export interface DeleteRepository {
+  delete(id: string, tx?: TransactionContext): Promise<Result<void>>;
 }

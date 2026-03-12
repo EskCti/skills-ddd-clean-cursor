@@ -6,7 +6,7 @@ Padronizar bootstrap do Prisma no backend NestJS com:
 
 - schema modular em `apps/backend/prisma/models/*.model.prisma`
 - entrypoint de seed técnico em `apps/backend/prisma/seed/main.ts` (sem seeds de módulos)
-- módulo Nest de banco em `apps/backend/src/db/*`
+- módulo Nest de banco em `apps/backend/src/db/*` com `PrismaService` compatível com `TransactionManager`/`runInTransaction`
 - Docker Compose do backend compatível com `DATABASE_URL`
 
 ## Pré-requisitos
@@ -49,13 +49,13 @@ node .agents/skills/config-prisma/scripts/init-prisma-backend.js --apply --modul
 - `apps/backend/src/db/db.module.ts`
 - `apps/backend/src/db/prisma.service.ts`
 - `apps/backend/src/app.module.ts`
-- `apps/backend/prisma/generated/client.ts` (gerado por `prisma generate`)
 
 ## Regra de escopo desta skill
 
 - Não incluir seeds de dados por módulo (`prisma/seed/tasks/*`) nesta etapa.
 - O bootstrap de seed deve permanecer neutro até os módulos específicos serem aplicados.
 - `prisma/models/bootstrap.model.prisma` deve existir apenas quando ainda não há arquivos `*.model.prisma` de domínio.
+- Não sobrescrever `prisma/seed/main.ts` já moderno (com `@prisma/client`/`PrismaPg` e tasks de módulo); somente corrigir templates legados.
 
 ## Flags
 
@@ -64,7 +64,7 @@ node .agents/skills/config-prisma/scripts/init-prisma-backend.js --apply --modul
 - `--install`: roda `npm install --workspace <workspace-backend>` usando o nome em `apps/backend/package.json` (fallback `apps/backend`)
 - `--start-db`: roda `docker compose up -d postgres` no `apps/backend`
 - `--module <nome>`: cria arquivo Prisma por módulo
-- `--prisma-version <semver>`: força versão de Prisma
+- `--prisma-version <semver>`: força versão de Prisma; sem esta flag, a skill preserva versão Prisma já existente no backend (fallback `7.4.2`)
 
 ## Pós-bootstrap
 
@@ -73,5 +73,5 @@ node .agents/skills/config-prisma/scripts/init-prisma-backend.js --apply --modul
 - Implementar seeds por módulo e registrá-las em `prisma/seed/main.ts`
 - Atualizar adapters `*.prisma.ts` para mapear domínio/DTO
 - Remover `prisma/models/bootstrap.model.prisma` após entrada dos modelos reais e gerar migration de substituição
-- Em rebootstrap de projetos antigos, o script corrige automaticamente `prisma/seed/main.ts` legado quando detecta imports de `@prisma/client`, `generated/prisma` ou `cid`.
+- Em rebootstrap de projetos antigos, o script corrige automaticamente `prisma/seed/main.ts` legado quando detecta imports de `generated/client`, `generated/prisma` ou `cid`.
 - Seguir convenção global em `../../skills-standards.md`.
