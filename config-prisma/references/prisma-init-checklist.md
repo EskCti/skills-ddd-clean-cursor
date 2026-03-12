@@ -49,6 +49,7 @@ node .agents/skills/config-prisma/scripts/init-prisma-backend.js --apply --modul
 - `apps/backend/src/db/db.module.ts`
 - `apps/backend/src/db/prisma.service.ts`
 - `apps/backend/src/app.module.ts`
+- `apps/backend/generated/prisma/client.ts` (gerado por `prisma generate`)
 
 ## Regra de escopo desta skill
 
@@ -72,5 +73,5 @@ node .agents/skills/config-prisma/scripts/init-prisma-backend.js --apply --modul
 - Implementar seeds por módulo e registrá-las em `prisma/seed/main.ts`
 - Atualizar adapters `*.prisma.ts` para mapear domínio/DTO
 - Remover `prisma/models/bootstrap.model.prisma` após entrada dos modelos reais e gerar migration de substituição
-- Em rebootstrap de projetos antigos, o script corrige automaticamente `prisma/seed/main.ts` legado quando detecta imports de `generated/prisma` ou `cid`.
+- Em rebootstrap de projetos antigos, o script corrige automaticamente `prisma/seed/main.ts` legado quando detecta imports de `@prisma/client`, `generated/prisma` ou `cid`.
 - Seguir convenção global em `../../skills-standards.md`.

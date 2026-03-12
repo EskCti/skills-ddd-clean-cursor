@@ -24,11 +24,11 @@ Executar setup determinístico da infraestrutura Prisma no `apps/backend`, com s
 
 ## O que o script garante
 
-- Dependências Prisma no `apps/backend/package.json` (`prisma`, `@prisma/client`, `@prisma/adapter-pg`, `tsx`).
+- Dependências Prisma no `apps/backend/package.json` (`prisma`, `@prisma/client`, `@prisma/adapter-pg`, `tsx`, `@types/pg`).
 - Scripts npm de banco/Prisma (`db:start`, `db:stop`, `db:logs`, `prisma:generate`, `prisma:migrate:*`, `prisma:seed`, `prisma:studio`).
 - Remoção de script legado `prisma:cid` quando presente.
 - `apps/backend/prisma.config.ts` com `seed: 'npx tsx prisma/seed/main.ts'`.
-- `apps/backend/prisma/schema.prisma` com `generator client` em `prisma-client-js`.
+- `apps/backend/prisma/schema.prisma` com `generator client` em `prisma-client` e `output = "../generated/prisma"`.
 - `apps/backend/prisma/seed/main.ts` inicial (sem implementação de módulos), com autocorreção de template legado (`generated/prisma`/`cid`) quando detectado.
 - Não cria nem altera `prisma/seed/tasks/*` de módulos específicos.
 - `apps/backend/prisma/models/bootstrap.model.prisma` temporário apenas quando ainda não existe nenhum `*.model.prisma` de domínio.

@@ -6,7 +6,7 @@ const fsp = fs.promises;
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 
-const DEFAULT_PRISMA_VERSION = '7.4.2';
+const DEFAULT_PRISMA_VERSION = '7.5.0';
 const DEFAULT_TSX_VERSION = '4.21.0';
 const BACKEND_WORKSPACE = 'apps/backend';
 const DEFAULT_DB = {
@@ -395,7 +395,8 @@ function renderSchemaPrisma() {
 // Add per-module models under prisma/models/*.model.prisma
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -406,7 +407,7 @@ datasource db {
 function renderSeedMainTs() {
   return `import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../../generated/prisma/client';
 
 type SeedTask = (prisma: PrismaClient) => Promise<void>;
 
@@ -442,6 +443,8 @@ main()
 
 function shouldReplaceLegacySeedMain(content) {
   return (
+    content.includes("from '@prisma/client'") ||
+    content.includes('from "@prisma/client"') ||
     content.includes("from '../generated/prisma/client'") ||
     content.includes('from "../generated/prisma/client"') ||
     content.includes('type CidLoader =') ||
@@ -452,7 +455,7 @@ function shouldReplaceLegacySeedMain(content) {
 function renderPrismaService() {
   return `import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../../generated/prisma/client';
 
 @Injectable()
 export class PrismaService implements OnModuleInit, OnModuleDestroy {
@@ -552,6 +555,7 @@ async function ensureBackendPackageJson(backendDir, args, ctx) {
 
   upsertValue(devDependencies, 'prisma', targetVersion);
   upsertValue(devDependencies, 'tsx', devDependencies.tsx || `^${DEFAULT_TSX_VERSION}`);
+  upsertValue(devDependencies, '@types/pg', devDependencies['@types/pg'] || '^8.15.6');
 
   upsertValue(scripts, 'db:start', 'docker compose up -d postgres');
   upsertValue(scripts, 'db:stop', 'docker compose down');
