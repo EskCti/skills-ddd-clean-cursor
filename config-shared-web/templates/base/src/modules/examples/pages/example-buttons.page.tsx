@@ -1,11 +1,8 @@
-"use client";
+'use client';
 
-import { toast } from "sonner";
-import { Button, PageSectionHeader, StandardDialogContent } from "@/shared";
-import {
-  Dialog,
-  DialogTrigger,
-} from "@/shared/components/ui/dialog";
+import { toast } from 'sonner';
+import { Button, PageSectionHeader, StandardDialogContent } from '@/shared';
+import { Dialog, DialogTrigger } from '@/shared/components/ui/dialog';
 
 export function ExampleButtonsPage() {
   return (
@@ -37,8 +34,8 @@ export function ExampleButtonsPage() {
             description="Esta ação publica o conteúdo no ambiente principal."
             footer={
               <>
-              <Button variant="secondary">Cancelar</Button>
-              <Button>Confirmar</Button>
+                <Button variant="secondary">Cancelar</Button>
+                <Button>Confirmar</Button>
               </>
             }
           />
@@ -51,8 +48,8 @@ export function ExampleButtonsPage() {
           <Button
             className="bg-blue-600 text-white hover:bg-blue-500"
             onClick={() =>
-              toast.info("Atualização disponível", {
-                description: "Nova versão pronta para sincronizar.",
+              toast.info('Atualização disponível', {
+                description: 'Nova versão pronta para sincronizar.',
               })
             }
           >
@@ -62,8 +59,8 @@ export function ExampleButtonsPage() {
           <Button
             className="bg-emerald-600 text-white hover:bg-emerald-500"
             onClick={() =>
-              toast.success("Operação concluída", {
-                description: "Registro salvo com sucesso.",
+              toast.success('Operação concluída', {
+                description: 'Registro salvo com sucesso.',
               })
             }
           >
@@ -73,8 +70,8 @@ export function ExampleButtonsPage() {
           <Button
             className="bg-amber-500 text-zinc-950 hover:bg-amber-400"
             onClick={() =>
-              toast.warning("Atenção ao revisar", {
-                description: "Há campos opcionais sem preenchimento.",
+              toast.warning('Atenção ao revisar', {
+                description: 'Há campos opcionais sem preenchimento.',
               })
             }
           >
@@ -84,8 +81,8 @@ export function ExampleButtonsPage() {
           <Button
             className="bg-red-600 text-white hover:bg-red-500"
             onClick={() =>
-              toast.error("Falha ao concluir", {
-                description: "Não foi possível finalizar a requisição.",
+              toast.error('Falha ao concluir', {
+                description: 'Não foi possível finalizar a requisição.',
               })
             }
           >
@@ -95,8 +92,8 @@ export function ExampleButtonsPage() {
           <Button
             variant="outline"
             onClick={() =>
-              toast("Mensagem padrão", {
-                description: "Exemplo de notificação neutra.",
+              toast('Mensagem padrão', {
+                description: 'Exemplo de notificação neutra.',
               })
             }
           >
@@ -108,12 +105,12 @@ export function ExampleButtonsPage() {
             onClick={() =>
               toast.promise(
                 new Promise((resolve) => {
-                  setTimeout(() => resolve("ok"), 1200);
+                  setTimeout(() => resolve('ok'), 1200);
                 }),
                 {
-                  loading: "Processando ação...",
-                  success: "Processamento concluído.",
-                  error: "Não foi possível concluir o processamento.",
+                  loading: 'Processando ação...',
+                  success: 'Processamento concluído.',
+                  error: 'Não foi possível concluir o processamento.',
                 },
               )
             }

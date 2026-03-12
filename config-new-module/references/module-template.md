@@ -3,6 +3,7 @@
 ## Goal
 
 Gerar um módulo novo de forma determinística em três áreas do monorepo:
+
 - package: `<dirname(sharedModulePath)>/<module-name>`
 - backend: `<backendAppPath>/src/modules/<module-name>` + `<backendAppPath>/prisma/models/<module-name>.model.prisma`
 - frontend: `<frontendAppPath>/src/modules/<module-name>` quando `src/` existir, ou `<frontendAppPath>/modules/<module-name>` quando não existir `src/`, além de rota em `<app-base>/(private)/<module-name>` quando `(private)` existir
@@ -10,6 +11,7 @@ Gerar um módulo novo de forma determinística em três áreas do monorepo:
 ## Required Files
 
 ### Package
+
 - `package.json`
 - `tsconfig.json`
 - `jest.config.ts`
@@ -17,6 +19,7 @@ Gerar um módulo novo de forma determinística em três áreas do monorepo:
 - `test/index.test.ts`
 
 ### Backend
+
 - `<module-name>.controller.ts`
 - `<module-name>.prisma.ts`
 - `<module-name>.module.ts`
@@ -26,6 +29,7 @@ Gerar um módulo novo de forma determinística em três áreas do monorepo:
 - Dependência `<scope>/<module-name>` em `<backendAppPath>/package.json`
 
 ### Frontend
+
 - `modules-base/<module-name>/components/<module-name>-dashboard.component.tsx`
 - `modules-base/<module-name>/data/<module-name>-menu.data.ts`
 - `modules-base/<module-name>/pages/dashboard.page.tsx`

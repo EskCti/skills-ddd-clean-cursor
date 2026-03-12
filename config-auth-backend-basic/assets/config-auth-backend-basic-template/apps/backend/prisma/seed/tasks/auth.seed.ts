@@ -27,7 +27,9 @@ async function readDefaultUsers(): Promise<DefaultUserSeed[]> {
   return JSON.parse(raw) as DefaultUserSeed[];
 }
 
-export async function seedAuthDefaultUsers(prisma: PrismaClient): Promise<void> {
+export async function seedAuthDefaultUsers(
+  prisma: PrismaClient,
+): Promise<void> {
   const users = await readDefaultUsers();
 
   for (const seedUser of users) {

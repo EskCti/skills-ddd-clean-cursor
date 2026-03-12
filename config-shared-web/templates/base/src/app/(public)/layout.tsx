@@ -1,9 +1,5 @@
-import { PublicBoxedLayout } from "@/shared/template/public-boxed-layout.component";
+import { PublicBoxedLayout } from '@/shared/template/public-boxed-layout.component';
 
-export default function PublicGroupLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function PublicGroupLayout({ children }: { children: React.ReactNode }) {
   return <PublicBoxedLayout>{children}</PublicBoxedLayout>;
 }

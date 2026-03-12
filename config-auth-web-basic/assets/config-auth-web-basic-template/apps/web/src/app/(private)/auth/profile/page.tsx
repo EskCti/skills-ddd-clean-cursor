@@ -1,4 +1,4 @@
-import { ProfilePage } from "@/modules/auth";
+import { ProfilePage } from '@/modules/auth';
 
 export default function AuthProfileRoutePage() {
   return <ProfilePage />;

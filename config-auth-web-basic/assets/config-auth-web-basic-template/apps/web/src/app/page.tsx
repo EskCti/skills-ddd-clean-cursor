@@ -1,6 +1,6 @@
-import Link from "next/link";
-import { ShieldCheck } from "lucide-react";
-import { Button } from "@/shared/components/ui/button";
+import Link from 'next/link';
+import { ShieldCheck } from 'lucide-react';
+import { Button } from '@/shared/components/ui/button';
 
 export default function HomePage() {
   return (
@@ -28,17 +28,15 @@ export default function HomePage() {
 
         <section className="mx-auto flex w-full max-w-4xl flex-1 items-center">
           <div className="space-y-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              Starter Kit
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Starter Kit</p>
 
             <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
               Qualidade e clareza para construir experiencias digitais de alto nivel.
             </h1>
 
             <p className="max-w-2xl text-base text-muted-foreground sm:text-lg">
-              Titulo e subtitulo genericos para a pagina inicial da aplicacao, prontos para
-              evoluir conforme o produto e a proposta de valor forem definidos.
+              Titulo e subtitulo genericos para a pagina inicial da aplicacao, prontos para evoluir conforme o produto e
+              a proposta de valor forem definidos.
             </p>
 
             <div className="flex flex-wrap gap-3 pt-2">

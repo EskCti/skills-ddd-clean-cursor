@@ -1,58 +1,48 @@
-import { promises as fs } from "node:fs";
-import path from "node:path";
+import { promises as fs } from 'node:fs';
+import path from 'node:path';
 
-const SKILL_CONFIG_DIR_CANDIDATES = [
-  ".agents/skills/.env",
-  ".cloud/skills/.env",
-  ".env",
-];
-const REPO_CONFIG_FILE = "skills.config.json";
-const LOCAL_CONFIG_FILE = "skills.config.local.json";
+const SKILL_CONFIG_DIR_CANDIDATES = ['.agents/skills/.env', '.cloud/skills/.env', '.env'];
+const REPO_CONFIG_FILE = 'skills.config.json';
+const LOCAL_CONFIG_FILE = 'skills.config.local.json';
 
 const DEFAULT_CONFIG = {
-  namespace: "",
-  sharedModulePath: "packages/shared",
-  frontendAppPath: "apps/web",
-  backendAppPath: "apps/backend",
+  namespace: '',
+  sharedModulePath: 'packages/shared',
+  frontendAppPath: 'apps/web',
+  backendAppPath: 'apps/backend',
   frontendPort: 3000,
   backendPort: 4000,
-  frontendApiUrlEnvVar: "NEXT_PUBLIC_API_URL",
-  backendPortEnvVar: "PORT",
+  frontendApiUrlEnvVar: 'NEXT_PUBLIC_API_URL',
+  backendPortEnvVar: 'PORT',
 };
 
 function isRecord(value) {
-  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
 
 function normalizeScope(scope) {
-  if (typeof scope !== "string") return "";
+  if (typeof scope !== 'string') return '';
   const trimmed = scope.trim();
-  if (!trimmed) return "";
-  return trimmed.startsWith("@") ? trimmed : `@${trimmed}`;
+  if (!trimmed) return '';
+  return trimmed.startsWith('@') ? trimmed : `@${trimmed}`;
 }
 
 function normalizeRelativePath(value, fallback, fieldName) {
-  if (typeof value !== "string") return fallback;
+  if (typeof value !== 'string') return fallback;
   const trimmed = value.trim();
   if (!trimmed) return fallback;
 
   if (path.isAbsolute(trimmed)) {
-    throw new Error(
-      `Invalid skill config: "${trimmed}" must be a relative path for ${fieldName}.`,
-    );
+    throw new Error(`Invalid skill config: "${trimmed}" must be a relative path for ${fieldName}.`);
   }
 
-  const normalized = path.normalize(trimmed).replace(/\\/g, "/");
-  if (normalized === ".." || normalized.startsWith("../")) {
-    throw new Error(
-      `Invalid skill config: ${fieldName} cannot point outside repository root ("${trimmed}").`,
-    );
+  const normalized = path.normalize(trimmed).replace(/\\/g, '/');
+  if (normalized === '..' || normalized.startsWith('../')) {
+    throw new Error(`Invalid skill config: ${fieldName} cannot point outside repository root ("${trimmed}").`);
   }
 
-  if (normalized === ".") {
-    throw new Error(
-      `Invalid skill config: ${fieldName} cannot point to repository root.`,
-    );
+  if (normalized === '.') {
+    throw new Error(`Invalid skill config: ${fieldName} cannot point to repository root.`);
   }
 
   return normalized;
@@ -61,34 +51,28 @@ function normalizeRelativePath(value, fallback, fieldName) {
 function validatePathLeaf(pathValue, fieldName) {
   const leaf = path.basename(pathValue);
   if (!/^[a-z][a-z0-9-]*$/.test(leaf)) {
-    throw new Error(
-      `Invalid skill config: ${fieldName} last segment "${leaf}" must match /^[a-z][a-z0-9-]*$/.`,
-    );
+    throw new Error(`Invalid skill config: ${fieldName} last segment "${leaf}" must match /^[a-z][a-z0-9-]*$/.`);
   }
 }
 
 function normalizePort(value, fallback, fieldName) {
-  if (value === undefined || value === null || value === "") return fallback;
+  if (value === undefined || value === null || value === '') return fallback;
   const parsed = Number(value);
 
   if (!Number.isInteger(parsed) || parsed < 1 || parsed > 65535) {
-    throw new Error(
-      `Invalid skill config: ${fieldName} must be an integer between 1 and 65535 ("${value}").`,
-    );
+    throw new Error(`Invalid skill config: ${fieldName} must be an integer between 1 and 65535 ("${value}").`);
   }
 
   return parsed;
 }
 
 function normalizeEnvVarName(value, fallback, fieldName) {
-  if (typeof value !== "string") return fallback;
+  if (typeof value !== 'string') return fallback;
   const trimmed = value.trim();
   if (!trimmed) return fallback;
 
   if (!/^[A-Z][A-Z0-9_]*$/.test(trimmed)) {
-    throw new Error(
-      `Invalid skill config: ${fieldName} must match /^[A-Z][A-Z0-9_]*$/ ("${trimmed}").`,
-    );
+    throw new Error(`Invalid skill config: ${fieldName} must match /^[A-Z][A-Z0-9_]*$/ ("${trimmed}").`);
   }
 
   return trimmed;
@@ -98,7 +82,7 @@ function derivePathFromLegacy(mergedDefaults, dirKey, nameKey, fallbackPath) {
   const dirValue = mergedDefaults[dirKey];
   const nameValue = mergedDefaults[nameKey];
 
-  if (typeof dirValue === "string" && typeof nameValue === "string") {
+  if (typeof dirValue === 'string' && typeof nameValue === 'string') {
     const dir = dirValue.trim();
     const name = nameValue.trim();
     if (dir && name) return `${dir}/${name}`;
@@ -111,11 +95,11 @@ function pickConfiguredString(configs, key) {
   for (const config of configs) {
     if (!isRecord(config)) continue;
     const value = config[key];
-    if (typeof value !== "string") continue;
+    if (typeof value !== 'string') continue;
     if (!value.trim()) continue;
     return value;
   }
-  return "";
+  return '';
 }
 
 function getDefaults(value) {
@@ -126,10 +110,10 @@ function getDefaults(value) {
 
 async function readJsonIfExists(filePath) {
   try {
-    const raw = await fs.readFile(filePath, "utf8");
+    const raw = await fs.readFile(filePath, 'utf8');
     return JSON.parse(raw);
   } catch (error) {
-    if (error && error.code === "ENOENT") {
+    if (error && error.code === 'ENOENT') {
       return null;
     }
     throw new Error(`Invalid JSON file at ${filePath}: ${error.message}`);
@@ -141,7 +125,7 @@ async function directoryExists(dirPath) {
     const stat = await fs.stat(dirPath);
     return stat.isDirectory();
   } catch (error) {
-    if (error && error.code === "ENOENT") return false;
+    if (error && error.code === 'ENOENT') return false;
     throw error;
   }
 }
@@ -174,96 +158,56 @@ export async function loadSkillConfig(rootDir) {
   const repoDefaults = getDefaults(repoConfigRaw);
   const localDefaults = getDefaults(localConfigRaw);
   const mergedDefaults = { ...DEFAULT_CONFIG, ...repoDefaults, ...localDefaults };
-  const explicitSharedModulePath = pickConfiguredString(
-    [localDefaults, repoDefaults],
-    "sharedModulePath",
-  );
-  const explicitFrontendAppPath = pickConfiguredString(
-    [localDefaults, repoDefaults],
-    "frontendAppPath",
-  );
-  const explicitBackendAppPath = pickConfiguredString(
-    [localDefaults, repoDefaults],
-    "backendAppPath",
-  );
+  const explicitSharedModulePath = pickConfiguredString([localDefaults, repoDefaults], 'sharedModulePath');
+  const explicitFrontendAppPath = pickConfiguredString([localDefaults, repoDefaults], 'frontendAppPath');
+  const explicitBackendAppPath = pickConfiguredString([localDefaults, repoDefaults], 'backendAppPath');
   const sharedModulePathInput =
     explicitSharedModulePath ||
-    derivePathFromLegacy(
-      mergedDefaults,
-      "packagesDir",
-      "sharedModule",
-      DEFAULT_CONFIG.sharedModulePath,
-    );
+    derivePathFromLegacy(mergedDefaults, 'packagesDir', 'sharedModule', DEFAULT_CONFIG.sharedModulePath);
   const frontendAppPathInput =
     explicitFrontendAppPath ||
-    derivePathFromLegacy(
-      mergedDefaults,
-      "appsDir",
-      "frontendAppName",
-      DEFAULT_CONFIG.frontendAppPath,
-    );
+    derivePathFromLegacy(mergedDefaults, 'appsDir', 'frontendAppName', DEFAULT_CONFIG.frontendAppPath);
   const backendAppPathInput =
     explicitBackendAppPath ||
-    derivePathFromLegacy(
-      mergedDefaults,
-      "appsDir",
-      "backendAppName",
-      DEFAULT_CONFIG.backendAppPath,
-    );
+    derivePathFromLegacy(mergedDefaults, 'appsDir', 'backendAppName', DEFAULT_CONFIG.backendAppPath);
 
   const sharedModulePath = normalizeRelativePath(
     sharedModulePathInput,
     DEFAULT_CONFIG.sharedModulePath,
-    "sharedModulePath",
+    'sharedModulePath',
   );
   const frontendAppPath = normalizeRelativePath(
     frontendAppPathInput,
     DEFAULT_CONFIG.frontendAppPath,
-    "frontendAppPath",
+    'frontendAppPath',
   );
-  const backendAppPath = normalizeRelativePath(
-    backendAppPathInput,
-    DEFAULT_CONFIG.backendAppPath,
-    "backendAppPath",
-  );
+  const backendAppPath = normalizeRelativePath(backendAppPathInput, DEFAULT_CONFIG.backendAppPath, 'backendAppPath');
 
-  validatePathLeaf(sharedModulePath, "sharedModulePath");
-  validatePathLeaf(frontendAppPath, "frontendAppPath");
-  validatePathLeaf(backendAppPath, "backendAppPath");
+  validatePathLeaf(sharedModulePath, 'sharedModulePath');
+  validatePathLeaf(frontendAppPath, 'frontendAppPath');
+  validatePathLeaf(backendAppPath, 'backendAppPath');
 
   if (frontendAppPath === backendAppPath) {
-    throw new Error(
-      "Invalid skill config: frontendAppPath and backendAppPath must be different.",
-    );
+    throw new Error('Invalid skill config: frontendAppPath and backendAppPath must be different.');
   }
 
   return {
     defaults: {
-      namespace: typeof mergedDefaults.namespace === "string"
-        ? mergedDefaults.namespace
-        : DEFAULT_CONFIG.namespace,
+      namespace: typeof mergedDefaults.namespace === 'string' ? mergedDefaults.namespace : DEFAULT_CONFIG.namespace,
       sharedModulePath,
       frontendAppPath,
       backendAppPath,
-      frontendPort: normalizePort(
-        mergedDefaults.frontendPort,
-        DEFAULT_CONFIG.frontendPort,
-        "frontendPort",
-      ),
-      backendPort: normalizePort(
-        mergedDefaults.backendPort,
-        DEFAULT_CONFIG.backendPort,
-        "backendPort",
-      ),
+      frontendPort: normalizePort(mergedDefaults.frontendPort, DEFAULT_CONFIG.frontendPort, 'frontendPort'),
+      backendPort: normalizePort(mergedDefaults.backendPort, DEFAULT_CONFIG.backendPort, 'backendPort'),
       frontendApiUrlEnvVar: normalizeEnvVarName(
         mergedDefaults.frontendApiUrlEnvVar,
         DEFAULT_CONFIG.frontendApiUrlEnvVar,
-        "frontendApiUrlEnvVar",
+        'frontendApiUrlEnvVar',
       ),
       backendPortEnvVar: normalizeEnvVarName(
         mergedDefaults.backendPortEnvVar,
         DEFAULT_CONFIG.backendPortEnvVar,
-        "backendPortEnvVar",
+        'backendPortEnvVar',
       ),
     },
     configPaths: {
@@ -284,13 +228,9 @@ export async function resolveSkillPaths(rootDir) {
   const sharedDir = path.join(rootDir, sharedModulePathRelative);
   const sharedModule = path.basename(sharedModulePathRelative);
   const packagesDirRelativeRaw = path.dirname(sharedModulePathRelative);
-  const packagesDirRelative = packagesDirRelativeRaw === "."
-    ? ""
-    : packagesDirRelativeRaw;
-  const packagesDir = packagesDirRelative
-    ? path.join(rootDir, packagesDirRelative)
-    : rootDir;
-  const sharedPackageJsonPath = path.join(sharedDir, "package.json");
+  const packagesDirRelative = packagesDirRelativeRaw === '.' ? '' : packagesDirRelativeRaw;
+  const packagesDir = packagesDirRelative ? path.join(rootDir, packagesDirRelative) : rootDir;
+  const sharedPackageJsonPath = path.join(sharedDir, 'package.json');
 
   return {
     packagesDir,
@@ -303,36 +243,30 @@ export async function resolveSkillPaths(rootDir) {
   };
 }
 
-export async function resolveNamespace({
-  rootDir,
-  cliScope = "",
-  fallbackScope = "",
-}) {
+export async function resolveNamespace({ rootDir, cliScope = '', fallbackScope = '' }) {
   const cli = normalizeScope(cliScope);
   if (cli) {
-    return { scope: cli, source: "cli" };
+    return { scope: cli, source: 'cli' };
   }
 
-  const env = normalizeScope(
-    process.env.PROJECT_NAMESPACE || process.env.SKILLS_NAMESPACE || "",
-  );
+  const env = normalizeScope(process.env.PROJECT_NAMESPACE || process.env.SKILLS_NAMESPACE || '');
   if (env) {
-    return { scope: env, source: "env" };
+    return { scope: env, source: 'env' };
   }
 
   const config = await loadSkillConfig(rootDir);
   const configScope = normalizeScope(config.defaults.namespace);
   if (configScope) {
-    const source = config.raw.local ? "local-config" : "repo-config";
+    const source = config.raw.local ? 'local-config' : 'repo-config';
     return { scope: configScope, source };
   }
 
   const fallback = normalizeScope(fallbackScope);
   if (fallback) {
-    return { scope: fallback, source: "fallback" };
+    return { scope: fallback, source: 'fallback' };
   }
 
-  return { scope: "@namespace", source: "default" };
+  return { scope: '@namespace', source: 'default' };
 }
 
 export { normalizeScope };

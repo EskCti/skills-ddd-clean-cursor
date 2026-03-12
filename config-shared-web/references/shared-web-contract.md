@@ -22,15 +22,16 @@ node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --theme fuchsi
 
 1. Resolve frontend pelo `skills.config.json`.
 2. Resolve scaffold base + adapter de UI selecionado.
-3. Instala/atualiza dependencias da biblioteca de UI (quando aplicavel).
-4. Remove arquivos legados conhecidos.
-5. Gera/atualiza arquivos do App Router (`private/public/example/dashboard`).
-6. Gera/atualiza `src/shared` base (incluindo `i18n` e `components/form/validator`).
-7. Gera/atualiza `src/modules/examples` (data, components, pages) e `src/modules/dashboard/components`.
-8. Gera/atualiza assets de dashboard vazio em `public/illustrations`.
-9. Gera/atualiza arquivos da biblioteca de UI selecionada.
-10. Preserva arquivos de `src/app` quando detectar integracao existente com modulos externos (ex.: `@/modules/auth`, `@/modules/dashboard`) e o template atual nao incluir essa integracao.
-11. Emite resumo de criados/atualizados/preservados/inalterados e registra no `.log/skills.log`.
+3. Valida contrato minimo dos templates (base + adapter) antes de aplicar alteracoes.
+4. Instala/atualiza dependencias agregadas de base + biblioteca de UI (quando aplicavel).
+5. Remove arquivos legados conhecidos.
+6. Gera/atualiza arquivos do App Router (`private/public/example/dashboard`).
+7. Gera/atualiza `src/shared` base (incluindo `i18n` e `components/form/validator`).
+8. Gera/atualiza `src/modules/examples` (data, components, pages) e `src/modules/dashboard/components`.
+9. Gera/atualiza assets de dashboard vazio em `public/illustrations`.
+10. Gera/atualiza arquivos da biblioteca de UI selecionada.
+11. Preserva arquivos de `src/app` quando detectar integracao existente com modulos externos (ex.: `@/modules/auth`, `@/modules/dashboard`) e o template atual nao incluir essa integracao.
+12. Emite resumo de criados/atualizados/preservados/inalterados e registra no `.log/skills.log`.
 
 ## Deterministic Outputs
 
@@ -119,6 +120,10 @@ node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --theme fuchsi
 ### Dashboard module (base)
 
 - `<frontendAppPath>/src/modules/dashboard/components/empty-dashboard-state.component.tsx`
+
+## Runtime dependencies installed (base)
+
+- `react-hook-form`
 
 ## Runtime dependencies installed (shadcn)
 

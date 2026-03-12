@@ -21,8 +21,10 @@
 
 1. Nome orientado à regra (`*Policy`, `*Calculator`, etc.).
 2. API enxuta:
-  - classe com método de instância simples (ex.: `PermissionPolicy.check`)
-  - ou método estático para cálculo (ex.: `StockCalculator.execute`)
+
+- classe com método de instância simples (ex.: `PermissionPolicy.check`)
+- ou método estático para cálculo (ex.: `StockCalculator.execute`)
+
 3. Entradas explícitas e tipadas.
 4. Saída objetiva (boolean, number, ou tipo de domínio).
 5. Sem acesso a banco, rede, filesystem, env, framework.

@@ -1,6 +1,6 @@
 ---
 name: config-auth-backend-basic
-description: Criar/recriar de forma determinística o módulo de autenticação do backend NestJS com endpoints HTTP (register/login/me/usuários/senha), JWT com Passport, controle de acesso admin, adapters Prisma compatíveis com `@namespace/auth`, modelo Prisma de auth, migrations SQL e seed JSON com usuários padrão. Usar quando o pedido envolver bootstrap/rebootstrap da camada backend auth completa no `apps/backend`.
+description: Criar/recriar de forma determinística o módulo de autenticação do backend NestJS com endpoints HTTP (register/login/me/usuários/senha), JWT com Passport, controle de acesso admin, adapters Prisma compatíveis com `@namespace/auth`, integração com `PrismaService`/`TransactionManager`, modelo Prisma de auth, migrations SQL e seed JSON com usuários padrão. Usar quando o pedido envolver bootstrap/rebootstrap da camada backend auth completa no `apps/backend`.
 ---
 
 # Config Auth Backend Basic
@@ -22,20 +22,23 @@ Executar setup idempotente do módulo de autenticação backend no padrão Gené
 - endpoints de autenticação e usuário com `JwtAuthGuard` e proteção administrativa por `RequireAdminGuard`
 - integração com `@namespace/auth` (use cases, entidades e providers)
 - implementação Prisma (repositories/queries + model `.prisma` com flag `admin`)
+- compatibilidade com infraestrutura de banco atual (`DbModule` + `PrismaService` implementando `runInTransaction`)
 - migrations de auth (criação inicial + evolução do campo `admin`)
 - seed com usuários padrão em JSON (incluindo `id` UUID, `admin` e metadados de auditoria)
 
 A skill aplica arquivos canônicos a partir de template versionado, convergindo arquivos existentes (`app.module.ts`, `apps/backend/package.json` e `prisma/seed/main.ts`) e removendo artefatos legados da implementação antiga.
+Antes de aplicar, o script valida pré-requisitos do banco (arquivos de `db` e contrato de transação) para evitar geração incompatível.
 
 ## Workflow
 
-1. Rodar simulação:
+1. Garantir infraestrutura Prisma/base pronta (ex.: skill `config-prisma` já aplicada).
+2. Rodar simulação:
    - `node .agents/skills/config-auth-backend-basic/scripts/init-config-auth-backend-basic.mjs --dry-run`
-2. Aplicar mudanças:
+3. Aplicar mudanças:
    - `node .agents/skills/config-auth-backend-basic/scripts/init-config-auth-backend-basic.mjs --apply`
-3. Opcionalmente instalar dependências e validar build:
+4. Opcionalmente instalar dependências e validar build:
    - `node .agents/skills/config-auth-backend-basic/scripts/init-config-auth-backend-basic.mjs --apply --install --run-build`
-4. Rodar migration/seed no backend:
+5. Rodar migration/seed no backend:
    - `npm --workspace apps/backend run prisma:migrate:dev -- --name auth-basic-init`
    - `npm --workspace apps/backend run prisma:seed`
 
@@ -67,7 +70,7 @@ node .agents/skills/config-auth-backend-basic/scripts/init-config-auth-backend-b
 
 ## Resources
 
-- `scripts/init-config-auth-backend-basic.mjs`: orquestrador idempotente da skill.
+- `scripts/init-config-auth-backend-basic.mjs`: orquestrador idempotente da skill com validações de pré-requisito de DB/Prisma e placeholders.
 - `assets/config-auth-backend-basic-template`: template canônico dos arquivos gerados.
 - `references/config-auth-backend-basic-contract.md`: contrato de saída esperado.
 - Log local: `.log/skills.log`.

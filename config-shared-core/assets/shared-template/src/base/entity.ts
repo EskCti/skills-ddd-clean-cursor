@@ -1,5 +1,5 @@
-import { Id } from "../vo/id.vo";
-import { Result } from "./result";
+import { Id } from '../vo/id.vo';
+import { Result } from './result';
 
 export interface EntityProps {
   id?: string;
@@ -12,7 +12,7 @@ export abstract class Entity<Type, Props extends EntityProps> {
   readonly id: string;
 
   protected constructor(public readonly props: Props) {
-    const id = Id.create(props.id!, { attribute: "id" }).value;
+    const id = Id.create(props.id!, { attribute: 'id' }).value;
     this.id = id;
     this.props = {
       ...props,
@@ -58,16 +58,12 @@ export abstract class Entity<Type, Props extends EntityProps> {
   }
 
   private deepMerge(target: any, source: any): any {
-    if (!source || typeof source !== "object") {
+    if (!source || typeof source !== 'object') {
       return target;
     }
 
     for (const key of Object.keys(source)) {
-      if (
-        source[key] &&
-        typeof source[key] === "object" &&
-        !Array.isArray(source[key])
-      ) {
+      if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
         if (!target[key]) target[key] = {};
         this.deepMerge(target[key], source[key]);
       } else {

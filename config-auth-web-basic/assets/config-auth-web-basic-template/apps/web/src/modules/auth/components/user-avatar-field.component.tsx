@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { Check, Pencil, RefreshCw, UserRound } from "lucide-react";
-import { useMemo, useState } from "react";
-import { Button, FormErrorMessage, Input } from "@/shared";
+import Image from 'next/image';
+import { Check, Pencil, RefreshCw, UserRound } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Button, FormErrorMessage, Input } from '@/shared';
 
-type UserAvatarSize = "small" | "medium" | "large" | "xl";
+type UserAvatarSize = 'small' | 'medium' | 'large' | 'xl';
 
 type UserAvatarFieldProps = {
   id: string;
@@ -26,24 +26,24 @@ const avatarSizeClasses: Record<
   }
 > = {
   small: {
-    container: "size-12",
-    fallbackIcon: "size-5",
-    hoverIcon: "size-3.5",
+    container: 'size-12',
+    fallbackIcon: 'size-5',
+    hoverIcon: 'size-3.5',
   },
   medium: {
-    container: "size-18",
-    fallbackIcon: "size-8",
-    hoverIcon: "size-4",
+    container: 'size-18',
+    fallbackIcon: 'size-8',
+    hoverIcon: 'size-4',
   },
   large: {
-    container: "size-24",
-    fallbackIcon: "size-10",
-    hoverIcon: "size-5",
+    container: 'size-24',
+    fallbackIcon: 'size-10',
+    hoverIcon: 'size-5',
   },
   xl: {
-    container: "size-28",
-    fallbackIcon: "size-12",
-    hoverIcon: "size-6",
+    container: 'size-28',
+    fallbackIcon: 'size-12',
+    hoverIcon: 'size-6',
   },
 };
 
@@ -59,11 +59,11 @@ function resolveResponsiveClasses(size: UserAvatarSize, desktopSize?: UserAvatar
     return avatarSizeClasses[size];
   }
 
-  if (size === "large" && desktopSize === "xl") {
+  if (size === 'large' && desktopSize === 'xl') {
     return {
-      container: "size-24 md:size-28",
-      fallbackIcon: "size-10 md:size-12",
-      hoverIcon: "size-5 md:size-6",
+      container: 'size-24 md:size-28',
+      fallbackIcon: 'size-10 md:size-12',
+      hoverIcon: 'size-5 md:size-6',
     };
   }
 
@@ -82,18 +82,18 @@ function resolveResponsiveImageSizes(size: UserAvatarSize, desktopSize?: UserAva
 }
 
 function generateRandomAvatarUrl() {
-  const profileType = Math.random() < 0.5 ? "women" : "men";
+  const profileType = Math.random() < 0.5 ? 'women' : 'men';
   const profileNumber = Math.floor(Math.random() * 100);
   return `https://randomuser.me/api/portraits/${profileType}/${profileNumber}.jpg`;
 }
 
 export function UserAvatarField({
   id,
-  value = "",
+  value = '',
   onChange,
   error,
   editable = true,
-  size = "medium",
+  size = 'medium',
   desktopSize,
 }: UserAvatarFieldProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -103,10 +103,7 @@ export function UserAvatarField({
   const imageSizes = resolveResponsiveImageSizes(size, desktopSize);
 
   const normalizedAvatarUrl = useMemo(() => value.trim(), [value]);
-  const resolvedAvatarUrl =
-    normalizedAvatarUrl && failedAvatarUrl !== normalizedAvatarUrl
-      ? normalizedAvatarUrl
-      : null;
+  const resolvedAvatarUrl = normalizedAvatarUrl && failedAvatarUrl !== normalizedAvatarUrl ? normalizedAvatarUrl : null;
 
   function openEditMode() {
     if (!editable) {
@@ -133,21 +130,15 @@ export function UserAvatarField({
 
   return (
     <div className="space-y-2">
-      <div
-        className={
-          editable && isEditing
-            ? "rounded-lg border border-border bg-muted/15 p-3"
-            : ""
-        }
-      >
-        <div className={editable && isEditing ? "space-y-3" : ""}>
+      <div className={editable && isEditing ? 'rounded-lg border border-border bg-muted/15 p-3' : ''}>
+        <div className={editable && isEditing ? 'space-y-3' : ''}>
           <div className="flex justify-center">
             <button
               type="button"
               onClick={openEditMode}
               disabled={!editable}
               className="group relative inline-flex rounded-full disabled:cursor-default"
-              aria-label={editable ? "Editar avatar" : "Avatar do usuário"}
+              aria-label={editable ? 'Editar avatar' : 'Avatar do usuário'}
             >
               {resolvedAvatarUrl ? (
                 <span

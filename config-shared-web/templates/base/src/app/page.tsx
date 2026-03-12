@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 export default function HomePage() {
   return (
@@ -7,16 +7,15 @@ export default function HomePage() {
         <header className="space-y-3">
           <h1 className="text-3xl font-semibold tracking-tight">Poupig Dashboard Starter</h1>
           <p className="max-w-3xl text-muted-foreground">
-            Estrutura inicial preparada com shell administrativo, modulo de exemplos e componentes base para uma aplicacao dashboard.
+            Estrutura inicial preparada com shell administrativo, modulo de exemplos e componentes base para uma
+            aplicacao dashboard.
           </p>
         </header>
 
         <div className="grid gap-4 md:grid-cols-2">
           <article className="rounded-lg border border-border bg-card p-5">
             <h2 className="text-lg font-medium">Dashboard principal</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Acesso ao shell privado com visao geral da aplicacao.
-            </p>
+            <p className="mt-2 text-sm text-muted-foreground">Acesso ao shell privado com visao geral da aplicacao.</p>
             <Link
               href="/dashboard"
               className="mt-4 inline-flex rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"

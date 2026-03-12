@@ -1,12 +1,4 @@
-import {
-  Id,
-  Email,
-  Entity,
-  EntityProps,
-  Result,
-  PersonName,
-  URL,
-} from "__SHARED_PACKAGE_NAME__";
+import { Id, Email, Entity, EntityProps, Result, PersonName, URL } from '__SHARED_PACKAGE_NAME__';
 
 export interface UserProps extends EntityProps {
   name: string;
@@ -22,14 +14,14 @@ export class User extends Entity<User, UserProps> {
 
   public static create(props: UserProps): User {
     const result = User.tryCreate(props);
-    result.throwIfFailed();
+    result.validator.throwsIfFailed();
     return result.instance;
   }
 
   static tryCreate(props: UserProps): Result<User> {
-    const id = Id.tryCreate(props.id, { attribute: "id" });
-    const email = Email.tryCreate(props.email, { attribute: "email" });
-    const name = PersonName.tryCreate(props.name, { attribute: "name" });
+    const id = Id.tryCreate(props.id, { attribute: 'id' });
+    const email = Email.tryCreate(props.email, { attribute: 'email' });
+    const name = PersonName.tryCreate(props.name, { attribute: 'name' });
 
     const attributes = Result.combine([id, email, name]);
     if (attributes.isFailure) {

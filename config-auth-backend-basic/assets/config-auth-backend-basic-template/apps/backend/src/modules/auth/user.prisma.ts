@@ -9,9 +9,12 @@ import {
   UserExistsQuery,
   UserRepository,
 } from '__AUTH_PACKAGE_NAME__';
-import type { PaginatedResultDTO } from '__SHARED_PACKAGE_NAME__';
+import type { PaginatedResultDTO, TransactionContext } from '__SHARED_PACKAGE_NAME__';
 import { Result } from '__SHARED_PACKAGE_NAME__';
-import { PrismaService } from '../../db/prisma.service';
+import {
+  PrismaService,
+  type PrismaTransactionContext,
+} from '../../db/prisma.service';
 
 @Injectable()
 export class UserPrisma implements UserRepository {
@@ -139,9 +142,9 @@ export class UserPrisma implements UserRepository {
     }
   }
 
-  async create(entity: User): Promise<Result<void>> {
+  async create(entity: User, tx?: TransactionContext): Promise<Result<void>> {
     try {
-      await this.prisma.client.user.create({
+      await this.resolveClient(tx).user.create({
         data: this.fromDomain(entity),
       });
       return Result.ok();
@@ -271,6 +274,12 @@ export class UserPrisma implements UserRepository {
       updatedAt: entity.updatedAt,
       deletedAt: entity.deletedAt,
     };
+  }
+
+  private resolveClient(tx?: TransactionContext) {
+    return (
+      (tx as PrismaTransactionContext | undefined)?.client ?? this.prisma.client
+    );
   }
 
   private isUniqueConstraintError(error: unknown): boolean {

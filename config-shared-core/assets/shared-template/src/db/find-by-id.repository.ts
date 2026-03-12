@@ -1,5 +1,5 @@
-import { Entity, Result } from "../base";
+import { Entity, Result } from '../base';
 
 export interface FindByIdRepository<T extends Entity<any, any>> {
-	findById(id: string): Promise<Result<T>>;
+  findById(id: string): Promise<Result<T>>;
 }

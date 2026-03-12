@@ -1,6 +1,6 @@
 ---
 name: config-shared-core
-description: Inicializar o módulo `packages/shared` completo de forma determinística no padrão do projeto Workspace, incluindo estrutura de código (`src/base`, `src/db`, `src/dto`, `src/vo`, `src/index.ts`) e testes (`test/base`, `test/vo`, `test/data`) com VO `HashPassword` para hashes bcrypt. Usar quando o pedido envolver bootstrap do pacote shared, recriação do shared em novo projeto, reset da base compartilhada ou scaffolding completo do core compartilhado com configs (`package.json`, `tsconfig.json`, `jest.config.ts`).
+description: Inicializar o módulo `packages/shared` completo de forma determinística no padrão do projeto Workspace, incluindo estrutura de código (`src/base`, `src/db`, `src/dto`, `src/vo`, `src/index.ts`) e testes (`test/base`, `test/vo`, `test/data`) com VO `HashPassword` para hashes bcrypt, `ResultValidator` em `src/base` e `TransactionManager` em `src/db`. Usar quando o pedido envolver bootstrap do pacote shared, recriação do shared em novo projeto, reset da base compartilhada ou scaffolding completo do core compartilhado com configs (`package.json`, `tsconfig.json`, `jest.config.ts`).
 ---
 
 # Config Shared Core
@@ -11,17 +11,21 @@ Criar ou recriar o pacote no caminho de `sharedModulePath` (padrão: `packages/s
 Executar o script Node da skill para gerar toda a estrutura de código e testes do módulo shared.
 O namespace e diretórios padrão devem ser resolvidos por configuração global compartilhada em `skills.config.json` (`.agents/skills/.env`, `.cloud/skills/.env` ou `.env/`).
 O template inclui obrigatoriamente o VO `HashPassword` (`src/vo/hash-password.vo.ts`), teste correspondente (`test/vo/hash-password.vo.test.ts`) e export em `src/vo/index.ts`, validando hash bcrypt no formato `$2a$|$2b$|$2y$` com rounds de dois dígitos e payload base64 bcrypt.
+Também inclui obrigatoriamente `ResultValidator` (`src/base/result-validator.ts`, `test/base/result-validator.test.ts`) e `TransactionManager` (`src/db/transaction.manager.ts`, exportado em `src/db/index.ts`).
 
 ## Workflow
 
 1. Executar `node scripts/create-shared.mjs`.
 2. Namespace é resolvido por precedência: `--scope` > `PROJECT_NAMESPACE`/`SKILLS_NAMESPACE` > `skills.config.local.json` > `skills.config.json` > fallback do template.
-3. Se o diretório já existir, usar `--force` para sobrescrever.
-4. Antes do `npm install`, adicionar/atualizar `"@<namespace>/shared": "*"` em `dependencies` apenas dos `package.json` de frontend e backend (conforme `frontendAppPath` e `backendAppPath` no config), sem remover dependências de outros pacotes.
-5. Após gerar em `<sharedModulePath>`, executar `npm install` na raiz do projeto para atualizar as dependências do workspace.
-6. Opcionalmente executar testes do pacote com `--run-tests`.
-7. Conferir estrutura final em `<sharedModulePath>`.
-8. Registrar execução em `.log/skills.log` com título da skill e lista simples dos comandos/ações relevantes (sem timestamps e sem status), garantindo `.log/` no `.gitignore`.
+3. Validar contrato mínimo do template (arquivos críticos de config, código e testes) antes de copiar para o destino.
+4. Se o diretório já existir, usar `--force` para sobrescrever (com proteção para nunca apagar raiz do repositório/sistema).
+5. Antes do `npm install`, adicionar/atualizar `"@<namespace>/shared": "*"` em `dependencies` apenas dos `package.json` de frontend e backend (conforme `frontendAppPath` e `backendAppPath` no config), sem remover dependências de outros pacotes.
+6. Após gerar em `<sharedModulePath>`, executar `npm install` na raiz do projeto para atualizar as dependências do workspace.
+7. Opcionalmente executar testes do pacote com `--run-tests`:
+   - alvo padrão (`<sharedModulePath>`): `npm run test -w <scope>/shared`
+   - alvo customizado com `--target`: executa `npm install` + `npm run test` no diretório alvo somente quando `../typescript-config/base.json` estiver disponível relativo ao target; caso contrário, registra skip com motivo explícito
+8. Conferir estrutura final em `<sharedModulePath>`.
+9. Registrar execução em `.log/skills.log` com título da skill e lista simples dos comandos/ações relevantes (sem timestamps e sem status), garantindo `.log/` no `.gitignore`.
 
 ## Commands
 

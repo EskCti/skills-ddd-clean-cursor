@@ -1,9 +1,9 @@
-import { TestEntity } from "../data/test.entity";
+import { TestEntity } from '../data/test.entity';
 
-describe("Entity", () => {
-  describe("creation", () => {
-    test("should create entity with provided id", () => {
-      const providedId = "550e8400-e29b-41d4-a716-446655440000";
+describe('Entity', () => {
+  describe('creation', () => {
+    test('should create entity with provided id', () => {
+      const providedId = '550e8400-e29b-41d4-a716-446655440000';
       const result = TestEntity.tryCreate({
         id: providedId,
         number: 42,
@@ -20,13 +20,13 @@ describe("Entity", () => {
       ).toBe(true);
     });
 
-    test("should generate id when not provided", () => {
+    test('should generate id when not provided', () => {
       const result = TestEntity.tryCreate({ number: 42 });
 
       expect(result.isOk).toBe(true);
     });
 
-    test("should initialize default timestamps and deletedAt as null", () => {
+    test('should initialize default timestamps and deletedAt as null', () => {
       const entity = TestEntity.create({ number: 42 });
 
       expect(entity.createdAt).toBeInstanceOf(Date);
@@ -34,10 +34,10 @@ describe("Entity", () => {
       expect(entity.deletedAt).toBeNull();
     });
 
-    test("should keep provided timestamps and deletedAt", () => {
-      const createdAt = new Date("2024-01-01T10:00:00.000Z");
-      const updatedAt = new Date("2024-01-02T11:00:00.000Z");
-      const deletedAt = new Date("2024-01-03T12:00:00.000Z");
+    test('should keep provided timestamps and deletedAt', () => {
+      const createdAt = new Date('2024-01-01T10:00:00.000Z');
+      const updatedAt = new Date('2024-01-02T11:00:00.000Z');
+      const deletedAt = new Date('2024-01-03T12:00:00.000Z');
 
       const entity = TestEntity.create({
         number: 42,
@@ -52,22 +52,22 @@ describe("Entity", () => {
     });
   });
 
-  describe("static create method", () => {
-    test("should create instance", () => {
+  describe('static create method', () => {
+    test('should create instance', () => {
       const entity = TestEntity.create({ number: 42 });
 
       expect(entity).toBeInstanceOf(TestEntity);
       expect(entity.number).toBe(42);
     });
 
-    test("should throw when creating invalid instance", () => {
+    test('should throw when creating invalid instance', () => {
       expect(() => TestEntity.create({ number: -1 })).toThrow();
     });
   });
 
-  describe("equality", () => {
-    test("should say that instances are equal if they have the same id", () => {
-      const providedId = "550e8400-e29b-41d4-a716-446655440000";
+  describe('equality', () => {
+    test('should say that instances are equal if they have the same id', () => {
+      const providedId = '550e8400-e29b-41d4-a716-446655440000';
       const entity1 = TestEntity.tryCreate({
         id: providedId,
         number: 42,
@@ -80,7 +80,7 @@ describe("Entity", () => {
       expect(entity1.equals(entity2)).toBe(true);
     });
 
-    test("should say that instances are different if they have different ids", () => {
+    test('should say that instances are different if they have different ids', () => {
       const entity1 = TestEntity.tryCreate({ number: 42 }).instance;
       const entity2 = TestEntity.tryCreate({ number: 42 }).instance;
 
@@ -88,8 +88,8 @@ describe("Entity", () => {
     });
   });
 
-  describe("cloneWith", () => {
-    test("should clone the entity with new properties", () => {
+  describe('cloneWith', () => {
+    test('should clone the entity with new properties', () => {
       const originalEntity = TestEntity.tryCreate({
         number: 1,
         obj: { a: 1, b: 2 },
@@ -108,23 +108,23 @@ describe("Entity", () => {
       expect(originalEntity.obj).toEqual({ a: 1, b: 2 });
     });
 
-    test("should not modify the original entity when cloning", () => {
+    test('should not modify the original entity when cloning', () => {
       const originalEntity = TestEntity.tryCreate({ number: 1 }).instance;
       originalEntity.cloneWith({ number: 2 });
 
       expect(originalEntity.number).toBe(1);
     });
-    test("should fail when clone with invalid props", () => {
+    test('should fail when clone with invalid props', () => {
       const originalEntity = TestEntity.tryCreate({ number: 1 }).instance;
       const result = originalEntity.cloneWith({ number: -2 });
 
       expect(result.isFailure).toBe(true);
     });
 
-    test("should perform deep merge for nested objects", () => {
+    test('should perform deep merge for nested objects', () => {
       const originalEntity = TestEntity.tryCreate({
         number: 1,
-        obj: { nested: { a: 1, b: 2 }, flat: "test" },
+        obj: { nested: { a: 1, b: 2 }, flat: 'test' },
       }).instance;
       const result = originalEntity.cloneWith({
         obj: { nested: { b: 3, c: 4 } },
@@ -135,15 +135,15 @@ describe("Entity", () => {
 
       expect(clonedEntity.obj).toEqual({
         nested: { a: 1, b: 3, c: 4 },
-        flat: "test",
+        flat: 'test',
       });
       expect(originalEntity.obj).toEqual({
         nested: { a: 1, b: 2 },
-        flat: "test",
+        flat: 'test',
       });
     });
 
-    test("should handle cloning with no overrides", () => {
+    test('should handle cloning with no overrides', () => {
       const originalEntity = TestEntity.tryCreate({
         number: 1,
         obj: { a: 1 },
@@ -158,12 +158,12 @@ describe("Entity", () => {
       expect(clonedEntity.id).toBe(originalEntity.id);
     });
 
-    test("should keep unmodified attributes the same when cloning with partial override", () => {
-      const originalId = "550e8400-e29b-41d4-a716-446655440001";
+    test('should keep unmodified attributes the same when cloning with partial override', () => {
+      const originalId = '550e8400-e29b-41d4-a716-446655440001';
       const originalEntity = TestEntity.tryCreate({
         id: originalId,
         number: 10,
-        obj: { prop: "value" },
+        obj: { prop: 'value' },
       }).instance;
 
       const result = originalEntity.cloneWith({ number: 20 });
@@ -173,10 +173,10 @@ describe("Entity", () => {
       expect(clonedEntity).not.toBe(originalEntity);
       expect(clonedEntity.number).toBe(20);
       expect(clonedEntity.id).toBe(originalId);
-      expect(clonedEntity.obj).toEqual({ prop: "value" });
+      expect(clonedEntity.obj).toEqual({ prop: 'value' });
     });
 
-    test("should create nested object path when target key does not exist", () => {
+    test('should create nested object path when target key does not exist', () => {
       const originalEntity = TestEntity.create({
         number: 1,
       });
@@ -190,9 +190,9 @@ describe("Entity", () => {
       expect(originalEntity.obj).toBeUndefined();
     });
 
-    test("should clone using clone alias", () => {
+    test('should clone using clone alias', () => {
       const originalEntity = TestEntity.create({
-        id: "550e8400-e29b-41d4-a716-446655440010",
+        id: '550e8400-e29b-41d4-a716-446655440010',
         number: 10,
         obj: { nested: true },
       });
@@ -205,9 +205,9 @@ describe("Entity", () => {
       expect(result.instance.obj).toEqual({ nested: true });
     });
 
-    test("should handle undefined overrides by returning cloned entity", () => {
+    test('should handle undefined overrides by returning cloned entity', () => {
       const originalEntity = TestEntity.create({
-        id: "550e8400-e29b-41d4-a716-446655440011",
+        id: '550e8400-e29b-41d4-a716-446655440011',
         number: 10,
         obj: { nested: true },
       });
@@ -222,12 +222,12 @@ describe("Entity", () => {
     });
   });
 
-  describe("serialization", () => {
-    test("should expose base props with toJSON", () => {
-      const createdAt = new Date("2024-02-01T00:00:00.000Z");
-      const updatedAt = new Date("2024-02-02T00:00:00.000Z");
+  describe('serialization', () => {
+    test('should expose base props with toJSON', () => {
+      const createdAt = new Date('2024-02-01T00:00:00.000Z');
+      const updatedAt = new Date('2024-02-02T00:00:00.000Z');
       const entity = TestEntity.create({
-        id: "550e8400-e29b-41d4-a716-446655440000",
+        id: '550e8400-e29b-41d4-a716-446655440000',
         number: 10,
         obj: { nested: true },
         createdAt,
@@ -235,7 +235,7 @@ describe("Entity", () => {
       });
 
       expect(entity.toJSON()).toEqual({
-        id: "550e8400-e29b-41d4-a716-446655440000",
+        id: '550e8400-e29b-41d4-a716-446655440000',
         number: 10,
         obj: { nested: true },
         createdAt,

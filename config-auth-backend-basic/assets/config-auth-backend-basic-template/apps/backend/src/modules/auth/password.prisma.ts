@@ -6,8 +6,11 @@ import {
   PasswordRepository,
   UserErrors,
 } from '__AUTH_PACKAGE_NAME__';
-import { Result } from '__SHARED_PACKAGE_NAME__';
-import { PrismaService } from '../../db/prisma.service';
+import { Result, type TransactionContext } from '__SHARED_PACKAGE_NAME__';
+import {
+  PrismaService,
+  type PrismaTransactionContext,
+} from '../../db/prisma.service';
 
 @Injectable()
 export class PasswordPrisma implements PasswordRepository {
@@ -37,9 +40,13 @@ export class PasswordPrisma implements PasswordRepository {
     },
   };
 
-  async create(entity: Password, userId: string): Promise<Result<void>> {
+  async create(
+    entity: Password,
+    userId: string,
+    tx?: TransactionContext,
+  ): Promise<Result<void>> {
     try {
-      await this.prisma.client.password.create({
+      await this.resolveClient(tx).password.create({
         data: {
           id: entity.id,
           userId,
@@ -129,5 +136,11 @@ export class PasswordPrisma implements PasswordRepository {
       updatedAt: data.updatedAt,
       deletedAt: data.deletedAt,
     });
+  }
+
+  private resolveClient(tx?: TransactionContext) {
+    return (
+      (tx as PrismaTransactionContext | undefined)?.client ?? this.prisma.client
+    );
   }
 }

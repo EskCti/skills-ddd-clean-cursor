@@ -1,12 +1,11 @@
-import { Result, ValueObject, ValueObjectConfig } from "../base";
+import { Result, ValueObject, ValueObjectConfig } from '../base';
 
 interface PersonNameConfig extends ValueObjectConfig {}
 
 export class PersonName extends ValueObject<string, PersonNameConfig> {
-  private static readonly TOO_SHORT = "NAME_TOO_SHORT";
-  private static readonly TOO_LONG = "NAME_TOO_LONG";
-  private static readonly MUST_HAVE_FIRST_AND_LAST_NAME =
-    "MUST_HAVE_FIRST_AND_LAST_NAME";
+  private static readonly TOO_SHORT = 'NAME_TOO_SHORT';
+  private static readonly TOO_LONG = 'NAME_TOO_LONG';
+  private static readonly MUST_HAVE_FIRST_AND_LAST_NAME = 'MUST_HAVE_FIRST_AND_LAST_NAME';
 
   private constructor(value: string, config?: PersonNameConfig) {
     super(value, config);
@@ -14,14 +13,11 @@ export class PersonName extends ValueObject<string, PersonNameConfig> {
 
   public static create(value: string, config?: PersonNameConfig): PersonName {
     const result = PersonName.tryCreate(value, config);
-    result.throwIfFailed();
+    result.validator.throwsIfFailed();
     return result.instance;
   }
 
-  public static tryCreate(
-    value: string,
-    config?: PersonNameConfig,
-  ): Result<PersonName> {
+  public static tryCreate(value: string, config?: PersonNameConfig): Result<PersonName> {
     try {
       const trimmedValue = value.trim();
       const min = 3;

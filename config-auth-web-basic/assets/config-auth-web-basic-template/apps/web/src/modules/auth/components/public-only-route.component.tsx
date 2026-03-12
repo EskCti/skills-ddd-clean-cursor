@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/modules/auth/data";
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/modules/auth/data';
 
 type PublicOnlyRouteProps = {
   children: React.ReactNode;
@@ -14,16 +14,12 @@ export function PublicOnlyRoute({ children }: PublicOnlyRouteProps) {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.replace("/dashboard");
+      router.replace('/dashboard');
     }
   }, [isAuthenticated, isLoading, router]);
 
   if (isLoading) {
-    return (
-      <div className="py-8 text-center text-sm text-muted-foreground">
-        Validando sessao...
-      </div>
-    );
+    return <div className="py-8 text-center text-sm text-muted-foreground">Validando sessao...</div>;
   }
 
   if (isAuthenticated) {

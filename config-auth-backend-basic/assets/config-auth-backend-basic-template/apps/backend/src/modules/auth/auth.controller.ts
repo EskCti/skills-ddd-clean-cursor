@@ -31,6 +31,7 @@ import type {
   LoginIn,
   UserDTO,
 } from '__AUTH_PACKAGE_NAME__';
+import { PrismaService } from '../../db/prisma.service';
 import { CurrentUser } from '../../shared/decorators/current-user.decorator';
 import { BcryptProvider } from './providers/bcrypt.provider';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -50,6 +51,7 @@ export class AuthController {
     private readonly passPrisma: PasswordPrisma,
     private readonly jwtService: JwtService,
     private readonly bcryptProvider: BcryptProvider,
+    private readonly prismaService: PrismaService,
   ) {}
 
   @Post('login')
@@ -90,6 +92,7 @@ export class AuthController {
       this.passPrisma,
       this.userPrisma.userExistsQuery,
       this.bcryptProvider,
+      this.prismaService,
     );
 
     const result = await uc.execute({
@@ -244,6 +247,7 @@ export class AuthController {
       this.passPrisma,
       this.userPrisma.userExistsQuery,
       this.bcryptProvider,
+      this.prismaService,
     );
 
     const result = await uc.execute(dados);

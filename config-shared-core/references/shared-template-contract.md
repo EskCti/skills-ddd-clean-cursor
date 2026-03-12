@@ -10,6 +10,8 @@ Inicializar `<sharedModulePath>` com o baseline completo do projeto:
 - VO obrigatório no template: `src/vo/hash-password.vo.ts` com validação de hash bcrypt (`$2a$|$2b$|$2y$`, rounds com dois dígitos, payload `[./A-Za-z0-9]{53}`)
 - teste obrigatório correspondente: `test/vo/hash-password.vo.test.ts`
 - export obrigatório em `src/vo/index.ts` para disponibilizar `HashPassword` via `src/index.ts`
+- utilitário obrigatório de validação de resultado: `src/base/result-validator.ts` + `test/base/result-validator.test.ts` + export em `src/base/index.ts`
+- contrato obrigatório de transação em `src/db/transaction.manager.ts` + export em `src/db/index.ts`
 
 ## Deterministic Source
 
@@ -28,6 +30,7 @@ node .agents/skills/config-shared-core/scripts/create-shared.mjs [--scope @names
 > Se o repositório estiver em `.cloud/skills`, ajuste o caminho do comando.
 > No fluxo padrão (sem `--target` customizado), o script executa `npm install` na raiz do projeto após gerar o módulo.
 > No fluxo padrão, o script sincroniza `"@<namespace>/shared": "*"` apenas em frontend/backend e preserva dependências existentes nos demais pacotes.
+> Com `--run-tests` + `--target` customizado, o script só executa `npm install` e `npm run test` no diretório alvo quando `../typescript-config/base.json` existir relativo ao target; caso contrário, registra skip explícito.
 
 ## Options
 
@@ -36,6 +39,7 @@ node .agents/skills/config-shared-core/scripts/create-shared.mjs [--scope @names
 - `--run-tests`: executa `npm run test -w <scope>/shared` após gerar.
 - `--target`: caminho absoluto/relativo alternativo para validar geração sem tocar em `<sharedModulePath>`.
   - quando `--target` é usado fora do caminho padrão, o script não executa `npm install` na raiz.
+  - quando combinado com `--force`, o script bloqueia sobrescrita da raiz do repositório e da raiz do sistema.
 
 ## Namespace Resolution
 

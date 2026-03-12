@@ -1,29 +1,16 @@
-"use client";
+'use client';
 
-import { PersonName, URL } from "__SHARED_PACKAGE_NAME__";
-import { useForm, useWatch } from "react-hook-form";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { getErrorMessage } from "@/shared/i18n";
-import { v } from "@/shared/components/form/validator";
-import {
-  Button,
-  FormErrorMessage,
-  Input,
-  Label,
-  MiniFormCard,
-  PageSectionHeader,
-} from "@/shared";
-import {
-  type ChangePasswordFormData,
-  changePasswordSchema,
-  useAuth,
-} from "@/modules/auth/data";
-import {
-  UserAvatarField,
-} from "@/modules/auth/components";
-import { UserAdminIndicator } from "@/modules/auth/components/user-admin-indicator.component";
+import { PersonName, URL } from '__SHARED_PACKAGE_NAME__';
+import { useForm, useWatch } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { getErrorMessage } from '@/shared/i18n';
+import { v } from '@/shared/components/form/validator';
+import { Button, FormErrorMessage, Input, Label, MiniFormCard, PageSectionHeader } from '@/shared';
+import { type ChangePasswordFormData, changePasswordSchema, useAuth } from '@/modules/auth/data';
+import { UserAvatarField } from '@/modules/auth/components';
+import { UserAdminIndicator } from '@/modules/auth/components/user-admin-indicator.component';
 
 const updateProfileNameSchema = v.defineObject({
   name: PersonName,
@@ -49,7 +36,7 @@ export function ProfilePage() {
   } = useForm<UpdateProfileNameFormData>({
     resolver: v.resolver(updateProfileNameSchema),
     defaultValues: {
-      name: user?.name ?? "",
+      name: user?.name ?? '',
     },
   });
 
@@ -61,9 +48,9 @@ export function ProfilePage() {
   } = useForm<ChangePasswordFormData>({
     resolver: v.resolver(changePasswordSchema),
     defaultValues: {
-      oldPassword: "",
-      newPassword: "",
-      confirmPassword: "",
+      oldPassword: '',
+      newPassword: '',
+      confirmPassword: '',
     },
   });
 
@@ -76,35 +63,36 @@ export function ProfilePage() {
   } = useForm<UpdateProfileAvatarFormData>({
     resolver: v.resolver(updateProfileAvatarSchema),
     defaultValues: {
-      avatarUrl: user?.avatarUrl ?? "",
+      avatarUrl: user?.avatarUrl ?? '',
     },
   });
 
-  const avatarPreviewUrl = useWatch({
-    control: avatarControl,
-    name: "avatarUrl",
-  }) ?? "";
+  const avatarPreviewUrl =
+    useWatch({
+      control: avatarControl,
+      name: 'avatarUrl',
+    }) ?? '';
 
   useEffect(() => {
-    resetName({ name: user?.name ?? "" });
+    resetName({ name: user?.name ?? '' });
   }, [resetName, user?.name]);
 
   useEffect(() => {
-    resetAvatar({ avatarUrl: user?.avatarUrl ?? "" });
+    resetAvatar({ avatarUrl: user?.avatarUrl ?? '' });
   }, [resetAvatar, user?.avatarUrl]);
 
   async function handleUpdateName(data: UpdateProfileNameFormData) {
     setNameFormError(null);
 
     if (!user?.id) {
-      setNameFormError("Usuário não encontrado.");
+      setNameFormError('Usuário não encontrado.');
       return;
     }
 
     try {
       await updateUser(user.id, { name: data.name });
       await refreshUser();
-      toast.success("Nome atualizado com sucesso.");
+      toast.success('Nome atualizado com sucesso.');
     } catch (error) {
       setNameFormError(getErrorMessage(error));
     }
@@ -112,7 +100,7 @@ export function ProfilePage() {
 
   async function handleUpdateAvatar(data: UpdateProfileAvatarFormData) {
     if (!user?.id) {
-      toast.error("Usuário não encontrado.");
+      toast.error('Usuário não encontrado.');
       return;
     }
 
@@ -121,10 +109,10 @@ export function ProfilePage() {
 
       await updateUser(user.id, { avatarUrl: normalizedAvatarUrl });
       await refreshUser();
-      resetAvatar({ avatarUrl: normalizedAvatarUrl ?? "" });
-      toast.success("Avatar atualizado com sucesso.");
+      resetAvatar({ avatarUrl: normalizedAvatarUrl ?? '' });
+      toast.success('Avatar atualizado com sucesso.');
     } catch (error) {
-      toast.error("Falha ao atualizar avatar.", {
+      toast.error('Falha ao atualizar avatar.', {
         description: getErrorMessage(error),
       });
     }
@@ -133,10 +121,10 @@ export function ProfilePage() {
   async function handleChangePassword(data: ChangePasswordFormData) {
     try {
       await changePassword(data);
-      toast.success("Senha alterada com sucesso.");
-      resetPassword({ oldPassword: "", newPassword: "", confirmPassword: "" });
+      toast.success('Senha alterada com sucesso.');
+      resetPassword({ oldPassword: '', newPassword: '', confirmPassword: '' });
     } catch (error) {
-      toast.error("Falha ao alterar senha.", {
+      toast.error('Falha ao alterar senha.', {
         description: getErrorMessage(error),
       });
     }
@@ -144,7 +132,7 @@ export function ProfilePage() {
 
   function handleLogout() {
     logout();
-    router.replace("/auth/sign-in");
+    router.replace('/auth/sign-in');
   }
 
   return (
@@ -159,35 +147,19 @@ export function ProfilePage() {
         title="Alterar Nome"
         description="Atualize o nome exibido no seu perfil."
         actions={
-          <Button
-            type="submit"
-            form="update-profile-name-form"
-            disabled={isUpdatingName || !user?.id}
-          >
-            {isUpdatingName ? "Salvando..." : "Atualizar Nome"}
+          <Button type="submit" form="update-profile-name-form" disabled={isUpdatingName || !user?.id}>
+            {isUpdatingName ? 'Salvando...' : 'Atualizar Nome'}
           </Button>
         }
       >
-        <form
-          id="update-profile-name-form"
-          className="space-y-4"
-          onSubmit={handleSubmitName(handleUpdateName)}
-        >
+        <form id="update-profile-name-form" className="space-y-4" onSubmit={handleSubmitName(handleUpdateName)}>
           <div className="space-y-2">
             <Label htmlFor="profile-name">Nome</Label>
-            <Input
-              id="profile-name"
-              autoComplete="name"
-              {...registerName("name")}
-            />
-            {nameErrors.name?.message ? (
-              <FormErrorMessage>{nameErrors.name.message}</FormErrorMessage>
-            ) : null}
+            <Input id="profile-name" autoComplete="name" {...registerName('name')} />
+            {nameErrors.name?.message ? <FormErrorMessage>{nameErrors.name.message}</FormErrorMessage> : null}
           </div>
 
-          {nameFormError ? (
-            <FormErrorMessage size="sm">{nameFormError}</FormErrorMessage>
-          ) : null}
+          {nameFormError ? <FormErrorMessage size="sm">{nameFormError}</FormErrorMessage> : null}
         </form>
       </MiniFormCard>
 
@@ -195,20 +167,12 @@ export function ProfilePage() {
         title="Alterar Avatar"
         description="Atualize a imagem do perfil usando uma URL pública."
         actions={
-          <Button
-            type="submit"
-            form="update-profile-avatar-form"
-            disabled={isUpdatingAvatar || !user?.id}
-          >
-            {isUpdatingAvatar ? "Salvando..." : "Atualizar Avatar"}
+          <Button type="submit" form="update-profile-avatar-form" disabled={isUpdatingAvatar || !user?.id}>
+            {isUpdatingAvatar ? 'Salvando...' : 'Atualizar Avatar'}
           </Button>
         }
       >
-        <form
-          id="update-profile-avatar-form"
-          className="space-y-4"
-          onSubmit={handleSubmitAvatar(handleUpdateAvatar)}
-        >
+        <form id="update-profile-avatar-form" className="space-y-4" onSubmit={handleSubmitAvatar(handleUpdateAvatar)}>
           <div className="flex flex-col gap-4 md:flex-row md:items-center">
             <div className="flex justify-center md:justify-start">
               <UserAvatarField
@@ -227,7 +191,7 @@ export function ProfilePage() {
                 id="profile-avatar-url"
                 autoComplete="off"
                 placeholder="https://exemplo.com/avatar.png"
-                {...registerAvatar("avatarUrl")}
+                {...registerAvatar('avatarUrl')}
               />
               {avatarErrors.avatarUrl?.message ? (
                 <FormErrorMessage>{avatarErrors.avatarUrl.message}</FormErrorMessage>
@@ -241,27 +205,19 @@ export function ProfilePage() {
         title="Alterar Senha"
         description="Atualize sua credencial de acesso de forma segura."
         actions={
-          <Button
-            type="submit"
-            form="change-password-form"
-            disabled={isUpdatingPassword}
-          >
-            {isUpdatingPassword ? "Salvando..." : "Atualizar Senha"}
+          <Button type="submit" form="change-password-form" disabled={isUpdatingPassword}>
+            {isUpdatingPassword ? 'Salvando...' : 'Atualizar Senha'}
           </Button>
         }
       >
-        <form
-          id="change-password-form"
-          className="space-y-4"
-          onSubmit={handleSubmitPassword(handleChangePassword)}
-        >
+        <form id="change-password-form" className="space-y-4" onSubmit={handleSubmitPassword(handleChangePassword)}>
           <div className="space-y-2">
             <Label htmlFor="oldPassword">Senha atual</Label>
             <Input
               id="oldPassword"
               type="password"
               autoComplete="current-password"
-              {...registerPassword("oldPassword")}
+              {...registerPassword('oldPassword')}
             />
             {passwordErrors.oldPassword?.message ? (
               <FormErrorMessage>{passwordErrors.oldPassword.message}</FormErrorMessage>
@@ -270,12 +226,7 @@ export function ProfilePage() {
 
           <div className="space-y-2">
             <Label htmlFor="newPassword">Nova senha</Label>
-            <Input
-              id="newPassword"
-              type="password"
-              autoComplete="new-password"
-              {...registerPassword("newPassword")}
-            />
+            <Input id="newPassword" type="password" autoComplete="new-password" {...registerPassword('newPassword')} />
             {passwordErrors.newPassword?.message ? (
               <FormErrorMessage>{passwordErrors.newPassword.message}</FormErrorMessage>
             ) : null}
@@ -287,13 +238,12 @@ export function ProfilePage() {
               id="confirmPassword"
               type="password"
               autoComplete="new-password"
-              {...registerPassword("confirmPassword")}
+              {...registerPassword('confirmPassword')}
             />
             {passwordErrors.confirmPassword?.message ? (
               <FormErrorMessage>{passwordErrors.confirmPassword.message}</FormErrorMessage>
             ) : null}
           </div>
-
         </form>
       </MiniFormCard>
 
@@ -312,17 +262,17 @@ export function ProfilePage() {
         contentClassName="space-y-2 text-sm"
       >
         <p>
-          <span className="font-medium">Nome:</span> {user?.name ?? "-"}
+          <span className="font-medium">Nome:</span> {user?.name ?? '-'}
         </p>
         <p>
-          <span className="font-medium">E-mail:</span> {user?.email ?? "-"}
+          <span className="font-medium">E-mail:</span> {user?.email ?? '-'}
         </p>
         <p>
-          <span className="font-medium">ID:</span> {user?.id ?? "-"}
+          <span className="font-medium">ID:</span> {user?.id ?? '-'}
         </p>
         <div className="flex items-center gap-2 pt-1">
           <span className="font-medium">Perfil:</span>
-          {user ? <UserAdminIndicator admin={user.admin} variant="tag" /> : "-"}
+          {user ? <UserAdminIndicator admin={user.admin} variant="tag" /> : '-'}
         </div>
       </MiniFormCard>
     </div>

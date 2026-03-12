@@ -78,9 +78,9 @@
 ## Exemplo mínimo
 
 ```ts
-import { Result, UseCase } from "@namespace/shared";
-import { Thing } from "../model/thing.entity";
-import { ThingRepository } from "../provider/thing.repository";
+import { Result, UseCase } from '@namespace/shared';
+import { Thing } from '../model/thing.entity';
+import { ThingRepository } from '../provider/thing.repository';
 
 export interface CreateThingIn {
   name: string;

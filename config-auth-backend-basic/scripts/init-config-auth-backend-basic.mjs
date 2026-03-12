@@ -156,6 +156,57 @@ async function copyTemplate(templateDir, rootDir, replacements, options) {
   }
 }
 
+async function assertRequiredPathsExist(paths) {
+  for (const targetPath of paths) {
+    if (!(await pathExists(targetPath))) {
+      throw new Error(`Required file not found: ${targetPath}`);
+    }
+  }
+}
+
+async function validateTemplateTokens(templateDir) {
+  const requiredTokens = [
+    '__AUTH_PACKAGE_NAME__',
+    '__SHARED_PACKAGE_NAME__',
+    '__PROJECT_SCOPE_SLUG__',
+  ];
+
+  const tokenHits = Object.fromEntries(requiredTokens.map((token) => [token, 0]));
+
+  for await (const sourcePath of walkFiles(templateDir)) {
+    const content = await fs.readFile(sourcePath, 'utf8');
+    for (const token of requiredTokens) {
+      if (content.includes(token)) {
+        tokenHits[token] += 1;
+      }
+    }
+  }
+
+  const missingTokens = requiredTokens.filter((token) => tokenHits[token] === 0);
+  if (missingTokens.length > 0) {
+    throw new Error(
+      `Template placeholders missing in assets/config-auth-backend-basic-template: ${missingTokens.join(', ')}`,
+    );
+  }
+}
+
+async function ensureDbInfrastructureCompatibility(rootDir) {
+  const prismaServicePath = path.join(rootDir, 'apps', 'backend', 'src', 'db', 'prisma.service.ts');
+  const dbModulePath = path.join(rootDir, 'apps', 'backend', 'src', 'db', 'db.module.ts');
+
+  await assertRequiredPathsExist([prismaServicePath, dbModulePath]);
+
+  const prismaServiceContent = await fs.readFile(prismaServicePath, 'utf8');
+  const hasTransactionManagerContract = prismaServiceContent.includes('TransactionManager');
+  const hasRunInTransaction = prismaServiceContent.includes('runInTransaction');
+
+  if (!hasTransactionManagerContract || !hasRunInTransaction) {
+    throw new Error(
+      'apps/backend/src/db/prisma.service.ts is not compatible with TransactionManager/runInTransaction. Run config-prisma before config-auth-backend-basic.',
+    );
+  }
+}
+
 async function ensureBackendDependencies(backendPackageJsonPath, authPackageName, options) {
   const pkg = await readJson(backendPackageJsonPath);
 
@@ -177,8 +228,7 @@ async function ensureBackendDependencies(backendPackageJsonPath, authPackageName
   };
 
   const dependenciesChanged = JSON.stringify(pkg.dependencies ?? {}) !== JSON.stringify(dependencies);
-  const devDependenciesChanged =
-    JSON.stringify(pkg.devDependencies ?? {}) !== JSON.stringify(devDependencies);
+  const devDependenciesChanged = JSON.stringify(pkg.devDependencies ?? {}) !== JSON.stringify(devDependencies);
 
   if (!dependenciesChanged && !devDependenciesChanged) {
     return;
@@ -200,9 +250,7 @@ async function ensureAuthModuleImported(appModulePath, options) {
   const importPath = './modules/auth/auth.module';
   const importLine = `import { AuthModule } from '${importPath}';`;
 
-  const hasImport =
-    next.includes(`from '${importPath}'`) ||
-    next.includes(`from \"${importPath}\"`);
+  const hasImport = next.includes(`from '${importPath}'`) || next.includes(`from \"${importPath}\"`);
 
   if (!hasImport) {
     const importBlockMatch = next.match(/^(import[^\n]*\n)+/m);
@@ -217,9 +265,7 @@ async function ensureAuthModuleImported(appModulePath, options) {
   const importsMatch = next.match(importsRegex);
   if (importsMatch && !/\bAuthModule\b/.test(importsMatch[1])) {
     const inner = importsMatch[1];
-    const replacement = inner.trim().length === 0
-      ? '\n    AuthModule,\n  '
-      : `\n    AuthModule,${inner}`;
+    const replacement = inner.trim().length === 0 ? '\n    AuthModule,\n  ' : `\n    AuthModule,${inner}`;
 
     next = next.replace(importsRegex, `imports: [${replacement}],`);
   }
@@ -238,10 +284,7 @@ async function ensureSeedMain(seedMainPath, options) {
   if (!next.includes(importLine)) {
     const prismaImportRegex = /import \{ PrismaClient \} from '@prisma\/client';\n/;
     if (prismaImportRegex.test(next)) {
-      next = next.replace(
-        prismaImportRegex,
-        `import { PrismaClient } from '@prisma/client';\n${importLine}\n`,
-      );
+      next = next.replace(prismaImportRegex, `import { PrismaClient } from '@prisma/client';\n${importLine}\n`);
     } else {
       next = `${importLine}\n${next}`;
     }
@@ -252,14 +295,12 @@ async function ensureSeedMain(seedMainPath, options) {
 
   if (seedTasksMatch) {
     if (!seedTasksMatch[1].includes('seedAuthDefaultUsers')) {
-      const updatedContent = seedTasksMatch[1].trim().length === 0
-        ? '\n  seedAuthDefaultUsers,\n'
-        : `\n  seedAuthDefaultUsers,${seedTasksMatch[1]}`;
+      const updatedContent =
+        seedTasksMatch[1].trim().length === 0
+          ? '\n  seedAuthDefaultUsers,\n'
+          : `\n  seedAuthDefaultUsers,${seedTasksMatch[1]}`;
 
-      next = next.replace(
-        seedTasksRegex,
-        `const seedTasks: SeedTask[] = [${updatedContent}];`,
-      );
+      next = next.replace(seedTasksRegex, `const seedTasks: SeedTask[] = [${updatedContent}];`);
     }
   } else {
     next = `${next.trimEnd()}\n\nconst seedTasks: SeedTask[] = [\n  seedAuthDefaultUsers,\n];\n`;
@@ -412,13 +453,15 @@ async function main() {
   };
 
   try {
-    if (!(await pathExists(path.join(rootDir, 'apps', 'backend', 'package.json')))) {
-      throw new Error('apps/backend/package.json not found.');
-    }
+    const backendPackageJsonPath = path.join(rootDir, 'apps', 'backend', 'package.json');
+    await assertRequiredPathsExist([backendPackageJsonPath]);
 
     if (!(await pathExists(templateDir))) {
       throw new Error(`Template directory not found: ${templateDir}`);
     }
+
+    await validateTemplateTokens(templateDir);
+    await ensureDbInfrastructureCompatibility(rootDir);
 
     const authPackageName = await resolveAuthPackageName(rootDir, args.scope);
     const sharedPackageName = resolveSharedPackageNameFromAuth(authPackageName);
@@ -427,27 +470,22 @@ async function main() {
     logger.step(`Pacote shared resolvido: ${sharedPackageName}.`);
     logger.step(`Slug de escopo resolvido para RestClient: ${scopeSlug}.`);
 
-    await copyTemplate(templateDir, rootDir, {
-      __AUTH_PACKAGE_NAME__: authPackageName,
-      __SHARED_PACKAGE_NAME__: sharedPackageName,
-      __PROJECT_SCOPE_SLUG__: scopeSlug,
-    }, options);
-
-    await ensureBackendDependencies(
-      path.join(rootDir, 'apps', 'backend', 'package.json'),
-      authPackageName,
+    await copyTemplate(
+      templateDir,
+      rootDir,
+      {
+        __AUTH_PACKAGE_NAME__: authPackageName,
+        __SHARED_PACKAGE_NAME__: sharedPackageName,
+        __PROJECT_SCOPE_SLUG__: scopeSlug,
+      },
       options,
     );
 
-    await ensureAuthModuleImported(
-      path.join(rootDir, 'apps', 'backend', 'src', 'app.module.ts'),
-      options,
-    );
+    await ensureBackendDependencies(backendPackageJsonPath, authPackageName, options);
 
-    await ensureSeedMain(
-      path.join(rootDir, 'apps', 'backend', 'prisma', 'seed', 'main.ts'),
-      options,
-    );
+    await ensureAuthModuleImported(path.join(rootDir, 'apps', 'backend', 'src', 'app.module.ts'), options);
+
+    await ensureSeedMain(path.join(rootDir, 'apps', 'backend', 'prisma', 'seed', 'main.ts'), options);
 
     await removeBootstrapModel(
       path.join(rootDir, 'apps', 'backend', 'prisma', 'models', 'bootstrap.model.prisma'),

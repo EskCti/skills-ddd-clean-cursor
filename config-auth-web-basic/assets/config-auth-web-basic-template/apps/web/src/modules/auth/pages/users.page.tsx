@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
-import type { UserDTO } from "__AUTH_PACKAGE_NAME__";
-import { Pencil, Plus, Trash2, UserRound } from "lucide-react";
-import { toast } from "sonner";
-import { getErrorMessage } from "@/shared/i18n";
-import { v } from "@/shared/components/form/validator";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import type { UserDTO } from '__AUTH_PACKAGE_NAME__';
+import { Pencil, Plus, Trash2, UserRound } from 'lucide-react';
+import { toast } from 'sonner';
+import { getErrorMessage } from '@/shared/i18n';
+import { v } from '@/shared/components/form/validator';
 import {
   Button,
   DeleteConfirmationDialog,
@@ -24,26 +24,26 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/shared";
+} from '@/shared';
 import {
   createUserSchema,
   editUserSchema,
   type CreateUserFormData,
   type EditUserFormData,
   useAuth,
-} from "@/modules/auth/data";
-import { UserDetailsCard } from "@/modules/auth/components/user-details-card.component";
-import { UserFormFields } from "@/modules/auth/components/user-form-fields.component";
-import { UserAdminIndicator } from "@/modules/auth/components/user-admin-indicator.component";
-import Image from "next/image";
+} from '@/modules/auth/data';
+import { UserDetailsCard } from '@/modules/auth/components/user-details-card.component';
+import { UserFormFields } from '@/modules/auth/components/user-form-fields.component';
+import { UserAdminIndicator } from '@/modules/auth/components/user-admin-indicator.component';
+import Image from 'next/image';
 
 const PAGE_SIZE = 10;
 
 const EMPTY_CREATE_FORM: CreateUserFormData = {
-  name: "",
-  email: "",
-  password: "",
-  avatarUrl: "",
+  name: '',
+  email: '',
+  password: '',
+  avatarUrl: '',
 };
 
 type UserTableAvatarProps = {
@@ -53,8 +53,7 @@ type UserTableAvatarProps = {
 
 function UserTableAvatar({ name, avatarUrl }: UserTableAvatarProps) {
   const [failedAvatarUrl, setFailedAvatarUrl] = useState<string | null>(null);
-  const resolvedAvatarUrl =
-    avatarUrl && failedAvatarUrl !== avatarUrl ? avatarUrl : null;
+  const resolvedAvatarUrl = avatarUrl && failedAvatarUrl !== avatarUrl ? avatarUrl : null;
 
   if (resolvedAvatarUrl) {
     return (
@@ -112,14 +111,14 @@ export function UsersPage() {
   } = useForm<EditUserFormData>({
     resolver: v.resolver(editUserSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      avatarUrl: "",
+      name: '',
+      email: '',
+      avatarUrl: '',
     },
   });
 
-  const createAvatarUrl = watchCreate("avatarUrl") ?? "";
-  const editAvatarUrl = watchEdit("avatarUrl") ?? "";
+  const createAvatarUrl = watchCreate('avatarUrl') ?? '';
+  const editAvatarUrl = watchEdit('avatarUrl') ?? '';
 
   const refreshUsers = useCallback(
     async (targetPage: number) => {
@@ -156,7 +155,7 @@ export function UsersPage() {
     resetEdit({
       name: editingUser.name,
       email: editingUser.email,
-      avatarUrl: editingUser.avatarUrl ?? "",
+      avatarUrl: editingUser.avatarUrl ?? '',
     });
   }, [editingUser, resetEdit]);
 
@@ -177,7 +176,7 @@ export function UsersPage() {
   async function onCreateUser(data: CreateUserFormData) {
     try {
       await createUser(data);
-      toast.success("Usuário criado com sucesso.");
+      toast.success('Usuário criado com sucesso.');
       setIsCreateDialogOpen(false);
       resetCreate(EMPTY_CREATE_FORM);
 
@@ -187,7 +186,7 @@ export function UsersPage() {
         await refreshUsers(1);
       }
     } catch (error) {
-      toast.error("Falha ao criar usuário.", {
+      toast.error('Falha ao criar usuário.', {
         description: getErrorMessage(error),
       });
     }
@@ -205,11 +204,11 @@ export function UsersPage() {
         avatarUrl: data.avatarUrl,
       });
 
-      toast.success("Usuário atualizado com sucesso.");
+      toast.success('Usuário atualizado com sucesso.');
       setEditingUser(null);
       await refreshUsers(page);
     } catch (error) {
-      toast.error("Falha ao atualizar usuário.", {
+      toast.error('Falha ao atualizar usuário.', {
         description: getErrorMessage(error),
       });
     }
@@ -222,11 +221,11 @@ export function UsersPage() {
 
     try {
       await deleteUser(deletingUser.id);
-      toast.success("Usuário excluído com sucesso.");
+      toast.success('Usuário excluído com sucesso.');
       setDeletingUser(null);
       await refreshUsers(page);
     } catch (error) {
-      toast.error("Falha ao excluir usuário.", {
+      toast.error('Falha ao excluir usuário.', {
         description: getErrorMessage(error),
       });
     }
@@ -293,17 +292,10 @@ export function UsersPage() {
               </TableRow>
             ) : (
               users.map((tableUser) => (
-                <TableRow
-                  key={tableUser.id}
-                  className="cursor-pointer"
-                  onClick={() => setViewingUser(tableUser)}
-                >
+                <TableRow key={tableUser.id} className="cursor-pointer" onClick={() => setViewingUser(tableUser)}>
                   <TableCell className="px-5 font-medium md:px-6">
                     <div className="flex items-center gap-3">
-                      <UserTableAvatar
-                        name={tableUser.name}
-                        avatarUrl={tableUser.avatarUrl}
-                      />
+                      <UserTableAvatar name={tableUser.name} avatarUrl={tableUser.avatarUrl} />
                       <div className="min-w-0 space-y-0.5">
                         <div className="flex items-center gap-1.5">
                           <span className="block min-w-0 truncate">{tableUser.name}</span>
@@ -315,9 +307,7 @@ export function UsersPage() {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="hidden px-5 md:table-cell md:px-6">
-                    {tableUser.email}
-                  </TableCell>
+                  <TableCell className="hidden px-5 md:table-cell md:px-6">{tableUser.email}</TableCell>
                   <TableCell className="hidden max-w-70 truncate px-5 text-xs text-muted-foreground xl:table-cell md:px-6">
                     {tableUser.id}
                   </TableCell>
@@ -349,9 +339,7 @@ export function UsersPage() {
                         disabled={tableUser.id === user?.id}
                         aria-label={`Excluir usuário ${tableUser.name}`}
                         title={
-                          tableUser.id === user?.id
-                            ? "Não é permitido excluir o usuário logado."
-                            : "Excluir usuário"
+                          tableUser.id === user?.id ? 'Não é permitido excluir o usuário logado.' : 'Excluir usuário'
                         }
                       >
                         <Trash2 className="size-3.5" />
@@ -409,17 +397,12 @@ export function UsersPage() {
                 Cancelar
               </Button>
               <Button type="submit" form="create-user-form" disabled={isCreating}>
-                {isCreating ? "Criando..." : "Criar usuário"}
+                {isCreating ? 'Criando...' : 'Criar usuário'}
               </Button>
             </>
           }
         >
-          <form
-            id="create-user-form"
-            className="space-y-4"
-            autoComplete="off"
-            onSubmit={submitCreate(onCreateUser)}
-          >
+          <form id="create-user-form" className="space-y-4" autoComplete="off" onSubmit={submitCreate(onCreateUser)}>
             <input
               type="text"
               name="fake-username"
@@ -440,21 +423,19 @@ export function UsersPage() {
             <UserFormFields
               mode="create"
               idPrefix="create-user"
-              nameField={registerCreate("name")}
-              emailField={registerCreate("email")}
-              passwordField={registerCreate("password")}
-              avatarField={registerCreate("avatarUrl")}
+              nameField={registerCreate('name')}
+              emailField={registerCreate('email')}
+              passwordField={registerCreate('password')}
+              avatarField={registerCreate('avatarUrl')}
               avatarUrl={createAvatarUrl}
               onAvatarUrlChange={(nextAvatarUrl) => {
-                setCreateValue("avatarUrl", nextAvatarUrl, {
+                setCreateValue('avatarUrl', nextAvatarUrl, {
                   shouldDirty: true,
                   shouldValidate: true,
                 });
               }}
               isPasswordVisible={isCreatePasswordVisible}
-              onTogglePasswordVisibility={() =>
-                setIsCreatePasswordVisible((previousState) => !previousState)
-              }
+              onTogglePasswordVisibility={() => setIsCreatePasswordVisible((previousState) => !previousState)}
               nameError={createErrors.name?.message}
               emailError={createErrors.email?.message}
               passwordError={createErrors.password?.message}
@@ -477,34 +458,26 @@ export function UsersPage() {
           description="Atualize os dados principais do usuário selecionado."
           footer={
             <>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => setEditingUser(null)}
-              >
+              <Button type="button" variant="secondary" onClick={() => setEditingUser(null)}>
                 Cancelar
               </Button>
               <Button type="submit" form="update-user-form" disabled={isUpdating}>
-                {isUpdating ? "Salvando..." : "Salvar alterações"}
+                {isUpdating ? 'Salvando...' : 'Salvar alterações'}
               </Button>
             </>
           }
         >
-          <form
-            id="update-user-form"
-            className="space-y-4"
-            onSubmit={submitEdit(onUpdateUser)}
-          >
+          <form id="update-user-form" className="space-y-4" onSubmit={submitEdit(onUpdateUser)}>
             <UserFormFields
               mode="update"
               idPrefix="update-user"
               userId={editingUser?.id}
-              nameField={registerEdit("name")}
-              emailField={registerEdit("email")}
-              avatarField={registerEdit("avatarUrl")}
+              nameField={registerEdit('name')}
+              emailField={registerEdit('email')}
+              avatarField={registerEdit('avatarUrl')}
               avatarUrl={editAvatarUrl}
               onAvatarUrlChange={(nextAvatarUrl) => {
-                setEditValue("avatarUrl", nextAvatarUrl, {
+                setEditValue('avatarUrl', nextAvatarUrl, {
                   shouldDirty: true,
                   shouldValidate: true,
                 });
@@ -533,11 +506,7 @@ export function UsersPage() {
           confirmLabel="Excluir usuário"
           onConfirm={onDeleteUser}
           confirmDisabled={!canDeleteSelectedUser}
-          confirmDisabledMessage={
-            !canDeleteSelectedUser
-              ? "Não é permitido excluir o usuário autenticado."
-              : undefined
-          }
+          confirmDisabledMessage={!canDeleteSelectedUser ? 'Não é permitido excluir o usuário autenticado.' : undefined}
         />
       ) : null}
     </div>

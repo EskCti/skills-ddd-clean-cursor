@@ -4,6 +4,14 @@
 
 Garantir que o frontend tenha o modulo de autenticacao web basico funcional, com fluxo de login/cadastro, rotas privadas/publicas, controle de acesso admin e telas de usuarios/perfil.
 
+## Pre-requisitos de infraestrutura
+
+- `apps/web/src/shared/index.ts` deve existir.
+- `apps/web/src/shared/i18n/index.ts` deve existir.
+- `apps/web/src/shared/components/form/validator/index.ts` deve existir.
+- `apps/web/src/modules/dashboard/components/empty-dashboard-state.component.tsx` deve existir.
+- `apps/web/src/modules/examples/components/example-navigation.component.tsx` deve existir.
+
 ## Artefatos obrigatorios
 
 - `apps/web/src/modules/auth/**`
@@ -24,7 +32,9 @@ Garantir que o frontend tenha o modulo de autenticacao web basico funcional, com
 - `apps/web/package.json` deve conter dependencias:
   - `<scope>/auth: "*"`
   - `<scope>/shared: "*"`
+  - `lucide-react`
   - `react-hook-form`
+  - `sonner`
 
 ## Endpoints consumidos pelo modulo web
 
@@ -67,3 +77,4 @@ Garantir que o frontend tenha o modulo de autenticacao web basico funcional, com
 - Rotas auth publicas devem funcionar sem shell privado.
 - Rotas privadas e administrativas devem respeitar autenticacao e perfil admin.
 - Chave de token local deve usar slug de scope (`__PROJECT_SCOPE_SLUG__.access_token`) apos replace.
+- Template deve manter placeholders `__AUTH_PACKAGE_NAME__`, `__SHARED_PACKAGE_NAME__` e `__PROJECT_SCOPE_SLUG__` para substituicao dinamica por namespace.

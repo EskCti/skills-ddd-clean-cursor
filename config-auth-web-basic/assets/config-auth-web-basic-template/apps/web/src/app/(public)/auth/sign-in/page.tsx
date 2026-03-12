@@ -1,4 +1,4 @@
-import { SignInPage } from "@/modules/auth";
+import { SignInPage } from '@/modules/auth';
 
 type SignInRoutePageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -10,7 +10,7 @@ function sanitizeNextPath(value?: string | string[]): string | undefined {
     return undefined;
   }
 
-  return next.startsWith("/") ? next : undefined;
+  return next.startsWith('/') ? next : undefined;
 }
 
 export default async function SignInRoutePage({ searchParams }: SignInRoutePageProps) {

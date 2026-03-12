@@ -156,23 +156,65 @@ async function copyTemplate(templateDir, rootDir, replacements, options) {
   }
 }
 
-async function ensureFrontendDependencies(
-  frontendPackageJsonPath,
-  authPackageName,
-  sharedPackageName,
-  options,
-) {
+async function assertRequiredPathsExist(paths) {
+  for (const targetPath of paths) {
+    if (!(await pathExists(targetPath))) {
+      throw new Error(`Required file not found: ${targetPath}`);
+    }
+  }
+}
+
+async function validateTemplateTokens(templateDir) {
+  const requiredTokens = [
+    '__AUTH_PACKAGE_NAME__',
+    '__SHARED_PACKAGE_NAME__',
+    '__PROJECT_SCOPE_SLUG__',
+  ];
+
+  const tokenHits = Object.fromEntries(requiredTokens.map((token) => [token, 0]));
+
+  for await (const sourcePath of walkFiles(templateDir)) {
+    const content = await fs.readFile(sourcePath, 'utf8');
+    for (const token of requiredTokens) {
+      if (content.includes(token)) {
+        tokenHits[token] += 1;
+      }
+    }
+  }
+
+  const missingTokens = requiredTokens.filter((token) => tokenHits[token] === 0);
+  if (missingTokens.length > 0) {
+    throw new Error(
+      `Template placeholders missing in assets/config-auth-web-basic-template: ${missingTokens.join(', ')}`,
+    );
+  }
+}
+
+async function ensureSharedWebInfrastructureCompatibility(rootDir) {
+  const requiredPaths = [
+    path.join(rootDir, 'apps', 'web', 'src', 'shared', 'index.ts'),
+    path.join(rootDir, 'apps', 'web', 'src', 'shared', 'i18n', 'index.ts'),
+    path.join(rootDir, 'apps', 'web', 'src', 'shared', 'components', 'form', 'validator', 'index.ts'),
+    path.join(rootDir, 'apps', 'web', 'src', 'modules', 'dashboard', 'components', 'empty-dashboard-state.component.tsx'),
+    path.join(rootDir, 'apps', 'web', 'src', 'modules', 'examples', 'components', 'example-navigation.component.tsx'),
+  ];
+
+  await assertRequiredPathsExist(requiredPaths);
+}
+
+async function ensureFrontendDependencies(frontendPackageJsonPath, authPackageName, sharedPackageName, options) {
   const pkg = await readJson(frontendPackageJsonPath);
 
   const dependencies = {
     ...(pkg.dependencies ?? {}),
     [authPackageName]: '*',
     [sharedPackageName]: '*',
+    'lucide-react': '^0.577.0',
     'react-hook-form': '^7.66.0',
+    sonner: '^2.0.7',
   };
 
-  const dependenciesChanged =
-    JSON.stringify(pkg.dependencies ?? {}) !== JSON.stringify(dependencies);
+  const dependenciesChanged = JSON.stringify(pkg.dependencies ?? {}) !== JSON.stringify(dependencies);
 
   if (!dependenciesChanged) {
     return;
@@ -281,13 +323,14 @@ async function main() {
 
   try {
     const webPackagePath = path.join(rootDir, 'apps', 'web', 'package.json');
-    if (!(await pathExists(webPackagePath))) {
-      throw new Error('apps/web/package.json not found.');
-    }
+    await assertRequiredPathsExist([webPackagePath]);
 
     if (!(await pathExists(templateDir))) {
       throw new Error(`Template directory not found: ${templateDir}`);
     }
+
+    await validateTemplateTokens(templateDir);
+    await ensureSharedWebInfrastructureCompatibility(rootDir);
 
     const authPackageName = await resolveAuthPackageName(rootDir, args.scope);
     const sharedPackageName = resolveSharedPackageNameFromAuth(authPackageName);
@@ -308,12 +351,7 @@ async function main() {
       options,
     );
 
-    await ensureFrontendDependencies(
-      webPackagePath,
-      authPackageName,
-      sharedPackageName,
-      options,
-    );
+    await ensureFrontendDependencies(webPackagePath, authPackageName, sharedPackageName, options);
 
     if (options.changes.length === 0) {
       logger.step('Nenhuma alteracao necessaria (estado ja convergente).');

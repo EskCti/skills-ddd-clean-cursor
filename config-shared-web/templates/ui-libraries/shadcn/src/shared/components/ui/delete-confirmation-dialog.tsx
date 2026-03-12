@@ -1,12 +1,12 @@
-"use client";
-import { useId, useState } from "react";
-import type { ReactNode } from "react";
-import { Button } from "@/shared/components/ui/button";
-import { Dialog } from "@/shared/components/ui/dialog";
-import { FormErrorMessage } from "@/shared/components/ui/form-error-message";
-import { Input } from "@/shared/components/ui/input";
-import { Label } from "@/shared/components/ui/label";
-import { StandardDialogContent } from "@/shared/components/ui/standard-dialog-content";
+'use client';
+import { useId, useState } from 'react';
+import type { ReactNode } from 'react';
+import { Button } from '@/shared/components/ui/button';
+import { Dialog } from '@/shared/components/ui/dialog';
+import { FormErrorMessage } from '@/shared/components/ui/form-error-message';
+import { Input } from '@/shared/components/ui/input';
+import { Label } from '@/shared/components/ui/label';
+import { StandardDialogContent } from '@/shared/components/ui/standard-dialog-content';
 
 type DeleteConfirmationDialogProps = {
   open: boolean;
@@ -29,19 +29,19 @@ export function DeleteConfirmationDialog({
   open,
   onOpenChange,
   onConfirm,
-  title = "Excluir registro",
-  description = "Esta ação remove o registro selecionado de forma permanente.",
+  title = 'Excluir registro',
+  description = 'Esta ação remove o registro selecionado de forma permanente.',
   itemLabel,
   itemValue,
-  confirmWord = "excluir",
-  confirmLabel = "Excluir",
-  cancelLabel = "Cancelar",
+  confirmWord = 'excluir',
+  confirmLabel = 'Excluir',
+  cancelLabel = 'Cancelar',
   isConfirming = false,
   confirmDisabled = false,
   confirmDisabledMessage,
   children,
 }: DeleteConfirmationDialogProps) {
-  const [confirmationText, setConfirmationText] = useState("");
+  const [confirmationText, setConfirmationText] = useState('');
   const confirmationInputId = useId();
   const normalizedConfirmation = confirmationText.trim().toLowerCase();
   const normalizedWord = confirmWord.trim().toLowerCase();
@@ -50,7 +50,7 @@ export function DeleteConfirmationDialog({
 
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
-      setConfirmationText("");
+      setConfirmationText('');
     }
 
     onOpenChange(nextOpen);
@@ -72,7 +72,7 @@ export function DeleteConfirmationDialog({
               onClick={onConfirm}
               disabled={!canConfirm}
             >
-              {isConfirming ? "Excluindo..." : confirmLabel}
+              {isConfirming ? 'Excluindo...' : confirmLabel}
             </Button>
           </>
         }
@@ -97,9 +97,7 @@ export function DeleteConfirmationDialog({
           />
         </div>
 
-        {confirmDisabledMessage ? (
-          <FormErrorMessage size="sm">{confirmDisabledMessage}</FormErrorMessage>
-        ) : null}
+        {confirmDisabledMessage ? <FormErrorMessage size="sm">{confirmDisabledMessage}</FormErrorMessage> : null}
       </StandardDialogContent>
     </Dialog>
   );

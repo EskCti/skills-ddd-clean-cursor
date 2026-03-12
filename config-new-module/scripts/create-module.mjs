@@ -1,13 +1,10 @@
 #!/usr/bin/env node
 
-import { promises as fs } from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import {
-  resolveNamespace,
-  resolveSkillPaths,
-} from "../../utils/resolve-skill-config.mjs";
-import { createSkillRunLogger } from "../../utils/skill-run-log.mjs";
+import { promises as fs } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { resolveNamespace, resolveSkillPaths } from '../../utils/resolve-skill-config.mjs';
+import { createSkillRunLogger } from '../../utils/skill-run-log.mjs';
 
 function usage() {
   console.log(`Usage:
@@ -20,39 +17,39 @@ Examples:
 }
 
 function parseArgs(argv) {
-  let moduleName = "";
-  let scope = "";
+  let moduleName = '';
+  let scope = '';
   let force = false;
 
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
 
-    if (arg === "--help" || arg === "-h") {
+    if (arg === '--help' || arg === '-h') {
       usage();
       process.exit(0);
     }
 
-    if (arg === "--force") {
+    if (arg === '--force') {
       force = true;
       continue;
     }
 
-    if (arg === "--scope") {
+    if (arg === '--scope') {
       const value = argv[i + 1];
       if (!value) {
-        throw new Error("Missing value for --scope");
+        throw new Error('Missing value for --scope');
       }
       scope = value;
       i += 1;
       continue;
     }
 
-    if (arg.startsWith("-")) {
+    if (arg.startsWith('-')) {
       throw new Error(`Unknown option: ${arg}`);
     }
 
     if (moduleName) {
-      throw new Error("Only one module name is allowed.");
+      throw new Error('Only one module name is allowed.');
     }
     moduleName = arg;
   }
@@ -66,28 +63,24 @@ function validateModuleName(name) {
 
 function toPascalCase(name) {
   return name
-    .split("-")
+    .split('-')
     .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join("");
+    .join('');
 }
 
 function toCamelCase(name) {
   const pascal = toPascalCase(name);
-  return pascal ? `${pascal.charAt(0).toLowerCase()}${pascal.slice(1)}` : "";
+  return pascal ? `${pascal.charAt(0).toLowerCase()}${pascal.slice(1)}` : '';
 }
 
 function toImportPath(fromDir, toFilePath) {
-  const withoutExtension = toPosixPath(
-    path.relative(fromDir, toFilePath).replace(/\.(tsx?|jsx?)$/, ""),
-  );
-  return withoutExtension.startsWith(".")
-    ? withoutExtension
-    : `./${withoutExtension}`;
+  const withoutExtension = toPosixPath(path.relative(fromDir, toFilePath).replace(/\.(tsx?|jsx?)$/, ''));
+  return withoutExtension.startsWith('.') ? withoutExtension : `./${withoutExtension}`;
 }
 
 function toPosixPath(value) {
-  return value.replace(/\\/g, "/");
+  return value.replace(/\\/g, '/');
 }
 
 async function pathExists(targetPath) {
@@ -99,12 +92,7 @@ async function pathExists(targetPath) {
   }
 }
 
-async function ensureTargetPathAvailability({
-  targetPath,
-  force,
-  logger,
-  label,
-}) {
+async function ensureTargetPathAvailability({ targetPath, force, logger, label }) {
   if (!(await pathExists(targetPath))) return;
   if (!force) {
     throw new Error(`Directory already exists: ${targetPath}. Use --force to overwrite.`);
@@ -114,34 +102,27 @@ async function ensureTargetPathAvailability({
 }
 
 async function readJson(filePath) {
-  const raw = await fs.readFile(filePath, "utf8");
+  const raw = await fs.readFile(filePath, 'utf8');
   return JSON.parse(raw);
 }
 
 async function writeFile(filePath, content) {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
-  await fs.writeFile(filePath, content, "utf8");
+  await fs.writeFile(filePath, content, 'utf8');
 }
 
 function stringifyJson(obj) {
   return `${JSON.stringify(obj, null, 2)}\n`;
 }
 
-async function ensurePackageDependency({
-  packageJsonPath,
-  dependencyName,
-  dependencyVersion,
-  logger,
-  label,
-}) {
+async function ensurePackageDependency({ packageJsonPath, dependencyName, dependencyVersion, logger, label }) {
   if (!(await pathExists(packageJsonPath))) {
     throw new Error(`Missing package.json file: ${packageJsonPath}`);
   }
 
   const packageJson = await readJson(packageJsonPath);
-  const dependencies = packageJson.dependencies && typeof packageJson.dependencies === "object"
-    ? packageJson.dependencies
-    : {};
+  const dependencies =
+    packageJson.dependencies && typeof packageJson.dependencies === 'object' ? packageJson.dependencies : {};
   const currentVersion = dependencies[dependencyName];
   if (currentVersion === dependencyVersion) {
     return false;
@@ -150,30 +131,21 @@ async function ensurePackageDependency({
   dependencies[dependencyName] = dependencyVersion;
   packageJson.dependencies = dependencies;
   await writeFile(packageJsonPath, stringifyJson(packageJson));
-  logger.step(
-    `${label} atualizado com dependência ${dependencyName}@${dependencyVersion}: ${packageJsonPath}`,
-  );
+  logger.step(`${label} atualizado com dependência ${dependencyName}@${dependencyVersion}: ${packageJsonPath}`);
   return true;
 }
 
-async function ensureBackendModuleImportedInAppModule({
-  appModulePath,
-  moduleName,
-  moduleClassName,
-  logger,
-}) {
+async function ensureBackendModuleImportedInAppModule({ appModulePath, moduleName, moduleClassName, logger }) {
   if (!(await pathExists(appModulePath))) {
     throw new Error(`Missing backend app module file: ${appModulePath}`);
   }
 
   const importPath = `./modules/${moduleName}/${moduleName}.module`;
   const importLine = `import { ${moduleClassName}Module } from '${importPath}';`;
-  let content = await fs.readFile(appModulePath, "utf8");
+  let content = await fs.readFile(appModulePath, 'utf8');
   let updated = content;
 
-  const hasImport =
-    updated.includes(`from '${importPath}'`) ||
-    updated.includes(`from "${importPath}"`);
+  const hasImport = updated.includes(`from '${importPath}'`) || updated.includes(`from "${importPath}"`);
   if (!hasImport) {
     const importBlockMatch = updated.match(/^(import[^\n]*\n)+/m);
     if (importBlockMatch) {
@@ -187,131 +159,81 @@ async function ensureBackendModuleImportedInAppModule({
   const importsArrayMatch = updated.match(importsArrayRegex);
   if (importsArrayMatch && !new RegExp(`\\b${moduleClassName}Module\\b`).test(importsArrayMatch[1])) {
     const inner = importsArrayMatch[1];
-    const replacement = inner.trim().length === 0
-      ? `\n    ${moduleClassName}Module,\n  `
-      : `\n    ${moduleClassName}Module,${inner}`;
+    const replacement =
+      inner.trim().length === 0 ? `\n    ${moduleClassName}Module,\n  ` : `\n    ${moduleClassName}Module,${inner}`;
     updated = updated.replace(importsArrayRegex, `imports: [${replacement}],`);
   }
 
   if (updated !== content) {
-    await fs.writeFile(appModulePath, updated, "utf8");
+    await fs.writeFile(appModulePath, updated, 'utf8');
     logger.step(`arquivo atualizado: ${appModulePath}`);
   }
 }
 
 async function main() {
   const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-  const rootDir = path.resolve(scriptDir, "../../../..");
+  const rootDir = path.resolve(scriptDir, '../../../..');
   const logger = await createSkillRunLogger({
     rootDir,
-    skillName: "config-new-module",
+    skillName: 'config-new-module',
     commandArgs: process.argv.slice(2),
   });
 
   try {
-    const {
-      moduleName,
-      scope: scopeArg,
-      force,
-    } = parseArgs(process.argv.slice(2));
+    const { moduleName, scope: scopeArg, force } = parseArgs(process.argv.slice(2));
 
     if (!moduleName) {
       usage();
-      logger.step("Comando sem nome de módulo. Encerrado após exibir help.");
+      logger.step('Comando sem nome de módulo. Encerrado após exibir help.');
       await logger.success();
       process.exit(1);
     }
 
     if (!validateModuleName(moduleName)) {
-      throw new Error(
-        `Invalid module name '${moduleName}'. Use lowercase letters, numbers and hyphens.`,
-      );
+      throw new Error(`Invalid module name '${moduleName}'. Use lowercase letters, numbers and hyphens.`);
     }
 
     logger.step(`Nome do módulo validado: ${moduleName}.`);
 
-    const { packagesDir, sharedModule, sharedPackageJsonPath, config } =
-      await resolveSkillPaths(rootDir);
+    const { packagesDir, sharedModule, sharedPackageJsonPath, config } = await resolveSkillPaths(rootDir);
     const targetDir = path.join(packagesDir, moduleName);
     const backendAppPath = config.defaults.backendAppPath;
     const frontendAppPath = config.defaults.frontendAppPath;
-    const frontendSrcDir = path.join(rootDir, frontendAppPath, "src");
+    const frontendSrcDir = path.join(rootDir, frontendAppPath, 'src');
     const hasFrontendSrcDir = await pathExists(frontendSrcDir);
-    const frontendModulesBaseSegments = hasFrontendSrcDir
-      ? ["src", "modules"]
-      : ["modules"];
-    const frontendAppBaseSegments = hasFrontendSrcDir
-      ? ["src", "app"]
-      : ["app"];
-    const frontendModulesBaseDir = path.join(
-      rootDir,
-      frontendAppPath,
-      ...frontendModulesBaseSegments,
-    );
+    const frontendModulesBaseSegments = hasFrontendSrcDir ? ['src', 'modules'] : ['modules'];
+    const frontendAppBaseSegments = hasFrontendSrcDir ? ['src', 'app'] : ['app'];
+    const frontendModulesBaseDir = path.join(rootDir, frontendAppPath, ...frontendModulesBaseSegments);
     const frontendEmptyDashboardStatePath = path.join(
       frontendModulesBaseDir,
-      "dashboard",
-      "components",
-      "empty-dashboard-state.component.tsx",
+      'dashboard',
+      'components',
+      'empty-dashboard-state.component.tsx',
     );
-    const frontendAppBaseDir = path.join(
-      rootDir,
-      frontendAppPath,
-      ...frontendAppBaseSegments,
-    );
-    const frontendPrivateGroupDir = path.join(frontendAppBaseDir, "(private)");
+    const frontendAppBaseDir = path.join(rootDir, frontendAppPath, ...frontendAppBaseSegments);
+    const frontendPrivateGroupDir = path.join(frontendAppBaseDir, '(private)');
     const hasFrontendPrivateGroup = await pathExists(frontendPrivateGroupDir);
-    const backendModuleDir = path.join(
-      rootDir,
-      backendAppPath,
-      "src",
-      "modules",
-      moduleName,
-    );
-    const frontendModuleDir = path.join(
-      frontendModulesBaseDir,
-      moduleName,
-    );
+    const backendModuleDir = path.join(rootDir, backendAppPath, 'src', 'modules', moduleName);
+    const frontendModuleDir = path.join(frontendModulesBaseDir, moduleName);
     const frontendRouteDir = path.join(
       hasFrontendPrivateGroup ? frontendPrivateGroupDir : frontendAppBaseDir,
       moduleName,
     );
-    const backendPrismaModelPath = path.join(
-      rootDir,
-      backendAppPath,
-      "prisma",
-      "models",
-      `${moduleName}.model.prisma`,
-    );
-    const backendAppModulePath = path.join(
-      rootDir,
-      backendAppPath,
-      "src",
-      "app.module.ts",
-    );
-    const backendPackageJsonPath = path.join(
-      rootDir,
-      backendAppPath,
-      "package.json",
-    );
-    const frontendPackageJsonPath = path.join(
-      rootDir,
-      frontendAppPath,
-      "package.json",
-    );
+    const backendPrismaModelPath = path.join(rootDir, backendAppPath, 'prisma', 'models', `${moduleName}.model.prisma`);
+    const backendAppModulePath = path.join(rootDir, backendAppPath, 'src', 'app.module.ts');
+    const backendPackageJsonPath = path.join(rootDir, backendAppPath, 'package.json');
+    const frontendPackageJsonPath = path.join(rootDir, frontendAppPath, 'package.json');
 
-    let sharedScopeFromPackage = "";
+    let sharedScopeFromPackage = '';
     try {
       const sharedPkg = await readJson(sharedPackageJsonPath);
       const sharedName = sharedPkg?.name;
-      if (typeof sharedName === "string" && sharedName.includes("/")) {
-        sharedScopeFromPackage = sharedName.split("/")[0];
+      if (typeof sharedName === 'string' && sharedName.includes('/')) {
+        sharedScopeFromPackage = sharedName.split('/')[0];
       }
     } catch (error) {
-      if (error && error.code !== "ENOENT") {
-        throw new Error(
-          `Invalid shared package file at ${sharedPackageJsonPath}: ${error.message}`,
-        );
+      if (error && error.code !== 'ENOENT') {
+        throw new Error(`Invalid shared package file at ${sharedPackageJsonPath}: ${error.message}`);
       }
     }
 
@@ -324,99 +246,86 @@ async function main() {
 
     const packageName = `${scope}/${moduleName}`;
     const sharedDependency = `${scope}/${sharedModule}`;
-    const workspaceTsConfigBasePath = path.join(
-      packagesDir,
-      "typescript-config",
-      "base.json",
-    );
-    const fallbackTsConfigBasePath = path.join(
-      rootDir,
-      "packages",
-      "typescript-config",
-      "base.json",
-    );
-    const tsConfigBasePath = await pathExists(workspaceTsConfigBasePath)
+    const workspaceTsConfigBasePath = path.join(packagesDir, 'typescript-config', 'base.json');
+    const fallbackTsConfigBasePath = path.join(rootDir, 'packages', 'typescript-config', 'base.json');
+    const tsConfigBasePath = (await pathExists(workspaceTsConfigBasePath))
       ? workspaceTsConfigBasePath
       : fallbackTsConfigBasePath;
-    const tsConfigExtendsPath = toPosixPath(
-      path.relative(targetDir, tsConfigBasePath),
-    );
+    const tsConfigExtendsPath = toPosixPath(path.relative(targetDir, tsConfigBasePath));
     const moduleClassName = toPascalCase(moduleName);
     const backendControllerClassName = `${moduleClassName}Controller`;
     const backendPrismaClassName = `${moduleClassName}Prisma`;
     const backendModuleClassName = `${moduleClassName}Module`;
     const frontendDashboardComponentName = `${moduleClassName}DashboardComponent`;
     const frontendDashboardComponentFileName = `${moduleName}-dashboard.component.tsx`;
-    const frontendDashboardPageName = "DashboardPage";
-    const frontendDashboardPageFileName = "dashboard.page.tsx";
+    const frontendDashboardPageName = 'DashboardPage';
+    const frontendDashboardPageFileName = 'dashboard.page.tsx';
     const frontendMenuDataTypeName = `${moduleClassName}MenuItem`;
     const frontendMenuItemsConstName = `${toCamelCase(moduleName)}MenuItems`;
-    const hasFrontendEmptyDashboardState = await pathExists(
-      frontendEmptyDashboardStatePath,
-    );
+    const hasFrontendEmptyDashboardState = await pathExists(frontendEmptyDashboardStatePath);
 
     await ensureTargetPathAvailability({
       targetPath: targetDir,
       force,
       logger,
-      label: "Diretório do package",
+      label: 'Diretório do package',
     });
     await ensureTargetPathAvailability({
       targetPath: backendModuleDir,
       force,
       logger,
-      label: "Diretório do módulo backend",
+      label: 'Diretório do módulo backend',
     });
     await ensureTargetPathAvailability({
       targetPath: frontendModuleDir,
       force,
       logger,
-      label: "Diretório do módulo frontend",
+      label: 'Diretório do módulo frontend',
     });
     await ensureTargetPathAvailability({
       targetPath: frontendRouteDir,
       force,
       logger,
-      label: "Diretório da rota frontend",
+      label: 'Diretório da rota frontend',
     });
 
     const packageJson = {
       name: packageName,
-      version: "0.1.0",
-      main: "dist/index.js",
-      types: "dist/index.d.ts",
+      version: '0.1.0',
+      main: 'dist/index.js',
+      types: 'dist/index.d.ts',
       exports: {
-        ".": {
-          import: "./dist/index.js",
-          require: "./dist/index.js",
-          types: "./dist/index.d.ts",
+        '.': {
+          import: './dist/index.js',
+          require: './dist/index.js',
+          types: './dist/index.d.ts',
         },
       },
       scripts: {
-        dev: "tsc --watch",
-        build: "tsc",
-        test: "jest --coverage",
-        "test:watch": "jest --watchAll",
+        dev: 'tsc --watch',
+        build: 'tsc',
+        test: 'jest --coverage',
+        'test:watch': 'jest --watchAll',
       },
       dependencies: {
-        [sharedDependency]: "*",
+        [sharedDependency]: '*',
       },
       devDependencies: {
-        "@types/jest": "^30.0.0",
-        jest: "^30.2.0",
-        "ts-jest": "^29.4.5",
+        '@types/jest': '^30.0.0',
+        jest: '^30.2.0',
+        'ts-jest': '^29.4.5',
       },
     };
 
     const tsconfigJson = {
       extends: tsConfigExtendsPath,
       compilerOptions: {
-        rootDir: "src",
-        outDir: "./dist",
+        rootDir: 'src',
+        outDir: './dist',
         declaration: true,
       },
-      include: ["src"],
-      exclude: ["dist", "build", "node_modules"],
+      include: ['src'],
+      exclude: ['dist', 'build', 'node_modules'],
     };
 
     const jestConfig = `import type { Config } from "jest";
@@ -501,9 +410,7 @@ export const ${frontendMenuItemsConstName}: ${frontendMenuDataTypeName}[] = [
 ];
 `;
     if (hasFrontendEmptyDashboardState) {
-      logger.step(
-        `Componente base detectado para dashboard vazio: ${frontendEmptyDashboardStatePath}.`,
-      );
+      logger.step(`Componente base detectado para dashboard vazio: ${frontendEmptyDashboardStatePath}.`);
     } else {
       logger.step(
         `Componente base de dashboard vazio nao encontrado (${frontendEmptyDashboardStatePath}); aplicando fallback local para evitar erro de compilacao.`,
@@ -534,40 +441,20 @@ export function ${frontendDashboardPageName}() {
   return <${frontendDashboardComponentName} />;
 }
 `;
-    const frontendMenuDataPath = path.join(
-      frontendModuleDir,
-      "data",
-      `${moduleName}-menu.data.ts`,
-    );
-    const frontendModuleIndexPath = path.join(frontendModuleDir, "index.ts");
-    const backendPrismaPath = path.join(
-      backendModuleDir,
-      `${moduleName}.prisma.ts`,
-    );
-    const backendControllerPath = path.join(
-      backendModuleDir,
-      `${moduleName}.controller.ts`,
-    );
-    const backendModulePath = path.join(
-      backendModuleDir,
-      `${moduleName}.module.ts`,
-    );
-    const backendModuleIndexPath = path.join(backendModuleDir, "index.ts");
+    const frontendMenuDataPath = path.join(frontendModuleDir, 'data', `${moduleName}-menu.data.ts`);
+    const frontendModuleIndexPath = path.join(frontendModuleDir, 'index.ts');
+    const backendPrismaPath = path.join(backendModuleDir, `${moduleName}.prisma.ts`);
+    const backendControllerPath = path.join(backendModuleDir, `${moduleName}.controller.ts`);
+    const backendModulePath = path.join(backendModuleDir, `${moduleName}.module.ts`);
+    const backendModuleIndexPath = path.join(backendModuleDir, 'index.ts');
     const frontendDashboardComponentPath = path.join(
       frontendModuleDir,
-      "components",
+      'components',
       frontendDashboardComponentFileName,
     );
-    const frontendDashboardPagePath = path.join(
-      frontendModuleDir,
-      "pages",
-      frontendDashboardPageFileName,
-    );
-    const frontendAppRoutePagePath = path.join(frontendRouteDir, "page.tsx");
-    const frontendDashboardPageImportPath = toImportPath(
-      frontendRouteDir,
-      frontendDashboardPagePath,
-    );
+    const frontendDashboardPagePath = path.join(frontendModuleDir, 'pages', frontendDashboardPageFileName);
+    const frontendAppRoutePagePath = path.join(frontendRouteDir, 'page.tsx');
+    const frontendDashboardPageImportPath = toImportPath(frontendRouteDir, frontendDashboardPagePath);
     const frontendAppRoutePageTsx = `import { ${frontendDashboardPageName} } from "${frontendDashboardPageImportPath}";
 
 export default function Page() {
@@ -581,25 +468,19 @@ export * from "./pages/dashboard.page";
     const backendModuleIndexTs = `export * from "./${moduleName}.module";
 `;
 
-    await fs.mkdir(path.join(targetDir, "src"), { recursive: true });
-    await fs.mkdir(path.join(targetDir, "test"), { recursive: true });
+    await fs.mkdir(path.join(targetDir, 'src'), { recursive: true });
+    await fs.mkdir(path.join(targetDir, 'test'), { recursive: true });
 
-    await writeFile(
-      path.join(targetDir, "package.json"),
-      stringifyJson(packageJson),
-    );
-    logger.step(`criou arquivo: ${path.join(targetDir, "package.json")}`);
-    await writeFile(
-      path.join(targetDir, "tsconfig.json"),
-      stringifyJson(tsconfigJson),
-    );
-    logger.step(`criou arquivo: ${path.join(targetDir, "tsconfig.json")}`);
-    await writeFile(path.join(targetDir, "jest.config.ts"), jestConfig);
-    logger.step(`criou arquivo: ${path.join(targetDir, "jest.config.ts")}`);
-    await writeFile(path.join(targetDir, "src", "index.ts"), indexTs);
-    logger.step(`criou arquivo: ${path.join(targetDir, "src", "index.ts")}`);
-    await writeFile(path.join(targetDir, "test", "index.test.ts"), indexTest);
-    logger.step(`criou arquivo: ${path.join(targetDir, "test", "index.test.ts")}`);
+    await writeFile(path.join(targetDir, 'package.json'), stringifyJson(packageJson));
+    logger.step(`criou arquivo: ${path.join(targetDir, 'package.json')}`);
+    await writeFile(path.join(targetDir, 'tsconfig.json'), stringifyJson(tsconfigJson));
+    logger.step(`criou arquivo: ${path.join(targetDir, 'tsconfig.json')}`);
+    await writeFile(path.join(targetDir, 'jest.config.ts'), jestConfig);
+    logger.step(`criou arquivo: ${path.join(targetDir, 'jest.config.ts')}`);
+    await writeFile(path.join(targetDir, 'src', 'index.ts'), indexTs);
+    logger.step(`criou arquivo: ${path.join(targetDir, 'src', 'index.ts')}`);
+    await writeFile(path.join(targetDir, 'test', 'index.test.ts'), indexTest);
+    logger.step(`criou arquivo: ${path.join(targetDir, 'test', 'index.test.ts')}`);
     logger.step(`Estrutura base criada em ${targetDir}.`);
     logger.step(`Dependência compartilhada configurada: ${sharedDependency}.`);
 
@@ -636,32 +517,28 @@ export * from "./pages/dashboard.page";
     await ensurePackageDependency({
       packageJsonPath: backendPackageJsonPath,
       dependencyName: packageName,
-      dependencyVersion: "*",
+      dependencyVersion: '*',
       logger,
-      label: "Backend package",
+      label: 'Backend package',
     });
     await ensurePackageDependency({
       packageJsonPath: frontendPackageJsonPath,
       dependencyName: packageName,
-      dependencyVersion: "*",
+      dependencyVersion: '*',
       logger,
-      label: "Frontend package",
+      label: 'Frontend package',
     });
 
     console.log(`Created module at: ${targetDir}`);
     console.log(`Package name: ${packageName}`);
-    console.log(
-      `Backend module scaffolded at: ${path.join(backendAppPath, "src", "modules", moduleName)}`,
-    );
+    console.log(`Backend module scaffolded at: ${path.join(backendAppPath, 'src', 'modules', moduleName)}`);
     console.log(
       `Frontend module scaffolded at: ${path.join(frontendAppPath, ...frontendModulesBaseSegments, moduleName)}`,
     );
     console.log(
-      `Frontend route scaffolded at: ${path.join(frontendAppPath, ...frontendAppBaseSegments, hasFrontendPrivateGroup ? "(private)" : "", moduleName)}`,
+      `Frontend route scaffolded at: ${path.join(frontendAppPath, ...frontendAppBaseSegments, hasFrontendPrivateGroup ? '(private)' : '', moduleName)}`,
     );
-    console.log(
-      `Backend/frontend dependencies updated with: ${packageName}@*`,
-    );
+    console.log(`Backend/frontend dependencies updated with: ${packageName}@*`);
     await logger.success();
   } catch (error) {
     await logger.failure(error);

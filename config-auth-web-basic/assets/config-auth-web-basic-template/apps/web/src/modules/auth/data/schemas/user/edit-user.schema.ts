@@ -1,5 +1,5 @@
-import { Email, PersonName, URL } from "__SHARED_PACKAGE_NAME__";
-import { v } from "@/shared/components/form/validator";
+import { Email, PersonName, URL } from '__SHARED_PACKAGE_NAME__';
+import { v } from '@/shared/components/form/validator';
 
 export const editUserSchema = v.defineObject({
   name: PersonName,

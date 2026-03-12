@@ -21,7 +21,7 @@
 2. Declarar classe `Xxx extends Entity<Xxx, XxxProps>`.
 3. Construtor `private/protected` + `super(props)`.
 4. Getters para campos relevantes.
-5. `static create(props)` delegando para `tryCreate` + `throwIfFailed`.
+5. `static create(props)` delegando para `tryCreate` + `throwsIfFailed`.
 6. `static tryCreate(props)` validando invariantes e retornando `Result`.
 7. `Result.combine([...])` para consolidar erros de VOs.
 8. Retornar instância com valores normalizados (`instance.value`).
@@ -52,7 +52,7 @@
 ## Exemplo mínimo
 
 ```ts
-import { Entity, EntityProps, Id, Name, Result } from "@namespace/shared";
+import { Entity, EntityProps, Id, Name, Result } from '@namespace/shared';
 
 export interface ExampleProps extends EntityProps {
   name: string;
@@ -69,7 +69,7 @@ export class Example extends Entity<Example, ExampleProps> {
 
   static create(props: ExampleProps): Example {
     const result = Example.tryCreate(props);
-    result.throwIfFailed();
+    result.validator.throwsIfFailed();
     return result.instance;
   }
 

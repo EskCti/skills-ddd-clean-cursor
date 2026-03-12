@@ -1,26 +1,26 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/shared/components/ui/button";
-import { Checkbox } from "@/shared/components/ui/checkbox";
-import { Combobox } from "@/shared/components/ui/combobox";
-import { Input } from "@/shared/components/ui/input";
-import { Label } from "@/shared/components/ui/label";
-import { PageSectionHeader } from "@/shared/components/ui/page-section-header";
-import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
-import { Textarea } from "@/shared/components/ui/textarea";
+import { useState } from 'react';
+import { Button } from '@/shared/components/ui/button';
+import { Checkbox } from '@/shared/components/ui/checkbox';
+import { Combobox } from '@/shared/components/ui/combobox';
+import { Input } from '@/shared/components/ui/input';
+import { Label } from '@/shared/components/ui/label';
+import { PageSectionHeader } from '@/shared/components/ui/page-section-header';
+import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
+import { Textarea } from '@/shared/components/ui/textarea';
 
 const teamOptions = [
-  { label: "Financeiro", value: "financeiro" },
-  { label: "Operações", value: "operacoes" },
-  { label: "Suporte", value: "suporte" },
-  { label: "Produto", value: "produto" },
+  { label: 'Financeiro', value: 'financeiro' },
+  { label: 'Operações', value: 'operacoes' },
+  { label: 'Suporte', value: 'suporte' },
+  { label: 'Produto', value: 'produto' },
 ];
 
 export function ExampleFormsPage() {
-  const [team, setTeam] = useState("financeiro");
-  const [channel, setChannel] = useState("email");
+  const [team, setTeam] = useState('financeiro');
+  const [channel, setChannel] = useState('email');
   const [sendReport, setSendReport] = useState(true);
 
   return (

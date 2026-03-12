@@ -13,29 +13,26 @@
 - Invariantes: validar no `tryCreate` e retornar `Result.fail` quando violado.
 - Normalizacao: aplicar `trim`, `toLowerCase`, formatações ou defaults quando fizer sentido.
 - Erros: usar constantes estaticas com codigo legivel (ex.: `INVALID_EMAIL`).
-- API consistente: `create` -> chama `tryCreate`, `throwIfFailed`, retorna `instance`.
+- API consistente: `create` -> chama `tryCreate`, `throwsIfFailed`, retorna `instance`.
 
 ## Skeleton
 
 ```ts
-import { Result, ValueObject, ValueObjectConfig } from "../base";
+import { Result, ValueObject, ValueObjectConfig } from '../base';
 
 export class ExampleVo extends ValueObject<string, ValueObjectConfig> {
-  private static readonly INVALID_EXAMPLE = "INVALID_EXAMPLE";
+  private static readonly INVALID_EXAMPLE = 'INVALID_EXAMPLE';
   private constructor(value: string, config?: ValueObjectConfig) {
     super(value, config);
   }
 
   public static create(value: string, config?: ValueObjectConfig): ExampleVo {
     const result = ExampleVo.tryCreate(value, config);
-    result.throwIfFailed();
+    result.validator.throwsIfFailed();
     return result.instance;
   }
 
-  public static tryCreate(
-    value: string,
-    config?: ValueObjectConfig,
-  ): Result<ExampleVo> {
+  public static tryCreate(value: string, config?: ValueObjectConfig): Result<ExampleVo> {
     try {
       const normalized = value.trim();
       if (!normalized) {

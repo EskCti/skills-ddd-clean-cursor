@@ -37,14 +37,17 @@ Adapter default: `shadcn`.
    - `public/illustrations/empty-dashboard-dark.svg`
 4. Validar estrutura da biblioteca de UI selecionada:
    - para `shadcn`: `components.json`, `src/shared/components/ui`, `src/shared/lib/class-name.util.ts`
-5. Confirmar layout admin com:
+5. Validar dependencias:
+   - base: `react-hook-form` (usado pelo validador em `src/shared/components/form/validator`)
+   - shadcn: dependencias Radix/lucide/sonner/cva/clsx/tailwind-merge + `shadcn` (dev)
+6. Confirmar layout admin com:
    - sidebar parametrizavel via prop `sidebar`
    - menu colapsado exibindo apenas icones no desktop
    - hover/focus no icone colapsado exibindo label do item
    - topbar com toggle
    - dropdown de usuario com logout
    - comportamento responsivo (mobile via drawer)
-6. Registrar execucao no `.log/skills.log` (automatico no script).
+7. Registrar execucao no `.log/skills.log` (automatico no script).
 
 ## Commands
 
@@ -97,6 +100,7 @@ node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --ui-library s
   - `public/illustrations/empty-dashboard-dark.svg`
 - Tema base em `src/app/globals.css` com token dinamico de cor primaria (`--theme`).
 - Classe de modo no `body` controlada por `--mode` (`dark` ou `light`).
+- Dependencia runtime obrigatoria: `react-hook-form`.
 
 ### Camada UI library (adapter)
 
@@ -119,6 +123,7 @@ node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --ui-library s
 ## Notes
 
 - Script idempotente: pode ser reexecutado para reconciliar arquivos.
+- Antes de escrever arquivos, o script valida contrato minimo de templates (base + adapter) e falha com erro explicito se faltar arquivo requerido.
 - Ao detectar integracao existente com modulos externos em arquivos de `src/app` (ex.: `@/modules/auth`, `@/modules/dashboard`), o script preserva esses arquivos em vez de sobrescrever com template base.
 - Se o frontend configurado em `skills.config.json` nao existir, o script falha com erro explicito.
 - Para adicionar nova biblioteca no futuro:

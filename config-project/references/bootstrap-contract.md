@@ -36,20 +36,24 @@ Com defaults obtidos de `skills.config.json`:
 7. Instalar apenas dependências faltantes:
    - root: `turbo` (dev dependency)
    - root: `ts-node` (dev dependency)
+   - root: `prettier` (dev dependency)
    - backend: `dotenv`
 8. Atualizar `package.json` root:
    - `name` preenchido (default: `<namespace>/workspace`)
    - `scripts.test = "turbo run test"`
+   - `scripts.format = "prettier --write \"**/*.{ts,tsx,md}\""` quando ausente
    - `private = true`
    - `workspaces` contendo `apps/*` e `packages/*`
    - `devDependencies.turbo` presente
    - `devDependencies.ts-node` presente
-9. Atualizar `turbo.json`:
+   - `devDependencies.prettier` presente
+9. Garantir `.prettierrc` na raiz com configuração padrão de formatação do workspace.
+10. Atualizar `turbo.json`:
    - `tasks.test.cache = false`
    - `tasks.build.outputs` contendo `dist/**`
-10. Atualizar `<frontendAppPath>/next.config.ts|js|mjs` de forma incremental para garantir:
-    - `images.remotePatterns` contendo regras para `https` e `http` com `hostname: "**"` (liberação de imagens remotas).
-11. Atualizar env files via upsert (preservando chaves extras):
+11. Atualizar `<frontendAppPath>/next.config.ts|js|mjs` de forma incremental para garantir:
+   - `images.remotePatterns` contendo regras para `https` e `http` com `hostname: "**"` (liberação de imagens remotas).
+12. Atualizar env files via upsert (preservando chaves extras):
    - `<frontendAppPath>/.env` e `.env.example` com:
      - `<frontendApiUrlEnvVar>=http://localhost:<backendPort>`
      - `PORT=<frontendPort>`
@@ -57,7 +61,7 @@ Com defaults obtidos de `skills.config.json`:
      - `<backendPortEnvVar>=<backendPort>`
      - `DATABASE_URL`
      - `JWT_SECRET`
-12. Atualizar `<backendAppPath>/src/main.ts` de forma incremental com:
+13. Atualizar `<backendAppPath>/src/main.ts` de forma incremental com:
    - `app.enableCors()`
    - leitura de `process.env.<backendPortEnvVar>` (default `<backendPort>`)
    - `import "dotenv/config"`

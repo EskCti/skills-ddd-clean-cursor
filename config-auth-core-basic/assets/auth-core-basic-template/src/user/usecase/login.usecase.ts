@@ -1,36 +1,34 @@
-import { Result, UseCase } from "__SHARED_PACKAGE_NAME__";
-import { PasswordErrors, PasswordCryptoProvider } from "../../password";
-import { UserProps } from "../model";
-import { FindPasswordHashQuery, UserRepository } from "../provider";
+import { FindPasswordHashQuery, UserRepository } from '../provider';
+import { PasswordErrors, PasswordCryptoProvider } from '../../password';
+import { Result, UseCase } from '__SHARED_PACKAGE_NAME__';
+import { UserProps } from '../model';
 
 export interface LoginIn {
-	email: string;
-	password: string;
+  email: string;
+  password: string;
 }
 
 export interface LoginOut extends UserProps {}
 
 export class LoginUseCase implements UseCase<LoginIn, LoginOut> {
-	constructor(
-		private readonly repo: UserRepository,
-		private readonly findPassHash: FindPasswordHashQuery,
-		private readonly passwordCryptoProvider: PasswordCryptoProvider,
-	) {}
+  constructor(
+    private readonly repo: UserRepository,
+    private readonly findPassHash: FindPasswordHashQuery,
+    private readonly passwordCryptoProvider: PasswordCryptoProvider,
+  ) {}
 
-	async execute(input: LoginIn): Promise<Result<LoginOut>> {
-		const userResult = await this.repo.findByEmail(input.email);
-		if (userResult.isFailure) return userResult.withFail;
+  async execute(input: LoginIn): Promise<Result<LoginOut>> {
+    return Result.try(async () => {
+      const tryFindUser = await this.repo.findByEmail(input.email);
+      tryFindUser.validator.throwsIfFailed();
 
-		const passResult = await this.findPassHash.execute(userResult.instance.id);
-		if (passResult.isFailure) return passResult.withFail;
+      const tryFindPass = await this.findPassHash.execute(tryFindUser.instance.id);
+      tryFindPass.validator.throwsIfFailed();
 
-		const isSamePass = await this.passwordCryptoProvider.compare(
-			input.password,
-			passResult.instance.hash,
-		);
+      const isSamePass = await this.passwordCryptoProvider.compare(input.password, tryFindPass.instance.hash);
+      Result.ok(isSamePass).validator.throwsIfFalse(PasswordErrors.MISMATCH);
 
-		if (!isSamePass) return Result.fail(PasswordErrors.MISMATCH);
-
-		return Result.ok(userResult.instance.props);
-	}
+      return tryFindUser.instance.props;
+    });
+  }
 }

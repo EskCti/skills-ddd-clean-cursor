@@ -1,5 +1,5 @@
-import { Button } from "@/shared/components/ui/button";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { Button } from '@/shared/components/ui/button';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 
 type PaginationControlsProps = {
   page: number;
@@ -37,7 +37,7 @@ export function PaginationControls({
   page,
   totalPages,
   totalItems,
-  totalLabel = "itens",
+  totalLabel = 'itens',
   onPageChange,
   disabled = false,
   siblingCount = 2,
@@ -52,7 +52,7 @@ export function PaginationControls({
   return (
     <div
       className={`flex flex-col gap-3 sm:flex-row sm:items-center ${
-        showSummary ? "sm:justify-between" : "sm:justify-end"
+        showSummary ? 'sm:justify-between' : 'sm:justify-end'
       }`}
     >
       {showSummary ? (
@@ -60,7 +60,7 @@ export function PaginationControls({
           <p>
             Página {safePage} de {safeTotalPages}
           </p>
-          {typeof totalItems === "number" ? (
+          {typeof totalItems === 'number' ? (
             <p>
               Total: {totalItems} {totalLabel}
             </p>
@@ -68,11 +68,7 @@ export function PaginationControls({
         </div>
       ) : null}
 
-      <div
-        className={`flex flex-wrap items-center gap-1 ${
-          showSummary ? "" : "justify-center"
-        } sm:justify-end`}
-      >
+      <div className={`flex flex-wrap items-center gap-1 ${showSummary ? '' : 'justify-center'} sm:justify-end`}>
         <Button
           type="button"
           variant="outline"
@@ -99,12 +95,12 @@ export function PaginationControls({
           <Button
             key={pageNumber}
             type="button"
-            variant={pageNumber === safePage ? "default" : "outline"}
+            variant={pageNumber === safePage ? 'default' : 'outline'}
             size="sm"
             className="min-w-9 px-2"
             onClick={() => onPageChange(pageNumber)}
             disabled={disabled}
-            aria-current={pageNumber === safePage ? "page" : undefined}
+            aria-current={pageNumber === safePage ? 'page' : undefined}
             aria-label={`Ir para a página ${pageNumber}`}
           >
             {pageNumber}

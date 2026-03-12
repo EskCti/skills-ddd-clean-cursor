@@ -1,27 +1,22 @@
-"use client";
+'use client';
 
-import type { ReactNode } from "react";
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Bell, ChevronDown, LogOut, Menu, UserRound } from "lucide-react";
-import { Button } from "@/shared/components/ui/button";
+import type { ReactNode } from 'react';
+import { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Bell, ChevronDown, LogOut, Menu, UserRound } from 'lucide-react';
+import { Button } from '@/shared/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/shared/components/ui/sheet";
-import { Separator } from "@/shared/components/ui/separator";
-import { useShell } from "@/shared/hooks/shell.hook";
-import { cn } from "@/shared/lib/class-name.util";
-import Image from "next/image";
+} from '@/shared/components/ui/dropdown-menu';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/components/ui/sheet';
+import { Separator } from '@/shared/components/ui/separator';
+import { useShell } from '@/shared/hooks/shell.hook';
+import { cn } from '@/shared/lib/class-name.util';
+import Image from 'next/image';
 
 type AdminShellProps = {
   sidebar: ReactNode;
@@ -41,11 +36,11 @@ export function AdminShell({
   children,
   logoIcon,
   logoText,
-  logoHref = "/dashboard",
-  userName = "Usuario",
-  userEmail = "usuario@aplicacao.local",
+  logoHref = '/dashboard',
+  userName = 'Usuario',
+  userEmail = 'usuario@aplicacao.local',
   userAvatarUrl,
-  profileHref = "/profile",
+  profileHref = '/profile',
   onLogout,
 }: AdminShellProps) {
   const router = useRouter();
@@ -53,44 +48,29 @@ export function AdminShell({
   const collapsed = !isMobile && !isSidebarOpen;
   const [failedAvatarUrl, setFailedAvatarUrl] = useState<string | null>(null);
 
-  const brandIcon = logoIcon ?? (
-    <span className="text-xs font-bold tracking-tight">AP</span>
-  );
-  const brandText = logoText ?? "Application";
-  const resolvedAvatarUrl =
-    userAvatarUrl && failedAvatarUrl !== userAvatarUrl ? userAvatarUrl : null;
+  const brandIcon = logoIcon ?? <span className="text-xs font-bold tracking-tight">AP</span>;
+  const brandText = logoText ?? 'Application';
+  const resolvedAvatarUrl = userAvatarUrl && failedAvatarUrl !== userAvatarUrl ? userAvatarUrl : null;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="flex min-h-screen">
-        <aside
-          className={cn(
-            "hidden border-r border-border bg-card lg:flex lg:flex-col",
-            collapsed ? "w-18" : "w-72",
-          )}
-        >
+        <aside className={cn('hidden border-r border-border bg-card lg:flex lg:flex-col', collapsed ? 'w-18' : 'w-72')}>
           <div
             className={cn(
-              "flex h-16 border-b border-border",
-              collapsed
-                ? "items-center justify-center px-2"
-                : "items-center gap-2 px-4",
+              'flex h-16 border-b border-border',
+              collapsed ? 'items-center justify-center px-2' : 'items-center gap-2 px-4',
             )}
           >
             <Link
               href={logoHref}
               aria-label="Ir para dashboard"
-              className={cn(
-                "flex items-center",
-                collapsed ? "justify-center" : "gap-2",
-              )}
+              className={cn('flex items-center', collapsed ? 'justify-center' : 'gap-2')}
             >
               <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-primary/15 text-primary">
                 {brandIcon}
               </div>
-              {!collapsed ? (
-                <div className="truncate text-sm font-semibold">{brandText}</div>
-              ) : null}
+              {!collapsed ? <div className="truncate text-sm font-semibold">{brandText}</div> : null}
             </Link>
           </div>
           <div className="flex-1 overflow-y-auto">{sidebar}</div>
@@ -118,12 +98,7 @@ export function AdminShell({
 
         <div className="flex min-h-screen flex-1 flex-col">
           <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur md:px-6">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleSidebar}
-              aria-label="Alternar menu lateral"
-            >
+            <Button variant="ghost" size="icon" onClick={toggleSidebar} aria-label="Alternar menu lateral">
               <Menu className="size-5" />
             </Button>
 
@@ -134,10 +109,7 @@ export function AdminShell({
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="h-auto gap-2 px-2.5 py-1.5"
-                  >
+                  <Button variant="ghost" className="h-auto gap-2 px-2.5 py-1.5">
                     {resolvedAvatarUrl ? (
                       <Image
                         src={resolvedAvatarUrl}
@@ -154,12 +126,8 @@ export function AdminShell({
                     )}
 
                     <span className="hidden min-w-0 flex-col items-start text-left md:flex">
-                      <span className="max-w-35 truncate text-sm leading-4">
-                        {userName}
-                      </span>
-                      <span className="max-w-35 truncate text-xs text-muted-foreground">
-                        {userEmail}
-                      </span>
+                      <span className="max-w-35 truncate text-sm leading-4">{userName}</span>
+                      <span className="max-w-35 truncate text-xs text-muted-foreground">{userEmail}</span>
                     </span>
                     <ChevronDown className="size-4" />
                   </Button>
@@ -167,19 +135,14 @@ export function AdminShell({
                 <DropdownMenuContent align="end" className="w-64">
                   <div className="px-2 py-2">
                     <p className="truncate text-sm font-medium">{userName}</p>
-                    <p className="truncate text-xs text-muted-foreground">
-                      {userEmail}
-                    </p>
+                    <p className="truncate text-xs text-muted-foreground">{userEmail}</p>
                   </div>
                   <Separator className="my-1" />
                   <DropdownMenuItem onSelect={() => router.push(profileHref)}>
                     <UserRound className="mr-2 size-4" />
                     Perfil
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={onLogout}
-                    className="text-red-500 focus:bg-red-500/10 focus:text-red-400"
-                  >
+                  <DropdownMenuItem onSelect={onLogout} className="text-red-500 focus:bg-red-500/10 focus:text-red-400">
                     <LogOut className="mr-2 size-4" />
                     Logout
                   </DropdownMenuItem>

@@ -4,6 +4,11 @@
 
 Garantir que o backend tenha o módulo de autenticação básico funcional com integração ao core `auth`, Prisma, JWT e seed inicial.
 
+## Pré-requisitos de infraestrutura
+
+- `apps/backend/src/db/db.module.ts` deve existir.
+- `apps/backend/src/db/prisma.service.ts` deve existir e expor `runInTransaction` com contrato `TransactionManager`.
+
 ## Artefatos obrigatórios
 
 - `apps/backend/src/modules/auth/**`
@@ -52,6 +57,8 @@ Garantir que o backend tenha o módulo de autenticação básico funcional com i
 
 - Use cases devem vir de `@namespace/auth`.
 - Adapters Prisma devem respeitar contracts de `UserRepository`, `PasswordRepository` e queries do core.
+- `CreateUserUseCase` deve receber `PrismaService` (como `TransactionManager`) nos fluxos de criação (`register` e `user/create`).
+- Métodos de escrita dos adapters Prisma (`user.prisma.ts` e `password.prisma.ts`) devem aceitar `TransactionContext` opcional e resolver o client transacional quando disponível.
 - `JwtAuthGuard` deve ser aplicado nos endpoints protegidos.
 - `RequireAdminGuard` deve proteger endpoints administrativos e permitir `allowSelfByParam` quando configurado.
 - Seed de usuários padrão deve ser idempotente, ler dados de `default-users.json` e respeitar campos `id` UUID, `admin`, `createdAt`, `updatedAt` e `deletedAt`.

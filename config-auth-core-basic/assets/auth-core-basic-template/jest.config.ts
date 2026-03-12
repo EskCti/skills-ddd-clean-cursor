@@ -1,9 +1,9 @@
-import type { Config } from "jest";
+import type { Config } from 'jest';
 
 const config: Config = {
-	verbose: true,
-	preset: "ts-jest",
-	testMatch: ["**/test/**/*.test.ts"],
+  verbose: true,
+  preset: 'ts-jest',
+  testMatch: ['**/test/**/*.test.ts'],
 };
 
 export default config;

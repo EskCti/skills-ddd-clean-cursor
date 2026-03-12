@@ -3,41 +3,41 @@
 ## Tipos de DTO
 
 - Input DTO:
-    - entrada de comando/use case/filtros.
-    - exemplos: `FindAllUsersInDTO`, `ProductFiltersDTO`.
+  - entrada de comando/use case/filtros.
+  - exemplos: `FindAllUsersInDTO`, `ProductFiltersDTO`.
 - Output DTO:
-    - saída de use case/controlador.
-    - exemplos: `FindAllUsersOutDTO`, `ProductListDTO`.
+  - saída de use case/controlador.
+  - exemplos: `FindAllUsersOutDTO`, `ProductListDTO`.
 - Query DTO (CQRS):
-    - projeção de leitura para API/front.
-    - exemplos: `UserDTO`, `RoleDTO`, `ProductDetailsDTO`.
+  - projeção de leitura para API/front.
+  - exemplos: `UserDTO`, `RoleDTO`, `ProductDetailsDTO`.
 
 ## Regra de modelagem de Query DTO
 
 - Não estender classe de entidade.
 - Opções válidas:
-    - Derivar de `*Props` com adaptação (`Omit`, `Pick`, campos enriquecidos) quando necessário.
-    - Criar DTO próprio e independente quando a projeção exigir.
+  - Derivar de `*Props` com adaptação (`Omit`, `Pick`, campos enriquecidos) quando necessário.
+  - Criar DTO próprio e independente quando a projeção exigir.
 
 Exemplos reais:
 
 - `packages/auth/core/src/user/dto/user.dto.ts`
-    - `UserDTO extends Omit<UserProps, "roleIds">` + `roles` e `permissions`.
+  - `UserDTO extends Omit<UserProps, "roleIds">` + `roles` e `permissions`.
 - `packages/auth/core/src/role/dto/role.dto.ts`
-    - `RoleDTO extends Omit<RoleProps, "permissionIds">` + `permissions`.
+  - `RoleDTO extends Omit<RoleProps, "permissionIds">` + `permissions`.
 - `packages/product/core/src/product/dto/product-details.dto.ts`
-    - `ProductDetailsDTO extends Omit<ProductProps, "subcategoryId" | "brandId">` + `category/subcategory/brand`.
+  - `ProductDetailsDTO extends Omit<ProductProps, "subcategoryId" | "brandId">` + `category/subcategory/brand`.
 
 ## Convenções úteis observadas
 
 - Entrada/saída com sufixos claros:
-    - `FindAllXxxInDTO`
-    - `FindAllXxxOutDTO`
-    - `FindAllXxxMetaDTO`
+  - `FindAllXxxInDTO`
+  - `FindAllXxxOutDTO`
+  - `FindAllXxxMetaDTO`
 - Itens de lista separados:
-    - `ProductListItem`, `BranchListItem`.
+  - `ProductListItem`, `BranchListItem`.
 - Filtros dedicados:
-    - `ProductFiltersDTO`, `BrandFiltersDTO`.
+  - `ProductFiltersDTO`, `BrandFiltersDTO`.
 
 ## Fronteiras
 

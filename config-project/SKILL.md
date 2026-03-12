@@ -21,8 +21,8 @@ As configurações padrão são lidas de `skills.config.json` (em `.agents/skill
 4. Criar app frontend com `create-next-app --src-dir` somente se `frontendAppPath` ainda não existir como app Next.js, garantindo estrutura `src/` no frontend.
 5. Criar app backend com `nest new --skip-git` somente se `backendAppPath` ainda não existir como app NestJS.
 6. Garantir namespace em todos os projetos do workspace (`apps/*` e `packages/*`), incluindo frontend/backend, usando `namespace` do config (ou `--scope`).
-7. Instalar apenas dependências faltantes (`turbo` e `ts-node` no root, `dotenv` no backend).
-8. Atualizar `package.json` root e `turbo.json` de forma incremental.
+7. Instalar apenas dependências faltantes (`turbo`, `ts-node` e `prettier` no root, `dotenv` no backend).
+8. Atualizar `package.json` root, garantir `.prettierrc` no root e atualizar `turbo.json` de forma incremental.
 9. Ajustar `next.config.ts|js|mjs` do frontend para garantir `images.remotePatterns` liberando imagens remotas em `http` e `https` com `hostname: "**"` (idempotente).
 10. Atualizar `.env` e `.env.example` de frontend/backend via upsert (sem apagar chaves extras existentes).
 11. Ajustar `main.ts` do backend de forma incremental (`dotenv/config`, `app.enableCors()`, porta via `backendPortEnvVar`).

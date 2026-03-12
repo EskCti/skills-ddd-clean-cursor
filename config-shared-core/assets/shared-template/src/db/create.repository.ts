@@ -1,5 +1,6 @@
-import { Entity, Result } from "../base";
+import { Entity, Result } from '../base';
+import { TransactionContext } from './transaction.manager';
 
 export interface CreateRepository<T extends Entity<any, any>> {
-	create(entity: T): Promise<Result<void>>;
+  create(entity: T, tx?: TransactionContext): Promise<Result<void>>;
 }

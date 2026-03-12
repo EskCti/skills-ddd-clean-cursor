@@ -8,6 +8,7 @@ description: Criar um novo módulo de forma determinística no padrão do projet
 ## Overview
 
 Padronizar a criação de novos módulos no monorepo com três entregas sincronizadas:
+
 1. pacote em `<dirname(sharedModulePath)>/<module-name>` (template TypeScript);
 2. módulo backend em `<backendAppPath>/src/modules/<module-name>` (Nest module + controller + provider Prisma de módulo) e modelo Prisma inicial em `<backendAppPath>/prisma/models/<module-name>.model.prisma`;
 3. módulo frontend em `<frontendAppPath>/src/modules/<module-name>` quando `src/` existir; caso não exista, em `<frontendAppPath>/modules/<module-name>`, sempre com pastas `components`, `pages` e `data`, e rota principal em `app/(private)/<module-name>/page.tsx` quando o grupo `(private)` existir (fallback para `app/<module-name>/page.tsx`).
@@ -85,6 +86,7 @@ O script deve gerar exatamente:
 - atualização em `<frontendAppPath>/package.json` com dependência `<scope>/<module-name>`
 
 Regra do dashboard do módulo:
+
 - quando existir `modules/dashboard/components/empty-dashboard-state.component.tsx`, o arquivo `<module-name>-dashboard.component.tsx` deve referenciar `EmptyDashboardState` como conteúdo principal do dashboard.
 
 ## Naming Convention

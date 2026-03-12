@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import { useAuth } from "@/modules/auth/data";
+import { useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAuth } from '@/modules/auth/data';
 
 type PrivateRouteProps = {
   children: React.ReactNode;
@@ -15,7 +15,7 @@ export function PrivateRoute({ children }: PrivateRouteProps) {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      const nextPath = encodeURIComponent(pathname || "/dashboard");
+      const nextPath = encodeURIComponent(pathname || '/dashboard');
       router.replace(`/auth/sign-in?next=${nextPath}`);
     }
   }, [isAuthenticated, isLoading, pathname, router]);

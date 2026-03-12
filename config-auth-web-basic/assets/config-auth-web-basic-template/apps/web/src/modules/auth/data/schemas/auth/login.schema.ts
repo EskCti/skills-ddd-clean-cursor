@@ -1,5 +1,5 @@
-import { Email, StrongPassword } from "__SHARED_PACKAGE_NAME__";
-import { v } from "@/shared/components/form/validator";
+import { Email, StrongPassword } from '__SHARED_PACKAGE_NAME__';
+import { v } from '@/shared/components/form/validator';
 
 export const loginSchema = v.defineObject({
   email: Email,

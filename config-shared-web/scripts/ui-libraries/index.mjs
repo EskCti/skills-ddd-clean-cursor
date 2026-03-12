@@ -1,4 +1,4 @@
-import { createShadcnUiLibrary } from "./shadcn.mjs";
+import { createShadcnUiLibrary } from './shadcn.mjs';
 
 const UI_LIBRARY_FACTORIES = {
   shadcn: createShadcnUiLibrary,
@@ -9,7 +9,7 @@ export function listUiLibraries() {
 }
 
 export function resolveUiLibrary(name, context) {
-  const normalized = String(name || "")
+  const normalized = String(name || '')
     .trim()
     .toLowerCase();
 

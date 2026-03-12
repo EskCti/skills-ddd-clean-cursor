@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { Eye, EyeOff } from "lucide-react";
-import type { UseFormRegisterReturn } from "react-hook-form";
-import { Button, FormErrorMessage, Input, Label } from "@/shared";
-import { UserAvatarField } from "@/modules/auth/components/user-avatar-field.component";
+import { Eye, EyeOff } from 'lucide-react';
+import type { UseFormRegisterReturn } from 'react-hook-form';
+import { Button, FormErrorMessage, Input, Label } from '@/shared';
+import { UserAvatarField } from '@/modules/auth/components/user-avatar-field.component';
 
-type UserFormMode = "create" | "update";
+type UserFormMode = 'create' | 'update';
 
 type UserFormFieldsProps = {
   mode: UserFormMode;
@@ -63,15 +63,10 @@ export function UserFormFields({
         desktopSize="xl"
       />
 
-      {mode === "update" ? (
+      {mode === 'update' ? (
         <div className="space-y-2">
           <Label htmlFor={idInputId}>ID</Label>
-          <Input
-            id={idInputId}
-            value={userId ?? ""}
-            readOnly
-            className="font-mono text-xs"
-          />
+          <Input id={idInputId} value={userId ?? ''} readOnly className="font-mono text-xs" />
         </div>
       ) : null}
 
@@ -87,13 +82,13 @@ export function UserFormFields({
         {emailError ? <FormErrorMessage>{emailError}</FormErrorMessage> : null}
       </div>
 
-      {mode === "create" ? (
+      {mode === 'create' ? (
         <div className="space-y-2">
           <Label htmlFor={passwordInputId}>Senha</Label>
           <div className="relative">
             <Input
               id={passwordInputId}
-              type={isPasswordVisible ? "text" : "password"}
+              type={isPasswordVisible ? 'text' : 'password'}
               className="pr-10"
               autoComplete="new-password"
               data-lpignore="true"
@@ -106,13 +101,9 @@ export function UserFormFields({
               size="icon"
               className="absolute right-1 top-1/2 size-8 -translate-y-1/2"
               onClick={onTogglePasswordVisibility}
-              aria-label={isPasswordVisible ? "Ocultar senha" : "Mostrar senha"}
+              aria-label={isPasswordVisible ? 'Ocultar senha' : 'Mostrar senha'}
             >
-              {isPasswordVisible ? (
-                <EyeOff className="size-4" />
-              ) : (
-                <Eye className="size-4" />
-              )}
+              {isPasswordVisible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
             </Button>
           </div>
           {passwordError ? <FormErrorMessage>{passwordError}</FormErrorMessage> : null}

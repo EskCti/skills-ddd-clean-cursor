@@ -1,18 +1,8 @@
-"use client";
+'use client';
 
-import type { UserDTO } from "__AUTH_PACKAGE_NAME__";
-import {
-  createContext,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import {
-  getMe,
-  login as loginRequest,
-  register as registerRequest,
-} from "../api/auth.service";
+import type { UserDTO } from '__AUTH_PACKAGE_NAME__';
+import { createContext, useCallback, useEffect, useMemo, useState } from 'react';
+import { getMe, login as loginRequest, register as registerRequest } from '../api/auth.service';
 import {
   changePassword as changePasswordRequest,
   createUser as createUserRequest,
@@ -21,19 +11,13 @@ import {
   findUserById as findUserByIdRequest,
   getUsers as getUsersRequest,
   updateUser as updateUserRequest,
-} from "../api/user.service";
-import type {
-  LoginFormData,
-  RegisterFormData,
-} from "../schemas/auth";
-import type {
-  ChangePasswordFormData,
-  CreateUserFormData,
-} from "../schemas/user";
-import type { PaginatedResultDTO } from "__SHARED_PACKAGE_NAME__";
-import type { FindAllUsersIn, UpdateUserPayload } from "../api/user.service";
+} from '../api/user.service';
+import type { LoginFormData, RegisterFormData } from '../schemas/auth';
+import type { ChangePasswordFormData, CreateUserFormData } from '../schemas/user';
+import type { PaginatedResultDTO } from '__SHARED_PACKAGE_NAME__';
+import type { FindAllUsersIn, UpdateUserPayload } from '../api/user.service';
 
-const ACCESS_TOKEN_STORAGE_KEY = "__PROJECT_SCOPE_SLUG__.access_token";
+const ACCESS_TOKEN_STORAGE_KEY = '__PROJECT_SCOPE_SLUG__.access_token';
 
 type AuthContextType = {
   user: UserDTO | null;
@@ -56,7 +40,7 @@ type AuthContextType = {
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 function unauthorizedError() {
-  return { errors: ["USER_UNAUTHORIZED"] };
+  return { errors: ['USER_UNAUTHORIZED'] };
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -71,21 +55,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     setIsAuthenticated(false);
 
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       window.localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
     }
   }, []);
 
-  const requireToken = useCallback(
-    (candidateToken: string | null): string => {
-      if (!candidateToken) {
-        throw unauthorizedError();
-      }
+  const requireToken = useCallback((candidateToken: string | null): string => {
+    if (!candidateToken) {
+      throw unauthorizedError();
+    }
 
-      return candidateToken;
-    },
-    [],
-  );
+    return candidateToken;
+  }, []);
 
   const refreshUser = useCallback(async () => {
     const activeToken = requireToken(token);
@@ -95,7 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [requireToken, token]);
 
   useEffect(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === 'undefined') {
       return;
     }
 
@@ -158,7 +139,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const response = await loginRequest(data);
         const nextToken = response.token;
 
-        if (typeof window !== "undefined") {
+        if (typeof window !== 'undefined') {
           window.localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, nextToken);
         }
 

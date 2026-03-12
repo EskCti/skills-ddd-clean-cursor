@@ -1,26 +1,26 @@
 #!/usr/bin/env node
 
-import { promises as fs } from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import { spawn } from "node:child_process";
-import { resolveSkillPaths } from "../../utils/resolve-skill-config.mjs";
-import { createSkillRunLogger } from "../../utils/skill-run-log.mjs";
-import { getBaseScaffoldConfig } from "./shared-web-base.mjs";
-import { listUiLibraries, resolveUiLibrary } from "./ui-libraries/index.mjs";
+import { promises as fs } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { spawn } from 'node:child_process';
+import { resolveSkillPaths } from '../../utils/resolve-skill-config.mjs';
+import { createSkillRunLogger } from '../../utils/skill-run-log.mjs';
+import { getBaseScaffoldConfig } from './shared-web-base.mjs';
+import { listUiLibraries, resolveUiLibrary } from './ui-libraries/index.mjs';
 
 const THEME_MAP = {
-  fuchsia: "#d946ef",
-  violet: "#8b5cf6",
-  blue: "#3b82f6",
-  emerald: "#10b981",
-  cyan: "#06b6d4",
-  amber: "#f59e0b",
-  rose: "#f43f5e",
+  fuchsia: '#d946ef',
+  violet: '#8b5cf6',
+  blue: '#3b82f6',
+  emerald: '#10b981',
+  cyan: '#06b6d4',
+  amber: '#f59e0b',
+  rose: '#f43f5e',
 };
 
 function usage() {
-  const libraries = listUiLibraries().join(", ");
+  const libraries = listUiLibraries().join(', ');
 
   console.log(`Usage:
   node init-shared-web.mjs [--theme <name-or-hex>] [--mode dark|light] [--ui-library <name>] [--skip-install] [--dry-run]
@@ -42,9 +42,9 @@ Examples:
 
 function parseArgs(argv) {
   const options = {
-    theme: "fuchsia",
-    mode: "dark",
-    uiLibrary: "shadcn",
+    theme: 'fuchsia',
+    mode: 'dark',
+    uiLibrary: 'shadcn',
     skipInstall: false,
     dryRun: false,
   };
@@ -52,40 +52,40 @@ function parseArgs(argv) {
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
 
-    if (arg === "--help" || arg === "-h") {
+    if (arg === '--help' || arg === '-h') {
       usage();
       process.exit(0);
     }
 
-    if (arg === "--skip-install") {
+    if (arg === '--skip-install') {
       options.skipInstall = true;
       continue;
     }
 
-    if (arg === "--dry-run") {
+    if (arg === '--dry-run') {
       options.dryRun = true;
       continue;
     }
 
-    if (arg === "--theme") {
+    if (arg === '--theme') {
       const value = argv[i + 1];
-      if (!value) throw new Error("Missing value for --theme");
+      if (!value) throw new Error('Missing value for --theme');
       options.theme = value.trim();
       i += 1;
       continue;
     }
 
-    if (arg === "--mode") {
+    if (arg === '--mode') {
       const value = argv[i + 1];
-      if (!value) throw new Error("Missing value for --mode");
+      if (!value) throw new Error('Missing value for --mode');
       options.mode = value.trim().toLowerCase();
       i += 1;
       continue;
     }
 
-    if (arg === "--ui-library") {
+    if (arg === '--ui-library') {
       const value = argv[i + 1];
-      if (!value) throw new Error("Missing value for --ui-library");
+      if (!value) throw new Error('Missing value for --ui-library');
       options.uiLibrary = value.trim().toLowerCase();
       i += 1;
       continue;
@@ -94,10 +94,7 @@ function parseArgs(argv) {
     throw new Error(`Unknown option: ${arg}`);
   }
 
-  if (![
-    "dark",
-    "light",
-  ].includes(options.mode)) {
+  if (!['dark', 'light'].includes(options.mode)) {
     throw new Error(`Invalid mode "${options.mode}". Use "dark" or "light".`);
   }
 
@@ -105,7 +102,7 @@ function parseArgs(argv) {
 }
 
 function normalizeThemeColor(themeInput) {
-  const value = String(themeInput ?? "").trim();
+  const value = String(themeInput ?? '').trim();
   if (!value) return THEME_MAP.fuchsia;
 
   const lower = value.toLowerCase();
@@ -119,24 +116,22 @@ function normalizeThemeColor(themeInput) {
     return value;
   }
 
-  throw new Error(
-    `Invalid theme color "${themeInput}". Use a known color name or #RRGGBB.`,
-  );
+  throw new Error(`Invalid theme color "${themeInput}". Use a known color name or #RRGGBB.`);
 }
 
 function runCommand(cmd, args, cwd, logger) {
   logger.command(cmd, args);
 
   return new Promise((resolve, reject) => {
-    const child = spawn(cmd, args, { cwd, stdio: "inherit" });
-    child.on("error", reject);
-    child.on("exit", (code) => {
+    const child = spawn(cmd, args, { cwd, stdio: 'inherit' });
+    child.on('error', reject);
+    child.on('exit', (code) => {
       if (code === 0) {
         resolve();
         return;
       }
 
-      reject(new Error(`Command failed: ${cmd} ${args.join(" ")} (exit ${code})`));
+      reject(new Error(`Command failed: ${cmd} ${args.join(' ')} (exit ${code})`));
     });
   });
 }
@@ -150,17 +145,12 @@ async function fileExists(filePath) {
   }
 }
 
-function shouldPreserveExternalModuleManagedAppFile({
-  relativePath,
-  previousContent,
-  nextContent,
-}) {
-  const normalizedPath = relativePath.replace(/\\/g, "/");
-  const isAppRouterFile = normalizedPath.includes("/src/app/");
+function shouldPreserveExternalModuleManagedAppFile({ relativePath, previousContent, nextContent }) {
+  const normalizedPath = relativePath.replace(/\\/g, '/');
+  const isAppRouterFile = normalizedPath.includes('/src/app/');
   if (!isAppRouterFile) return false;
 
-  const externalModuleImportPattern =
-    /from\s+["']@\/modules\/(?!examples(?:\/|["']))[^"']+["']/;
+  const externalModuleImportPattern = /from\s+["']@\/modules\/(?!examples(?:\/|["']))[^"']+["']/;
   const authRoutePattern = /["'`]\/auth(?:\/[^"'`]*)?["'`]/;
   const appProvidersPattern = /\bAppProviders\b/;
 
@@ -176,18 +166,11 @@ function shouldPreserveExternalModuleManagedAppFile({
   return previousUsesExternalModule && !nextUsesExternalModule;
 }
 
-async function writeManagedFile({
-  absolutePath,
-  relativePath,
-  content,
-  dryRun,
-  logger,
-  stats,
-}) {
+async function writeManagedFile({ absolutePath, relativePath, content, dryRun, logger, stats }) {
   const exists = await fileExists(absolutePath);
 
   if (exists) {
-    const previous = await fs.readFile(absolutePath, "utf8");
+    const previous = await fs.readFile(absolutePath, 'utf8');
     if (previous === content) {
       stats.unchanged += 1;
       return;
@@ -201,36 +184,34 @@ async function writeManagedFile({
       })
     ) {
       stats.preserved += 1;
-      logger.step(
-        `${dryRun ? "[dry-run] " : ""}arquivo preservado por integracao com modulo externo: ${relativePath}`,
-      );
+      logger.step(`${dryRun ? '[dry-run] ' : ''}arquivo preservado por integracao com modulo externo: ${relativePath}`);
       return;
     }
 
     stats.updated += 1;
-    logger.step(`${dryRun ? "[dry-run] " : ""}arquivo atualizado: ${relativePath}`);
+    logger.step(`${dryRun ? '[dry-run] ' : ''}arquivo atualizado: ${relativePath}`);
 
     if (!dryRun) {
       await fs.mkdir(path.dirname(absolutePath), { recursive: true });
-      await fs.writeFile(absolutePath, content, "utf8");
+      await fs.writeFile(absolutePath, content, 'utf8');
     }
 
     return;
   }
 
   stats.created += 1;
-  logger.step(`${dryRun ? "[dry-run] " : ""}arquivo criado: ${relativePath}`);
+  logger.step(`${dryRun ? '[dry-run] ' : ''}arquivo criado: ${relativePath}`);
 
   if (!dryRun) {
     await fs.mkdir(path.dirname(absolutePath), { recursive: true });
-    await fs.writeFile(absolutePath, content, "utf8");
+    await fs.writeFile(absolutePath, content, 'utf8');
   }
 }
 
 async function removeLegacyFile({ absolutePath, relativePath, dryRun, logger }) {
   if (!(await fileExists(absolutePath))) return false;
 
-  logger.step(`${dryRun ? "[dry-run] " : ""}arquivo legado removido: ${relativePath}`);
+  logger.step(`${dryRun ? '[dry-run] ' : ''}arquivo legado removido: ${relativePath}`);
 
   if (!dryRun) {
     await fs.rm(absolutePath, { force: true });
@@ -272,16 +253,33 @@ async function readTemplateFiles({ templateDir, replacements }) {
   const files = new Map();
 
   for await (const sourcePath of walkFiles(templateDir)) {
-    const relativePath = path
-      .relative(templateDir, sourcePath)
-      .replace(/\\/g, "/");
+    const relativePath = path.relative(templateDir, sourcePath).replace(/\\/g, '/');
 
-    const rawContent = await fs.readFile(sourcePath, "utf8");
+    const rawContent = await fs.readFile(sourcePath, 'utf8');
     const content = applyReplacements(rawContent, replacements);
-    files.set(relativePath, content.endsWith("\n") ? content : `${content}\n`);
+    files.set(relativePath, content.endsWith('\n') ? content : `${content}\n`);
   }
 
   return files;
+}
+
+async function ensureTemplateLayerContract(layer) {
+  const requiredFiles = Array.isArray(layer.requiredTemplateFiles) ? layer.requiredTemplateFiles : [];
+
+  for (const templateDir of layer.templateDirs ?? []) {
+    if (!(await fileExists(templateDir))) {
+      throw new Error(`Template directory not found: ${templateDir}`);
+    }
+
+    for (const requiredRelativePath of requiredFiles) {
+      const requiredAbsolutePath = path.join(templateDir, requiredRelativePath);
+      if (!(await fileExists(requiredAbsolutePath))) {
+        throw new Error(
+          `Template contract broken for layer "${layer.name}". Missing required file: ${requiredRelativePath}`,
+        );
+      }
+    }
+  }
 }
 
 async function buildFileMap(layers, logger) {
@@ -296,9 +294,7 @@ async function buildFileMap(layers, logger) {
 
       for (const [relativePath, content] of layerFiles) {
         if (files.has(relativePath)) {
-          logger.step(
-            `camada "${layer.name}" sobrescreveu arquivo de camada anterior: ${relativePath}`,
-          );
+          logger.step(`camada "${layer.name}" sobrescreveu arquivo de camada anterior: ${relativePath}`);
         }
 
         files.set(relativePath, content);
@@ -309,47 +305,61 @@ async function buildFileMap(layers, logger) {
   return files;
 }
 
-async function installDependencies({ rootDir, frontendAppPath, libraryConfig, logger, dryRun }) {
-  const runtimeDeps = Array.from(new Set(libraryConfig.runtimeDependencies ?? []));
-  const devDeps = Array.from(new Set(libraryConfig.devDependencies ?? []));
+function buildDependencyPlan(layers) {
+  const runtimeSet = new Set();
+  const devSet = new Set();
+  const sources = [];
+
+  for (const layer of layers) {
+    const runtimeDeps = Array.from(new Set(layer.runtimeDependencies ?? []));
+    const devDeps = Array.from(new Set(layer.devDependencies ?? []));
+
+    for (const dependency of runtimeDeps) runtimeSet.add(dependency);
+    for (const dependency of devDeps) devSet.add(dependency);
+
+    if (runtimeDeps.length > 0 || devDeps.length > 0) {
+      sources.push(layer.name);
+    }
+  }
+
+  return {
+    runtimeDeps: Array.from(runtimeSet),
+    devDeps: Array.from(devSet),
+    sources,
+  };
+}
+
+async function installDependencies({ rootDir, frontendAppPath, dependencyPlan, logger, dryRun }) {
+  const runtimeDeps = dependencyPlan.runtimeDeps;
+  const devDeps = dependencyPlan.devDeps;
 
   if (runtimeDeps.length === 0 && devDeps.length === 0) {
-    logger.step(`Biblioteca ${libraryConfig.name} nao exige dependencias adicionais.`);
+    logger.step('Nenhuma dependencia adicional requerida pelas camadas selecionadas.');
     return;
+  }
+
+  if (dependencyPlan.sources.length > 0) {
+    logger.step(`Dependencias agregadas a partir das camadas: ${dependencyPlan.sources.join(', ')}.`);
   }
 
   if (dryRun) {
     if (runtimeDeps.length > 0) {
-      logger.step(
-        `[dry-run] instalaria dependencias runtime no frontend: ${runtimeDeps.join(", ")}`,
-      );
+      logger.step(`[dry-run] instalaria dependencias runtime no frontend: ${runtimeDeps.join(', ')}`);
     }
 
     if (devDeps.length > 0) {
-      logger.step(
-        `[dry-run] instalaria dependencias dev no frontend: ${devDeps.join(", ")}`,
-      );
+      logger.step(`[dry-run] instalaria dependencias dev no frontend: ${devDeps.join(', ')}`);
     }
 
     return;
   }
 
   if (runtimeDeps.length > 0) {
-    await runCommand(
-      "npm",
-      ["--workspace", frontendAppPath, "install", ...runtimeDeps],
-      rootDir,
-      logger,
-    );
+    await runCommand('npm', ['--workspace', frontendAppPath, 'install', ...runtimeDeps], rootDir, logger);
   }
 
   if (devDeps.length > 0) {
-    await runCommand(
-      "npm",
-      ["--workspace", frontendAppPath, "install", "-D", ...devDeps],
-      rootDir,
-      logger,
-    );
+    await runCommand('npm', ['--workspace', frontendAppPath, 'install', '-D', ...devDeps], rootDir, logger);
   }
 }
 
@@ -357,12 +367,12 @@ async function main() {
   const options = parseArgs(process.argv.slice(2));
 
   const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-  const skillRoot = path.resolve(scriptDir, "..");
-  const rootDir = path.resolve(skillRoot, "../../..");
+  const skillRoot = path.resolve(scriptDir, '..');
+  const rootDir = path.resolve(skillRoot, '../../..');
 
   const logger = await createSkillRunLogger({
     rootDir,
-    skillName: "config-shared-web",
+    skillName: 'config-shared-web',
     commandArgs: process.argv.slice(2),
   });
 
@@ -370,22 +380,18 @@ async function main() {
     const { config } = await resolveSkillPaths(rootDir);
     const frontendAppPath = config.defaults.frontendAppPath;
     const frontendRoot = path.join(rootDir, frontendAppPath);
-    const frontendPackageJsonPath = path.join(frontendRoot, "package.json");
+    const frontendPackageJsonPath = path.join(frontendRoot, 'package.json');
 
     if (!(await fileExists(frontendPackageJsonPath))) {
-      throw new Error(
-        `Frontend package.json not found: ${frontendPackageJsonPath}. Run config-project first.`,
-      );
+      throw new Error(`Frontend package.json not found: ${frontendPackageJsonPath}. Run config-project first.`);
     }
 
     const themeColor = normalizeThemeColor(options.theme);
     const uiLibrary = resolveUiLibrary(options.uiLibrary, { skillRoot });
 
     if (!uiLibrary) {
-      const available = listUiLibraries().join(", ");
-      throw new Error(
-        `Invalid --ui-library "${options.uiLibrary}". Available options: ${available}.`,
-      );
+      const available = listUiLibraries().join(', ');
+      throw new Error(`Invalid --ui-library "${options.uiLibrary}". Available options: ${available}.`);
     }
 
     logger.step(`Frontend alvo: ${frontendAppPath}.`);
@@ -393,47 +399,48 @@ async function main() {
     logger.step(`Modo resolvido: ${options.mode}.`);
     logger.step(`Biblioteca de UI: ${uiLibrary.label} (${uiLibrary.name}).`);
 
-    if (!options.skipInstall) {
-      await installDependencies({
-        rootDir,
-        frontendAppPath,
-        libraryConfig: uiLibrary,
-        logger,
-        dryRun: options.dryRun,
-      });
-    } else {
-      logger.step("Instalacao de dependencias ignorada por --skip-install.");
-    }
-
     const baseScaffold = getBaseScaffoldConfig({
       skillRoot,
       primaryColor: themeColor,
       mode: options.mode,
     });
+    const uiLibraryLayer = {
+      name: `ui-library:${uiLibrary.name}`,
+      templateDirs: uiLibrary.templateDirs,
+      requiredTemplateFiles: uiLibrary.requiredTemplateFiles ?? [],
+      replacements: uiLibrary.replacements,
+      runtimeDependencies: uiLibrary.runtimeDependencies ?? [],
+      devDependencies: uiLibrary.devDependencies ?? [],
+      legacyFiles: uiLibrary.legacyFiles ?? [],
+    };
+    const scaffoldLayers = [baseScaffold, uiLibraryLayer];
 
-    const files = await buildFileMap(
-      [
-        baseScaffold,
-        {
-          name: `ui-library:${uiLibrary.name}`,
-          templateDirs: uiLibrary.templateDirs,
-          replacements: uiLibrary.replacements,
-        },
-      ],
-      logger,
-    );
+    for (const layer of scaffoldLayers) {
+      await ensureTemplateLayerContract(layer);
+      logger.step(`Contrato de template validado: ${layer.name}.`);
+    }
+
+    if (!options.skipInstall) {
+      const dependencyPlan = buildDependencyPlan(scaffoldLayers);
+      await installDependencies({
+        rootDir,
+        frontendAppPath,
+        dependencyPlan,
+        logger,
+        dryRun: options.dryRun,
+      });
+    } else {
+      logger.step('Instalacao de dependencias ignorada por --skip-install.');
+    }
+
+    const files = await buildFileMap(scaffoldLayers, logger);
 
     const stats = { created: 0, updated: 0, unchanged: 0, preserved: 0 };
-    const legacyFiles = Array.from(
-      new Set([...(baseScaffold.legacyFiles ?? []), ...(uiLibrary.legacyFiles ?? [])]),
-    );
+    const legacyFiles = Array.from(new Set([...(baseScaffold.legacyFiles ?? []), ...(uiLibraryLayer.legacyFiles ?? [])]));
 
     for (const legacyRelativePath of legacyFiles) {
       const absoluteLegacyPath = path.join(frontendRoot, legacyRelativePath);
-      const logLegacyPath = path.posix.join(
-        frontendAppPath,
-        legacyRelativePath.replace(/\\/g, "/"),
-      );
+      const logLegacyPath = path.posix.join(frontendAppPath, legacyRelativePath.replace(/\\/g, '/'));
 
       await removeLegacyFile({
         absolutePath: absoluteLegacyPath,
@@ -447,7 +454,7 @@ async function main() {
 
     for (const [relativePath, content] of entries) {
       const absolutePath = path.join(frontendRoot, relativePath);
-      const logPath = path.posix.join(frontendAppPath, relativePath.replace(/\\/g, "/"));
+      const logPath = path.posix.join(frontendAppPath, relativePath.replace(/\\/g, '/'));
 
       await writeManagedFile({
         absolutePath,
@@ -464,12 +471,12 @@ async function main() {
     );
 
     if (options.dryRun) {
-      logger.step("Execucao concluida em dry-run (sem persistencia).");
+      logger.step('Execucao concluida em dry-run (sem persistencia).');
     }
 
     await logger.success();
 
-    console.log("Shared web shell configured successfully.");
+    console.log('Shared web shell configured successfully.');
     console.log(`Frontend: ${frontendAppPath}`);
     console.log(`Theme: ${themeColor}`);
     console.log(`Mode: ${options.mode}`);

@@ -1,29 +1,29 @@
-import { Blend, LayoutGrid, Rows3, SquareMousePointer } from "lucide-react";
-import { NavigationLinkCard, PageSectionHeader } from "@/shared";
+import { Blend, LayoutGrid, Rows3, SquareMousePointer } from 'lucide-react';
+import { NavigationLinkCard, PageSectionHeader } from '@/shared';
 
 const blocks = [
   {
-    title: "Formulários",
-    description: "Campos de texto, combobox, radio, checkbox e tabs.",
-    href: "/example/forms",
+    title: 'Formulários',
+    description: 'Campos de texto, combobox, radio, checkbox e tabs.',
+    href: '/example/forms',
     icon: <SquareMousePointer className="size-6" />,
   },
   {
-    title: "Botões e Diálogo",
-    description: "Botões em variações, modal de diálogo e toasts.",
-    href: "/example/buttons",
+    title: 'Botões e Diálogo',
+    description: 'Botões em variações, modal de diálogo e toasts.',
+    href: '/example/buttons',
     icon: <Blend className="size-6" />,
   },
   {
-    title: "Tabelas",
-    description: "Tabela com filtros e navegação de páginas.",
-    href: "/example/tables",
+    title: 'Tabelas',
+    description: 'Tabela com filtros e navegação de páginas.',
+    href: '/example/tables',
     icon: <Rows3 className="size-6" />,
   },
   {
-    title: "Widgets",
-    description: "Cards e indicadores para painéis de monitoramento.",
-    href: "/example/widgets",
+    title: 'Widgets',
+    description: 'Cards e indicadores para painéis de monitoramento.',
+    href: '/example/widgets',
     icon: <LayoutGrid className="size-6" />,
   },
 ];

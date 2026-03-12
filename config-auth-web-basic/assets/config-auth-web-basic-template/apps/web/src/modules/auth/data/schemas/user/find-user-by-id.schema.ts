@@ -1,5 +1,5 @@
-import { Id } from "__SHARED_PACKAGE_NAME__";
-import { v } from "@/shared/components/form/validator";
+import { Id } from '__SHARED_PACKAGE_NAME__';
+import { v } from '@/shared/components/form/validator';
 
 export const findUserByIdSchema = v.defineObject({
   id: Id,

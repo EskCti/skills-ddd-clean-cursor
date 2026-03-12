@@ -1,6 +1,6 @@
 ---
 name: frontend-form-schema
-description: "Criar, revisar ou orientar forms frontend e schemas de validação no padrão Genérico Web. Usar quando o pedido envolver componentes de formulário React Hook Form, arquivos `data/schemas/*`, validação com `v` (`@namespace/shared-web`), tipagem com `v.infer`, campos opcionais/refinamentos/arrays e integração de erro com componentes de form compartilhados."
+description: 'Criar, revisar ou orientar forms frontend e schemas de validação no padrão Genérico Web. Usar quando o pedido envolver componentes de formulário React Hook Form, arquivos `data/schemas/*`, validação com `v` (`@namespace/shared-web`), tipagem com `v.infer`, campos opcionais/refinamentos/arrays e integração de erro com componentes de form compartilhados.'
 ---
 
 # Frontend Form Schema

@@ -1,6 +1,6 @@
-import Link from "next/link";
-import type { ReactNode } from "react";
-import { cn } from "@/shared/lib/class-name.util";
+import Link from 'next/link';
+import type { ReactNode } from 'react';
+import { cn } from '@/shared/lib/class-name.util';
 
 type NavigationLinkCardProps = {
   href: string;
@@ -10,20 +10,14 @@ type NavigationLinkCardProps = {
   className?: string;
 };
 
-export function NavigationLinkCard({
-  href,
-  title,
-  description,
-  icon,
-  className,
-}: NavigationLinkCardProps) {
+export function NavigationLinkCard({ href, title, description, icon, className }: NavigationLinkCardProps) {
   return (
     <Link
       href={href}
       className={cn(
-        "group relative block h-full overflow-hidden rounded-2xl border border-border/80 bg-card/70 p-5 text-card-foreground transition-all duration-300",
-        "hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-[0_20px_55px_-35px_hsl(var(--primary)/0.8)]",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2",
+        'group relative block h-full overflow-hidden rounded-2xl border border-border/80 bg-card/70 p-5 text-card-foreground transition-all duration-300',
+        'hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-[0_20px_55px_-35px_hsl(var(--primary)/0.8)]',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2',
         className,
       )}
     >

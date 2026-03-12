@@ -1,18 +1,10 @@
-import { BriefcaseBusiness, Clock3, DollarSign, UserRoundPlus } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  MetricCard,
-  PageSectionHeader,
-  Separator,
-} from "@/shared";
+import { BriefcaseBusiness, Clock3, DollarSign, UserRoundPlus } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, MetricCard, PageSectionHeader, Separator } from '@/shared';
 
 const cards = [
   {
-    title: "Total Revenue",
-    value: "R$ 45.231,89",
+    title: 'Total Revenue',
+    value: 'R$ 45.231,89',
     subtitle: (
       <>
         <span className="text-emerald-400">+2,01%</span> from last month
@@ -21,8 +13,8 @@ const cards = [
     icon: <DollarSign className="size-4" />,
   },
   {
-    title: "Active Projects",
-    value: "1.423",
+    title: 'Active Projects',
+    value: '1.423',
     subtitle: (
       <>
         <span className="text-emerald-400">+5,02%</span> from last month
@@ -31,8 +23,8 @@ const cards = [
     icon: <BriefcaseBusiness className="size-4" />,
   },
   {
-    title: "New Leads",
-    value: "3.500",
+    title: 'New Leads',
+    value: '3.500',
     subtitle: (
       <>
         <span className="text-rose-400">-3,58%</span> from last month
@@ -41,8 +33,8 @@ const cards = [
     icon: <UserRoundPlus className="size-4" />,
   },
   {
-    title: "Time Spent",
-    value: "168h 40m",
+    title: 'Time Spent',
+    value: '168h 40m',
     subtitle: (
       <>
         <span className="text-rose-400">-3,58%</span> from last month
@@ -53,9 +45,9 @@ const cards = [
 ];
 
 const progress = [
-  { label: "Backoffice", value: 82 },
-  { label: "CRM", value: 63 },
-  { label: "Checkout", value: 91 },
+  { label: 'Backoffice', value: 82 },
+  { label: 'CRM', value: 63 },
+  { label: 'Checkout', value: 91 },
 ];
 
 export function ExampleWidgetsPage() {
@@ -85,14 +77,12 @@ export function ExampleWidgetsPage() {
                 <span className="text-muted-foreground">{item.value}%</span>
               </div>
               <div className="h-2 rounded-full bg-muted">
-                <div className="h-2 rounded-full bg-primary" style={{ width: item.value + "%" }} />
+                <div className="h-2 rounded-full bg-primary" style={{ width: item.value + '%' }} />
               </div>
             </div>
           ))}
           <Separator />
-          <p className="text-xs text-muted-foreground">
-            Exemplo de widget composto para monitoramento de módulos.
-          </p>
+          <p className="text-xs text-muted-foreground">Exemplo de widget composto para monitoramento de módulos.</p>
         </CardContent>
       </Card>
     </div>

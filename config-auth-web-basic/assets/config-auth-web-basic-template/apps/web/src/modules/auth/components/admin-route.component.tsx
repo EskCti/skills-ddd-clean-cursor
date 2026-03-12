@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import { useAuth } from "@/modules/auth/data";
+import { useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAuth } from '@/modules/auth/data';
 
 type AdminRouteProps = {
   children: React.ReactNode;
@@ -19,13 +19,13 @@ export function AdminRoute({ children }: AdminRouteProps) {
     }
 
     if (!isAuthenticated) {
-      const nextPath = encodeURIComponent(pathname || "/dashboard");
+      const nextPath = encodeURIComponent(pathname || '/dashboard');
       router.replace(`/auth/sign-in?next=${nextPath}`);
       return;
     }
 
     if (!user?.admin) {
-      router.replace("/dashboard");
+      router.replace('/dashboard');
     }
   }, [isAuthenticated, isLoading, pathname, router, user?.admin]);
 

@@ -1,14 +1,7 @@
-"use client";
+'use client';
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { getMessage } from "../i18n";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { getMessage } from '../i18n';
 
 type ShellContextValue = {
   isSidebarOpen: boolean;
@@ -40,8 +33,8 @@ export function ShellProvider({ children, defaultOpen = true }: ShellProviderPro
     };
 
     handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const toggleSidebar = useCallback(() => {
@@ -64,7 +57,7 @@ export function ShellProvider({ children, defaultOpen = true }: ShellProviderPro
 export function useShellContext() {
   const context = useContext(ShellContext);
   if (!context) {
-    throw new Error(getMessage("SHELL_CONTEXT_PROVIDER_REQUIRED"));
+    throw new Error(getMessage('SHELL_CONTEXT_PROVIDER_REQUIRED'));
   }
   return context;
 }

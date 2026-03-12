@@ -9,6 +9,7 @@ Inicializar o módulo auth no caminho padrão detectado (`packages/auth` ou `pac
 - testes (`test/user`, `test/password`, `test/root`)
 
 Sem escopo de geração:
+
 - `permission`
 - `role`
 - `audit`
@@ -32,7 +33,8 @@ Sem escopo de geração:
 - `CreateUserUseCase` deve:
   - validar existência prévia de usuário por `UserExistsQuery`
   - aceitar `avatarUrl` opcional e normalizar com trim antes de persistir
-  - persistir `User` e depois `Password` (hash) via `PasswordRepository.create`
+  - usar `TransactionManager.runInTransaction` para persistir `User` e depois `Password` (hash) no mesmo fluxo transacional
+- `UserRepository.create` e `PasswordRepository.create` devem aceitar `tx?: TransactionContext`
 - `User` deve expor:
   - `avatarUrl` opcional
   - `admin` opcional com default `false`
@@ -48,6 +50,8 @@ Sem escopo de geração:
 ```bash
 node .agents/skills/config-auth-core-basic/scripts/create-auth-core-basic.mjs [--scope @namespace] [--force] [--run-tests] [--target <path>] [--skip-apps-sync] [--skip-install]
 ```
+
+> Com `--run-tests`, a execução de testes ocorre apenas quando o alvo é o caminho padrão detectado do workspace (`packages/auth` ou `packages/auth/core`); em `--target` customizado o script registra skip explícito para manter previsibilidade.
 
 ## Namespace Resolution
 

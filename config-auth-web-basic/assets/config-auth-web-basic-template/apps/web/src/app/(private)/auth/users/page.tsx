@@ -1,4 +1,4 @@
-import { UsersPage } from "@/modules/auth";
+import { UsersPage } from '@/modules/auth';
 
 export default function AuthUsersRoutePage() {
   return <UsersPage />;

@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useMemo, useState } from "react";
+import { useMemo, useState } from 'react';
 import {
   Input,
   PageSectionHeader,
@@ -12,9 +12,9 @@ import {
   TableHeader,
   TableRow,
   TableCard,
-} from "@/shared";
+} from '@/shared';
 
-type OrderStatus = "Pago" | "Pendente" | "Em análise";
+type OrderStatus = 'Pago' | 'Pendente' | 'Em análise';
 
 type OrderRow = {
   id: string;
@@ -24,18 +24,18 @@ type OrderRow = {
 };
 
 const rows: OrderRow[] = [
-  { id: "PED-001", customer: "Ana Souza", status: "Pago", total: "R$ 320,00" },
-  { id: "PED-002", customer: "Lucas Lima", status: "Pendente", total: "R$ 89,00" },
-  { id: "PED-003", customer: "Aline Costa", status: "Pago", total: "R$ 1.240,00" },
-  { id: "PED-004", customer: "Tiago Alves", status: "Em análise", total: "R$ 420,00" },
-  { id: "PED-005", customer: "Julia Mendes", status: "Pago", total: "R$ 215,00" },
-  { id: "PED-006", customer: "Bruno Rocha", status: "Pendente", total: "R$ 560,00" },
+  { id: 'PED-001', customer: 'Ana Souza', status: 'Pago', total: 'R$ 320,00' },
+  { id: 'PED-002', customer: 'Lucas Lima', status: 'Pendente', total: 'R$ 89,00' },
+  { id: 'PED-003', customer: 'Aline Costa', status: 'Pago', total: 'R$ 1.240,00' },
+  { id: 'PED-004', customer: 'Tiago Alves', status: 'Em análise', total: 'R$ 420,00' },
+  { id: 'PED-005', customer: 'Julia Mendes', status: 'Pago', total: 'R$ 215,00' },
+  { id: 'PED-006', customer: 'Bruno Rocha', status: 'Pendente', total: 'R$ 560,00' },
 ];
 
 const PAGE_SIZE = 3;
 
 export function ExampleTablesPage() {
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
 
   const filteredRows = useMemo(() => {
@@ -44,9 +44,7 @@ export function ExampleTablesPage() {
       return rows;
     }
 
-    return rows.filter((item) =>
-      [item.id, item.customer, item.status].join(" ").toLowerCase().includes(normalized),
-    );
+    return rows.filter((item) => [item.id, item.customer, item.status].join(' ').toLowerCase().includes(normalized));
   }, [search]);
 
   const safeTotalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));

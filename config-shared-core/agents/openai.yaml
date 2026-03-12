@@ -1,4 +1,4 @@
 interface:
-  display_name: "Config Shared Core"
-  short_description: "Inicializar core compartilhado"
-  default_prompt: "Crie ou recrie o módulo packages/shared completo usando node .agents/skills/config-shared-core/scripts/create-shared.mjs, incluindo src/base, src/db, src/dto, src/vo e toda a suíte de testes."
+  display_name: 'Config Shared Core'
+  short_description: 'Inicializar core compartilhado'
+  default_prompt: 'Crie ou recrie o módulo packages/shared completo usando node .agents/skills/config-shared-core/scripts/create-shared.mjs, incluindo src/base (com ResultValidator), src/db (com TransactionManager), src/dto, src/vo e toda a suíte de testes.'
