@@ -5,7 +5,7 @@
 Padronizar bootstrap do Prisma no backend NestJS com:
 
 - schema modular em `apps/backend/prisma/models/*.model.prisma`
-- entrypoint de seed em `apps/backend/prisma/seed/main.ts`
+- entrypoint de seed técnico em `apps/backend/prisma/seed/main.ts` (sem seeds de módulos)
 - módulo Nest de banco em `apps/backend/src/db/*`
 - Docker Compose do backend compatível com `DATABASE_URL`
 
@@ -23,14 +23,12 @@ Padronizar bootstrap do Prisma no backend NestJS com:
 3. Instalar dependências.
 4. Subir Postgres com Docker Compose.
 5. Gerar client Prisma.
-6. Rodar seed.
 
 ```bash
 node .agents/skills/config-prisma/scripts/init-prisma-backend.js --dry-run
 node .agents/skills/config-prisma/scripts/init-prisma-backend.js --apply --install
 npm --workspace apps/backend run db:start
 npm --workspace apps/backend run prisma:generate
-npm --workspace apps/backend run prisma:seed
 ```
 
 ## Escaffold de módulos Prisma
@@ -51,6 +49,12 @@ node .agents/skills/config-prisma/scripts/init-prisma-backend.js --apply --modul
 - `apps/backend/src/db/db.module.ts`
 - `apps/backend/src/db/prisma.service.ts`
 - `apps/backend/src/app.module.ts`
+
+## Regra de escopo desta skill
+
+- Não incluir seeds de dados por módulo (`prisma/seed/tasks/*`) nesta etapa.
+- O bootstrap de seed deve permanecer neutro até os módulos específicos serem aplicados.
+- `prisma/models/bootstrap.model.prisma` deve existir apenas quando ainda não há arquivos `*.model.prisma` de domínio.
 
 ## Flags
 

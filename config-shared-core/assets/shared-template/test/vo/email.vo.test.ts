@@ -16,10 +16,10 @@ describe("Email", () => {
 	});
 
 	test("should expose local and domain parts", () => {
-		const email = Email.create("john.doe@example.com");
+		const email = Email.create("john.doe@pharmacore.com");
 
 		expect(email.local).toBe("john.doe");
-		expect(email.domain).toBe("example.com");
+		expect(email.domain).toBe("pharmacore.com");
 	});
 
 	test("should return empty local when split result is undefined", () => {

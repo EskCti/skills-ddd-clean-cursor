@@ -6,7 +6,9 @@ import { UserPrisma } from './user.prisma';
 
 interface JwtPayload {
   sub: string;
+  name?: string;
   email: string;
+  admin?: boolean;
 }
 
 @Injectable()
@@ -20,7 +22,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload): Promise<UserDTO> {
-    const userResult = await this.userPrisma.findUserByIdQuery.execute(payload.sub);
+    const userResult = await this.userPrisma.findUserByIdQuery.execute(
+      payload.sub,
+    );
 
     if (userResult.isFailure) {
       throw new UnauthorizedException();

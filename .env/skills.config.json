@@ -1,7 +1,7 @@
 {
   "version": 1,
   "defaults": {
-    "namespace": "@namespace",
+    "namespace": "@poupig",
     "sharedModulePath": "packages/shared",
     "frontendAppPath": "apps/web",
     "backendAppPath": "apps/backend",

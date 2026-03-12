@@ -1,0 +1,122 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f4f4f5;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+  --primary: __PRIMARY_COLOR__;
+  --primary-foreground: #ffffff;
+  --secondary: #e4e4e7;
+  --secondary-foreground: #18181b;
+  --muted: #e4e4e7;
+  --muted-foreground: #52525b;
+  --accent: #e4e4e7;
+  --accent-foreground: #18181b;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #d4d4d8;
+  --input: #d4d4d8;
+  --ring: __PRIMARY_COLOR__;
+  --radius: 0.625rem;
+}
+
+.dark {
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #111113;
+  --card-foreground: #fafafa;
+  --popover: #111113;
+  --popover-foreground: #fafafa;
+  --primary: __PRIMARY_COLOR__;
+  --primary-foreground: #ffffff;
+  --secondary: #18181b;
+  --secondary-foreground: #fafafa;
+  --muted: #18181b;
+  --muted-foreground: #a1a1aa;
+  --accent: #18181b;
+  --accent-foreground: #fafafa;
+  --destructive: #f87171;
+  --destructive-foreground: #ffffff;
+  --border: #27272a;
+  --input: #27272a;
+  --ring: __PRIMARY_COLOR__;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* Mantem o tema visual consistente quando o navegador aplica autofill */
+:is(input, textarea, select):-webkit-autofill,
+:is(input, textarea, select):-webkit-autofill:hover,
+:is(input, textarea, select):-webkit-autofill:focus,
+:is(input, textarea, select):-webkit-autofill:active,
+:is(input, textarea, select):autofill,
+:is(input, textarea, select):autofill:hover,
+:is(input, textarea, select):autofill:focus {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  -webkit-text-fill-color: var(--foreground) !important;
+  caret-color: var(--foreground);
+  border-color: var(--input) !important;
+  -webkit-box-shadow:
+    0 0 0 1000px var(--background) inset,
+    0 0 0 1px var(--input) inset !important;
+  box-shadow:
+    0 0 0 1000px var(--background) inset,
+    0 0 0 1px var(--input) inset !important;
+  transition:
+    background-color 9999s ease-out 0s,
+    color 9999s ease-out 0s;
+}
+
+:is(input, textarea, select):-moz-autofill {
+  color: var(--foreground) !important;
+  background-color: var(--background) !important;
+  -moz-text-fill-color: var(--foreground) !important;
+  border-color: var(--input) !important;
+  box-shadow:
+    0 0 0 1000px var(--background) inset,
+    0 0 0 1px var(--input) inset !important;
+}

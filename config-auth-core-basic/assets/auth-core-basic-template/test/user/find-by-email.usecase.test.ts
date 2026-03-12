@@ -13,6 +13,7 @@ const userDto: UserDTO = {
 	id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 	name: "Test User",
 	email: "test@example.com",
+	admin: false,
 	avatarUrl: null,
 };
 

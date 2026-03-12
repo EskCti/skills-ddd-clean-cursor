@@ -2,6 +2,7 @@ model User {
   id        String     @id @default(uuid()) @db.Uuid
   name      String
   email     String     @unique
+  admin     Boolean    @default(false)
   avatarUrl String?    @map("avatar_url")
   createdAt DateTime   @default(now()) @map("created_at")
   updatedAt DateTime   @updatedAt @map("updated_at")

@@ -9,6 +9,7 @@ Garantir que o backend tenha o módulo de autenticação básico funcional com i
 - `apps/backend/src/modules/auth/**`
 - `apps/backend/prisma/models/auth.model.prisma`
 - `apps/backend/prisma/migrations/20260311032045_auth/migration.sql`
+- `apps/backend/prisma/migrations/20260311191936_add_user_admin_flag/migration.sql`
 - `apps/backend/prisma/migrations/migration_lock.toml`
 - `apps/backend/prisma/seed/data/default-users.json`
 - `apps/backend/prisma/seed/tasks/auth.seed.ts`
@@ -25,11 +26,13 @@ Garantir que o backend tenha o módulo de autenticação básico funcional com i
 - `POST /auth/register`
 - `POST /auth/login`
 - `GET /auth/me` (JWT)
-- `GET /auth/users/by-email?email=...` (JWT)
-- `GET /auth/users/:id` (JWT)
-- `POST /auth/user/create` (JWT)
+- `GET /auth/users` (JWT + admin)
+- `GET /auth/users/by-email?email=...` (JWT + admin)
+- `PATCH /auth/users/:id` (JWT + admin)
+- `GET /auth/users/:id` (JWT + admin, com exceção opcional allow-self)
+- `POST /auth/user/create` (JWT + admin)
 - `PATCH /auth/password/change` (JWT)
-- `DELETE /auth/users/:id` (JWT)
+- `DELETE /auth/users/:id` (JWT + admin)
 
 ## Estrutura simplificada esperada
 
@@ -37,6 +40,8 @@ Garantir que o backend tenha o módulo de autenticação básico funcional com i
 - `apps/backend/src/modules/auth/auth.module.ts`
 - `apps/backend/src/modules/auth/jwt-auth.guard.ts`
 - `apps/backend/src/modules/auth/jwt.strategy.ts`
+- `apps/backend/src/modules/auth/require-admin.decorator.ts`
+- `apps/backend/src/modules/auth/require-admin.guard.ts`
 - `apps/backend/src/modules/auth/user.prisma.ts`
 - `apps/backend/src/modules/auth/password.prisma.ts`
 - `apps/backend/src/modules/auth/providers/bcrypt.provider.ts`
@@ -48,5 +53,6 @@ Garantir que o backend tenha o módulo de autenticação básico funcional com i
 - Use cases devem vir de `@namespace/auth`.
 - Adapters Prisma devem respeitar contracts de `UserRepository`, `PasswordRepository` e queries do core.
 - `JwtAuthGuard` deve ser aplicado nos endpoints protegidos.
-- Seed de usuário padrão deve ser idempotente e ler dados de `default-users.json`.
+- `RequireAdminGuard` deve proteger endpoints administrativos e permitir `allowSelfByParam` quando configurado.
+- Seed de usuários padrão deve ser idempotente, ler dados de `default-users.json` e respeitar campos `id` UUID, `admin`, `createdAt`, `updatedAt` e `deletedAt`.
 - Modelo de senha não deve conter `isActive/is_active`; a senha vigente é obtida por ordenação de `createdAt DESC`.

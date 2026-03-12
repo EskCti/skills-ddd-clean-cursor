@@ -1,0 +1,4 @@
+interface:
+  display_name: "Config Auth Web Basic"
+  short_description: "Reconciliar modulo auth web basico no Next.js"
+  default_prompt: "Implemente ou reconcilie o modulo web de autenticacao no apps/web com estrutura atual (modules/auth completo, rotas app/(public)/auth e app/(private)/auth, provider global de auth, controle de acesso private/admin e telas de usuarios/perfil), mantendo compatibilidade com <scope>/auth e <scope>/shared."

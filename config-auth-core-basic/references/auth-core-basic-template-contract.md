@@ -31,7 +31,11 @@ Sem escopo de geração:
   - reuso das últimas senhas por `PasswordCryptoProvider.compare`
 - `CreateUserUseCase` deve:
   - validar existência prévia de usuário por `UserExistsQuery`
+  - aceitar `avatarUrl` opcional e normalizar com trim antes de persistir
   - persistir `User` e depois `Password` (hash) via `PasswordRepository.create`
+- `User` deve expor:
+  - `avatarUrl` opcional
+  - `admin` opcional com default `false`
 - `LoginUseCase` deve comparar senha via `PasswordCryptoProvider`
 - `ChangePasswordUseCase` deve:
   - validar usuário por `UserExistsQuery`

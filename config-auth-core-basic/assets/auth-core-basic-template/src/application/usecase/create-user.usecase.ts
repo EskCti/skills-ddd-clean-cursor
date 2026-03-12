@@ -11,6 +11,7 @@ export interface CreateUserIn {
 	name: string;
 	email: string;
 	password: string;
+	avatarUrl?: string;
 }
 
 export class CreateUserUseCase implements UseCase<CreateUserIn, void> {
@@ -43,6 +44,7 @@ export class CreateUserUseCase implements UseCase<CreateUserIn, void> {
 		const userResult = User.tryCreate({
 			name: data.name,
 			email: data.email,
+			avatarUrl: data.avatarUrl?.trim() || undefined,
 		});
 		if (userResult.isFailure) {
 			return userResult.withFail;

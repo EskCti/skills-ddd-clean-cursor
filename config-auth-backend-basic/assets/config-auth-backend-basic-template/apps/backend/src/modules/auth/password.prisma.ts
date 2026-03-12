@@ -78,7 +78,10 @@ export class PasswordPrisma implements PasswordRepository {
     }
   }
 
-  async findRecentByUserId(id: string, limit: number): Promise<Result<Password[]>> {
+  async findRecentByUserId(
+    id: string,
+    limit: number,
+  ): Promise<Result<Password[]>> {
     try {
       const passwords = await this.prisma.client.password.findMany({
         where: {

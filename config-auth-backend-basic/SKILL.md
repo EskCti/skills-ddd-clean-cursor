@@ -1,6 +1,6 @@
 ---
 name: config-auth-backend-basic
-description: Criar/recriar de forma determinística o módulo de autenticação do backend NestJS com endpoints HTTP (register/login/me/usuários/senha), JWT com Passport, adapters Prisma compatíveis com `@namespace/auth`, modelo Prisma de auth, migration SQL inicial e seed JSON com usuário padrão. Usar quando o pedido envolver bootstrap/rebootstrap da camada backend auth completa no `apps/backend`.
+description: Criar/recriar de forma determinística o módulo de autenticação do backend NestJS com endpoints HTTP (register/login/me/usuários/senha), JWT com Passport, controle de acesso admin, adapters Prisma compatíveis com `@namespace/auth`, modelo Prisma de auth, migrations SQL e seed JSON com usuários padrão. Usar quando o pedido envolver bootstrap/rebootstrap da camada backend auth completa no `apps/backend`.
 ---
 
 # Config Auth Backend Basic
@@ -14,14 +14,16 @@ Executar setup idempotente do módulo de autenticação backend no padrão Gené
   - `auth.module.ts`
   - `jwt-auth.guard.ts`
   - `jwt.strategy.ts`
+  - `require-admin.decorator.ts`
+  - `require-admin.guard.ts`
   - `user.prisma.ts`
   - `password.prisma.ts`
   - `providers/bcrypt.provider.ts`
-- endpoints de autenticação e usuário com `JwtAuthGuard`
+- endpoints de autenticação e usuário com `JwtAuthGuard` e proteção administrativa por `RequireAdminGuard`
 - integração com `@namespace/auth` (use cases, entidades e providers)
-- implementação Prisma (repositories/queries + model `.prisma`)
-- migration inicial de auth
-- seed com usuário padrão em JSON
+- implementação Prisma (repositories/queries + model `.prisma` com flag `admin`)
+- migrations de auth (criação inicial + evolução do campo `admin`)
+- seed com usuários padrão em JSON (incluindo `id` UUID, `admin` e metadados de auditoria)
 
 A skill aplica arquivos canônicos a partir de template versionado, convergindo arquivos existentes (`app.module.ts`, `apps/backend/package.json` e `prisma/seed/main.ts`) e removendo artefatos legados da implementação antiga.
 

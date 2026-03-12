@@ -381,6 +381,17 @@ function resolveSharedPackageNameFromAuth(authPackageName) {
   return `${scope}/shared`;
 }
 
+function resolveScopeSlugFromPackageName(packageName) {
+  if (typeof packageName !== 'string') {
+    return 'namespace';
+  }
+
+  const slashIndex = packageName.indexOf('/');
+  const scope = slashIndex > 0 ? packageName.slice(0, slashIndex) : packageName;
+  const slug = scope.replace(/^@/, '').trim();
+  return slug || 'namespace';
+}
+
 async function main() {
   const scriptDir = path.dirname(fileURLToPath(import.meta.url));
   const skillDir = path.resolve(scriptDir, '..');
@@ -411,12 +422,15 @@ async function main() {
 
     const authPackageName = await resolveAuthPackageName(rootDir, args.scope);
     const sharedPackageName = resolveSharedPackageNameFromAuth(authPackageName);
+    const scopeSlug = resolveScopeSlugFromPackageName(authPackageName);
     logger.step(`Pacote auth resolvido: ${authPackageName}.`);
     logger.step(`Pacote shared resolvido: ${sharedPackageName}.`);
+    logger.step(`Slug de escopo resolvido para RestClient: ${scopeSlug}.`);
 
     await copyTemplate(templateDir, rootDir, {
       __AUTH_PACKAGE_NAME__: authPackageName,
       __SHARED_PACKAGE_NAME__: sharedPackageName,
+      __PROJECT_SCOPE_SLUG__: scopeSlug,
     }, options);
 
     await ensureBackendDependencies(

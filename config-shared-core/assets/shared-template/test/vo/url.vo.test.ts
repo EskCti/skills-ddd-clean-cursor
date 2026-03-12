@@ -16,9 +16,9 @@ describe("URL", () => {
 	});
 
 	test("should create valid url with create", () => {
-		const url = URLVo.create("https://example.com");
+		const url = URLVo.create("https://pharmacore.com");
 
-		expect(url.value).toBe("https://example.com");
+		expect(url.value).toBe("https://pharmacore.com");
 	});
 
 	test("should fail with invalid url", () => {

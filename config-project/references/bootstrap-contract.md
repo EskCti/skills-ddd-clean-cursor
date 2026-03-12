@@ -25,10 +25,9 @@ Com defaults obtidos de `skills.config.json`:
    - `.npmrc`
    - `packages/eslint-config`
    - `packages/typescript-config`
-   - `packages/ui`
    - demais estruturas padrão faltantes
    - se `.git` já existir no root, rodar scaffold com `--no-git` para evitar recriação de repositório git
-3. Antes de criar os apps customizados, remover os apps padrão do Turbo (`apps/docs` e `apps/web`) quando detectados como template original.
+3. Antes de criar os apps customizados, remover os projetos padrão do Turbo (`apps/docs`, `apps/web` e `packages/ui`) quando detectados como template original.
 4. Criar `<frontendAppPath>` com `npx create-next-app@latest <frontendName> --yes --use-npm --src-dir` somente se o app Next.js ainda não existir.
 5. Criar `<backendAppPath>` com `nest new <backendName> --skip-git --package-manager npm` (ou fallback via `npx @nestjs/cli@latest`) somente se o app NestJS ainda não existir.
 6. Garantir `name` de todos os projetos do workspace (`apps/*` e `packages/*`) com namespace:
@@ -48,7 +47,9 @@ Com defaults obtidos de `skills.config.json`:
 9. Atualizar `turbo.json`:
    - `tasks.test.cache = false`
    - `tasks.build.outputs` contendo `dist/**`
-10. Atualizar env files via upsert (preservando chaves extras):
+10. Atualizar `<frontendAppPath>/next.config.ts|js|mjs` de forma incremental para garantir:
+    - `images.remotePatterns` contendo regras para `https` e `http` com `hostname: "**"` (liberação de imagens remotas).
+11. Atualizar env files via upsert (preservando chaves extras):
    - `<frontendAppPath>/.env` e `.env.example` com:
      - `<frontendApiUrlEnvVar>=http://localhost:<backendPort>`
      - `PORT=<frontendPort>`
@@ -56,7 +57,7 @@ Com defaults obtidos de `skills.config.json`:
      - `<backendPortEnvVar>=<backendPort>`
      - `DATABASE_URL`
      - `JWT_SECRET`
-11. Atualizar `<backendAppPath>/src/main.ts` de forma incremental com:
+12. Atualizar `<backendAppPath>/src/main.ts` de forma incremental com:
    - `app.enableCors()`
    - leitura de `process.env.<backendPortEnvVar>` (default `<backendPort>`)
    - `import "dotenv/config"`
@@ -64,5 +65,5 @@ Com defaults obtidos de `skills.config.json`:
 ## Notes
 
 - O script é idempotente: ao executar novamente, ele pula etapas já atendidas.
-- O script só remove automaticamente diretórios existentes quando detectar que são os apps padrão originais do Turbo (`apps/docs` e `apps/web`).
+- O script só remove automaticamente diretórios existentes quando detectar que são projetos padrão originais do Turbo (`apps/docs`, `apps/web` e `packages/ui`).
 - Se um diretório de frontend/backend já existir mas não corresponder ao tipo esperado (Next/Nest), o processo falha para evitar sobrescrita acidental.

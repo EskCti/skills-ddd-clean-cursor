@@ -1,0 +1,33 @@
+import type { ErrorMessages } from "./messages.pt";
+
+export const errorMessagesEn: ErrorMessages = {
+    REQUIRED_FIELD: "This field is required.",
+    INVALID_VALUE: "Invalid value.",
+    INVALID_ARRAY: "The value must be an array.",
+    INVALID_OBJECT: "The value must be an object.",
+    INVALID_ITEM: "Invalid item.",
+    MIN_ITEMS: "Minimum of {{min}} items.",
+    MAX_ITEMS: "Maximum of {{max}} items.",
+    USER_NOT_FOUND: "User not found.",
+    USER_EMAIL_ALREADY_EXISTS: "A user with this email already exists.",
+    USER_INVALID_CREDENTIALS:
+        "Invalid credentials. Please check your email and password.",
+    USER_UNAUTHORIZED: "Unauthorized. Please log in again.",
+    USER_ACCESS_DENIED:
+        "Access denied. You do not have permission to perform this action.",
+    PASSWORD_MISMATCH: "Incorrect username or password.",
+    WEAK_PASSWORD: "The password is too weak.",
+    PASSWORD_REUSED_RECENT_PASSWORD:
+        "The new password cannot match a recently used password.",
+    NOT_FOUND: "Record not found.",
+    INVALID_ID: "Invalid ID. Check the data and try again.",
+    MUST_HAVE_FIRST_AND_LAST_NAME: "Provide first and last name.",
+    USER_UPDATE_EMPTY_PAYLOAD:
+        "Provide at least name or email to update the user.",
+    AUTH_FIND_ALL_USERS_ERROR:
+        "Unable to load the users list right now.",
+    SHELL_CONTEXT_PROVIDER_REQUIRED:
+        "useShellContext must be used within <ShellProvider>.",
+    UNKNOWN_ERROR_CODE: "Unknown error: {{code}}",
+    DEFAULT_API_ERROR: "An unexpected error occurred while contacting the server.",
+};

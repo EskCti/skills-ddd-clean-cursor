@@ -10,14 +10,14 @@ description: Inicializar o módulo `packages/shared` completo de forma determin�
 Criar ou recriar o pacote no caminho de `sharedModulePath` (padrão: `packages/shared`) com template versionado dentro da própria skill, sem depender do sistema operacional.
 Executar o script Node da skill para gerar toda a estrutura de código e testes do módulo shared.
 O namespace e diretórios padrão devem ser resolvidos por configuração global compartilhada em `skills.config.json` (`.agents/skills/.env`, `.cloud/skills/.env` ou `.env/`).
-O template inclui obrigatoriamente o VO `HashPassword` (`src/vo/hash-password.vo.ts`), teste correspondente (`test/vo/hash-password.vo.test.ts`) e export em `src/vo/index.ts`, validando hash bcrypt no formato `$2a$|$2b$|$2y$`, rounds `04-31` e payload base64 bcrypt.
+O template inclui obrigatoriamente o VO `HashPassword` (`src/vo/hash-password.vo.ts`), teste correspondente (`test/vo/hash-password.vo.test.ts`) e export em `src/vo/index.ts`, validando hash bcrypt no formato `$2a$|$2b$|$2y$` com rounds de dois dígitos e payload base64 bcrypt.
 
 ## Workflow
 
 1. Executar `node scripts/create-shared.mjs`.
 2. Namespace é resolvido por precedência: `--scope` > `PROJECT_NAMESPACE`/`SKILLS_NAMESPACE` > `skills.config.local.json` > `skills.config.json` > fallback do template.
 3. Se o diretório já existir, usar `--force` para sobrescrever.
-4. Antes do `npm install`, adicionar `"@<namespace>/shared": "*"` em `dependencies` apenas dos `package.json` de frontend e backend (conforme `frontendAppPath` e `backendAppPath` no config).
+4. Antes do `npm install`, adicionar/atualizar `"@<namespace>/shared": "*"` em `dependencies` apenas dos `package.json` de frontend e backend (conforme `frontendAppPath` e `backendAppPath` no config), sem remover dependências de outros pacotes.
 5. Após gerar em `<sharedModulePath>`, executar `npm install` na raiz do projeto para atualizar as dependências do workspace.
 6. Opcionalmente executar testes do pacote com `--run-tests`.
 7. Conferir estrutura final em `<sharedModulePath>`.

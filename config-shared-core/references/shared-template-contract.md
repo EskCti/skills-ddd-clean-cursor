@@ -7,7 +7,7 @@ Inicializar `<sharedModulePath>` com o baseline completo do projeto:
 - configs do pacote (`package.json`, `tsconfig.json`, `jest.config.ts`)
 - código fonte (`src/base`, `src/db`, `src/dto`, `src/vo`, `src/index.ts`)
 - testes (`test/base`, `test/vo`, `test/data`)
-- VO obrigatório no template: `src/vo/hash-password.vo.ts` com validação de hash bcrypt (`$2a$|$2b$|$2y$`, rounds `04-31`, payload `[./A-Za-z0-9]{53}`)
+- VO obrigatório no template: `src/vo/hash-password.vo.ts` com validação de hash bcrypt (`$2a$|$2b$|$2y$`, rounds com dois dígitos, payload `[./A-Za-z0-9]{53}`)
 - teste obrigatório correspondente: `test/vo/hash-password.vo.test.ts`
 - export obrigatório em `src/vo/index.ts` para disponibilizar `HashPassword` via `src/index.ts`
 
@@ -27,6 +27,7 @@ node .agents/skills/config-shared-core/scripts/create-shared.mjs [--scope @names
 
 > Se o repositório estiver em `.cloud/skills`, ajuste o caminho do comando.
 > No fluxo padrão (sem `--target` customizado), o script executa `npm install` na raiz do projeto após gerar o módulo.
+> No fluxo padrão, o script sincroniza `"@<namespace>/shared": "*"` apenas em frontend/backend e preserva dependências existentes nos demais pacotes.
 
 ## Options
 

@@ -1,112 +1,128 @@
 ---
 name: config-shared-web
-description: Inicializar e padronizar a camada web compartilhada para apps admin em Next.js com Shadcn UI, ícones Lucide, grupos de rotas `app/(private)` e `app/(public)`, estrutura `src/shared` com componentes de dashboard e módulo `src/modules/examples` com rotas de demonstração. Usar quando o pedido envolver bootstrap/rebootstrap do shell web, criação de layout dashboard reutilizavel e setup inicial de componentes/páginas de referência.
+description: Inicializar e padronizar a camada web compartilhada para apps admin em Next.js com scaffold base agnostico de biblioteca de componentes, grupos de rotas `app/(private)` e `app/(public)`, estrutura `src/shared` (incluindo i18n e form validator), modulo `src/modules/examples` e adapter de UI selecionavel (default: Shadcn). Usar quando o pedido envolver bootstrap/rebootstrap do shell web, criacao de layout dashboard reutilizavel e setup inicial de componentes/paginas de referencia.
 ---
 
 # Config Shared Web
 
 ## Overview
 
-Executar bootstrap deterministico do shell web compartilhado no frontend (`apps/web` por default), criando estrutura base de UI para admin dashboard com modo dark por padrao e tema configuravel (default: `fuchsia`), incluindo:
+Executa bootstrap deterministico do shell web compartilhado no frontend (`apps/web` por default) em duas camadas:
 
-- shell administrativo com grupos de rotas private/public;
-- componentes UI principais para aplicações dashboard;
-- módulo funcional `examples` em `src/modules/examples`;
-- rotas `app/(private)/example/*` com menu próprio (primeiro item sempre volta ao dashboard).
+- camada base (`templates/base`): estrutura do projeto, rotas, modulo examples, `src/shared` (context/hook/template), internacionalizacao e validador de formularios;
+- camada de biblioteca de UI (`templates/ui-libraries/<library>`): dependencias, setup da biblioteca e componentes basicos.
+
+Adapter default: `shadcn`.
 
 ## Workflow
 
-1. Definir tema desejado com o usuario (`--theme <name-or-hex>`). Se nao houver escolha, usar `fuchsia`.
+1. Definir parametros com o usuario:
+   - `--theme <name-or-hex>` (default: `fuchsia`)
+   - `--mode <dark|light>` (default: `dark`)
+   - `--ui-library <name>` (default: `shadcn`)
 2. Executar script principal:
-   - `node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --theme fuchsia --mode dark`
-3. Validar rotas e estrutura criada:
+   - `node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --theme fuchsia --mode dark --ui-library shadcn`
+3. Validar estrutura base criada:
    - `src/app/(private)`
    - `src/app/(public)`
    - `src/app/(private)/example`
-   - `src/shared/components`
-   - `src/shared/hooks`
-   - `src/shared/context`
-   - `src/shared/template`
    - `src/modules/examples`
-4. Confirmar layout admin com:
-   - sidebar parametrizavel por prop
-   - itens de menu com icones
+   - `src/modules/dashboard/components`
+   - `src/shared/i18n`
+   - `src/shared/components/form/validator`
+   - `src/shared/context`
+   - `src/shared/hooks`
+   - `src/shared/template`
+   - `public/illustrations/empty-dashboard.svg`
+   - `public/illustrations/empty-dashboard-dark.svg`
+4. Validar estrutura da biblioteca de UI selecionada:
+   - para `shadcn`: `components.json`, `src/shared/components/ui`, `src/shared/lib/class-name.util.ts`
+5. Confirmar layout admin com:
+   - sidebar parametrizavel via prop `sidebar`
    - menu colapsado exibindo apenas icones no desktop
    - hover/focus no icone colapsado exibindo label do item
-   - separadores/labels de grupo (ex.: `Modulos`)
-   - logo com icone + texto (texto oculto quando colapsado)
    - topbar com toggle
    - dropdown de usuario com logout
-   - comportamento responsivo (mobile apenas drawer)
-5. Confirmar menu do módulo `example`:
-   - primeiro item: `Voltar ao dashboard` (link para `/private`)
-   - demais itens: visao geral, botoes/dialog, formularios, tabelas, widgets
-6. Registrar execucao no `.log/skills.log` (o script faz isso automaticamente).
+   - comportamento responsivo (mobile via drawer)
+6. Registrar execucao no `.log/skills.log` (automatico no script).
 
 ## Commands
 
-Bootstrap completo com tema fuchsia em modo dark (padrao recomendado):
+Bootstrap completo com Shadcn em modo dark (padrao):
 
 ```bash
-node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --theme fuchsia --mode dark
+node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --theme fuchsia --mode dark --ui-library shadcn
 ```
 
-Escolher outro tema sem prompt (exemplo com hex):
+Escolher outro tema e modo light:
 
 ```bash
-node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --theme '#22c55e' --mode dark
+node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --theme '#22c55e' --mode light --ui-library shadcn
 ```
 
 Executar sem instalar dependencias (somente arquivos):
 
 ```bash
-node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --skip-install
+node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --ui-library shadcn --skip-install
 ```
 
 Simular alteracoes sem gravar arquivos:
 
 ```bash
-node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --dry-run
+node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --ui-library shadcn --dry-run
 ```
 
 ## O que o script garante
 
-- Dependencias para stack Shadcn/Lucide no frontend (`apps/web/package.json`) via `npm --workspace <frontend> install`.
-- Dependencias extras para componentes de dashboard (tabs, radio, checkbox, label, popover, separator e mensagens toast).
-- Arquivo `components.json` alinhado para aliases em `src/shared`.
+### Camada base (independente da biblioteca de UI)
+
 - Grupos de rota:
   - `src/app/(private)` com layout administrativo
+  - `src/app/(private)/dashboard` como entrada do shell
   - `src/app/(public)` com layout boxed/centralizado
-  - `src/app/(private)/example/*` para catálogo de exemplos
-- Estrutura compartilhada:
-  - `src/shared/components/ui` (button, input, dropdown-menu, sheet, card, badge, dialog, combobox, tabs, table, checkbox, radio-group, label, textarea, popover, separator, toaster)
-  - `src/shared/lib/class-name.util.ts` (`cn` helper)
-  - `src/shared/context/shell.context.tsx`
-  - `src/shared/hooks/shell.hook.ts`
-  - `src/shared/template/admin-shell.component.tsx`
-  - `src/shared/template/public-boxed-layout.component.tsx`
-- Estrutura de módulo funcional:
+  - `src/app/(private)/example/*` para catalogo de exemplos
+- Estrutura compartilhada base:
+  - `src/shared/context`
+  - `src/shared/hooks`
+  - `src/shared/template`
+  - `src/shared/i18n`
+  - `src/shared/components/form/validator`
+- Estrutura de modulo funcional:
+  - `src/modules/dashboard/components` (estado vazio de dashboard)
   - `src/modules/examples/data`
   - `src/modules/examples/components`
   - `src/modules/examples/pages`
-  - `src/modules/examples/index.ts`
-- Tema dark por padrao e tokens de cor atualizados em `src/app/globals.css`.
-- Layout privado com sidebar parametrizavel (prop `sidebar`) e `children` como body.
-- Estado de shell (open/close sidebar, mobile detection, toggle) centralizado em contexto/hook.
-- Dashboard principal com um módulo inicial (`Examples`) no grupo `Modulos`.
-- Layout do módulo `example` com navegação local e primeiro item obrigatório para retorno ao dashboard.
+- Assets de ilustracao para dashboard vazio:
+  - `public/illustrations/empty-dashboard.svg`
+  - `public/illustrations/empty-dashboard-dark.svg`
+- Tema base em `src/app/globals.css` com token dinamico de cor primaria (`--theme`).
+- Classe de modo no `body` controlada por `--mode` (`dark` ou `light`).
+
+### Camada UI library (adapter)
+
+- Seleciona adapter por `--ui-library`.
+- Permite estender a skill sem mexer no scaffold base.
+- Adapter `shadcn` aplica:
+  - dependencias runtime e dev necessarias;
+  - `components.json`;
+  - `src/shared/lib/class-name.util.ts`;
+  - `src/shared/components/ui/*`, incluindo componentes compostos (`metric-card`, `table-card`, `pagination-controls`, `delete-confirmation-dialog` e correlatos).
+
+### Comportamento de shell
+
 - Sidebar desktop colapsavel (somente icones no estado colapsado).
-- No estado colapsado, hover/focus sobre icones exibe label contextual do item.
 - Em mobile, navegacao lateral exibida somente via drawer.
-- Logo no sidebar com icone + texto (texto escondido no estado colapsado).
-- Padrao de nomenclatura global aplicado para novos arquivos customizados: `<nome-kebab>.<tipo>.<ext>`.
-- Excecoes permitidas: arquivos fixos de framework (`page.tsx`, `layout.tsx`) e componentes importados no padrao original do Shadcn.
+- Logo no sidebar com icone + texto (texto oculto quando colapsado).
+- Item de logout como placeholder para evolucao futura.
+- Dashboard privado inicial renderiza `EmptyDashboardState` com ilustracao SVG.
 
 ## Notes
 
 - Script idempotente: pode ser reexecutado para reconciliar arquivos.
+- Ao detectar integracao existente com modulos externos em arquivos de `src/app` (ex.: `@/modules/auth`, `@/modules/dashboard`), o script preserva esses arquivos em vez de sobrescrever com template base.
 - Se o frontend configurado em `skills.config.json` nao existir, o script falha com erro explicito.
-- O item de logout e placeholder para evolucao futura com outra skill.
-- O modulo `examples` funciona como referência inicial para escalar novas interfaces.
-- Consultar `references/shared-web-contract.md` para contrato completo dos arquivos gerados.
+- Para adicionar nova biblioteca no futuro:
+  - criar adapter em `scripts/ui-libraries/<nome>.mjs`;
+  - criar templates em `templates/ui-libraries/<nome>`.
+- Consultar `references/shared-web-contract.md` para o contrato completo dos arquivos gerados.
 - Consultar `../skills-standards.md` para diretrizes globais de padronizacao.

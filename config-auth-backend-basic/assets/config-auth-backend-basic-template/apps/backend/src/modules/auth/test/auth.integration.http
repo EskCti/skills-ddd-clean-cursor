@@ -6,7 +6,7 @@
 @userVersion=1
 
 @baseUrl=http://localhost:4000
-@email=restclient+{{$userVersion}}@namespace.local
+@email=restclient+{{$userVersion}}@__PROJECT_SCOPE_SLUG__.local
 @password=StrongPass1!
 @newPassword=StrongPass2!
 
@@ -52,7 +52,22 @@ Authorization: Bearer {{token}}
 GET {{baseUrl}}/auth/users/by-email?email={{email}}
 Authorization: Bearer {{token}}
 
-### 6) Trocar senha
+### 6) Listar usuários (paginado)
+# @name listUsers
+GET {{baseUrl}}/auth/users?page=1&pageSize=10
+Authorization: Bearer {{token}}
+
+### 7) Atualizar usuário
+# @name updateUser
+PATCH {{baseUrl}}/auth/users/{{userId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Rest Client Updated"
+}
+
+### 8) Trocar senha
 # @name changePassword
 PATCH {{baseUrl}}/auth/password/change
 Authorization: Bearer {{token}}
@@ -64,7 +79,7 @@ Content-Type: application/json
   "confirmPassword": "{{newPassword}}"
 }
 
-### 7) Login com senha antiga (esperado: 401)
+### 9) Login com senha antiga (esperado: 401)
 # @name loginOldPassword
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
@@ -74,7 +89,7 @@ Content-Type: application/json
   "password": "{{password}}"
 }
 
-### 8) Login com nova senha
+### 10) Login com nova senha
 # @name loginWithNewPassword
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
@@ -86,7 +101,7 @@ Content-Type: application/json
 
 @token2={{loginWithNewPassword.response.body.$.token}}
 
-### 9) Remover usuário criado (cleanup)
+### 11) Remover usuário criado (cleanup)
 # @name cleanupDeleteUser
 DELETE {{baseUrl}}/auth/users/{{userId}}
 Authorization: Bearer {{token2}}

@@ -1,4 +1,4 @@
 interface:
   display_name: "Config New Module"
   short_description: "Criar módulo full-stack (package + backend + frontend)"
-  default_prompt: "Crie um novo módulo com node .agents/skills/config-new-module/scripts/create-module.mjs gerando package, backend e frontend com nomenclatura kebab-case, e sincronize a dependência <scope>/<modulo> em apps/backend/package.json e apps/web/package.json."
+  default_prompt: "Crie um novo módulo com node .agents/skills/config-new-module/scripts/create-module.mjs gerando package compartilhado, módulo backend com provider Prisma e modelo Prisma, módulo frontend com dashboard/menu e rota em app/(private), usando `EmptyDashboardState` como padrão de dashboard quando disponível, e sincronize a dependência <scope>/<modulo> em apps/backend/package.json e apps/web/package.json."

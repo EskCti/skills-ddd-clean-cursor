@@ -4,8 +4,8 @@
 
 Gerar um módulo novo de forma determinística em três áreas do monorepo:
 - package: `<dirname(sharedModulePath)>/<module-name>`
-- backend: `<backendAppPath>/src/modules/<module-name>`
-- frontend: `<frontendAppPath>/src/modules/<module-name>` quando `src/` existir, ou `<frontendAppPath>/modules/<module-name>` quando não existir `src/`, além de `<frontendAppPath>/app/<module-name>`
+- backend: `<backendAppPath>/src/modules/<module-name>` + `<backendAppPath>/prisma/models/<module-name>.model.prisma`
+- frontend: `<frontendAppPath>/src/modules/<module-name>` quando `src/` existir, ou `<frontendAppPath>/modules/<module-name>` quando não existir `src/`, além de rota em `<app-base>/(private)/<module-name>` quando `(private)` existir
 
 ## Required Files
 
@@ -18,17 +18,23 @@ Gerar um módulo novo de forma determinística em três áreas do monorepo:
 
 ### Backend
 - `<module-name>.controller.ts`
+- `<module-name>.prisma.ts`
 - `<module-name>.module.ts`
+- `index.ts` (re-export do módulo)
 - Registro do `<ModuleName>Module` em `<backendAppPath>/src/app.module.ts`
+- `<backendAppPath>/prisma/models/<module-name>.model.prisma`
 - Dependência `<scope>/<module-name>` em `<backendAppPath>/package.json`
 
 ### Frontend
 - `modules-base/<module-name>/components/<module-name>-dashboard.component.tsx`
+- `modules-base/<module-name>/data/<module-name>-menu.data.ts`
 - `modules-base/<module-name>/pages/dashboard.page.tsx`
-- `app/<module-name>/page.tsx`
+- `modules-base/<module-name>/index.ts`
+- `app-base/(private)/<module-name>/page.tsx` quando `(private)` existir, senão `app-base/<module-name>/page.tsx`
 - Dependência `<scope>/<module-name>` em `<frontendAppPath>/package.json`
 
 > `modules-base` = `src/modules` (se `src/` existir) ou `modules` (se `src/` não existir).
+> `app-base` = `src/app` (se `src/` existir) ou `app` (se `src/` não existir).
 
 ## Package Rules
 
@@ -52,21 +58,25 @@ Gerar um módulo novo de forma determinística em três áreas do monorepo:
 
 ## Source Rules
 
-- `src/index.ts` deve exportar a função:
-  - `sum(a: number, b: number): number`
-- `test/index.test.ts` deve validar o comportamento de `sum`.
+- `src/index.ts` deve exportar uma API mínima do módulo (`getModuleName`).
+- `test/index.test.ts` deve validar essa API mínima.
 
 ## Backend Rules
 
 - `controller` deve expor endpoint `GET /<module-name>` de exemplo.
+- `<module-name>.prisma.ts` deve encapsular acesso ao `PrismaService`.
 - `module` deve declarar o controller no decorator `@Module`.
+- `module` deve importar `DbModule` e registrar/exportar o provider Prisma do módulo.
+- `<module-name>.model.prisma` deve existir como placeholder de modelos do módulo.
 - O módulo novo deve ser importado e adicionado no array `imports` do `AppModule`.
 
 ## Frontend Rules
 
-- O dashboard deve ser componente simples com label/título do módulo.
+- Deve criar estrutura mínima de menu em `data/<module-name>-menu.data.ts`.
+- O dashboard deve usar `EmptyDashboardState` de `modules/dashboard/components/empty-dashboard-state.component.tsx` quando o componente existir no projeto.
+- Se o componente base de dashboard vazio não existir, gerar fallback local simples para evitar erro de compilação.
 - A página de dashboard deve renderizar o componente de dashboard.
-- A rota `app/<module-name>/page.tsx` deve renderizar a página principal do módulo.
+- A rota principal do módulo deve renderizar a página de dashboard dentro de `app-base/(private)` quando esse grupo existir.
 - Pastas e arquivos do frontend devem seguir kebab-case em minúsculo.
 - O arquivo de componente deve usar sufixo `.component.tsx`.
 - O arquivo de página interna deve usar sufixo `.page.tsx`.

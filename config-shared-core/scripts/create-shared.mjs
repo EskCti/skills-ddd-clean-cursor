@@ -143,27 +143,6 @@ async function listFrontendAndBackendPackageJsonPaths({
   return packageJsonPaths;
 }
 
-async function listWorkspacePackageJsonPaths(rootDir) {
-  const roots = ["apps", "packages"];
-  const results = [];
-
-  for (const root of roots) {
-    const rootPath = path.join(rootDir, root);
-    if (!(await exists(rootPath))) continue;
-
-    const entries = await fs.readdir(rootPath, { withFileTypes: true });
-    for (const entry of entries) {
-      if (!entry.isDirectory()) continue;
-      const packageJsonPath = path.join(rootPath, entry.name, "package.json");
-      if (await exists(packageJsonPath)) {
-        results.push(packageJsonPath);
-      }
-    }
-  }
-
-  return results;
-}
-
 async function ensureSharedDependencyOnFrontendAndBackend({
   rootDir,
   sharedPackageName,
@@ -175,51 +154,27 @@ async function ensureSharedDependencyOnFrontendAndBackend({
     frontendAppPath,
     backendAppPath,
   });
-  const targetPackageJsonSet = new Set(
-    targetPackageJsonPaths.map((packageJsonPath) => path.resolve(packageJsonPath)),
-  );
-  const workspacePackageJsonPaths = await listWorkspacePackageJsonPaths(rootDir);
 
   let changedCount = 0;
-  let addedOrUpdatedCount = 0;
-  let removedCount = 0;
+  let upsertedCount = 0;
 
-  for (const packageJsonPath of workspacePackageJsonPaths) {
+  for (const packageJsonPath of targetPackageJsonPaths) {
     const pkg = await readJson(packageJsonPath);
     if (pkg.name === sharedPackageName) continue;
 
-    const isTargetPackage = targetPackageJsonSet.has(path.resolve(packageJsonPath));
     const deps = pkg.dependencies ?? {};
-    const hasSharedDependency = sharedPackageName in deps;
+    if (deps[sharedPackageName] === "*") continue;
 
-    if (isTargetPackage) {
-      if (deps[sharedPackageName] === "*") continue;
-
-      pkg.dependencies = deps;
-      pkg.dependencies[sharedPackageName] = "*";
-      await writeJson(packageJsonPath, pkg);
-      changedCount += 1;
-      addedOrUpdatedCount += 1;
-      continue;
-    }
-
-    if (!hasSharedDependency) continue;
-
-    delete deps[sharedPackageName];
-    if (Object.keys(deps).length === 0) {
-      delete pkg.dependencies;
-    } else {
-      pkg.dependencies = deps;
-    }
+    pkg.dependencies = deps;
+    pkg.dependencies[sharedPackageName] = "*";
     await writeJson(packageJsonPath, pkg);
     changedCount += 1;
-    removedCount += 1;
+    upsertedCount += 1;
   }
 
   return {
     changedCount,
-    addedOrUpdatedCount,
-    removedCount,
+    upsertedCount,
   };
 }
 
@@ -295,10 +250,10 @@ async function main() {
       });
       if (dependencyChanges.changedCount > 0) {
         console.log(
-          `Synchronized dependency "${pkg.name}: *" on frontend/backend (updated: ${dependencyChanges.addedOrUpdatedCount}, removed from non-targets: ${dependencyChanges.removedCount}).`,
+          `Synchronized dependency "${pkg.name}: *" on frontend/backend (upserted: ${dependencyChanges.upsertedCount}).`,
         );
         logger.step(
-          `Dependência "${pkg.name}: *" sincronizada em frontend/backend (atualizados: ${dependencyChanges.addedOrUpdatedCount}, removidos fora do alvo: ${dependencyChanges.removedCount}).`,
+          `Dependência "${pkg.name}: *" sincronizada em frontend/backend (upserted: ${dependencyChanges.upsertedCount}).`,
         );
       } else {
         console.log(

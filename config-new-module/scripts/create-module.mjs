@@ -72,6 +72,24 @@ function toPascalCase(name) {
     .join("");
 }
 
+function toCamelCase(name) {
+  const pascal = toPascalCase(name);
+  return pascal ? `${pascal.charAt(0).toLowerCase()}${pascal.slice(1)}` : "";
+}
+
+function toImportPath(fromDir, toFilePath) {
+  const withoutExtension = toPosixPath(
+    path.relative(fromDir, toFilePath).replace(/\.(tsx?|jsx?)$/, ""),
+  );
+  return withoutExtension.startsWith(".")
+    ? withoutExtension
+    : `./${withoutExtension}`;
+}
+
+function toPosixPath(value) {
+  return value.replace(/\\/g, "/");
+}
+
 async function pathExists(targetPath) {
   try {
     await fs.access(targetPath);
@@ -222,14 +240,27 @@ async function main() {
     const frontendModulesBaseSegments = hasFrontendSrcDir
       ? ["src", "modules"]
       : ["modules"];
-    const frontendModulesImportPrefix = hasFrontendSrcDir
-      ? "@/src/modules"
-      : "@/modules";
+    const frontendAppBaseSegments = hasFrontendSrcDir
+      ? ["src", "app"]
+      : ["app"];
     const frontendModulesBaseDir = path.join(
       rootDir,
       frontendAppPath,
       ...frontendModulesBaseSegments,
     );
+    const frontendEmptyDashboardStatePath = path.join(
+      frontendModulesBaseDir,
+      "dashboard",
+      "components",
+      "empty-dashboard-state.component.tsx",
+    );
+    const frontendAppBaseDir = path.join(
+      rootDir,
+      frontendAppPath,
+      ...frontendAppBaseSegments,
+    );
+    const frontendPrivateGroupDir = path.join(frontendAppBaseDir, "(private)");
+    const hasFrontendPrivateGroup = await pathExists(frontendPrivateGroupDir);
     const backendModuleDir = path.join(
       rootDir,
       backendAppPath,
@@ -242,10 +273,15 @@ async function main() {
       moduleName,
     );
     const frontendRouteDir = path.join(
-      rootDir,
-      frontendAppPath,
-      "app",
+      hasFrontendPrivateGroup ? frontendPrivateGroupDir : frontendAppBaseDir,
       moduleName,
+    );
+    const backendPrismaModelPath = path.join(
+      rootDir,
+      backendAppPath,
+      "prisma",
+      "models",
+      `${moduleName}.model.prisma`,
     );
     const backendAppModulePath = path.join(
       rootDir,
@@ -288,14 +324,36 @@ async function main() {
 
     const packageName = `${scope}/${moduleName}`;
     const sharedDependency = `${scope}/${sharedModule}`;
+    const workspaceTsConfigBasePath = path.join(
+      packagesDir,
+      "typescript-config",
+      "base.json",
+    );
+    const fallbackTsConfigBasePath = path.join(
+      rootDir,
+      "packages",
+      "typescript-config",
+      "base.json",
+    );
+    const tsConfigBasePath = await pathExists(workspaceTsConfigBasePath)
+      ? workspaceTsConfigBasePath
+      : fallbackTsConfigBasePath;
+    const tsConfigExtendsPath = toPosixPath(
+      path.relative(targetDir, tsConfigBasePath),
+    );
     const moduleClassName = toPascalCase(moduleName);
     const backendControllerClassName = `${moduleClassName}Controller`;
+    const backendPrismaClassName = `${moduleClassName}Prisma`;
     const backendModuleClassName = `${moduleClassName}Module`;
     const frontendDashboardComponentName = `${moduleClassName}DashboardComponent`;
     const frontendDashboardComponentFileName = `${moduleName}-dashboard.component.tsx`;
     const frontendDashboardPageName = "DashboardPage";
     const frontendDashboardPageFileName = "dashboard.page.tsx";
-    const frontendDashboardPageImportPath = `${frontendModulesImportPrefix}/${moduleName}/pages/dashboard.page`;
+    const frontendMenuDataTypeName = `${moduleClassName}MenuItem`;
+    const frontendMenuItemsConstName = `${toCamelCase(moduleName)}MenuItems`;
+    const hasFrontendEmptyDashboardState = await pathExists(
+      frontendEmptyDashboardStatePath,
+    );
 
     await ensureTargetPathAvailability({
       targetPath: targetDir,
@@ -342,7 +400,6 @@ async function main() {
       },
       dependencies: {
         [sharedDependency]: "*",
-        "eslint-config": "*",
       },
       devDependencies: {
         "@types/jest": "^30.0.0",
@@ -352,7 +409,7 @@ async function main() {
     };
 
     const tsconfigJson = {
-      extends: "../typescript-config/base.json",
+      extends: tsConfigExtendsPath,
       compilerOptions: {
         rootDir: "src",
         outDir: "./dist",
@@ -373,16 +430,16 @@ const config: Config = {
 export default config;
 `;
 
-    const indexTs = `export function sum(a: number, b: number): number {
-  return a + b;
+    const indexTs = `export function getModuleName(): string {
+  return "${moduleName}";
 }
 `;
 
-    const indexTest = `import { sum } from "../src";
+    const indexTest = `import { getModuleName } from "../src";
 
-describe("sum", () => {
-  it("adds two numbers", () => {
-    expect(sum(2, 3)).toBe(5);
+describe("getModuleName", () => {
+  it("returns module name", () => {
+    expect(getModuleName()).toBe("${moduleName}");
   });
 });
 `;
@@ -399,19 +456,74 @@ export class ${backendControllerClassName} {
   }
 }
 `;
+    const backendPrismaTs = `import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../db/prisma.service';
+
+@Injectable()
+export class ${backendPrismaClassName} {
+  constructor(private readonly prisma: PrismaService) {}
+
+  get client() {
+    return this.prisma.client;
+  }
+}
+`;
     const backendModuleTs = `import { Module } from '@nestjs/common';
+import { DbModule } from '../../db/db.module';
 import { ${backendControllerClassName} } from './${moduleName}.controller';
+import { ${backendPrismaClassName} } from './${moduleName}.prisma';
 
 @Module({
+  imports: [DbModule],
   controllers: [${backendControllerClassName}],
+  providers: [${backendPrismaClassName}],
+  exports: [${backendPrismaClassName}],
 })
 export class ${backendModuleClassName} {}
 `;
-    const frontendDashboardComponentTsx = `export function ${frontendDashboardComponentName}() {
+    const backendPrismaModel = `// Prisma models for module: ${moduleName}
+// Add concrete models for this module below.
+`;
+    const frontendMenuDataTs = `export type ${frontendMenuDataTypeName} = {
+  id: "dashboard";
+  label: string;
+  href: string;
+  description: string;
+};
+
+export const ${frontendMenuItemsConstName}: ${frontendMenuDataTypeName}[] = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    href: "/${moduleName}",
+    description: "Página inicial do módulo ${moduleName}.",
+  },
+];
+`;
+    if (hasFrontendEmptyDashboardState) {
+      logger.step(
+        `Componente base detectado para dashboard vazio: ${frontendEmptyDashboardStatePath}.`,
+      );
+    } else {
+      logger.step(
+        `Componente base de dashboard vazio nao encontrado (${frontendEmptyDashboardStatePath}); aplicando fallback local para evitar erro de compilacao.`,
+      );
+    }
+
+    const frontendDashboardComponentTsx = hasFrontendEmptyDashboardState
+      ? `import { EmptyDashboardState } from "../../dashboard/components/empty-dashboard-state.component";
+
+export function ${frontendDashboardComponentName}() {
+  return <EmptyDashboardState />;
+}
+`
+      : `export function ${frontendDashboardComponentName}() {
   return (
-    <section>
-      <h1>${moduleClassName} Dashboard</h1>
-      <p>Template do módulo ${moduleName}.</p>
+    <section className="space-y-1">
+      <h1 className="text-2xl font-semibold tracking-tight">${moduleClassName} Dashboard</h1>
+      <p className="text-sm text-muted-foreground">
+        Estrutura inicial do módulo ${moduleName}.
+      </p>
     </section>
   );
 }
@@ -422,12 +534,16 @@ export function ${frontendDashboardPageName}() {
   return <${frontendDashboardComponentName} />;
 }
 `;
-    const frontendAppRoutePageTsx = `import { ${frontendDashboardPageName} } from "${frontendDashboardPageImportPath}";
-
-export default function Page() {
-  return <${frontendDashboardPageName} />;
-}
-`;
+    const frontendMenuDataPath = path.join(
+      frontendModuleDir,
+      "data",
+      `${moduleName}-menu.data.ts`,
+    );
+    const frontendModuleIndexPath = path.join(frontendModuleDir, "index.ts");
+    const backendPrismaPath = path.join(
+      backendModuleDir,
+      `${moduleName}.prisma.ts`,
+    );
     const backendControllerPath = path.join(
       backendModuleDir,
       `${moduleName}.controller.ts`,
@@ -436,6 +552,7 @@ export default function Page() {
       backendModuleDir,
       `${moduleName}.module.ts`,
     );
+    const backendModuleIndexPath = path.join(backendModuleDir, "index.ts");
     const frontendDashboardComponentPath = path.join(
       frontendModuleDir,
       "components",
@@ -447,6 +564,22 @@ export default function Page() {
       frontendDashboardPageFileName,
     );
     const frontendAppRoutePagePath = path.join(frontendRouteDir, "page.tsx");
+    const frontendDashboardPageImportPath = toImportPath(
+      frontendRouteDir,
+      frontendDashboardPagePath,
+    );
+    const frontendAppRoutePageTsx = `import { ${frontendDashboardPageName} } from "${frontendDashboardPageImportPath}";
+
+export default function Page() {
+  return <${frontendDashboardPageName} />;
+}
+`;
+    const frontendModuleIndexTs = `export * from "./components/${moduleName}-dashboard.component";
+export * from "./data/${moduleName}-menu.data";
+export * from "./pages/dashboard.page";
+`;
+    const backendModuleIndexTs = `export * from "./${moduleName}.module";
+`;
 
     await fs.mkdir(path.join(targetDir, "src"), { recursive: true });
     await fs.mkdir(path.join(targetDir, "test"), { recursive: true });
@@ -472,8 +605,14 @@ export default function Page() {
 
     await writeFile(backendControllerPath, backendControllerTs);
     logger.step(`criou arquivo: ${backendControllerPath}`);
+    await writeFile(backendPrismaPath, backendPrismaTs);
+    logger.step(`criou arquivo: ${backendPrismaPath}`);
     await writeFile(backendModulePath, backendModuleTs);
     logger.step(`criou arquivo: ${backendModulePath}`);
+    await writeFile(backendModuleIndexPath, backendModuleIndexTs);
+    logger.step(`criou arquivo: ${backendModuleIndexPath}`);
+    await writeFile(backendPrismaModelPath, backendPrismaModel);
+    logger.step(`criou arquivo: ${backendPrismaModelPath}`);
     await ensureBackendModuleImportedInAppModule({
       appModulePath: backendAppModulePath,
       moduleName,
@@ -484,8 +623,12 @@ export default function Page() {
 
     await writeFile(frontendDashboardComponentPath, frontendDashboardComponentTsx);
     logger.step(`criou arquivo: ${frontendDashboardComponentPath}`);
+    await writeFile(frontendMenuDataPath, frontendMenuDataTs);
+    logger.step(`criou arquivo: ${frontendMenuDataPath}`);
     await writeFile(frontendDashboardPagePath, frontendDashboardPageTsx);
     logger.step(`criou arquivo: ${frontendDashboardPagePath}`);
+    await writeFile(frontendModuleIndexPath, frontendModuleIndexTs);
+    logger.step(`criou arquivo: ${frontendModuleIndexPath}`);
     await writeFile(frontendAppRoutePagePath, frontendAppRoutePageTsx);
     logger.step(`criou arquivo: ${frontendAppRoutePagePath}`);
     logger.step(`Estrutura frontend criada em ${frontendModuleDir}.`);
@@ -514,7 +657,7 @@ export default function Page() {
       `Frontend module scaffolded at: ${path.join(frontendAppPath, ...frontendModulesBaseSegments, moduleName)}`,
     );
     console.log(
-      `Frontend route scaffolded at: ${path.join(frontendAppPath, "app", moduleName)}`,
+      `Frontend route scaffolded at: ${path.join(frontendAppPath, ...frontendAppBaseSegments, hasFrontendPrivateGroup ? "(private)" : "", moduleName)}`,
     );
     console.log(
       `Backend/frontend dependencies updated with: ${packageName}@*`,

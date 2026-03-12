@@ -1,0 +1,123 @@
+<svg width="1600" height="1000" viewBox="0 0 1600 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+  <defs>
+    <linearGradient id="frameStroke" x1="220" y1="110" x2="1380" y2="890" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22D3EE"/>
+      <stop offset="1" stop-color="#34D399"/>
+    </linearGradient>
+
+    <linearGradient id="cardStroke" x1="380" y1="220" x2="1220" y2="760" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2C3C52"/>
+      <stop offset="1" stop-color="#2A4452"/>
+    </linearGradient>
+
+    <linearGradient id="chartLine" x1="460" y1="700" x2="930" y2="520" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22D3EE"/>
+      <stop offset="1" stop-color="#34D399"/>
+    </linearGradient>
+
+    <radialGradient id="glowL" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(360 200) rotate(22) scale(360 230)">
+      <stop stop-color="#22D3EE" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#22D3EE" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="glowR" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1250 820) rotate(-14) scale(390 260)">
+      <stop stop-color="#34D399" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#34D399" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="softShadow" x="150" y="80" width="1300" height="860" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="24"/>
+      <feGaussianBlur stdDeviation="24"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.03 0 0 0 0 0.05 0 0 0 0 0.08 0 0 0 0.75 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_1"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_1" result="shape"/>
+    </filter>
+  </defs>
+
+  <ellipse cx="360" cy="200" rx="360" ry="230" fill="url(#glowL)"/>
+  <ellipse cx="1250" cy="820" rx="390" ry="260" fill="url(#glowR)"/>
+
+  <g filter="url(#softShadow)">
+    <rect x="200" y="110" width="1200" height="780" rx="34" fill="#070D16"/>
+    <rect x="201" y="111" width="1198" height="778" rx="33" stroke="url(#frameStroke)" stroke-opacity="0.5" stroke-width="2"/>
+  </g>
+
+  <!-- Top stats widgets -->
+  <rect x="260" y="180" width="250" height="140" rx="18" fill="#0C1626" stroke="url(#cardStroke)"/>
+  <rect x="292" y="214" width="126" height="12" rx="6" fill="#4A5B73"/>
+  <rect x="292" y="240" width="82" height="34" rx="10" fill="#12243A" stroke="#2C3C52"/>
+  <rect x="292" y="286" width="160" height="10" rx="5" fill="#33455C"/>
+
+  <rect x="540" y="180" width="250" height="140" rx="18" fill="#0C1626" stroke="url(#cardStroke)"/>
+  <rect x="572" y="214" width="126" height="12" rx="6" fill="#4A5B73"/>
+  <rect x="572" y="240" width="82" height="34" rx="10" fill="#12243A" stroke="#2C3C52"/>
+  <rect x="572" y="286" width="160" height="10" rx="5" fill="#33455C"/>
+
+  <rect x="820" y="180" width="250" height="140" rx="18" fill="#0C1626" stroke="url(#cardStroke)"/>
+  <rect x="852" y="214" width="126" height="12" rx="6" fill="#4A5B73"/>
+  <rect x="852" y="240" width="82" height="34" rx="10" fill="#12243A" stroke="#2C3C52"/>
+  <rect x="852" y="286" width="160" height="10" rx="5" fill="#33455C"/>
+
+  <rect x="1100" y="180" width="240" height="140" rx="18" fill="#0C1626" stroke="url(#cardStroke)"/>
+  <rect x="1132" y="214" width="118" height="12" rx="6" fill="#4A5B73"/>
+  <rect x="1132" y="240" width="76" height="34" rx="10" fill="#12243A" stroke="#2C3C52"/>
+  <rect x="1132" y="286" width="150" height="10" rx="5" fill="#33455C"/>
+
+  <!-- Main chart widget -->
+  <rect x="260" y="350" width="760" height="470" rx="22" fill="#0A1422" stroke="url(#cardStroke)"/>
+  <rect x="300" y="390" width="220" height="11" rx="5.5" fill="#4A5A71"/>
+  <rect x="300" y="415" width="130" height="9" rx="4.5" fill="#33455C"/>
+
+  <line x1="320" y1="750" x2="960" y2="750" stroke="#22354A" stroke-width="2"/>
+  <line x1="320" y1="695" x2="960" y2="695" stroke="#1C2D40" stroke-width="1"/>
+  <line x1="320" y1="640" x2="960" y2="640" stroke="#1C2D40" stroke-width="1"/>
+  <line x1="320" y1="585" x2="960" y2="585" stroke="#1C2D40" stroke-width="1"/>
+  <line x1="320" y1="530" x2="960" y2="530" stroke="#1C2D40" stroke-width="1"/>
+
+  <path d="M350 730L450 680L540 705L650 610L740 645L840 560L930 590" stroke="url(#chartLine)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="450" cy="680" r="8" fill="#22D3EE"/>
+  <circle cx="650" cy="610" r="8" fill="#34D399"/>
+  <circle cx="840" cy="560" r="8" fill="#22D3EE"/>
+
+  <!-- Right column: list skeleton -->
+  <rect x="1050" y="350" width="290" height="280" rx="22" fill="#0A1422" stroke="url(#cardStroke)"/>
+  <rect x="1084" y="388" width="170" height="11" rx="5.5" fill="#4A5A71"/>
+  <rect x="1084" y="416" width="120" height="9" rx="4.5" fill="#33455C"/>
+
+  <rect x="1084" y="454" width="222" height="42" rx="12" fill="#0F1F31" stroke="#2C3C52"/>
+  <rect x="1102" y="468" width="132" height="9" rx="4.5" fill="#5B6D86"/>
+  <rect x="1102" y="482" width="92" height="7" rx="3.5" fill="#3B4D64"/>
+
+  <rect x="1084" y="508" width="222" height="42" rx="12" fill="#0F1F31" stroke="#2C3C52"/>
+  <rect x="1102" y="522" width="146" height="9" rx="4.5" fill="#5B6D86"/>
+  <rect x="1102" y="536" width="84" height="7" rx="3.5" fill="#3B4D64"/>
+
+  <rect x="1084" y="562" width="222" height="42" rx="12" fill="#0F1F31" stroke="#2C3C52"/>
+  <rect x="1102" y="576" width="120" height="9" rx="4.5" fill="#5B6D86"/>
+  <rect x="1102" y="590" width="94" height="7" rx="3.5" fill="#3B4D64"/>
+
+  <!-- Right column: table skeleton -->
+  <rect x="1050" y="650" width="290" height="170" rx="22" fill="#0A1422" stroke="url(#cardStroke)"/>
+  <rect x="1084" y="684" width="156" height="10" rx="5" fill="#4A5A71"/>
+  <rect x="1084" y="710" width="210" height="1" fill="#23364A"/>
+
+  <rect x="1084" y="726" width="70" height="8" rx="4" fill="#5A6C85"/>
+  <rect x="1170" y="726" width="50" height="8" rx="4" fill="#3B4D64"/>
+  <rect x="1230" y="726" width="64" height="8" rx="4" fill="#3B4D64"/>
+
+  <rect x="1084" y="744" width="70" height="8" rx="4" fill="#5A6C85"/>
+  <rect x="1170" y="744" width="50" height="8" rx="4" fill="#3B4D64"/>
+  <rect x="1230" y="744" width="64" height="8" rx="4" fill="#3B4D64"/>
+
+  <rect x="1084" y="762" width="70" height="8" rx="4" fill="#5A6C85"/>
+  <rect x="1170" y="762" width="50" height="8" rx="4" fill="#3B4D64"/>
+  <rect x="1230" y="762" width="64" height="8" rx="4" fill="#3B4D64"/>
+
+  <rect x="1084" y="780" width="70" height="8" rx="4" fill="#5A6C85"/>
+  <rect x="1170" y="780" width="50" height="8" rx="4" fill="#3B4D64"/>
+  <rect x="1230" y="780" width="64" height="8" rx="4" fill="#3B4D64"/>
+</svg>

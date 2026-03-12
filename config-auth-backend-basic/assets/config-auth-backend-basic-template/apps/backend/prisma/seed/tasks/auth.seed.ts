@@ -8,7 +8,11 @@ interface DefaultUserSeed {
   name: string;
   email: string;
   password: string;
+  admin?: boolean;
   avatarUrl?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string | null;
 }
 
 async function readDefaultUsers(): Promise<DefaultUserSeed[]> {
@@ -28,6 +32,9 @@ export async function seedAuthDefaultUsers(prisma: PrismaClient): Promise<void> 
 
   for (const seedUser of users) {
     const email = seedUser.email.trim().toLowerCase();
+    const createdAt = new Date(seedUser.createdAt);
+    const updatedAt = new Date(seedUser.updatedAt);
+    const deletedAt = seedUser.deletedAt ? new Date(seedUser.deletedAt) : null;
 
     const user = await prisma.user.upsert({
       where: {
@@ -35,15 +42,21 @@ export async function seedAuthDefaultUsers(prisma: PrismaClient): Promise<void> 
       },
       update: {
         name: seedUser.name,
+        admin: seedUser.admin ?? false,
         avatarUrl: seedUser.avatarUrl ?? null,
-        deletedAt: null,
-        updatedAt: new Date(),
+        createdAt,
+        updatedAt,
+        deletedAt,
       },
       create: {
         id: seedUser.id,
         name: seedUser.name,
         email,
+        admin: seedUser.admin ?? false,
         avatarUrl: seedUser.avatarUrl ?? null,
+        createdAt,
+        updatedAt,
+        deletedAt,
       },
     });
 

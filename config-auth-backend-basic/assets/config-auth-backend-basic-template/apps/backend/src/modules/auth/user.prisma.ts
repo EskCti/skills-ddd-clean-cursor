@@ -2,19 +2,56 @@ import { Injectable } from '@nestjs/common';
 import {
   FindUserByEmailQuery,
   FindUserByIdQuery,
+  type UserDTO,
   User,
-  UserDTO,
   UserErrors,
   UserExistsIn,
   UserExistsQuery,
   UserRepository,
 } from '__AUTH_PACKAGE_NAME__';
+import type { PaginatedResultDTO } from '__SHARED_PACKAGE_NAME__';
 import { Result } from '__SHARED_PACKAGE_NAME__';
 import { PrismaService } from '../../db/prisma.service';
 
 @Injectable()
 export class UserPrisma implements UserRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  async findAllUsers(input: {
+    page: number;
+    pageSize: number;
+  }): Promise<Result<PaginatedResultDTO<UserDTO>>> {
+    const page = Math.max(1, Math.floor(input.page));
+    const pageSize = Math.max(1, Math.min(100, Math.floor(input.pageSize)));
+
+    try {
+      const total = await this.prisma.client.user.count({
+        where: { deletedAt: null },
+      });
+
+      const totalPages = Math.max(1, Math.ceil(total / pageSize));
+      const safePage = Math.min(page, totalPages);
+
+      const users = await this.prisma.client.user.findMany({
+        where: { deletedAt: null },
+        orderBy: { createdAt: 'desc' },
+        skip: (safePage - 1) * pageSize,
+        take: pageSize,
+      });
+
+      return Result.ok({
+        data: users.map((user) => this.toDto(user)),
+        meta: {
+          page: safePage,
+          pageSize,
+          total,
+          totalPages,
+        },
+      });
+    } catch {
+      return Result.fail('AUTH_FIND_ALL_USERS_ERROR');
+    }
+  }
 
   readonly findUserByIdQuery: FindUserByIdQuery = {
     execute: async (id): Promise<Result<UserDTO>> => {
@@ -78,7 +115,7 @@ export class UserPrisma implements UserRepository {
         });
 
         return Result.ok(count > 0);
-      } catch(e: unknown) {
+      } catch (e: unknown) {
         console.error(e);
         return Result.fail('AUTH_USER_EXISTS_QUERY_ERROR');
       }
@@ -183,6 +220,7 @@ export class UserPrisma implements UserRepository {
     id: string;
     name: string;
     email: string;
+    admin: boolean;
     avatarUrl: string | null;
     createdAt: Date;
     updatedAt: Date;
@@ -192,6 +230,7 @@ export class UserPrisma implements UserRepository {
       id: data.id,
       name: data.name,
       email: data.email,
+      admin: data.admin,
       avatarUrl: data.avatarUrl,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
@@ -203,6 +242,7 @@ export class UserPrisma implements UserRepository {
     id: string;
     name: string;
     email: string;
+    admin: boolean;
     avatarUrl: string | null;
     createdAt: Date;
     updatedAt: Date;
@@ -212,6 +252,7 @@ export class UserPrisma implements UserRepository {
       id: data.id,
       name: data.name,
       email: data.email,
+      admin: data.admin,
       avatarUrl: data.avatarUrl,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
@@ -224,6 +265,7 @@ export class UserPrisma implements UserRepository {
       id: entity.id,
       name: entity.name,
       email: entity.email,
+      admin: entity.admin,
       avatarUrl: entity.avatarUrl ?? null,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
@@ -234,9 +276,9 @@ export class UserPrisma implements UserRepository {
   private isUniqueConstraintError(error: unknown): boolean {
     return Boolean(
       error &&
-        typeof error === 'object' &&
-        'code' in error &&
-        (error as { code?: string }).code === 'P2002',
+      typeof error === 'object' &&
+      'code' in error &&
+      (error as { code?: string }).code === 'P2002',
     );
   }
 }

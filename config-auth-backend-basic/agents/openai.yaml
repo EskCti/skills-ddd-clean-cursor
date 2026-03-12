@@ -1,4 +1,4 @@
 interface:
   display_name: "Config Auth Backend Basic"
   short_description: "Reconciliar módulo auth backend básico com NestJS/JWT/Prisma"
-  default_prompt: "Implemente ou reconcilie o módulo backend de autenticação básico no apps/backend com estrutura simplificada (auth.controller/auth.module/jwt-auth.guard/jwt.strategy/user.prisma/password.prisma/providers/bcrypt.provider), integração com @namespace/auth, migration/seed atuais e teste RestClient auth.integration.http."
+  default_prompt: "Implemente ou reconcilie o módulo backend de autenticação básico no apps/backend com estrutura atual (auth.controller/auth.module/jwt-auth.guard/jwt.strategy/require-admin.decorator/require-admin.guard/user.prisma/password.prisma/providers/bcrypt.provider), integração com @namespace/auth, migrations de auth (base + admin), seed idempotente com UUID/admin e teste RestClient auth.integration.http."

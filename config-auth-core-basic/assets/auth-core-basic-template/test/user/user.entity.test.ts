@@ -11,6 +11,17 @@ describe("User Entity", () => {
 		expect(user.id).toBeDefined();
 		expect(user.name).toBe("Joao Silva");
 		expect(user.email).toBe("joao@example.com");
+		expect(user.admin).toBe(false);
+	});
+
+	test("should keep explicit admin flag", () => {
+		const user = User.create({
+			name: "Joao Silva",
+			email: "joao@example.com",
+			admin: true,
+		});
+
+		expect(user.admin).toBe(true);
 	});
 
 	test("should expose avatarUrl from props", () => {

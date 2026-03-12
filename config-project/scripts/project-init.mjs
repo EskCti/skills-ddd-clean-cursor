@@ -992,19 +992,18 @@ async function patchBackendMain({
   }
 
   const portVariableName = `process.env.${backendPortEnvVar}`;
-  if (!content.includes(portVariableName)) {
-    const portAssignmentRegex = /const\s+port\s*=\s*[^;]+;/;
-    if (portAssignmentRegex.test(content)) {
-      content = content.replace(
-        portAssignmentRegex,
-        `const port = Number(${portVariableName} ?? ${backendPort});`,
-      );
-    } else {
-      content = content.replace(
-        /await app\.listen\(([^;]+)\);/,
-        `const port = Number(${portVariableName} ?? ${backendPort});\n  await app.listen(port);`,
-      );
-    }
+  const desiredPortLine = `const port = Number(${portVariableName} ?? ${backendPort});`;
+  const portAssignmentRegex = /const\s+port\s*=\s*[^;]+;/;
+  const listenCallRegex = /await app\.listen\(([^;]+)\);/;
+
+  if (portAssignmentRegex.test(content)) {
+    content = content.replace(portAssignmentRegex, desiredPortLine);
+    content = content.replace(listenCallRegex, "await app.listen(port);");
+  } else if (listenCallRegex.test(content)) {
+    content = content.replace(
+      listenCallRegex,
+      `${desiredPortLine}\n  await app.listen(port);`,
+    );
   }
 
   if (content === original) {
@@ -1013,6 +1012,206 @@ async function patchBackendMain({
 
   await fs.writeFile(mainPath, content, "utf8");
   return { updated: true, skipped: false };
+}
+
+function findMatchingToken(content, startIndex, openToken, closeToken) {
+  let depth = 0;
+  for (let index = startIndex; index < content.length; index += 1) {
+    const char = content[index];
+
+    if (char === openToken) {
+      depth += 1;
+      continue;
+    }
+
+    if (char === closeToken) {
+      depth -= 1;
+      if (depth === 0) {
+        return index;
+      }
+    }
+  }
+
+  return -1;
+}
+
+function hasWildcardPatternForProtocol(patternContent, protocol) {
+  const protocolMatcher = new RegExp(
+    `protocol\\s*:\\s*["']${escapeRegExp(protocol)}["']`,
+  );
+  const hostnameMatcher = /hostname\s*:\s*["']\*\*["']/;
+  return protocolMatcher.test(patternContent) && hostnameMatcher.test(patternContent);
+}
+
+function buildRemotePatternItem(protocol, indent) {
+  return [
+    `${indent}{`,
+    `${indent}  protocol: "${protocol}",`,
+    `${indent}  hostname: "**",`,
+    `${indent}}`,
+  ].join("\n");
+}
+
+function ensureNextRemotePatterns(content) {
+  const nextConfigDeclaration = /const\s+nextConfig(?:\s*:\s*NextConfig)?\s*=\s*\{/m;
+  const declarationMatch = nextConfigDeclaration.exec(content);
+
+  if (!declarationMatch || declarationMatch.index === undefined) {
+    return { updated: false, nextContent: content, reason: "unsupported-structure" };
+  }
+
+  const declarationStart = declarationMatch.index;
+  const configObjectStart =
+    declarationStart + declarationMatch[0].lastIndexOf("{");
+  const configObjectEnd = findMatchingToken(content, configObjectStart, "{", "}");
+
+  if (configObjectEnd < 0) {
+    return { updated: false, nextContent: content, reason: "unbalanced-config" };
+  }
+
+  const configBody = content.slice(configObjectStart + 1, configObjectEnd);
+  const imagesBlockRegex = /\bimages\s*:\s*\{/m;
+  const imagesMatch = imagesBlockRegex.exec(configBody);
+
+  if (!imagesMatch) {
+    const remotePatternsBlock = [
+      "  images: {",
+      "    remotePatterns: [",
+      buildRemotePatternItem("https", "      ") + ",",
+      buildRemotePatternItem("http", "      "),
+      "    ],",
+      "  },",
+    ].join("\n");
+
+    const injected = `${content.slice(
+      0,
+      configObjectStart + 1,
+    )}\n${remotePatternsBlock}${content.slice(configObjectStart + 1)}`;
+    return { updated: true, nextContent: injected, reason: "inserted-images-block" };
+  }
+
+  const imagesAbsoluteStart =
+    configObjectStart + 1 + imagesMatch.index + imagesMatch[0].lastIndexOf("{");
+  const imagesAbsoluteEnd = findMatchingToken(content, imagesAbsoluteStart, "{", "}");
+
+  if (imagesAbsoluteEnd < 0) {
+    return { updated: false, nextContent: content, reason: "unbalanced-images" };
+  }
+
+  const imagesBody = content.slice(imagesAbsoluteStart + 1, imagesAbsoluteEnd);
+  const remotePatternsRegex = /\bremotePatterns\s*:\s*\[/m;
+  const remotePatternsMatch = remotePatternsRegex.exec(imagesBody);
+
+  if (!remotePatternsMatch) {
+    const remotePatternsBlock = [
+      "    remotePatterns: [",
+      buildRemotePatternItem("https", "      ") + ",",
+      buildRemotePatternItem("http", "      "),
+      "    ],",
+    ].join("\n");
+
+    const injected = `${content.slice(
+      0,
+      imagesAbsoluteStart + 1,
+    )}\n${remotePatternsBlock}${content.slice(imagesAbsoluteStart + 1)}`;
+    return {
+      updated: true,
+      nextContent: injected,
+      reason: "inserted-remote-patterns",
+    };
+  }
+
+  const remotePatternsAbsoluteStart =
+    imagesAbsoluteStart +
+    1 +
+    remotePatternsMatch.index +
+    remotePatternsMatch[0].lastIndexOf("[");
+  const remotePatternsAbsoluteEnd = findMatchingToken(
+    content,
+    remotePatternsAbsoluteStart,
+    "[",
+    "]",
+  );
+
+  if (remotePatternsAbsoluteEnd < 0) {
+    return {
+      updated: false,
+      nextContent: content,
+      reason: "unbalanced-remote-patterns",
+    };
+  }
+
+  const remotePatternsBody = content.slice(
+    remotePatternsAbsoluteStart + 1,
+    remotePatternsAbsoluteEnd,
+  );
+  const hasHttps = hasWildcardPatternForProtocol(remotePatternsBody, "https");
+  const hasHttp = hasWildcardPatternForProtocol(remotePatternsBody, "http");
+
+  if (hasHttps && hasHttp) {
+    return { updated: false, nextContent: content, reason: "already-configured" };
+  }
+
+  const missingItems = [];
+  if (!hasHttps) {
+    missingItems.push(buildRemotePatternItem("https", "      "));
+  }
+  if (!hasHttp) {
+    missingItems.push(buildRemotePatternItem("http", "      "));
+  }
+
+  const trimmedPatternsBody = remotePatternsBody.trim();
+  const prependComma =
+    trimmedPatternsBody.length > 0 && !trimmedPatternsBody.endsWith(",");
+  const addition = `${prependComma ? "," : ""}\n${missingItems.join(",\n")}\n    `;
+
+  const injected = `${content.slice(
+    0,
+    remotePatternsAbsoluteEnd,
+  )}${addition}${content.slice(remotePatternsAbsoluteEnd)}`;
+  return {
+    updated: true,
+    nextContent: injected,
+    reason: "appended-missing-patterns",
+  };
+}
+
+async function patchFrontendNextConfig({ rootDir, frontendPath }) {
+  const frontendDir = path.join(rootDir, frontendPath);
+  const candidates = ["next.config.ts", "next.config.mjs", "next.config.js"];
+  let configPath = "";
+
+  for (const candidate of candidates) {
+    const absolutePath = path.join(frontendDir, candidate);
+    if (await pathExists(absolutePath)) {
+      configPath = absolutePath;
+      break;
+    }
+  }
+
+  if (!configPath) {
+    return { updated: false, skipped: true, reason: "file-not-found", file: "" };
+  }
+
+  const content = await fs.readFile(configPath, "utf8");
+  const patchResult = ensureNextRemotePatterns(content);
+
+  if (!patchResult.updated) {
+    return {
+      updated: false,
+      skipped: false,
+      reason: patchResult.reason,
+      file: path.relative(rootDir, configPath).replace(/\\/g, "/"),
+    };
+  }
+
+  await fs.writeFile(configPath, patchResult.nextContent, "utf8");
+  return {
+    updated: true,
+    skipped: false,
+    reason: patchResult.reason,
+    file: path.relative(rootDir, configPath).replace(/\\/g, "/"),
+  };
 }
 
 async function main() {
@@ -1236,6 +1435,33 @@ async function main() {
 
     await patchTurboJson(rootDir);
     logger.step("turbo.json atualizado incrementalmente.");
+
+    const frontendConfigPatchResult = await patchFrontendNextConfig({
+      rootDir,
+      frontendPath,
+    });
+    if (frontendConfigPatchResult.updated) {
+      console.log(
+        `Updated ${frontendConfigPatchResult.file} (images.remotePatterns liberado para http/https).`,
+      );
+      logger.step(
+        `${frontendConfigPatchResult.file} atualizado com images.remotePatterns para http/https.`,
+      );
+    } else if (frontendConfigPatchResult.skipped) {
+      console.log(
+        `Skipped Next config patch at ${frontendPath} (${frontendConfigPatchResult.reason}).`,
+      );
+      logger.step(
+        `Configuração de imagens do Next ignorada em ${frontendPath} (${frontendConfigPatchResult.reason}).`,
+      );
+    } else {
+      console.log(
+        `${frontendConfigPatchResult.file} already configured for remote images (${frontendConfigPatchResult.reason}).`,
+      );
+      logger.step(
+        `${frontendConfigPatchResult.file} já estava configurado para imagens remotas.`,
+      );
+    }
 
     const mainPatchResult = await patchBackendMain({
       rootDir,

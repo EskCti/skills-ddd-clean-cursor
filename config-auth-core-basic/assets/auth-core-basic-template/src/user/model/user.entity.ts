@@ -12,6 +12,7 @@ export interface UserProps extends EntityProps {
   name: string;
   email: string;
   avatarUrl?: string | null;
+  admin?: boolean;
 }
 
 export class User extends Entity<User, UserProps> {
@@ -41,6 +42,7 @@ export class User extends Entity<User, UserProps> {
         id: id.instance.value,
         name: name.instance.value,
         email: email.instance.value,
+        admin: props.admin ?? false,
       }),
     );
   }
@@ -63,6 +65,10 @@ export class User extends Entity<User, UserProps> {
 
   get avatarUrl(): string | null | undefined {
     return this.props.avatarUrl;
+  }
+
+  get admin(): boolean {
+    return this.props.admin ?? false;
   }
 
   get $avatarUrl(): URL | null {

@@ -9,8 +9,8 @@ description: Criar um novo módulo de forma determinística no padrão do projet
 
 Padronizar a criação de novos módulos no monorepo com três entregas sincronizadas:
 1. pacote em `<dirname(sharedModulePath)>/<module-name>` (template TypeScript);
-2. módulo backend em `<backendAppPath>/src/modules/<module-name>` (Nest module + controller);
-3. módulo frontend em `<frontendAppPath>/src/modules/<module-name>` quando `src/` existir; caso não exista, em `<frontendAppPath>/modules/<module-name>`, sempre com pastas `components` e `pages`, e rota em `<frontendAppPath>/app/<module-name>/page.tsx`.
+2. módulo backend em `<backendAppPath>/src/modules/<module-name>` (Nest module + controller + provider Prisma de módulo) e modelo Prisma inicial em `<backendAppPath>/prisma/models/<module-name>.model.prisma`;
+3. módulo frontend em `<frontendAppPath>/src/modules/<module-name>` quando `src/` existir; caso não exista, em `<frontendAppPath>/modules/<module-name>`, sempre com pastas `components`, `pages` e `data`, e rota principal em `app/(private)/<module-name>/page.tsx` quando o grupo `(private)` existir (fallback para `app/<module-name>/page.tsx`).
 
 Executar o script Node da skill para receber o nome do módulo e gerar os arquivos mínimos de código e teste, sem depender de shell específico de SO.
 O namespace e diretórios padrão devem ser resolvidos por configuração global compartilhada em `skills.config.json` (`.agents/skills/.env`, `.cloud/skills/.env` ou `.env/`).
@@ -23,11 +23,13 @@ O namespace e diretórios padrão devem ser resolvidos por configuração global
 4. Conferir a estrutura criada em:
    - `<dirname(sharedModulePath)>/<module-name>`
    - `<backendAppPath>/src/modules/<module-name>`
+   - `<backendAppPath>/prisma/models/<module-name>.model.prisma`
    - `<frontendAppPath>/src/modules/<module-name>` **ou** `<frontendAppPath>/modules/<module-name>` (conforme existência da pasta `src`)
-   - `<frontendAppPath>/app/<module-name>`
-5. Confirmar que o package contém função `sum` e teste `index.test.ts`.
-6. Confirmar que o backend contém `<module-name>.module.ts` e `<module-name>.controller.ts`, e que o módulo foi registrado no `app.module.ts`.
-7. Confirmar que o frontend contém dashboard template e rota principal para acessar o módulo.
+   - `<frontendAppPath>/<app-base>/(private)/<module-name>` **ou** `<frontendAppPath>/<app-base>/<module-name>` (fallback)
+5. Confirmar que o package contém API mínima (`getModuleName`) e teste `index.test.ts`.
+6. Confirmar que o backend contém `<module-name>.module.ts`, `<module-name>.controller.ts`, `<module-name>.prisma.ts`, e que o módulo foi registrado no `app.module.ts`.
+7. Confirmar que o frontend contém estrutura de menu (`data`), dashboard template e rota principal para acessar o módulo.
+   - o componente `<module-name>-dashboard.component.tsx` deve usar `EmptyDashboardState` de `modules/dashboard/components/empty-dashboard-state.component.tsx` quando esse componente existir no projeto.
 8. Confirmar que `apps/backend/package.json` e `apps/web/package.json` possuem a dependência `<scope>/<module-name>`.
 9. Registrar execução em `.log/skills.log` com título da skill e lista simples dos comandos/ações relevantes (sem timestamps e sem status), garantindo `.log/` no `.gitignore`.
 
@@ -69,13 +71,21 @@ O script deve gerar exatamente:
 - `<dirname(sharedModulePath)>/<module-name>/src/index.ts`
 - `<dirname(sharedModulePath)>/<module-name>/test/index.test.ts`
 - `<backendAppPath>/src/modules/<module-name>/<module-name>.controller.ts`
+- `<backendAppPath>/src/modules/<module-name>/<module-name>.prisma.ts`
 - `<backendAppPath>/src/modules/<module-name>/<module-name>.module.ts`
+- `<backendAppPath>/src/modules/<module-name>/index.ts`
+- `<backendAppPath>/prisma/models/<module-name>.model.prisma`
 - atualização em `<backendAppPath>/src/app.module.ts` para importar e registrar `<ModuleName>Module`
 - `<frontendAppPath>/src/modules/<module-name>/components/<module-name>-dashboard.component.tsx` **ou** `<frontendAppPath>/modules/<module-name>/components/<module-name>-dashboard.component.tsx`
+- `<frontendAppPath>/src/modules/<module-name>/data/<module-name>-menu.data.ts` **ou** `<frontendAppPath>/modules/<module-name>/data/<module-name>-menu.data.ts`
 - `<frontendAppPath>/src/modules/<module-name>/pages/dashboard.page.tsx` **ou** `<frontendAppPath>/modules/<module-name>/pages/dashboard.page.tsx`
-- `<frontendAppPath>/app/<module-name>/page.tsx`
+- `<frontendAppPath>/src/modules/<module-name>/index.ts` **ou** `<frontendAppPath>/modules/<module-name>/index.ts`
+- `<frontendAppPath>/src/app/(private)/<module-name>/page.tsx` quando `(private)` existir, senão `<frontendAppPath>/src/app/<module-name>/page.tsx` (ou equivalente sem `src/`)
 - atualização em `<backendAppPath>/package.json` com dependência `<scope>/<module-name>`
 - atualização em `<frontendAppPath>/package.json` com dependência `<scope>/<module-name>`
+
+Regra do dashboard do módulo:
+- quando existir `modules/dashboard/components/empty-dashboard-state.component.tsx`, o arquivo `<module-name>-dashboard.component.tsx` deve referenciar `EmptyDashboardState` como conteúdo principal do dashboard.
 
 ## Naming Convention
 

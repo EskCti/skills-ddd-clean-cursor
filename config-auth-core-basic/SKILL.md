@@ -17,9 +17,9 @@ Executar o script Node da skill para gerar estrutura mínima de autenticação c
 O namespace e diretórios padrão devem ser resolvidos por configuração global compartilhada em `skills.config.json` (`.agents/skills/.env`, `.cloud/skills/.env` ou `.env/`).
 
 A implementação gerada é determinística e inclui:
-- `user` (entidade, providers e use cases básicos)
+- `user` (entidade com `avatarUrl` opcional e `admin` com default `false`, providers e use cases básicos)
 - `password` (entidade, providers e use case de troca de senha com política de reuso/força)
-- `application` (query `user-exists` e use case `create-user`)
+- `application` (query `user-exists` e use case `create-user` com `avatarUrl` opcional)
 - suíte de testes unitários dos fluxos principais
 
 Correção obrigatória do modelo:

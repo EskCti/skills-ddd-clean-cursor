@@ -23,9 +23,10 @@ As configurações padrão são lidas de `skills.config.json` (em `.agents/skill
 6. Garantir namespace em todos os projetos do workspace (`apps/*` e `packages/*`), incluindo frontend/backend, usando `namespace` do config (ou `--scope`).
 7. Instalar apenas dependências faltantes (`turbo` e `ts-node` no root, `dotenv` no backend).
 8. Atualizar `package.json` root e `turbo.json` de forma incremental.
-9. Atualizar `.env` e `.env.example` de frontend/backend via upsert (sem apagar chaves extras existentes).
-10. Ajustar `main.ts` do backend de forma incremental (`dotenv/config`, `app.enableCors()`, porta via `backendPortEnvVar`).
-11. Registrar execução em `.log/skills.log` com título da skill e lista simples dos comandos/ações relevantes (sem timestamps e sem status), garantindo `.log/` no `.gitignore`.
+9. Ajustar `next.config.ts|js|mjs` do frontend para garantir `images.remotePatterns` liberando imagens remotas em `http` e `https` com `hostname: "**"` (idempotente).
+10. Atualizar `.env` e `.env.example` de frontend/backend via upsert (sem apagar chaves extras existentes).
+11. Ajustar `main.ts` do backend de forma incremental (`dotenv/config`, `app.enableCors()`, porta via `backendPortEnvVar`).
+12. Registrar execução em `.log/skills.log` com título da skill e lista simples dos comandos/ações relevantes (sem timestamps e sem status), garantindo `.log/` no `.gitignore`.
 
 ## Commands
 
