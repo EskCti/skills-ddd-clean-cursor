@@ -74,6 +74,14 @@ node .agents/skills/config-project/scripts/project-init.mjs --scope @namespace
 - `references/bootstrap-contract.md`: contrato dos arquivos e alterações que o bootstrap aplica.
 - Log local de execução: `.log/skills.log` (não versionado; `.log/` é adicionado ao `.gitignore` automaticamente, sem metadados extras).
 
+## Risk Logging Guardrails
+
+- Registrar fatos de execucao em `.log/skills.log` com marcador no inicio da linha.
+- Marcadores minimos esperados: `[CMD]`, `[FILE_CREATE]`, `[FILE_UPDATE]`, `[FILE_DELETE]`, `[DIR_CREATE]`, `[RISK]`, `[FAIL]`, `[AI]`.
+- Sempre registrar `[RISK]` quando houver sobrescrita, exclusao, rename/move, ou fallback forcado em arquivos/pastas.
+- Toda falha inesperada deve gerar `[FAIL]` com descricao factual curta do evento.
+- Operacoes de terminal e alteracoes de arquivos devem passar pelos utilitarios compartilhados em `../utils` para manter rastreabilidade consistente.
+
 ## Global Standards
 
 - Consultar `../skills-standards.md` para padroes globais de nomenclatura e convencoes gerais entre skills.

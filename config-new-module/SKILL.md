@@ -11,7 +11,7 @@ Padronizar a criação de novos módulos no monorepo com três entregas sincroni
 
 1. pacote em `<dirname(sharedModulePath)>/<module-name>` (template TypeScript);
 2. módulo backend em `<backendAppPath>/src/modules/<module-name>` (Nest module + controller + provider Prisma de módulo) e modelo Prisma inicial em `<backendAppPath>/prisma/models/<module-name>.model.prisma`;
-3. módulo frontend em `<frontendAppPath>/src/modules/<module-name>` quando `src/` existir; caso não exista, em `<frontendAppPath>/modules/<module-name>`, sempre com pastas `components`, `pages` e `data`, e rota principal em `app/(private)/<module-name>/page.tsx` quando o grupo `(private)` existir (fallback para `app/<module-name>/page.tsx`), com `layout.tsx` de módulo e menu lateral específico do módulo.
+3. módulo frontend em `<frontendAppPath>/src/modules/<module-name>` quando `src/` existir; caso não exista, em `<frontendAppPath>/modules/<module-name>`, sempre com pastas `components` e `pages`, e rota principal em `app/(private)/<module-name>/page.tsx` quando o grupo `(private)` existir (fallback para `app/<module-name>/page.tsx`), com `layout.tsx` de módulo e menu lateral específico do módulo.
 
 Executar o script Node da skill para receber o nome do módulo e gerar os arquivos mínimos de código e teste, sem depender de shell específico de SO.
 O namespace e diretórios padrão devem ser resolvidos por configuração global compartilhada em `skills.config.json` (`.agents/skills/.env`, `.cloud/skills/.env` ou `.env/`).
@@ -29,16 +29,15 @@ O namespace e diretórios padrão devem ser resolvidos por configuração global
    - `<frontendAppPath>/<app-base>/(private)/<module-name>` **ou** `<frontendAppPath>/<app-base>/<module-name>` (fallback)
 5. Confirmar que o package contém API mínima (`getModuleName`) e teste `index.test.ts`.
 6. Confirmar que o backend contém `<module-name>.module.ts`, `<module-name>.controller.ts`, `<module-name>.prisma.ts`, e que o módulo foi registrado no `app.module.ts`.
-7. Confirmar que o frontend contém estrutura de menu (`data`), dashboard template, componente de navegação lateral e rota principal para acessar o módulo.
+7. Confirmar que o frontend contém dashboard template, `layout.tsx` do módulo com menu lateral embutido e rota principal para acessar o módulo.
    - o arquivo `app/(private)/<module-name>/layout.tsx` (ou fallback equivalente sem `(private)`) deve existir para todo módulo.
    - o menu lateral do módulo deve seguir padrão obrigatório: primeiro item "Voltar" (`/dashboard`), linha divisória, label com nome do módulo e itens específicos do módulo.
    - os rótulos dos menus (principal e lateral) devem respeitar grafia PT-BR com acentuação correta quando aplicável.
    - por padrão (módulo novo), o único item específico é `Visão Geral <Nome do Módulo>` apontando para `/<module-name>`.
-   - o componente `<module-name>-dashboard.component.tsx` deve usar `EmptyDashboardState` de `shared/components/ui/empty-dashboard-state.tsx` quando esse componente existir no projeto, passando `moduleName` quando aplicavel.
-   - o componente `<module-name>-navigation.component.tsx` deve existir em `modules/<module-name>/components` e encapsular a navegação do módulo.
-   - a padronização visual/comportamental do sidebar deve usar componente compartilhado em `shared/navigation/module-sidebar-menu.component.tsx` (sem dependências de módulos de negócio).
-   - o `layout.tsx` do módulo em `app/(private)/<module-name>` deve decidir o menu aplicado passando `<ModuleName>SidebarMenu` para `PrivateAppShell` (de `modules/auth/template/private-app-shell.component.tsx`).
-   - o registro central do menu principal deve ser atualizado em `app/(private)/dashboard/_data/main-menu-modules.json` com `href`, `label` e `icon` determinísticos para o novo módulo.
+   - o componente `<module-name>-dashboard.component.tsx` deve usar `EmptyDashboardState` de `shared/components/ui/empty-dashboard-state.tsx` quando esse componente existir no projeto, passando `moduleName` quando aplicável.
+   - o `layout.tsx` do módulo em `app/(private)/<module-name>` deve encapsular o menu lateral localmente (padrão do `auth/layout.tsx`) usando `SidebarMenu` + `SidebarMenuItem` e passando o sidebar para `PrivateAppShell` (de `modules/auth/template/private-app-shell.component.tsx`).
+   - o menu lateral do módulo não deve depender de arquivos `data/*-menu.data.ts` nem de `*-navigation.component.tsx`.
+   - o menu principal da aplicação deve ser atualizado em `app/(private)/dashboard/layout.tsx`, adicionando o novo módulo em `moduleItems` com `href`, `label` (PT-BR) e ícone determinístico do `lucide-react`.
 8. Confirmar que `apps/backend/package.json` e `apps/web/package.json` possuem a dependência `<scope>/<module-name>`.
 9. Executar análise semântica determinística (heurística de IA local) para ordenar o menu principal por frequência provável de uso e mover módulos administrativos para a parte inferior.
 10. Registrar execução em `.log/skills.log` com título da skill e lista simples dos comandos/ações relevantes (sem timestamps e sem status), garantindo `.log/` no `.gitignore`.
@@ -87,11 +86,9 @@ O script deve gerar exatamente:
 - `<backendAppPath>/prisma/models/<module-name>.model.prisma`
 - atualização em `<backendAppPath>/src/app.module.ts` para importar e registrar `<ModuleName>Module`
 - `<frontendAppPath>/src/modules/<module-name>/components/<module-name>-dashboard.component.tsx` **ou** `<frontendAppPath>/modules/<module-name>/components/<module-name>-dashboard.component.tsx`
-- `<frontendAppPath>/src/modules/<module-name>/components/<module-name>-navigation.component.tsx` **ou** `<frontendAppPath>/modules/<module-name>/components/<module-name>-navigation.component.tsx`
-- `<frontendAppPath>/src/modules/<module-name>/data/<module-name>-menu.data.ts` **ou** `<frontendAppPath>/modules/<module-name>/data/<module-name>-menu.data.ts`
 - `<frontendAppPath>/src/modules/<module-name>/pages/dashboard.page.tsx` **ou** `<frontendAppPath>/modules/<module-name>/pages/dashboard.page.tsx`
 - `<frontendAppPath>/src/modules/<module-name>/index.ts` **ou** `<frontendAppPath>/modules/<module-name>/index.ts`
-- atualização em `<frontendAppPath>/src/app/(private)/dashboard/_data/main-menu-modules.json` (ou fallback equivalente sem `(private)`/sem `src`) com entrada determinística do módulo no menu principal (incluindo ícone)
+- atualização em `<frontendAppPath>/src/app/(private)/dashboard/layout.tsx` (ou fallback equivalente sem `(private)`/sem `src`) adicionando entrada determinística do módulo em `moduleItems` no menu principal (incluindo ícone)
 - `<frontendAppPath>/src/app/(private)/<module-name>/page.tsx` quando `(private)` existir, senão `<frontendAppPath>/src/app/<module-name>/page.tsx` (ou equivalente sem `src/`)
 - `<frontendAppPath>/src/app/(private)/<module-name>/layout.tsx` quando `(private)` existir, senão `<frontendAppPath>/src/app/<module-name>/layout.tsx` (ou equivalente sem `src/`)
 - atualização em `<backendAppPath>/package.json` com dependência `<scope>/<module-name>`
@@ -112,13 +109,12 @@ Regra do menu principal:
 Regra do menu lateral por módulo:
 
 - todo módulo deve ter um menu lateral específico para suas páginas (`/<module-name>` e subrotas).
-- esse menu deve estar implementado em `modules/<module-name>/components/<module-name>-navigation.component.tsx`.
-- a composição base do menu deve usar `shared/navigation/module-sidebar-menu.component.tsx` para manter padrão único e previsível.
+- esse menu deve ser definido diretamente em `app/(private)/<module-name>/layout.tsx`, seguindo o mesmo padrão estrutural do `app/(private)/auth/layout.tsx`.
 - o primeiro item obrigatório deve ser `Voltar`, navegando para `/dashboard`.
 - após o item `Voltar`, deve existir separador visual (linha divisória), seguido de label com o nome do módulo.
 - os demais itens são os itens específicos do módulo.
 - no scaffold inicial, o único item específico deve ser `Visão Geral <Nome do Módulo>`.
-- a decisão de qual menu lateral renderizar deve ser local ao módulo, no arquivo `app/(private)/<module-name>/layout.tsx`, passando o sidebar no `PrivateAppShell`.
+- o `layout.tsx` deve renderizar `PrivateAppShell` com sidebar local do módulo, sem criar arquivos separados de menu/data.
 
 ## Naming Convention
 
@@ -134,6 +130,14 @@ Consultar `references/module-template.md` para o contrato completo dos arquivos 
 - Override local (gitignored): `skills.config.local.json` no mesmo diretório da configuração principal
 - Exemplo local: `skills.config.local.example.json` no mesmo diretório da configuração principal
 - Log local de execução: `.log/skills.log` (não versionado; `.log/` é adicionado ao `.gitignore` automaticamente, sem metadados extras).
+
+## Risk Logging Guardrails
+
+- Registrar fatos de execucao em `.log/skills.log` com marcador no inicio da linha.
+- Marcadores minimos esperados: `[CMD]`, `[FILE_CREATE]`, `[FILE_UPDATE]`, `[FILE_DELETE]`, `[DIR_CREATE]`, `[RISK]`, `[FAIL]`, `[AI]`.
+- Sempre registrar `[RISK]` quando houver sobrescrita, exclusao, rename/move, ou fallback forcado em arquivos/pastas.
+- Toda falha inesperada deve gerar `[FAIL]` com descricao factual curta do evento.
+- Operacoes de terminal e alteracoes de arquivos devem passar pelos utilitarios compartilhados em `../utils` para manter rastreabilidade consistente.
 
 ## Global Standards
 

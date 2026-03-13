@@ -4,7 +4,6 @@
 const fs = require('node:fs');
 const fsp = fs.promises;
 const path = require('node:path');
-const { spawn } = require('node:child_process');
 
 const DEFAULT_PRISMA_VERSION = '7.4.2';
 const DEFAULT_TSX_VERSION = '4.21.0';
@@ -17,6 +16,20 @@ const DEFAULT_DB = {
   database: 'docker',
   schema: 'public',
 };
+let createSkillRunLogger = null;
+let createSkillRunOps = null;
+
+async function loadSkillLoggingUtils() {
+  if (createSkillRunLogger && createSkillRunOps) return;
+
+  const [loggerModule, opsModule] = await Promise.all([
+    import('../../utils/skill-run-log.mjs'),
+    import('../../utils/skill-run-ops.mjs'),
+  ]);
+
+  createSkillRunLogger = loggerModule.createSkillRunLogger;
+  createSkillRunOps = opsModule.createSkillRunOps;
+}
 
 function printHelp() {
   console.log(`Prisma init (Genérico)
@@ -330,40 +343,28 @@ async function resolveDatabaseConfig(backendDir) {
 
 async function writeFileIfChanged(filePath, content, ctx) {
   const normalized = ensureTrailingLineBreak(content);
-  let currentContent = null;
-
-  try {
-    currentContent = await fsp.readFile(filePath, 'utf8');
-  } catch (error) {
-    if (error.code !== 'ENOENT') {
-      throw error;
-    }
-  }
-
-  if (currentContent === normalized) {
+  const result = await ctx.ops.writeTextFile(filePath, normalized, {
+    ensureNewline: false,
+    markRiskOnOverwrite: true,
+  });
+  if (!result.changed) {
     return false;
   }
 
-  ctx.changes.push(`${currentContent === null ? 'create' : 'update'} ${toPosix(path.relative(ctx.rootDir, filePath))}`);
-
-  if (!ctx.dryRun) {
-    await fsp.mkdir(path.dirname(filePath), { recursive: true });
-    await fsp.writeFile(filePath, normalized, 'utf8');
-  }
+  ctx.changes.push(`${result.created ? 'create' : 'update'} ${toPosix(path.relative(ctx.rootDir, filePath))}`);
 
   return true;
 }
 
 async function ensureDir(dirPath, ctx) {
-  if (fs.existsSync(dirPath)) {
+  const created = await ctx.ops.ensureDir(dirPath, {
+    note: 'preparacao de infraestrutura prisma',
+  });
+  if (!created) {
     return;
   }
 
   ctx.changes.push(`mkdir ${toPosix(path.relative(ctx.rootDir, dirPath))}`);
-
-  if (!ctx.dryRun) {
-    await fsp.mkdir(dirPath, { recursive: true });
-  }
 }
 
 async function moveFileIfExists(fromPath, toPath, ctx) {
@@ -374,11 +375,10 @@ async function moveFileIfExists(fromPath, toPath, ctx) {
   ctx.changes.push(
     `rename ${toPosix(path.relative(ctx.rootDir, fromPath))} -> ${toPosix(path.relative(ctx.rootDir, toPath))}`,
   );
-
-  if (!ctx.dryRun) {
-    await fsp.mkdir(path.dirname(toPath), { recursive: true });
-    await fsp.rename(fromPath, toPath);
-  }
+  await ctx.ops.renamePath(fromPath, toPath, {
+    markRisk: true,
+    note: 'migracao de nome legado',
+  });
 
   return true;
 }
@@ -683,44 +683,12 @@ async function ensureEnvFiles(dbConfig, ctx) {
   }
 }
 
-async function runInstall(rootDir, backendWorkspace) {
-  await new Promise((resolve, reject) => {
-    const child = spawn('npm', ['install', '--workspace', backendWorkspace], {
-      cwd: rootDir,
-      stdio: 'inherit',
-      shell: false,
-      env: process.env,
-    });
-
-    child.on('error', reject);
-    child.on('close', (code) => {
-      if (code === 0) {
-        resolve();
-        return;
-      }
-      reject(new Error(`npm install failed with exit code ${code}`));
-    });
-  });
+async function runInstall(rootDir, backendWorkspace, ops) {
+  await ops.runCommand('npm', ['install', '--workspace', backendWorkspace], rootDir);
 }
 
-async function runStartDb(backendDir) {
-  await new Promise((resolve, reject) => {
-    const child = spawn('docker', ['compose', 'up', '-d', 'postgres'], {
-      cwd: backendDir,
-      stdio: 'inherit',
-      shell: false,
-      env: process.env,
-    });
-
-    child.on('error', reject);
-    child.on('close', (code) => {
-      if (code === 0) {
-        resolve();
-        return;
-      }
-      reject(new Error(`docker compose up failed with exit code ${code}`));
-    });
-  });
+async function runStartDb(backendDir, ops) {
+  await ops.runCommand('docker', ['compose', 'up', '-d', 'postgres'], backendDir);
 }
 
 async function main() {
@@ -731,111 +699,139 @@ async function main() {
     return;
   }
 
+  await loadSkillLoggingUtils();
+
   const rootDir = detectProjectRoot(process.cwd());
   const backendDir = path.join(rootDir, 'apps', 'backend');
-  const backendPackageJson = await readBackendPackageJson(backendDir);
-  const backendWorkspace = backendPackageJson.name || BACKEND_WORKSPACE;
-  const dbConfig = await resolveDatabaseConfig(backendDir);
-
-  const ctx = {
+  const logger = await createSkillRunLogger({
     rootDir,
+    skillName: 'config-prisma',
+    commandArgs: process.argv.slice(2),
+  });
+  const ops = createSkillRunOps({
+    rootDir,
+    logger,
     dryRun: args.dryRun,
-    changes: [],
-  };
+  });
 
-  const prismaDir = path.join(backendDir, 'prisma');
-  const prismaModelsDir = path.join(prismaDir, 'models');
-  const prismaMigrationsDir = path.join(prismaDir, 'migrations');
-  const prismaSeedDir = path.join(prismaDir, 'seed');
-  const dbDir = path.join(backendDir, 'src', 'db');
+  try {
+    const backendPackageJson = await readBackendPackageJson(backendDir);
+    const backendWorkspace = backendPackageJson.name || BACKEND_WORKSPACE;
+    const dbConfig = await resolveDatabaseConfig(backendDir);
 
-  await ensureDir(prismaDir, ctx);
-  await ensureDir(prismaModelsDir, ctx);
-  await ensureDir(prismaMigrationsDir, ctx);
-  await ensureDir(prismaSeedDir, ctx);
-  await ensureDir(dbDir, ctx);
-  await ensureBackendPackageJson(backendDir, args, ctx);
-  await ensureEnvFiles(dbConfig, ctx);
+    const ctx = {
+      rootDir,
+      dryRun: args.dryRun,
+      changes: [],
+      ops,
+    };
 
-  await writeFileIfChanged(path.join(backendDir, 'prisma.config.ts'), renderPrismaConfig(), ctx);
-  await writeFileIfChanged(path.join(prismaDir, 'schema.prisma'), renderSchemaPrisma(), ctx);
-  await writeFileIfChanged(path.join(backendDir, 'docker-compose.yml'), renderDockerCompose(dbConfig), ctx);
-  await writeFileIfChanged(path.join(dbDir, 'prisma.service.ts'), renderPrismaService(), ctx);
-  await writeFileIfChanged(path.join(dbDir, 'db.module.ts'), renderDbModule(), ctx);
+    const prismaDir = path.join(backendDir, 'prisma');
+    const prismaModelsDir = path.join(prismaDir, 'models');
+    const prismaMigrationsDir = path.join(prismaDir, 'migrations');
+    const prismaSeedDir = path.join(prismaDir, 'seed');
+    const dbDir = path.join(backendDir, 'src', 'db');
 
-  const seedMainPath = path.join(prismaSeedDir, 'main.ts');
-  if (!fs.existsSync(seedMainPath)) {
-    await writeFileIfChanged(seedMainPath, renderSeedMainTs(), ctx);
-  } else {
-    const seedMainContent = await fsp.readFile(seedMainPath, 'utf8');
-    if (shouldReplaceLegacySeedMain(seedMainContent)) {
+    await ensureDir(prismaDir, ctx);
+    await ensureDir(prismaModelsDir, ctx);
+    await ensureDir(prismaMigrationsDir, ctx);
+    await ensureDir(prismaSeedDir, ctx);
+    await ensureDir(dbDir, ctx);
+    await ensureBackendPackageJson(backendDir, args, ctx);
+    await ensureEnvFiles(dbConfig, ctx);
+
+    await writeFileIfChanged(path.join(backendDir, 'prisma.config.ts'), renderPrismaConfig(), ctx);
+    await writeFileIfChanged(path.join(prismaDir, 'schema.prisma'), renderSchemaPrisma(), ctx);
+    await writeFileIfChanged(path.join(backendDir, 'docker-compose.yml'), renderDockerCompose(dbConfig), ctx);
+    await writeFileIfChanged(path.join(dbDir, 'prisma.service.ts'), renderPrismaService(), ctx);
+    await writeFileIfChanged(path.join(dbDir, 'db.module.ts'), renderDbModule(), ctx);
+
+    const seedMainPath = path.join(prismaSeedDir, 'main.ts');
+    if (!fs.existsSync(seedMainPath)) {
       await writeFileIfChanged(seedMainPath, renderSeedMainTs(), ctx);
-    }
-  }
-
-  const moduleSet = new Set(args.modules.filter(Boolean));
-  for (const moduleName of moduleSet) {
-    const moduleFilePath = path.join(prismaModelsDir, `${moduleName}.model.prisma`);
-    const legacyModuleFilePath = path.join(prismaModelsDir, `${moduleName}.prisma`);
-
-    if (await moveFileIfExists(legacyModuleFilePath, moduleFilePath, ctx)) {
-      continue;
-    }
-
-    if (fs.existsSync(moduleFilePath)) {
-      continue;
-    }
-    await writeFileIfChanged(moduleFilePath, renderModulePrismaFile(moduleName), ctx);
-  }
-
-  const bootstrapModelFilePath = path.join(prismaModelsDir, 'bootstrap.model.prisma');
-  const legacyBootstrapModelFilePath = path.join(prismaModelsDir, 'bootstrap.prisma');
-  const hasDomainModels = await hasDomainModelFiles(prismaModelsDir);
-  if (!hasDomainModels) {
-    const bootstrapRenamed = await moveFileIfExists(
-      legacyBootstrapModelFilePath,
-      bootstrapModelFilePath,
-      ctx,
-    );
-    if (!bootstrapRenamed && !fs.existsSync(bootstrapModelFilePath)) {
-      await writeFileIfChanged(bootstrapModelFilePath, renderBootstrapModelPrismaFile(), ctx);
-    }
-  }
-
-  await ensureDbModuleImportedInAppModule(backendDir, ctx);
-
-  if (ctx.changes.length === 0) {
-    console.log('No changes required. Prisma init is already up to date.');
-  } else {
-    const modeLabel = args.dryRun ? 'Dry-run changes' : 'Applied changes';
-    console.log(`\n${modeLabel}:`);
-    for (const change of ctx.changes) {
-      console.log(`- ${change}`);
-    }
-  }
-
-  if (args.install) {
-    if (args.dryRun) {
-      console.log('\nDry-run: skipped dependency installation.');
     } else {
-      console.log('\nInstalling backend dependencies...');
-      await runInstall(rootDir, backendWorkspace);
-      console.log('Backend dependencies installed successfully.');
+      const seedMainContent = await fsp.readFile(seedMainPath, 'utf8');
+      if (shouldReplaceLegacySeedMain(seedMainContent)) {
+        logger.risk(`seed legado sera sobrescrito: ${toPosix(path.relative(rootDir, seedMainPath))}`);
+        await writeFileIfChanged(seedMainPath, renderSeedMainTs(), ctx);
+      }
     }
-  }
 
-  if (args.startDb) {
-    if (args.dryRun) {
-      console.log('\nDry-run: skipped docker compose up.');
+    const moduleSet = new Set(args.modules.filter(Boolean));
+    for (const moduleName of moduleSet) {
+      const moduleFilePath = path.join(prismaModelsDir, `${moduleName}.model.prisma`);
+      const legacyModuleFilePath = path.join(prismaModelsDir, `${moduleName}.prisma`);
+
+      if (await moveFileIfExists(legacyModuleFilePath, moduleFilePath, ctx)) {
+        continue;
+      }
+
+      if (fs.existsSync(moduleFilePath)) {
+        continue;
+      }
+      await writeFileIfChanged(moduleFilePath, renderModulePrismaFile(moduleName), ctx);
+    }
+
+    const bootstrapModelFilePath = path.join(prismaModelsDir, 'bootstrap.model.prisma');
+    const legacyBootstrapModelFilePath = path.join(prismaModelsDir, 'bootstrap.prisma');
+    const hasDomainModels = await hasDomainModelFiles(prismaModelsDir);
+    if (!hasDomainModels) {
+      const bootstrapRenamed = await moveFileIfExists(
+        legacyBootstrapModelFilePath,
+        bootstrapModelFilePath,
+        ctx,
+      );
+      if (!bootstrapRenamed && !fs.existsSync(bootstrapModelFilePath)) {
+        await writeFileIfChanged(bootstrapModelFilePath, renderBootstrapModelPrismaFile(), ctx);
+      }
+    }
+
+    await ensureDbModuleImportedInAppModule(backendDir, ctx);
+
+    if (ctx.changes.length === 0) {
+      console.log('No changes required. Prisma init is already up to date.');
+      logger.step('Nenhuma alteracao necessaria (estado convergente).');
     } else {
-      console.log('\nStarting postgres with docker compose...');
-      await runStartDb(backendDir);
-      console.log('Postgres started successfully.');
+      const modeLabel = args.dryRun ? 'Dry-run changes' : 'Applied changes';
+      console.log(`\n${modeLabel}:`);
+      logger.step(`${modeLabel}: ${ctx.changes.length} alteracoes.`);
+      for (const change of ctx.changes) {
+        console.log(`- ${change}`);
+        logger.step(change, 'CHANGE');
+      }
     }
-  }
 
-  if (args.dryRun) {
-    console.log('\nRun again with --apply to persist these changes.');
+    if (args.install) {
+      if (args.dryRun) {
+        console.log('\nDry-run: skipped dependency installation.');
+        logger.step('Instalacao ignorada em dry-run.');
+      } else {
+        console.log('\nInstalling backend dependencies...');
+        await runInstall(rootDir, backendWorkspace, ops);
+        console.log('Backend dependencies installed successfully.');
+      }
+    }
+
+    if (args.startDb) {
+      if (args.dryRun) {
+        console.log('\nDry-run: skipped docker compose up.');
+        logger.step('Subida de banco ignorada em dry-run.');
+      } else {
+        console.log('\nStarting postgres with docker compose...');
+        await runStartDb(backendDir, ops);
+        console.log('Postgres started successfully.');
+      }
+    }
+
+    if (args.dryRun) {
+      console.log('\nRun again with --apply to persist these changes.');
+      logger.step('Dry-run concluido. Execute com --apply para persistir.');
+    }
+
+    await logger.success();
+  } catch (error) {
+    await logger.failure(error);
+    throw error;
   }
 }
 

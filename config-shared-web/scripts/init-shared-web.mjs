@@ -3,9 +3,9 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { spawn } from 'node:child_process';
 import { resolveSkillPaths } from '../../utils/resolve-skill-config.mjs';
 import { createSkillRunLogger } from '../../utils/skill-run-log.mjs';
+import { createSkillRunOps } from '../../utils/skill-run-ops.mjs';
 import { getBaseScaffoldConfig } from './shared-web-base.mjs';
 import { listUiLibraries, resolveUiLibrary } from './ui-libraries/index.mjs';
 
@@ -119,21 +119,8 @@ function normalizeThemeColor(themeInput) {
   throw new Error(`Invalid theme color "${themeInput}". Use a known color name or #RRGGBB.`);
 }
 
-function runCommand(cmd, args, cwd, logger) {
-  logger.command(cmd, args);
-
-  return new Promise((resolve, reject) => {
-    const child = spawn(cmd, args, { cwd, stdio: 'inherit' });
-    child.on('error', reject);
-    child.on('exit', (code) => {
-      if (code === 0) {
-        resolve();
-        return;
-      }
-
-      reject(new Error(`Command failed: ${cmd} ${args.join(' ')} (exit ${code})`));
-    });
-  });
+function runCommand(cmd, args, cwd, ops) {
+  return ops.runCommand(cmd, args, cwd);
 }
 
 async function fileExists(filePath) {
@@ -166,7 +153,7 @@ function shouldPreserveExternalModuleManagedAppFile({ relativePath, previousCont
   return previousUsesExternalModule && !nextUsesExternalModule;
 }
 
-async function writeManagedFile({ absolutePath, relativePath, content, dryRun, logger, stats }) {
+async function writeManagedFile({ absolutePath, relativePath, content, logger, stats, ops }) {
   const exists = await fileExists(absolutePath);
 
   if (exists) {
@@ -184,38 +171,39 @@ async function writeManagedFile({ absolutePath, relativePath, content, dryRun, l
       })
     ) {
       stats.preserved += 1;
-      logger.step(`${dryRun ? '[dry-run] ' : ''}arquivo preservado por integracao com modulo externo: ${relativePath}`);
+      logger.step(`${ops.dryRun ? '[dry-run] ' : ''}arquivo preservado por integracao com modulo externo: ${relativePath}`);
       return;
     }
 
     stats.updated += 1;
-    logger.step(`${dryRun ? '[dry-run] ' : ''}arquivo atualizado: ${relativePath}`);
-
-    if (!dryRun) {
-      await fs.mkdir(path.dirname(absolutePath), { recursive: true });
-      await fs.writeFile(absolutePath, content, 'utf8');
-    }
+    logger.step(`${ops.dryRun ? '[dry-run] ' : ''}arquivo atualizado: ${relativePath}`);
+    await ops.writeTextFile(absolutePath, content, {
+      ensureNewline: false,
+      note: relativePath,
+      markRiskOnOverwrite: true,
+    });
 
     return;
   }
 
   stats.created += 1;
-  logger.step(`${dryRun ? '[dry-run] ' : ''}arquivo criado: ${relativePath}`);
-
-  if (!dryRun) {
-    await fs.mkdir(path.dirname(absolutePath), { recursive: true });
-    await fs.writeFile(absolutePath, content, 'utf8');
-  }
+  logger.step(`${ops.dryRun ? '[dry-run] ' : ''}arquivo criado: ${relativePath}`);
+  await ops.writeTextFile(absolutePath, content, {
+    ensureNewline: false,
+    note: relativePath,
+    markRiskOnOverwrite: true,
+  });
 }
 
-async function removeLegacyFile({ absolutePath, relativePath, dryRun, logger }) {
-  if (!(await fileExists(absolutePath))) return false;
+async function removeLegacyFile({ absolutePath, relativePath, logger, ops }) {
+  const removed = await ops.removePath(absolutePath, {
+    force: true,
+    markRisk: true,
+    note: relativePath,
+  });
+  if (!removed) return false;
 
-  logger.step(`${dryRun ? '[dry-run] ' : ''}arquivo legado removido: ${relativePath}`);
-
-  if (!dryRun) {
-    await fs.rm(absolutePath, { force: true });
-  }
+  logger.step(`${ops.dryRun ? '[dry-run] ' : ''}arquivo legado removido: ${relativePath}`);
 
   return true;
 }
@@ -329,7 +317,7 @@ function buildDependencyPlan(layers) {
   };
 }
 
-async function installDependencies({ rootDir, frontendAppPath, dependencyPlan, logger, dryRun }) {
+async function installDependencies({ rootDir, frontendAppPath, dependencyPlan, logger, dryRun, ops }) {
   const runtimeDeps = dependencyPlan.runtimeDeps;
   const devDeps = dependencyPlan.devDeps;
 
@@ -355,11 +343,11 @@ async function installDependencies({ rootDir, frontendAppPath, dependencyPlan, l
   }
 
   if (runtimeDeps.length > 0) {
-    await runCommand('npm', ['--workspace', frontendAppPath, 'install', ...runtimeDeps], rootDir, logger);
+    await runCommand('npm', ['--workspace', frontendAppPath, 'install', ...runtimeDeps], rootDir, ops);
   }
 
   if (devDeps.length > 0) {
-    await runCommand('npm', ['--workspace', frontendAppPath, 'install', '-D', ...devDeps], rootDir, logger);
+    await runCommand('npm', ['--workspace', frontendAppPath, 'install', '-D', ...devDeps], rootDir, ops);
   }
 }
 
@@ -374,6 +362,11 @@ async function main() {
     rootDir,
     skillName: 'config-shared-web',
     commandArgs: process.argv.slice(2),
+  });
+  const ops = createSkillRunOps({
+    rootDir,
+    logger,
+    dryRun: options.dryRun,
   });
 
   try {
@@ -428,6 +421,7 @@ async function main() {
         dependencyPlan,
         logger,
         dryRun: options.dryRun,
+        ops,
       });
     } else {
       logger.step('Instalacao de dependencias ignorada por --skip-install.');
@@ -445,8 +439,8 @@ async function main() {
       await removeLegacyFile({
         absolutePath: absoluteLegacyPath,
         relativePath: logLegacyPath,
-        dryRun: options.dryRun,
         logger,
+        ops,
       });
     }
 
@@ -460,9 +454,9 @@ async function main() {
         absolutePath,
         relativePath: logPath,
         content,
-        dryRun: options.dryRun,
         logger,
         stats,
+        ops,
       });
     }
 

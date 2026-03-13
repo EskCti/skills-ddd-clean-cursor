@@ -5,6 +5,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { resolveNamespace, resolveSkillPaths } from '../../utils/resolve-skill-config.mjs';
 import { createSkillRunLogger } from '../../utils/skill-run-log.mjs';
+import { createSkillRunOps } from '../../utils/skill-run-ops.mjs';
+
+let activeRunOps = null;
 
 function usage() {
   console.log(`Usage:
@@ -92,6 +95,7 @@ const MODULE_MAIN_MENU_LABELS = {
   cartoes: 'Cartões',
   example: 'Exemplos',
   examples: 'Exemplos',
+  'finance-hub': 'Hub Financeiro',
   recurring: 'Recorrentes',
   statements: 'Extratos',
   transactions: 'Transações',
@@ -134,6 +138,7 @@ const MODULE_MAIN_MENU_ICONS = {
   'credit-cards': 'credit-card',
   example: 'flask-conical',
   examples: 'flask-conical',
+  'finance-hub': 'wallet',
   recurring: 'repeat',
   statements: 'file-text',
   transactions: 'arrow-right-left',
@@ -149,6 +154,18 @@ const MODULE_MAIN_MENU_ICON_RULES = [
   { icon: 'shield-check', keywords: ['auth', 'permission', 'access', 'role', 'security'] },
   { icon: 'flask-conical', keywords: ['example', 'demo', 'sample'] },
 ];
+
+const LUCIDE_ICON_COMPONENT_BY_MAIN_MENU_ICON = {
+  'arrow-right-left': 'ArrowRightLeft',
+  boxes: 'Boxes',
+  'credit-card': 'CreditCard',
+  'file-text': 'FileText',
+  'flask-conical': 'FlaskConical',
+  repeat: 'Repeat',
+  'shield-check': 'Fingerprint',
+  tags: 'Tags',
+  wallet: 'Wallet',
+};
 
 const MODULE_MAIN_MENU_USAGE_BASE_SCORES = {
   accounts: 98,
@@ -220,6 +237,11 @@ function resolveMainMenuIcon(moduleName) {
   return 'boxes';
 }
 
+function resolveMainMenuLucideIcon(moduleName) {
+  const menuIcon = resolveMainMenuIcon(moduleName);
+  return LUCIDE_ICON_COMPONENT_BY_MAIN_MENU_ICON[menuIcon] || 'Boxes';
+}
+
 function normalizeMainMenuItem(entry) {
   if (!entry || typeof entry !== 'object') return null;
 
@@ -280,48 +302,108 @@ function compareMainMenuItems(a, b) {
   return a.id.localeCompare(b.id, 'en', { sensitivity: 'base' });
 }
 
-async function ensureFrontendMainMenuRegistryEntry({ mainMenuRegistryPath, moduleName, logger }) {
+function parseDashboardLayoutMenuItems(moduleItemsBlock) {
+  const items = [];
+  const itemRegex = /\{[\s\S]*?\}/g;
+  const matches = moduleItemsBlock.match(itemRegex) || [];
+
+  for (const rawItem of matches) {
+    const idMatch = rawItem.match(/id:\s*['"]([^'"]+)['"]/);
+    const labelMatch = rawItem.match(/label:\s*['"]([^'"]+)['"]/);
+    const hrefMatch = rawItem.match(/href:\s*['"]([^'"]+)['"]/);
+    const iconMatch = rawItem.match(/icon:\s*([A-Za-z0-9_]+)/);
+
+    const normalized = normalizeMainMenuItem({
+      id: idMatch?.[1] || '',
+      label: labelMatch?.[1] || '',
+      href: hrefMatch?.[1] || '',
+      icon: iconMatch?.[1] || '',
+    });
+
+    if (normalized) {
+      items.push(normalized);
+    }
+  }
+
+  return items;
+}
+
+function renderDashboardLayoutMenuItems(items) {
+  return items
+    .map(
+      (item) => `  {
+    id: '${item.id}',
+    label: '${item.label}',
+    href: '${item.href}',
+    icon: ${item.icon},
+  },`,
+    )
+    .join('\n');
+}
+
+function parseLucideImportSpecifiers(importSpecifiersRaw) {
+  return importSpecifiersRaw
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+async function ensureFrontendDashboardLayoutMenuEntry({ dashboardLayoutPath, moduleName, logger }) {
+  if (!(await pathExists(dashboardLayoutPath))) {
+    throw new Error(`Missing dashboard layout file for menu registration: ${dashboardLayoutPath}`);
+  }
+
   const expectedHref = `/${moduleName}`;
   const nextItem = {
     id: moduleName,
     label: resolveMainMenuLabel(moduleName),
     href: expectedHref,
-    icon: resolveMainMenuIcon(moduleName),
+    icon: resolveMainMenuLucideIcon(moduleName),
   };
 
-  let raw = '';
-  if (await pathExists(mainMenuRegistryPath)) {
-    raw = await fs.readFile(mainMenuRegistryPath, 'utf8');
+  const source = await fs.readFile(dashboardLayoutPath, 'utf8');
+  const moduleItemsRegex = /const\s+moduleItems:\s*SidebarMenuItem\[]\s*=\s*\[([\s\S]*?)\];/m;
+  const moduleItemsMatch = source.match(moduleItemsRegex);
+  if (!moduleItemsMatch) {
+    throw new Error(`Unable to locate moduleItems list in dashboard layout: ${dashboardLayoutPath}`);
   }
 
-  let parsedItems = [];
-  if (raw.trim().length > 0) {
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) {
-      throw new Error(`Invalid menu registry content at ${mainMenuRegistryPath}. Expected JSON array.`);
-    }
-    parsedItems = parsed.map(normalizeMainMenuItem).filter(Boolean);
-  }
-
+  const parsedItems = parseDashboardLayoutMenuItems(moduleItemsMatch[1]);
   const existing = parsedItems.find((item) => item.id === moduleName || item.href === expectedHref);
   const nextItemAnalysis = analyzeMainMenuItem(nextItem);
+  logger.ai(`heuristica de ordenacao de menu aplicada para o modulo ${moduleName}`);
   if (existing?.adminOnly === true || moduleName === 'auth' || nextItemAnalysis.isAdmin) {
     nextItem.adminOnly = true;
   }
 
   const keptItems = parsedItems.filter((item) => item.id !== moduleName && item.href !== expectedHref);
   const nextItems = [...keptItems, nextItem].sort(compareMainMenuItems);
-  const nextRaw = stringifyJson(nextItems);
+  const renderedItems = renderDashboardLayoutMenuItems(nextItems);
+  let updated = source.replace(moduleItemsRegex, `const moduleItems: SidebarMenuItem[] = [\n${renderedItems}\n];`);
 
-  if (nextRaw === raw) {
-    logger.step(`Registro do menu principal já estava atualizado: ${mainMenuRegistryPath}`);
+  const requiredIcons = new Set(nextItems.map((item) => item.icon).filter(Boolean));
+  const lucideImportRegex = /import\s*\{([\s\S]*?)\}\s*from\s*['"]lucide-react['"];/m;
+  const lucideImportMatch = updated.match(lucideImportRegex);
+
+  if (!lucideImportMatch) {
+    throw new Error(`Unable to locate lucide-react import in dashboard layout: ${dashboardLayoutPath}`);
+  }
+
+  const currentImports = new Set(parseLucideImportSpecifiers(lucideImportMatch[1]));
+  for (const iconName of requiredIcons) {
+    currentImports.add(iconName);
+  }
+  currentImports.add('LayoutDashboard');
+  const nextImportLine = `import { ${Array.from(currentImports).sort((a, b) => a.localeCompare(b)).join(', ')} } from 'lucide-react';`;
+  updated = updated.replace(lucideImportRegex, nextImportLine);
+
+  if (updated === source) {
+    logger.step(`Menu principal já estava atualizado em ${dashboardLayoutPath}`);
     return;
   }
 
-  await writeFile(mainMenuRegistryPath, nextRaw);
-  logger.step(
-    `Menu principal atualizado com o módulo ${moduleName} (ícone ${nextItem.icon}) com ordenação inteligente por uso: ${mainMenuRegistryPath}`,
-  );
+  await writeFile(dashboardLayoutPath, updated);
+  logger.step(`Menu principal atualizado no layout do dashboard com o módulo ${moduleName}: ${dashboardLayoutPath}`);
 }
 
 async function pathExists(targetPath) {
@@ -338,7 +420,10 @@ async function ensureTargetPathAvailability({ targetPath, force, logger, label }
   if (!force) {
     throw new Error(`Directory already exists: ${targetPath}. Use --force to overwrite.`);
   }
-  await fs.rm(targetPath, { recursive: true, force: true });
+  if (!activeRunOps) {
+    throw new Error('Run operations are not initialized.');
+  }
+  await activeRunOps.removePath(targetPath, { recursive: true, force: true, markRisk: true });
   logger.step(`${label} existente removido com --force: ${targetPath}.`);
 }
 
@@ -348,8 +433,13 @@ async function readJson(filePath) {
 }
 
 async function writeFile(filePath, content) {
-  await fs.mkdir(path.dirname(filePath), { recursive: true });
-  await fs.writeFile(filePath, content, 'utf8');
+  if (!activeRunOps) {
+    throw new Error('Run operations are not initialized.');
+  }
+  await activeRunOps.writeTextFile(filePath, content, {
+    ensureNewline: false,
+    markRiskOnOverwrite: true,
+  });
 }
 
 function stringifyJson(obj) {
@@ -406,7 +496,14 @@ async function ensureBackendModuleImportedInAppModule({ appModulePath, moduleNam
   }
 
   if (updated !== content) {
-    await fs.writeFile(appModulePath, updated, 'utf8');
+    if (!activeRunOps) {
+      throw new Error('Run operations are not initialized.');
+    }
+    await activeRunOps.writeTextFile(appModulePath, updated, {
+      ensureNewline: false,
+      note: `${moduleName}.module import`,
+      markRiskOnOverwrite: true,
+    });
     logger.step(`arquivo atualizado: ${appModulePath}`);
   }
 }
@@ -421,6 +518,11 @@ async function main() {
   });
 
   try {
+    activeRunOps = createSkillRunOps({
+      rootDir,
+      logger,
+      dryRun: false,
+    });
     const { moduleName, scope: scopeArg, force } = parseArgs(process.argv.slice(2));
 
     if (!moduleName) {
@@ -467,19 +569,14 @@ async function main() {
     const backendAppModulePath = path.join(rootDir, backendAppPath, 'src', 'app.module.ts');
     const backendPackageJsonPath = path.join(rootDir, backendAppPath, 'package.json');
     const frontendPackageJsonPath = path.join(rootDir, frontendAppPath, 'package.json');
-    const frontendMainMenuRegistryCandidates = [
-      path.join(
-        hasFrontendPrivateGroup ? frontendPrivateGroupDir : frontendAppBaseDir,
-        'dashboard',
-        '_data',
-        'main-menu-modules.json',
-      ),
-      path.join(frontendModulesBaseDir, 'navigation', 'data', 'main-menu-modules.json'),
+    const frontendDashboardLayoutCandidates = [
+      path.join(hasFrontendPrivateGroup ? frontendPrivateGroupDir : frontendAppBaseDir, 'dashboard', 'layout.tsx'),
+      path.join(frontendAppBaseDir, 'dashboard', 'layout.tsx'),
     ];
-    let frontendMainMenuRegistryPath = frontendMainMenuRegistryCandidates[0];
-    for (const candidate of frontendMainMenuRegistryCandidates) {
+    let frontendDashboardLayoutPath = frontendDashboardLayoutCandidates[0];
+    for (const candidate of frontendDashboardLayoutCandidates) {
       if (await pathExists(candidate)) {
-        frontendMainMenuRegistryPath = candidate;
+        frontendDashboardLayoutPath = candidate;
         break;
       }
     }
@@ -524,14 +621,12 @@ async function main() {
     const backendPrismaClassName = `${moduleClassName}Prisma`;
     const backendModuleClassName = `${moduleClassName}Module`;
     const frontendDashboardComponentName = `${moduleClassName}DashboardComponent`;
-    const frontendSidebarComponentName = `${moduleClassName}SidebarMenu`;
     const frontendDashboardComponentFileName = `${moduleName}-dashboard.component.tsx`;
-    const frontendSidebarComponentFileName = `${moduleName}-navigation.component.tsx`;
     const frontendDashboardPageName = 'DashboardPage';
     const frontendDashboardPageFileName = 'dashboard.page.tsx';
     const frontendModuleLayoutName = `${moduleClassName}ModuleLayout`;
-    const frontendMenuDataTypeName = `${moduleClassName}MenuItem`;
-    const frontendMenuItemsConstName = `${toCamelCase(moduleName)}MenuItems`;
+    const frontendModuleMenuItemsName = `${toCamelCase(moduleName)}MenuItems`;
+    const frontendModuleSidebarMenuName = `${moduleClassName}SidebarMenu`;
     const frontendDashboardModuleName = resolveMainMenuLabel(moduleName);
     const hasFrontendEmptyDashboardState = await pathExists(frontendEmptyDashboardStatePath);
 
@@ -664,28 +759,6 @@ export class ${backendModuleClassName} {}
     const backendPrismaModel = `// Prisma models for module: ${moduleName}
 // Add concrete models for this module below.
 `;
-    const frontendMenuDataTs = `export type ${frontendMenuDataTypeName} = {
-  id: "back" | "dashboard";
-  label: string;
-  href: string;
-  description: string;
-};
-
-export const ${frontendMenuItemsConstName}: ${frontendMenuDataTypeName}[] = [
-  {
-    id: "back",
-    label: "Voltar",
-    href: "/dashboard",
-    description: "Retorna para o menu principal da aplicação.",
-  },
-  {
-    id: "dashboard",
-    label: "Visão Geral ${frontendDashboardModuleName}",
-    href: "/${moduleName}",
-    description: "Resumo inicial do módulo ${frontendDashboardModuleName}.",
-  },
-];
-`;
     if (hasFrontendEmptyDashboardState) {
       logger.step(`Componente base detectado para dashboard vazio: ${frontendEmptyDashboardStatePath}.`);
     } else {
@@ -718,35 +791,46 @@ export function ${frontendDashboardPageName}() {
   return <${frontendDashboardComponentName} />;
 }
 `;
-    const frontendNavigationComponentTsx = `import { LayoutDashboard } from 'lucide-react';
-import { ModuleSidebarMenu } from '@/shared/navigation/module-sidebar-menu.component';
-import { ${frontendMenuItemsConstName} } from '../data/${moduleName}-menu.data';
+    const frontendModuleLayoutTsx = `'use client';
 
-const iconById = {
-  dashboard: LayoutDashboard,
-} as const;
+import { ArrowLeft, LayoutDashboard } from 'lucide-react';
+import { PrivateAppShell } from '@/modules/auth/template/private-app-shell.component';
+import { SidebarMenu, type SidebarMenuItem } from '@/shared/components/ui/sidebar-menu.component';
 
-export function ${frontendSidebarComponentName}() {
+const ${frontendModuleMenuItemsName}: SidebarMenuItem[] = [
+  {
+    id: 'overview',
+    label: 'Visão Geral ${frontendDashboardModuleName}',
+    href: '/${moduleName}',
+    icon: LayoutDashboard,
+    match: 'exact',
+  },
+];
+
+function ${frontendModuleSidebarMenuName}() {
   return (
-    <ModuleSidebarMenu
-      moduleLabel='${frontendDashboardModuleName}'
-      moduleRootHref='/${moduleName}'
-      items={${frontendMenuItemsConstName}}
-      iconById={iconById}
+    <SidebarMenu
+      mainItem={{
+        id: 'back',
+        label: 'Voltar',
+        href: '/dashboard',
+        icon: ArrowLeft,
+      }}
+      sections={[
+        {
+          id: '${moduleName}',
+          label: '${frontendDashboardModuleName}',
+          items: ${frontendModuleMenuItemsName},
+        },
+      ]}
     />
   );
 }
-`;
-    const frontendModuleLayoutTsx = `'use client';
-
-import { ${frontendSidebarComponentName} } from '@/modules/${moduleName}';
-import { PrivateAppShell } from '@/modules/auth/template/private-app-shell.component';
 
 export default function ${frontendModuleLayoutName}({ children }: { children: React.ReactNode }) {
-  return <PrivateAppShell sidebar={<${frontendSidebarComponentName} />}>{children}</PrivateAppShell>;
+  return <PrivateAppShell sidebar={<${frontendModuleSidebarMenuName} />}>{children}</PrivateAppShell>;
 }
 `;
-    const frontendMenuDataPath = path.join(frontendModuleDir, 'data', `${moduleName}-menu.data.ts`);
     const frontendModuleIndexPath = path.join(frontendModuleDir, 'index.ts');
     const backendPrismaPath = path.join(backendModuleDir, `${moduleName}.prisma.ts`);
     const backendControllerPath = path.join(backendModuleDir, `${moduleName}.controller.ts`);
@@ -757,7 +841,6 @@ export default function ${frontendModuleLayoutName}({ children }: { children: Re
       'components',
       frontendDashboardComponentFileName,
     );
-    const frontendSidebarComponentPath = path.join(frontendModuleDir, 'components', frontendSidebarComponentFileName);
     const frontendDashboardPagePath = path.join(frontendModuleDir, 'pages', frontendDashboardPageFileName);
     const frontendAppRoutePagePath = path.join(frontendRouteDir, 'page.tsx');
     const frontendAppRouteLayoutPath = path.join(frontendRouteDir, 'layout.tsx');
@@ -769,15 +852,17 @@ export default function Page() {
 }
 `;
     const frontendModuleIndexTs = `export * from "./components/${moduleName}-dashboard.component";
-export * from "./components/${moduleName}-navigation.component";
-export * from "./data/${moduleName}-menu.data";
 export * from "./pages/dashboard.page";
 `;
     const backendModuleIndexTs = `export * from "./${moduleName}.module";
 `;
 
-    await fs.mkdir(path.join(targetDir, 'src'), { recursive: true });
-    await fs.mkdir(path.join(targetDir, 'test'), { recursive: true });
+    await activeRunOps.ensureDir(path.join(targetDir, 'src'), {
+      note: 'estrutura base de pacote',
+    });
+    await activeRunOps.ensureDir(path.join(targetDir, 'test'), {
+      note: 'estrutura base de pacote',
+    });
 
     await writeFile(path.join(targetDir, 'package.json'), stringifyJson(packageJson));
     logger.step(`criou arquivo: ${path.join(targetDir, 'package.json')}`);
@@ -812,10 +897,6 @@ export * from "./pages/dashboard.page";
 
     await writeFile(frontendDashboardComponentPath, frontendDashboardComponentTsx);
     logger.step(`criou arquivo: ${frontendDashboardComponentPath}`);
-    await writeFile(frontendSidebarComponentPath, frontendNavigationComponentTsx);
-    logger.step(`criou arquivo: ${frontendSidebarComponentPath}`);
-    await writeFile(frontendMenuDataPath, frontendMenuDataTs);
-    logger.step(`criou arquivo: ${frontendMenuDataPath}`);
     await writeFile(frontendDashboardPagePath, frontendDashboardPageTsx);
     logger.step(`criou arquivo: ${frontendDashboardPagePath}`);
     await writeFile(frontendModuleIndexPath, frontendModuleIndexTs);
@@ -824,8 +905,8 @@ export * from "./pages/dashboard.page";
     logger.step(`criou arquivo: ${frontendAppRoutePagePath}`);
     await writeFile(frontendAppRouteLayoutPath, frontendModuleLayoutTsx);
     logger.step(`criou arquivo: ${frontendAppRouteLayoutPath}`);
-    await ensureFrontendMainMenuRegistryEntry({
-      mainMenuRegistryPath: frontendMainMenuRegistryPath,
+    await ensureFrontendDashboardLayoutMenuEntry({
+      dashboardLayoutPath: frontendDashboardLayoutPath,
       moduleName,
       logger,
     });

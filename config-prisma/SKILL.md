@@ -52,6 +52,14 @@ O contrato gerado de banco deve ficar compatível com a versão atual do projeto
 - Seguir convenção global em `../skills-standards.md`.
 - Consultar `references/prisma-init-checklist.md` para checklist operacional.
 
+## Risk Logging Guardrails
+
+- Registrar fatos de execucao em `.log/skills.log` com marcador no inicio da linha.
+- Marcadores minimos esperados: `[CMD]`, `[FILE_CREATE]`, `[FILE_UPDATE]`, `[FILE_DELETE]`, `[DIR_CREATE]`, `[RISK]`, `[FAIL]`, `[AI]`.
+- Sempre registrar `[RISK]` quando houver sobrescrita, exclusao, rename/move, ou fallback forcado em arquivos/pastas.
+- Toda falha inesperada deve gerar `[FAIL]` com descricao factual curta do evento.
+- Operacoes de terminal e alteracoes de arquivos devem passar pelos utilitarios compartilhados em `../utils` para manter rastreabilidade consistente.
+
 ## Global Standards
 
 - Consultar `../skills-standards.md` para padroes globais de nomenclatura e convencoes gerais entre skills.

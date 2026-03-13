@@ -63,10 +63,6 @@ export class Example extends Entity<Example, ExampleProps> {
     super(props);
   }
 
-  get name(): string {
-    return this.props.name;
-  }
-
   static create(props: ExampleProps): Example {
     const result = Example.tryCreate(props);
     result.validator.throwsIfFailed();
@@ -87,6 +83,14 @@ export class Example extends Entity<Example, ExampleProps> {
         name: name.instance.value,
       }),
     );
+  }
+
+  get name(): string {
+    return this.props.name;
+  }
+
+  get $name(): Name {
+    return Name.create(this.props.name);
   }
 }
 ```

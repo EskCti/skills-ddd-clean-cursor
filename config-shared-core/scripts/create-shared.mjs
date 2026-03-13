@@ -3,11 +3,12 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { spawn } from 'node:child_process';
 import { resolveNamespace, resolveSkillPaths } from '../../utils/resolve-skill-config.mjs';
 import { createSkillRunLogger } from '../../utils/skill-run-log.mjs';
+import { createSkillRunOps } from '../../utils/skill-run-ops.mjs';
 
 let activeRunLogger = null;
+let activeRunOps = null;
 const REQUIRED_TEMPLATE_FILES = [
   'package.json',
   'tsconfig.json',
@@ -122,7 +123,15 @@ async function readJson(filePath) {
 }
 
 async function writeJson(filePath, data) {
-  await fs.writeFile(filePath, `${JSON.stringify(data, null, 2)}\n`, 'utf8');
+  if (!activeRunOps) {
+    await fs.writeFile(filePath, `${JSON.stringify(data, null, 2)}\n`, 'utf8');
+    return;
+  }
+
+  await activeRunOps.writeJsonFile(filePath, data, {
+    note: path.basename(filePath),
+    markRiskOnOverwrite: true,
+  });
 }
 
 async function exists(filePath) {
@@ -157,18 +166,11 @@ function ensureSafeOverwriteTarget(rootDir, targetDir) {
 }
 
 function runCommand(cmd, args, cwd) {
-  activeRunLogger?.command(cmd, args);
-  return new Promise((resolve, reject) => {
-    const child = spawn(cmd, args, { cwd, stdio: 'inherit' });
-    child.on('error', reject);
-    child.on('exit', (code) => {
-      if (code === 0) {
-        resolve();
-        return;
-      }
-      reject(new Error(`Command failed: ${cmd} ${args.join(' ')} (exit ${code})`));
-    });
-  });
+  if (!activeRunOps) {
+    throw new Error('Run operations are not initialized.');
+  }
+
+  return activeRunOps.runCommand(cmd, args, cwd);
 }
 
 async function installRootDependencies(rootDir) {
@@ -274,6 +276,11 @@ async function main() {
 
   try {
     activeRunLogger = logger;
+    activeRunOps = createSkillRunOps({
+      rootDir,
+      logger,
+      dryRun: false,
+    });
     const { scope: scopeArg, force, runTests, target } = parseArgs(process.argv.slice(2));
     const { packagesDir, sharedModule, config } = await resolveSkillPaths(rootDir);
     const defaultTargetDir = path.join(packagesDir, sharedModule);
@@ -293,11 +300,13 @@ async function main() {
         throw new Error(`Target directory already exists: ${targetDir}. Use --force to overwrite.`);
       }
       ensureSafeOverwriteTarget(rootDir, targetDir);
-      await fs.rm(targetDir, { recursive: true, force: true });
+      await activeRunOps.removePath(targetDir, { recursive: true, force: true, markRisk: true });
       logger.step(`Diretório existente removido com --force: ${targetDir}.`);
     }
 
-    await fs.mkdir(path.dirname(targetDir), { recursive: true });
+    await activeRunOps.ensureDir(path.dirname(targetDir), {
+      note: `preparacao de diretorio para ${path.basename(targetDir)}`,
+    });
     await fs.cp(templateDir, targetDir, { recursive: true });
     logger.step('Template do módulo shared copiado para o diretório alvo.');
 

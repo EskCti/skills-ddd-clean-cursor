@@ -7,8 +7,10 @@ import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 import { loadSkillConfig, resolveNamespace } from '../../utils/resolve-skill-config.mjs';
 import { createSkillRunLogger } from '../../utils/skill-run-log.mjs';
+import { createSkillRunOps } from '../../utils/skill-run-ops.mjs';
 
 let activeRunLogger = null;
+let activeRunOps = null;
 
 const DEFAULT_PRETTIER_CONFIG = {
   singleQuote: true,
@@ -205,15 +207,11 @@ function parseArgs(argv, defaults) {
 }
 
 function runCommand(cmd, args, cwd) {
-  activeRunLogger?.command(cmd, args);
-  return new Promise((resolve, reject) => {
-    const child = spawn(cmd, args, { cwd, stdio: 'inherit' });
-    child.on('error', reject);
-    child.on('exit', (code) => {
-      if (code === 0) return resolve();
-      reject(new Error(`Command failed: ${cmd} ${args.join(' ')} (exit ${code})`));
-    });
-  });
+  if (!activeRunOps) {
+    throw new Error('Run operations are not initialized.');
+  }
+
+  return activeRunOps.runCommand(cmd, args, cwd);
 }
 
 function commandExists(cmd, args = ['--version']) {
@@ -230,7 +228,15 @@ async function readJson(filePath) {
 }
 
 async function writeJson(filePath, data) {
-  await fs.writeFile(filePath, `${JSON.stringify(data, null, 2)}\n`, 'utf8');
+  if (!activeRunOps) {
+    await fs.writeFile(filePath, `${JSON.stringify(data, null, 2)}\n`, 'utf8');
+    return;
+  }
+
+  await activeRunOps.writeJsonFile(filePath, data, {
+    note: path.basename(filePath),
+    markRiskOnOverwrite: true,
+  });
 }
 
 function ensureArrayValue(arr, value) {
@@ -322,7 +328,16 @@ async function scaffoldTurboStructureWithCreateTurbo(rootDir) {
       skippedPaths: mergeResult.skipped,
     };
   } finally {
-    await fs.rm(tempRoot, { recursive: true, force: true });
+    if (activeRunOps) {
+      await activeRunOps.removePath(tempRoot, {
+        recursive: true,
+        force: true,
+        markRisk: false,
+        note: 'cleanup temp scaffold',
+      });
+    } else {
+      await fs.rm(tempRoot, { recursive: true, force: true });
+    }
   }
 }
 
@@ -638,7 +653,15 @@ async function removeDefaultTurboApps({ rootDir, frontendPath, backendPath }) {
       console.log(`Removing unused Turbo default app at ${candidate}.`);
     }
 
-    await fs.rm(candidateDir, { recursive: true, force: true });
+    if (!activeRunOps) {
+      throw new Error('Run operations are not initialized.');
+    }
+    await activeRunOps.removePath(candidateDir, {
+      recursive: true,
+      force: true,
+      markRisk: true,
+      note: 'remove default turbo app',
+    });
     removed.push(candidate);
   }
 
@@ -655,7 +678,15 @@ async function removeDefaultTurboPackages({ rootDir }) {
   if (!isLikelyTurboDefaultUiPackage(pkg)) return [];
 
   console.log(`Removing unused Turbo default package at ${candidate}.`);
-  await fs.rm(candidateDir, { recursive: true, force: true });
+  if (!activeRunOps) {
+    throw new Error('Run operations are not initialized.');
+  }
+  await activeRunOps.removePath(candidateDir, {
+    recursive: true,
+    force: true,
+    markRisk: true,
+    note: 'remove default turbo package',
+  });
   return [candidate];
 }
 
@@ -674,7 +705,12 @@ async function ensureFrontendApp({ rootDir, frontendPath, frontendName, frontend
     );
   }
 
-  await fs.mkdir(frontendParentDir, { recursive: true });
+  if (!activeRunOps) {
+    throw new Error('Run operations are not initialized.');
+  }
+  await activeRunOps.ensureDir(frontendParentDir, {
+    note: 'preparacao de diretorio frontend',
+  });
   console.log(`Creating Next.js app: ${frontendName}`);
   await runCommand(
     'npx',
@@ -708,7 +744,12 @@ async function ensureBackendApp({ rootDir, backendPath, backendName, backendPare
   const nestCreateArgs = ['new', backendName, '--skip-git', '--package-manager', 'npm'];
 
   const hasNestCli = await commandExists('nest');
-  await fs.mkdir(backendParentDir, { recursive: true });
+  if (!activeRunOps) {
+    throw new Error('Run operations are not initialized.');
+  }
+  await activeRunOps.ensureDir(backendParentDir, {
+    note: 'preparacao de diretorio backend',
+  });
   if (hasNestCli) {
     console.log(`Creating NestJS app with nest CLI: ${backendName}`);
     await runCommand('nest', nestCreateArgs, backendParentDir);
@@ -751,7 +792,14 @@ async function upsertEnvFile(filePath, entries) {
     return false;
   }
 
-  await fs.writeFile(filePath, next, 'utf8');
+  if (!activeRunOps) {
+    throw new Error('Run operations are not initialized.');
+  }
+  await activeRunOps.writeTextFile(filePath, next, {
+    ensureNewline: false,
+    markRiskOnOverwrite: true,
+    note: path.basename(filePath),
+  });
   return true;
 }
 
@@ -822,7 +870,14 @@ async function ensureRootPrettierConfig(rootDir) {
     return { updated: false, created: false };
   }
 
-  await fs.writeFile(prettierConfigPath, expectedContent, 'utf8');
+  if (!activeRunOps) {
+    throw new Error('Run operations are not initialized.');
+  }
+  await activeRunOps.writeTextFile(prettierConfigPath, expectedContent, {
+    ensureNewline: false,
+    markRiskOnOverwrite: true,
+    note: '.prettierrc',
+  });
   return { updated: true, created: !fileExists };
 }
 
@@ -905,7 +960,14 @@ async function patchBackendMain({ rootDir, backendPath, backendPort, backendPort
     return { updated: false, skipped: false };
   }
 
-  await fs.writeFile(mainPath, content, 'utf8');
+  if (!activeRunOps) {
+    throw new Error('Run operations are not initialized.');
+  }
+  await activeRunOps.writeTextFile(mainPath, content, {
+    ensureNewline: false,
+    markRiskOnOverwrite: true,
+    note: 'backend main.ts',
+  });
   return { updated: true, skipped: false };
 }
 
@@ -1079,7 +1141,14 @@ async function patchFrontendNextConfig({ rootDir, frontendPath }) {
     };
   }
 
-  await fs.writeFile(configPath, patchResult.nextContent, 'utf8');
+  if (!activeRunOps) {
+    throw new Error('Run operations are not initialized.');
+  }
+  await activeRunOps.writeTextFile(configPath, patchResult.nextContent, {
+    ensureNewline: false,
+    markRiskOnOverwrite: true,
+    note: path.basename(configPath),
+  });
   return {
     updated: true,
     skipped: false,
@@ -1101,6 +1170,11 @@ async function main() {
 
   try {
     activeRunLogger = logger;
+    activeRunOps = createSkillRunOps({
+      rootDir,
+      logger,
+      dryRun: false,
+    });
     const skillConfig = await loadSkillConfig(rootDir);
 
     const {

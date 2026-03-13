@@ -31,11 +31,9 @@ Gerar um módulo novo de forma determinística em três áreas do monorepo:
 ### Frontend
 
 - `modules-base/<module-name>/components/<module-name>-dashboard.component.tsx`
-- `modules-base/<module-name>/components/<module-name>-navigation.component.tsx`
-- `modules-base/<module-name>/data/<module-name>-menu.data.ts`
 - `modules-base/<module-name>/pages/dashboard.page.tsx`
 - `modules-base/<module-name>/index.ts`
-- atualização em `app-base/(private)/dashboard/_data/main-menu-modules.json` (ou fallback equivalente sem `(private)`) com item do novo módulo no menu principal (label/href/icon)
+- atualização em `app-base/(private)/dashboard/layout.tsx` (ou fallback equivalente sem `(private)`) com item do novo módulo no menu principal (`moduleItems` com label/href/icon)
 - `app-base/(private)/<module-name>/page.tsx` quando `(private)` existir, senão `app-base/<module-name>/page.tsx`
 - `app-base/(private)/<module-name>/layout.tsx` quando `(private)` existir, senão `app-base/<module-name>/layout.tsx`
 - Dependência `<scope>/<module-name>` em `<frontendAppPath>/package.json`
@@ -79,7 +77,6 @@ Gerar um módulo novo de forma determinística em três áreas do monorepo:
 
 ## Frontend Rules
 
-- Deve criar estrutura mínima de menu em `data/<module-name>-menu.data.ts`.
 - A estrutura de menu do módulo deve seguir padrão obrigatório:
   - primeiro item `Voltar` (`/dashboard`);
   - separador visual;
@@ -93,10 +90,9 @@ Gerar um módulo novo de forma determinística em três áreas do monorepo:
 - A página de dashboard deve renderizar o componente de dashboard.
 - A rota principal do módulo deve renderizar a página de dashboard dentro de `app-base/(private)` quando esse grupo existir.
 - A rota principal do módulo deve possuir `layout.tsx` próprio no mesmo diretório da rota.
-- O `layout.tsx` do módulo deve resolver localmente seu sidebar, usando `PrivateAppShell` (de `modules/auth/template/private-app-shell.component.tsx`) e passando `<ModuleName>SidebarMenu`.
-- O componente `components/<module-name>-navigation.component.tsx` deve encapsular a renderização do menu lateral do módulo.
-- A base visual/comportamental compartilhada do sidebar deve ficar em `shared/navigation/module-sidebar-menu.component.tsx`, sem depender de módulos de negócio.
-- O registro central `app-base/(private)/dashboard/_data/main-menu-modules.json` (ou fallback sem `(private)`) deve receber `upsert` da entrada do módulo novo com ícone de `lucide-react` definido por regras determinísticas.
+- O `layout.tsx` do módulo deve definir localmente o sidebar no padrão do `auth/layout.tsx`, usando `SidebarMenu` + `SidebarMenuItem` e passando `<ModuleName>SidebarMenu` para `PrivateAppShell` (de `modules/auth/template/private-app-shell.component.tsx`).
+- O menu lateral do módulo não deve depender de arquivos separados (`data/*-menu.data.ts` ou `*-navigation.component.tsx`).
+- O `app-base/(private)/dashboard/layout.tsx` (ou fallback sem `(private)`) deve receber `upsert` da entrada do módulo novo em `moduleItems`, com ícone de `lucide-react` definido por regras determinísticas.
 - Após o `upsert`, aplicar ordenação semântica determinística com heurística de IA local: módulos com maior uso provável acima e módulos administrativos no bloco inferior.
 - Pastas e arquivos do frontend devem seguir kebab-case em minúsculo.
 - O arquivo de componente deve usar sufixo `.component.tsx`.

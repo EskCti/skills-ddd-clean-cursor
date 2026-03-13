@@ -3,8 +3,8 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { spawn } from 'node:child_process';
 import { createSkillRunLogger } from '../../utils/skill-run-log.mjs';
+import { createSkillRunOps } from '../../utils/skill-run-ops.mjs';
 import { resolveNamespace } from '../../utils/resolve-skill-config.mjs';
 
 function usage() {
@@ -98,28 +98,16 @@ async function writeJson(filePath, value, options) {
 
 async function writeText(filePath, content, options) {
   const normalized = content.endsWith('\n') ? content : `${content}\n`;
-  let current = null;
-
-  try {
-    current = await fs.readFile(filePath, 'utf8');
-  } catch (error) {
-    if (!error || error.code !== 'ENOENT') {
-      throw error;
-    }
-  }
-
-  if (current === normalized) {
+  const result = await options.ops.writeTextFile(filePath, normalized, {
+    ensureNewline: false,
+  });
+  if (!result.changed) {
     return false;
   }
 
   options.changes.push(
-    `${current === null ? 'create' : 'update'} ${toPosix(path.relative(options.rootDir, filePath))}`,
+    `${result.created ? 'create' : 'update'} ${toPosix(path.relative(options.rootDir, filePath))}`,
   );
-
-  if (!options.dryRun) {
-    await fs.mkdir(path.dirname(filePath), { recursive: true });
-    await fs.writeFile(filePath, normalized, 'utf8');
-  }
 
   return true;
 }
@@ -305,23 +293,8 @@ async function enforcePrivateAppShellOnPrivateLayouts(rootDir, options) {
   }
 }
 
-function runCommand(cmd, args, cwd, logger) {
-  logger.command(cmd, args);
-  return new Promise((resolve, reject) => {
-    const child = spawn(cmd, args, {
-      cwd,
-      stdio: 'inherit',
-    });
-
-    child.on('error', reject);
-    child.on('exit', (code) => {
-      if (code === 0) {
-        resolve();
-        return;
-      }
-      reject(new Error(`Command failed: ${cmd} ${args.join(' ')} (exit ${code})`));
-    });
-  });
+function runCommand(cmd, args, cwd, ops) {
+  return ops.runCommand(cmd, args, cwd);
 }
 
 async function resolveAuthPackageName(rootDir, fallbackScope) {
@@ -391,11 +364,17 @@ async function main() {
     skillName: 'config-auth-web-basic',
     commandArgs: process.argv.slice(2),
   });
+  const ops = createSkillRunOps({
+    rootDir,
+    logger,
+    dryRun: args.dryRun,
+  });
 
   const options = {
     rootDir,
     dryRun: args.dryRun,
     changes: [],
+    ops,
   };
 
   try {
@@ -455,13 +434,13 @@ async function main() {
     }
 
     if (args.install && !args.dryRun) {
-      await runCommand('npm', ['install', '--workspace', 'apps/web'], rootDir, logger);
+      await runCommand('npm', ['install', '--workspace', 'apps/web'], rootDir, ops);
     } else if (args.install && args.dryRun) {
       logger.step('Instalacao ignorada em dry-run.');
     }
 
     if (args.runBuild && !args.dryRun) {
-      await runCommand('npm', ['run', 'build', '--workspace', 'apps/web'], rootDir, logger);
+      await runCommand('npm', ['run', 'build', '--workspace', 'apps/web'], rootDir, ops);
     } else if (args.runBuild && args.dryRun) {
       logger.step('Build ignorado em dry-run.');
     }
