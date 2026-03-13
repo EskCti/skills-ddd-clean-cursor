@@ -240,17 +240,23 @@ function ensureArrayValue(arr, value) {
 
 function ensureWorkspacePatterns(workspaces) {
   if (Array.isArray(workspaces)) {
-    return ensureArrayValue(ensureArrayValue(workspaces, 'apps/*'), 'packages/*');
+    return ensureArrayValue(
+      ensureArrayValue(ensureArrayValue(workspaces, 'apps/*'), 'packages/*'),
+      'packages/config/*',
+    );
   }
 
   if (workspaces && typeof workspaces === 'object' && Array.isArray(workspaces.packages)) {
     return {
       ...workspaces,
-      packages: ensureArrayValue(ensureArrayValue(workspaces.packages, 'apps/*'), 'packages/*'),
+      packages: ensureArrayValue(
+        ensureArrayValue(ensureArrayValue(workspaces.packages, 'apps/*'), 'packages/*'),
+        'packages/config/*',
+      ),
     };
   }
 
-  return ['apps/*', 'packages/*'];
+  return ['apps/*', 'packages/*', 'packages/config/*'];
 }
 
 async function pathExists(targetPath) {

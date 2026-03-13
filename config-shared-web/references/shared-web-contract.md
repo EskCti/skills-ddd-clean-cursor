@@ -27,10 +27,10 @@ node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --theme fuchsi
 5. Remove arquivos legados conhecidos.
 6. Gera/atualiza arquivos do App Router (`private/public/example/dashboard`).
 7. Gera/atualiza `src/shared` base (incluindo `i18n` e `components/form/validator`).
-8. Gera/atualiza `src/modules/examples` (data, components, pages) e `src/modules/dashboard/components`.
+8. Gera/atualiza `src/modules/examples` (data, components, pages) e `src/shared/components/ui/empty-dashboard-state.tsx`.
 9. Gera/atualiza assets de dashboard vazio em `public/illustrations`.
 10. Gera/atualiza arquivos da biblioteca de UI selecionada.
-11. Preserva arquivos de `src/app` quando detectar integracao existente com modulos externos (ex.: `@/modules/auth`, `@/modules/dashboard`) e o template atual nao incluir essa integracao.
+11. Preserva arquivos de `src/app` quando detectar integracao existente com modulos externos (ex.: `@/modules/auth`, `@/modules/accounts`) e o template atual nao incluir essa integracao.
 12. Emite resumo de criados/atualizados/preservados/inalterados e registra no `.log/skills.log`.
 
 ## Deterministic Outputs
@@ -42,7 +42,6 @@ node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --theme fuchsi
 ### App Router (base)
 
 - `<frontendAppPath>/src/app/layout.tsx`
-- `<frontendAppPath>/src/app/page.tsx`
 - `<frontendAppPath>/src/app/globals.css`
 - `<frontendAppPath>/src/app/(private)/layout.tsx`
 - `<frontendAppPath>/src/app/(private)/dashboard/page.tsx`
@@ -53,8 +52,7 @@ node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --theme fuchsi
 - `<frontendAppPath>/src/app/(private)/example/tables/page.tsx`
 - `<frontendAppPath>/src/app/(private)/example/widgets/page.tsx`
 - `<frontendAppPath>/src/app/(public)/layout.tsx`
-- `<frontendAppPath>/src/app/(public)/public/page.tsx`
-- `<frontendAppPath>/public/illustrations/empty-dashboard.svg`
+- `<frontendAppPath>/src/app/(public)/page.tsx`
 - `<frontendAppPath>/public/illustrations/empty-dashboard-dark.svg`
 
 ### Shared layer (base)
@@ -64,10 +62,12 @@ node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --theme fuchsi
 - `<frontendAppPath>/src/shared/hooks/shell.hook.ts`
 - `<frontendAppPath>/src/shared/template/index.ts`
 - `<frontendAppPath>/src/shared/template/admin-shell.component.tsx`
+- `<frontendAppPath>/src/shared/template/app-shell.component.tsx`
 - `<frontendAppPath>/src/shared/template/public-boxed-layout.component.tsx`
 - `<frontendAppPath>/src/shared/i18n/index.ts`
 - `<frontendAppPath>/src/shared/i18n/messages.pt.ts`
 - `<frontendAppPath>/src/shared/i18n/messages.en.ts`
+- `<frontendAppPath>/src/shared/components/ui/sidebar-menu.component.tsx`
 - `<frontendAppPath>/src/shared/components/form/validator/index.ts`
 - `<frontendAppPath>/src/shared/components/form/validator/types.ts`
 - `<frontendAppPath>/src/shared/components/form/validator/type-guards.ts`
@@ -117,9 +117,9 @@ node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --theme fuchsi
 - `<frontendAppPath>/src/modules/examples/pages/example-tables.page.tsx`
 - `<frontendAppPath>/src/modules/examples/pages/example-widgets.page.tsx`
 
-### Dashboard module (base)
+### Shared UI (base)
 
-- `<frontendAppPath>/src/modules/dashboard/components/empty-dashboard-state.component.tsx`
+- `<frontendAppPath>/src/shared/components/ui/empty-dashboard-state.tsx`
 
 ## Runtime dependencies installed (base)
 
@@ -151,9 +151,11 @@ node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --theme fuchsi
 - Private shell com sidebar full-height, topbar, menu de usuario e area de conteudo.
 - Grupo `Modulos` com modulo inicial `Examples`.
 - Menu local de `Examples` com item de retorno para `/dashboard`.
+- `SidebarMenu` padroniza a estrutura do menu lateral com item principal opcional e itens agrupados por secao.
 - Sidebar desktop colapsavel exibindo apenas icones quando fechado.
 - Em mobile, navegacao lateral somente via drawer.
 - Dashboard privado inicial com estado vazio (`EmptyDashboardState`) e ilustracao SVG.
+- `EmptyDashboardState` com `moduleName?: string` para customizar titulo como "Dashboard <moduleName>" quando informado; sem prop, manter "Dashboard Vazio".
 - Layout publico sem shell admin, centralizado e boxed.
 - Internacionalizacao de mensagens via `src/shared/i18n`.
 - Validacao de formularios com schema/resolver via `src/shared/components/form/validator`.

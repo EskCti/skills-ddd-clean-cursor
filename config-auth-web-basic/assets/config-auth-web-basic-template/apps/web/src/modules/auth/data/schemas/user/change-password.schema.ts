@@ -1,4 +1,4 @@
-import { StrongPassword, Text } from '__SHARED_PACKAGE_NAME__';
+import { StrongPassword, Text } from '@poupig/shared';
 import { v } from '@/shared/components/form/validator';
 
 export const changePasswordSchema = v

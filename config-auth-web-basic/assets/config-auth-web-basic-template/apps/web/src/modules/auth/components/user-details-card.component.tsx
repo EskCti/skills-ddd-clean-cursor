@@ -1,6 +1,6 @@
 'use client';
 
-import type { UserDTO } from '__AUTH_PACKAGE_NAME__';
+import type { UserDTO } from '@poupig/auth';
 import { Check, Copy } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';

@@ -8,11 +8,14 @@ const BASE_REQUIRED_TEMPLATE_FILES = [
   'src/app/(private)/layout.tsx',
   'src/app/(private)/dashboard/page.tsx',
   'src/app/(public)/layout.tsx',
+  'src/app/(public)/page.tsx',
   'src/shared/template/admin-shell.component.tsx',
+  'src/shared/template/app-shell.component.tsx',
   'src/shared/components/form/validator/validator.ts',
   'src/shared/components/form/validator/validators.ts',
+  'src/shared/components/ui/empty-dashboard-state.tsx',
+  'src/shared/components/ui/sidebar-menu.component.tsx',
   'src/modules/examples/index.ts',
-  'public/illustrations/empty-dashboard.svg',
   'public/illustrations/empty-dashboard-dark.svg',
 ];
 
@@ -22,8 +25,17 @@ const BASE_LEGACY_FILES = [
   'src/shared/lib/utils.ts',
   'src/shared/template/admin-shell.tsx',
   'src/shared/template/public-boxed-layout.tsx',
+  'app/globals.css',
+  'app/layout.tsx',
+  'app/page.tsx',
+  'app/page.module.css',
+  'app/favicon.ico',
+  'app/fonts/GeistMonoVF.woff',
+  'app/fonts/GeistVF.woff',
+  'src/app/page.tsx',
   'src/app/(private)/private/page.tsx',
   'src/modules/examples/pages/example-overview.page.tsx',
+  'src/modules/dashboard/components/empty-dashboard-state.component.tsx',
 ];
 
 export function getBaseScaffoldConfig({ skillRoot, primaryColor, mode }) {

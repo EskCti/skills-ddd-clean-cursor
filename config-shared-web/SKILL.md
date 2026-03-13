@@ -1,6 +1,6 @@
 ---
 name: config-shared-web
-description: Inicializar e padronizar a camada web compartilhada para apps admin em Next.js com scaffold base agnostico de biblioteca de componentes, grupos de rotas `app/(private)` e `app/(public)`, estrutura `src/shared` (incluindo i18n e form validator), modulo `src/modules/examples` e adapter de UI selecionavel (default: Shadcn). Usar quando o pedido envolver bootstrap/rebootstrap do shell web, criacao de layout dashboard reutilizavel e setup inicial de componentes/paginas de referencia.
+description: 'Inicializar e padronizar a camada web compartilhada para apps admin em Next.js com scaffold base agnostico de biblioteca de componentes, grupos de rotas `app/(private)` e `app/(public)`, estrutura `src/shared` (incluindo i18n e form validator), modulo `src/modules/examples` e adapter de UI selecionavel (default: Shadcn). Usar quando o pedido envolver bootstrap/rebootstrap do shell web, criacao de layout dashboard reutilizavel e setup inicial de componentes/paginas de referencia.'
 ---
 
 # Config Shared Web
@@ -27,13 +27,14 @@ Adapter default: `shadcn`.
    - `src/app/(public)`
    - `src/app/(private)/example`
    - `src/modules/examples`
-   - `src/modules/dashboard/components`
+   - `src/shared/components/ui/empty-dashboard-state.tsx`
+   - `src/shared/components/ui/sidebar-menu.component.tsx`
    - `src/shared/i18n`
    - `src/shared/components/form/validator`
    - `src/shared/context`
    - `src/shared/hooks`
    - `src/shared/template`
-   - `public/illustrations/empty-dashboard.svg`
+   - `src/shared/template/app-shell.component.tsx`
    - `public/illustrations/empty-dashboard-dark.svg`
 4. Validar estrutura da biblioteca de UI selecionada:
    - para `shadcn`: `components.json`, `src/shared/components/ui`, `src/shared/lib/class-name.util.ts`
@@ -91,12 +92,15 @@ node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --ui-library s
   - `src/shared/i18n`
   - `src/shared/components/form/validator`
 - Estrutura de modulo funcional:
-  - `src/modules/dashboard/components` (estado vazio de dashboard)
   - `src/modules/examples/data`
   - `src/modules/examples/components`
   - `src/modules/examples/pages`
+- Estrutura compartilhada de UI:
+  - `src/shared/components/ui/empty-dashboard-state.tsx` (estado vazio de dashboard)
+  - `src/shared/components/ui/sidebar-menu.component.tsx` (padrao de navegacao lateral com suporte a colapso e tooltip)
+- Compatibilidade de shell para integracoes que esperam `AppShell`:
+  - `src/shared/template/app-shell.component.tsx` (alias de `AdminShell`)
 - Assets de ilustracao para dashboard vazio:
-  - `public/illustrations/empty-dashboard.svg`
   - `public/illustrations/empty-dashboard-dark.svg`
 - Tema base em `src/app/globals.css` com token dinamico de cor primaria (`--theme`).
 - Classe de modo no `body` controlada por `--mode` (`dark` ou `light`).
@@ -119,12 +123,14 @@ node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --ui-library s
 - Logo no sidebar com icone + texto (texto oculto quando colapsado).
 - Item de logout como placeholder para evolucao futura.
 - Dashboard privado inicial renderiza `EmptyDashboardState` com ilustracao SVG.
+- `EmptyDashboardState` deve aceitar `moduleName?: string`; sem prop, manter "Dashboard Vazio"; com prop, mostrar "Dashboard <moduleName>" com destaque visual no nome.
+- `SidebarMenu` padroniza menu de navegacao com item principal opcional, grupos por secao e suporte a menu colapsado com tooltip.
 
 ## Notes
 
 - Script idempotente: pode ser reexecutado para reconciliar arquivos.
 - Antes de escrever arquivos, o script valida contrato minimo de templates (base + adapter) e falha com erro explicito se faltar arquivo requerido.
-- Ao detectar integracao existente com modulos externos em arquivos de `src/app` (ex.: `@/modules/auth`, `@/modules/dashboard`), o script preserva esses arquivos em vez de sobrescrever com template base.
+- Ao detectar integracao existente com modulos externos em arquivos de `src/app` (ex.: `@/modules/auth`, `@/modules/accounts`), o script preserva esses arquivos em vez de sobrescrever com template base.
 - Se o frontend configurado em `skills.config.json` nao existir, o script falha com erro explicito.
 - Para adicionar nova biblioteca no futuro:
   - criar adapter em `scripts/ui-libraries/<nome>.mjs`;

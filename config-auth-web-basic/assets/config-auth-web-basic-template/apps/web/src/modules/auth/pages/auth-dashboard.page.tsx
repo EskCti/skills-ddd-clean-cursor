@@ -1,5 +1,5 @@
-import { EmptyDashboardState } from '@/modules/dashboard/components/empty-dashboard-state.component';
+import { EmptyDashboardState } from '@/shared/components/ui/empty-dashboard-state';
 
 export function AuthDashboardPage() {
-  return <EmptyDashboardState />;
+  return <EmptyDashboardState moduleName="Autenticacao" />;
 }

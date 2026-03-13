@@ -1,6 +1,6 @@
 'use client';
 
-import { PersonName, URL } from '__SHARED_PACKAGE_NAME__';
+import { PersonName, URL } from '@poupig/shared';
 import { useForm, useWatch } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';

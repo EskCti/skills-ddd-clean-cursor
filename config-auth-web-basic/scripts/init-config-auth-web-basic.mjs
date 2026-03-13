@@ -183,11 +183,10 @@ async function validateTemplateTokens(templateDir) {
   }
 
   const missingTokens = requiredTokens.filter((token) => tokenHits[token] === 0);
-  if (missingTokens.length > 0) {
-    throw new Error(
-      `Template placeholders missing in assets/config-auth-web-basic-template: ${missingTokens.join(', ')}`,
-    );
-  }
+  return {
+    tokenHits,
+    missingTokens,
+  };
 }
 
 async function ensureSharedWebInfrastructureCompatibility(rootDir) {
@@ -195,8 +194,9 @@ async function ensureSharedWebInfrastructureCompatibility(rootDir) {
     path.join(rootDir, 'apps', 'web', 'src', 'shared', 'index.ts'),
     path.join(rootDir, 'apps', 'web', 'src', 'shared', 'i18n', 'index.ts'),
     path.join(rootDir, 'apps', 'web', 'src', 'shared', 'components', 'form', 'validator', 'index.ts'),
-    path.join(rootDir, 'apps', 'web', 'src', 'modules', 'dashboard', 'components', 'empty-dashboard-state.component.tsx'),
-    path.join(rootDir, 'apps', 'web', 'src', 'modules', 'examples', 'components', 'example-navigation.component.tsx'),
+    path.join(rootDir, 'apps', 'web', 'src', 'shared', 'components', 'ui', 'empty-dashboard-state.tsx'),
+    path.join(rootDir, 'apps', 'web', 'src', 'shared', 'components', 'ui', 'sidebar-menu.component.tsx'),
+    path.join(rootDir, 'apps', 'web', 'src', 'shared', 'template', 'app-shell.component.tsx'),
   ];
 
   await assertRequiredPathsExist(requiredPaths);
@@ -226,6 +226,83 @@ async function ensureFrontendDependencies(frontendPackageJsonPath, authPackageNa
   };
 
   await writeJson(frontendPackageJsonPath, next, options);
+}
+
+function injectPrivateAppShellImport(content) {
+  const importLine = "import { PrivateAppShell } from '@/modules/auth/template/private-app-shell.component';";
+
+  if (content.includes(importLine)) {
+    return content;
+  }
+
+  const importBlockMatch = content.match(/^(import[^\n]*\n)+/m);
+  if (importBlockMatch) {
+    return `${importBlockMatch[0]}${importLine}\n${content.slice(importBlockMatch[0].length)}`;
+  }
+
+  return `${importLine}\n${content}`;
+}
+
+function replaceAdminShellWithPrivateAppShell(content) {
+  let next = content;
+
+  next = next.replace(
+    /import\s+\{\s*AdminShell\s*\}\s+from\s+['"]@\/shared\/template\/admin-shell\.component['"];\n?/g,
+    '',
+  );
+  next = next.replace(/<AdminShell\b/g, '<PrivateAppShell');
+  next = next.replace(/<\/AdminShell>/g, '</PrivateAppShell>');
+
+  return next;
+}
+
+function wrapChildrenWithPrivateAppShell(content) {
+  const wrappedChildren = '<PrivateAppShell sidebar={<></>}>{children}</PrivateAppShell>';
+
+  if (content.includes(wrappedChildren)) {
+    return content;
+  }
+
+  return content.replace(/\{\s*children\s*\}/, wrappedChildren);
+}
+
+async function enforcePrivateAppShellOnPrivateLayouts(rootDir, options) {
+  const privateRoutesDir = path.join(rootDir, 'apps', 'web', 'src', 'app', '(private)');
+
+  if (!(await pathExists(privateRoutesDir))) {
+    return;
+  }
+
+  for await (const filePath of walkFiles(privateRoutesDir)) {
+    if (path.basename(filePath) !== 'layout.tsx') {
+      continue;
+    }
+
+    const relativePath = toPosix(path.relative(privateRoutesDir, filePath));
+    const isDirectChildLayout = /^[^/]+\/layout\.tsx$/.test(relativePath);
+    if (!isDirectChildLayout) {
+      continue;
+    }
+
+    const content = await fs.readFile(filePath, 'utf8');
+    if (!/\{\s*children\s*\}/.test(content)) {
+      continue;
+    }
+
+    if (content.includes('<PrivateAppShell')) {
+      continue;
+    }
+
+    const withoutAdminShell = replaceAdminShellWithPrivateAppShell(content);
+    const withImport = injectPrivateAppShellImport(withoutAdminShell);
+    const withShell = withImport.includes('<PrivateAppShell')
+      ? withImport
+      : wrapChildrenWithPrivateAppShell(withImport);
+
+    if (withShell !== content) {
+      await writeText(filePath, withShell, options);
+    }
+  }
 }
 
 function runCommand(cmd, args, cwd, logger) {
@@ -329,7 +406,7 @@ async function main() {
       throw new Error(`Template directory not found: ${templateDir}`);
     }
 
-    await validateTemplateTokens(templateDir);
+    const tokenValidation = await validateTemplateTokens(templateDir);
     await ensureSharedWebInfrastructureCompatibility(rootDir);
 
     const authPackageName = await resolveAuthPackageName(rootDir, args.scope);
@@ -339,6 +416,13 @@ async function main() {
     logger.step(`Pacote auth resolvido: ${authPackageName}.`);
     logger.step(`Pacote shared resolvido: ${sharedPackageName}.`);
     logger.step(`Slug de escopo resolvido para storage/email: ${scopeSlug}.`);
+    if (tokenValidation.missingTokens.length > 0) {
+      logger.step(
+        `Template sem placeholders canônicos (${tokenValidation.missingTokens.join(
+          ', ',
+        )}); aplicando fallback de replace por literais.`,
+      );
+    }
 
     await copyTemplate(
       templateDir,
@@ -347,9 +431,17 @@ async function main() {
         __AUTH_PACKAGE_NAME__: authPackageName,
         __SHARED_PACKAGE_NAME__: sharedPackageName,
         __PROJECT_SCOPE_SLUG__: scopeSlug,
+        '@namespace/auth': authPackageName,
+        '@namespace/shared': sharedPackageName,
+        '@poupig/auth': authPackageName,
+        '@poupig/shared': sharedPackageName,
+        'namespace.access_token': `${scopeSlug}.access_token`,
+        'poupig.access_token': `${scopeSlug}.access_token`,
       },
       options,
     );
+
+    await enforcePrivateAppShellOnPrivateLayouts(rootDir, options);
 
     await ensureFrontendDependencies(webPackagePath, authPackageName, sharedPackageName, options);
 

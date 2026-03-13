@@ -83,6 +83,247 @@ function toPosixPath(value) {
   return value.replace(/\\/g, '/');
 }
 
+const MODULE_MAIN_MENU_LABELS = {
+  accounts: 'Contas',
+  auth: 'Autenticação',
+  autenticacao: 'Autenticação',
+  categories: 'Categorias',
+  'credit-cards': 'Cartões',
+  cartoes: 'Cartões',
+  example: 'Exemplos',
+  examples: 'Exemplos',
+  recurring: 'Recorrentes',
+  statements: 'Extratos',
+  transactions: 'Transações',
+  transacoes: 'Transações',
+};
+
+const MODULE_MENU_WORD_ACCENT_OVERRIDES = {
+  aplicacao: 'Aplicação',
+  autenticacao: 'Autenticação',
+  cartoes: 'Cartões',
+  categorias: 'Categorias',
+  configuracoes: 'Configurações',
+  conexoes: 'Conexões',
+  consolidacao: 'Consolidação',
+  conciliacao: 'Conciliação',
+  creditos: 'Créditos',
+  diagnostico: 'Diagnóstico',
+  estagio: 'Estágio',
+  extratos: 'Extratos',
+  historico: 'Histórico',
+  informacoes: 'Informações',
+  integracoes: 'Integrações',
+  modulo: 'Módulo',
+  notificacoes: 'Notificações',
+  parametros: 'Parâmetros',
+  permissoes: 'Permissões',
+  relatorios: 'Relatórios',
+  revisao: 'Revisão',
+  transacoes: 'Transações',
+  usuarios: 'Usuários',
+  validacao: 'Validação',
+  variacoes: 'Variações',
+  visao: 'Visão',
+};
+
+const MODULE_MAIN_MENU_ICONS = {
+  accounts: 'wallet',
+  auth: 'shield-check',
+  categories: 'tags',
+  'credit-cards': 'credit-card',
+  example: 'flask-conical',
+  examples: 'flask-conical',
+  recurring: 'repeat',
+  statements: 'file-text',
+  transactions: 'arrow-right-left',
+};
+
+const MODULE_MAIN_MENU_ICON_RULES = [
+  { icon: 'wallet', keywords: ['account', 'wallet', 'bank', 'balance'] },
+  { icon: 'tags', keywords: ['categor', 'tag', 'classif'] },
+  { icon: 'credit-card', keywords: ['card', 'credit'] },
+  { icon: 'repeat', keywords: ['recurr', 'repeat', 'subscription'] },
+  { icon: 'file-text', keywords: ['statement', 'invoice', 'report', 'document'] },
+  { icon: 'arrow-right-left', keywords: ['transaction', 'transfer', 'movement', 'payment'] },
+  { icon: 'shield-check', keywords: ['auth', 'permission', 'access', 'role', 'security'] },
+  { icon: 'flask-conical', keywords: ['example', 'demo', 'sample'] },
+];
+
+const MODULE_MAIN_MENU_USAGE_BASE_SCORES = {
+  accounts: 98,
+  transactions: 100,
+  'credit-cards': 94,
+  recurring: 90,
+  categories: 86,
+  statements: 82,
+  example: 35,
+  examples: 35,
+  auth: 20,
+};
+
+const MODULE_MAIN_MENU_USAGE_RULES = [
+  { score: 35, keywords: ['transaction', 'transfer', 'payment', 'movement'] },
+  { score: 33, keywords: ['account', 'wallet', 'bank', 'cash', 'balance'] },
+  { score: 30, keywords: ['card', 'credit', 'debit'] },
+  { score: 27, keywords: ['recurr', 'subscription', 'installment', 'repeat'] },
+  { score: 22, keywords: ['categor', 'tag', 'classif', 'budget'] },
+  { score: 18, keywords: ['statement', 'report', 'invoice', 'document'] },
+  { score: -15, keywords: ['example', 'demo', 'sample'] },
+];
+
+const MODULE_MAIN_MENU_ADMIN_IDS = new Set(['auth']);
+const MODULE_MAIN_MENU_ADMIN_KEYWORDS = ['auth', 'admin', 'permission', 'role', 'security', 'access', 'user'];
+
+function normalizeSemanticText(value) {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
+function hasSomeKeyword(text, keywords) {
+  return keywords.some((keyword) => text.includes(keyword));
+}
+
+function toTitleCaseFromKebab(value) {
+  return value
+    .split('-')
+    .filter(Boolean)
+    .map((part) => {
+      const normalizedPart = part.toLowerCase();
+      if (MODULE_MENU_WORD_ACCENT_OVERRIDES[normalizedPart]) {
+        return MODULE_MENU_WORD_ACCENT_OVERRIDES[normalizedPart];
+      }
+      return normalizedPart.charAt(0).toUpperCase() + normalizedPart.slice(1);
+    })
+    .join(' ');
+}
+
+function resolveMainMenuLabel(moduleName) {
+  return MODULE_MAIN_MENU_LABELS[moduleName] || toTitleCaseFromKebab(moduleName);
+}
+
+function resolveMainMenuIcon(moduleName) {
+  if (MODULE_MAIN_MENU_ICONS[moduleName]) {
+    return MODULE_MAIN_MENU_ICONS[moduleName];
+  }
+
+  const normalizedName = moduleName.toLowerCase();
+  for (const rule of MODULE_MAIN_MENU_ICON_RULES) {
+    if (rule.keywords.some((keyword) => normalizedName.includes(keyword))) {
+      return rule.icon;
+    }
+  }
+
+  return 'boxes';
+}
+
+function normalizeMainMenuItem(entry) {
+  if (!entry || typeof entry !== 'object') return null;
+
+  const id = typeof entry.id === 'string' ? entry.id.trim() : '';
+  const href = typeof entry.href === 'string' ? entry.href.trim() : '';
+  const label = typeof entry.label === 'string' ? entry.label.trim() : '';
+  const icon = typeof entry.icon === 'string' ? entry.icon.trim() : '';
+
+  if (!id || !href || !label || !icon) {
+    return null;
+  }
+
+  const normalized = { id, href, label, icon };
+  if (typeof entry.adminOnly === 'boolean') {
+    normalized.adminOnly = entry.adminOnly;
+  }
+
+  return normalized;
+}
+
+function analyzeMainMenuItem(item) {
+  const semanticText = normalizeSemanticText(`${item.id} ${item.href} ${item.label} ${item.icon}`);
+  const hasBaseScore = Object.hasOwn(MODULE_MAIN_MENU_USAGE_BASE_SCORES, item.id);
+  let usageScore = hasBaseScore ? MODULE_MAIN_MENU_USAGE_BASE_SCORES[item.id] : 50;
+
+  for (const rule of MODULE_MAIN_MENU_USAGE_RULES) {
+    if (hasSomeKeyword(semanticText, rule.keywords)) {
+      usageScore += rule.score;
+    }
+  }
+
+  const inferredAdmin = MODULE_MAIN_MENU_ADMIN_IDS.has(item.id) || hasSomeKeyword(semanticText, MODULE_MAIN_MENU_ADMIN_KEYWORDS);
+  const isAdmin = item.adminOnly === true || inferredAdmin;
+
+  if (isAdmin) {
+    usageScore -= 40;
+  }
+
+  return { isAdmin, usageScore };
+}
+
+function compareMainMenuItems(a, b) {
+  const aAnalysis = analyzeMainMenuItem(a);
+  const bAnalysis = analyzeMainMenuItem(b);
+
+  if (aAnalysis.isAdmin !== bAnalysis.isAdmin) {
+    return aAnalysis.isAdmin ? 1 : -1;
+  }
+
+  if (aAnalysis.usageScore !== bAnalysis.usageScore) {
+    return bAnalysis.usageScore - aAnalysis.usageScore;
+  }
+
+  const labelComparison = a.label.localeCompare(b.label, 'pt-BR', { sensitivity: 'base' });
+  if (labelComparison !== 0) return labelComparison;
+  const hrefComparison = a.href.localeCompare(b.href, 'en', { sensitivity: 'base' });
+  if (hrefComparison !== 0) return hrefComparison;
+  return a.id.localeCompare(b.id, 'en', { sensitivity: 'base' });
+}
+
+async function ensureFrontendMainMenuRegistryEntry({ mainMenuRegistryPath, moduleName, logger }) {
+  const expectedHref = `/${moduleName}`;
+  const nextItem = {
+    id: moduleName,
+    label: resolveMainMenuLabel(moduleName),
+    href: expectedHref,
+    icon: resolveMainMenuIcon(moduleName),
+  };
+
+  let raw = '';
+  if (await pathExists(mainMenuRegistryPath)) {
+    raw = await fs.readFile(mainMenuRegistryPath, 'utf8');
+  }
+
+  let parsedItems = [];
+  if (raw.trim().length > 0) {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) {
+      throw new Error(`Invalid menu registry content at ${mainMenuRegistryPath}. Expected JSON array.`);
+    }
+    parsedItems = parsed.map(normalizeMainMenuItem).filter(Boolean);
+  }
+
+  const existing = parsedItems.find((item) => item.id === moduleName || item.href === expectedHref);
+  const nextItemAnalysis = analyzeMainMenuItem(nextItem);
+  if (existing?.adminOnly === true || moduleName === 'auth' || nextItemAnalysis.isAdmin) {
+    nextItem.adminOnly = true;
+  }
+
+  const keptItems = parsedItems.filter((item) => item.id !== moduleName && item.href !== expectedHref);
+  const nextItems = [...keptItems, nextItem].sort(compareMainMenuItems);
+  const nextRaw = stringifyJson(nextItems);
+
+  if (nextRaw === raw) {
+    logger.step(`Registro do menu principal já estava atualizado: ${mainMenuRegistryPath}`);
+    return;
+  }
+
+  await writeFile(mainMenuRegistryPath, nextRaw);
+  logger.step(
+    `Menu principal atualizado com o módulo ${moduleName} (ícone ${nextItem.icon}) com ordenação inteligente por uso: ${mainMenuRegistryPath}`,
+  );
+}
+
 async function pathExists(targetPath) {
   try {
     await fs.access(targetPath);
@@ -203,12 +444,15 @@ async function main() {
     const hasFrontendSrcDir = await pathExists(frontendSrcDir);
     const frontendModulesBaseSegments = hasFrontendSrcDir ? ['src', 'modules'] : ['modules'];
     const frontendAppBaseSegments = hasFrontendSrcDir ? ['src', 'app'] : ['app'];
+    const frontendSharedBaseSegments = hasFrontendSrcDir ? ['src', 'shared'] : ['shared'];
     const frontendModulesBaseDir = path.join(rootDir, frontendAppPath, ...frontendModulesBaseSegments);
     const frontendEmptyDashboardStatePath = path.join(
-      frontendModulesBaseDir,
-      'dashboard',
+      rootDir,
+      frontendAppPath,
+      ...frontendSharedBaseSegments,
       'components',
-      'empty-dashboard-state.component.tsx',
+      'ui',
+      'empty-dashboard-state.tsx',
     );
     const frontendAppBaseDir = path.join(rootDir, frontendAppPath, ...frontendAppBaseSegments);
     const frontendPrivateGroupDir = path.join(frontendAppBaseDir, '(private)');
@@ -223,6 +467,22 @@ async function main() {
     const backendAppModulePath = path.join(rootDir, backendAppPath, 'src', 'app.module.ts');
     const backendPackageJsonPath = path.join(rootDir, backendAppPath, 'package.json');
     const frontendPackageJsonPath = path.join(rootDir, frontendAppPath, 'package.json');
+    const frontendMainMenuRegistryCandidates = [
+      path.join(
+        hasFrontendPrivateGroup ? frontendPrivateGroupDir : frontendAppBaseDir,
+        'dashboard',
+        '_data',
+        'main-menu-modules.json',
+      ),
+      path.join(frontendModulesBaseDir, 'navigation', 'data', 'main-menu-modules.json'),
+    ];
+    let frontendMainMenuRegistryPath = frontendMainMenuRegistryCandidates[0];
+    for (const candidate of frontendMainMenuRegistryCandidates) {
+      if (await pathExists(candidate)) {
+        frontendMainMenuRegistryPath = candidate;
+        break;
+      }
+    }
 
     let sharedScopeFromPackage = '';
     try {
@@ -246,22 +506,33 @@ async function main() {
 
     const packageName = `${scope}/${moduleName}`;
     const sharedDependency = `${scope}/${sharedModule}`;
-    const workspaceTsConfigBasePath = path.join(packagesDir, 'typescript-config', 'base.json');
-    const fallbackTsConfigBasePath = path.join(rootDir, 'packages', 'typescript-config', 'base.json');
-    const tsConfigBasePath = (await pathExists(workspaceTsConfigBasePath))
-      ? workspaceTsConfigBasePath
-      : fallbackTsConfigBasePath;
+    const workspaceTsConfigBasePath = path.join(packagesDir, 'config', 'typescript-config', 'base.json');
+    const legacyWorkspaceTsConfigBasePath = path.join(packagesDir, 'typescript-config', 'base.json');
+    const fallbackTsConfigBasePath = path.join(rootDir, 'packages', 'config', 'typescript-config', 'base.json');
+    const legacyFallbackTsConfigBasePath = path.join(rootDir, 'packages', 'typescript-config', 'base.json');
+    let tsConfigBasePath = fallbackTsConfigBasePath;
+    if (await pathExists(workspaceTsConfigBasePath)) {
+      tsConfigBasePath = workspaceTsConfigBasePath;
+    } else if (await pathExists(legacyWorkspaceTsConfigBasePath)) {
+      tsConfigBasePath = legacyWorkspaceTsConfigBasePath;
+    } else if (await pathExists(legacyFallbackTsConfigBasePath)) {
+      tsConfigBasePath = legacyFallbackTsConfigBasePath;
+    }
     const tsConfigExtendsPath = toPosixPath(path.relative(targetDir, tsConfigBasePath));
     const moduleClassName = toPascalCase(moduleName);
     const backendControllerClassName = `${moduleClassName}Controller`;
     const backendPrismaClassName = `${moduleClassName}Prisma`;
     const backendModuleClassName = `${moduleClassName}Module`;
     const frontendDashboardComponentName = `${moduleClassName}DashboardComponent`;
+    const frontendSidebarComponentName = `${moduleClassName}SidebarMenu`;
     const frontendDashboardComponentFileName = `${moduleName}-dashboard.component.tsx`;
+    const frontendSidebarComponentFileName = `${moduleName}-navigation.component.tsx`;
     const frontendDashboardPageName = 'DashboardPage';
     const frontendDashboardPageFileName = 'dashboard.page.tsx';
+    const frontendModuleLayoutName = `${moduleClassName}ModuleLayout`;
     const frontendMenuDataTypeName = `${moduleClassName}MenuItem`;
     const frontendMenuItemsConstName = `${toCamelCase(moduleName)}MenuItems`;
+    const frontendDashboardModuleName = resolveMainMenuLabel(moduleName);
     const hasFrontendEmptyDashboardState = await pathExists(frontendEmptyDashboardStatePath);
 
     await ensureTargetPathAvailability({
@@ -394,7 +665,7 @@ export class ${backendModuleClassName} {}
 // Add concrete models for this module below.
 `;
     const frontendMenuDataTs = `export type ${frontendMenuDataTypeName} = {
-  id: "dashboard";
+  id: "back" | "dashboard";
   label: string;
   href: string;
   description: string;
@@ -402,10 +673,16 @@ export class ${backendModuleClassName} {}
 
 export const ${frontendMenuItemsConstName}: ${frontendMenuDataTypeName}[] = [
   {
+    id: "back",
+    label: "Voltar",
+    href: "/dashboard",
+    description: "Retorna para o menu principal da aplicação.",
+  },
+  {
     id: "dashboard",
-    label: "Dashboard",
+    label: "Visão Geral ${frontendDashboardModuleName}",
     href: "/${moduleName}",
-    description: "Página inicial do módulo ${moduleName}.",
+    description: "Resumo inicial do módulo ${frontendDashboardModuleName}.",
   },
 ];
 `;
@@ -418,10 +695,10 @@ export const ${frontendMenuItemsConstName}: ${frontendMenuDataTypeName}[] = [
     }
 
     const frontendDashboardComponentTsx = hasFrontendEmptyDashboardState
-      ? `import { EmptyDashboardState } from "../../dashboard/components/empty-dashboard-state.component";
+      ? `import { EmptyDashboardState } from '@/shared/components/ui/empty-dashboard-state';
 
 export function ${frontendDashboardComponentName}() {
-  return <EmptyDashboardState />;
+  return <EmptyDashboardState moduleName="${frontendDashboardModuleName}" />;
 }
 `
       : `export function ${frontendDashboardComponentName}() {
@@ -441,6 +718,34 @@ export function ${frontendDashboardPageName}() {
   return <${frontendDashboardComponentName} />;
 }
 `;
+    const frontendNavigationComponentTsx = `import { LayoutDashboard } from 'lucide-react';
+import { ModuleSidebarMenu } from '@/shared/navigation/module-sidebar-menu.component';
+import { ${frontendMenuItemsConstName} } from '../data/${moduleName}-menu.data';
+
+const iconById = {
+  dashboard: LayoutDashboard,
+} as const;
+
+export function ${frontendSidebarComponentName}() {
+  return (
+    <ModuleSidebarMenu
+      moduleLabel='${frontendDashboardModuleName}'
+      moduleRootHref='/${moduleName}'
+      items={${frontendMenuItemsConstName}}
+      iconById={iconById}
+    />
+  );
+}
+`;
+    const frontendModuleLayoutTsx = `'use client';
+
+import { ${frontendSidebarComponentName} } from '@/modules/${moduleName}';
+import { PrivateAppShell } from '@/modules/auth/template/private-app-shell.component';
+
+export default function ${frontendModuleLayoutName}({ children }: { children: React.ReactNode }) {
+  return <PrivateAppShell sidebar={<${frontendSidebarComponentName} />}>{children}</PrivateAppShell>;
+}
+`;
     const frontendMenuDataPath = path.join(frontendModuleDir, 'data', `${moduleName}-menu.data.ts`);
     const frontendModuleIndexPath = path.join(frontendModuleDir, 'index.ts');
     const backendPrismaPath = path.join(backendModuleDir, `${moduleName}.prisma.ts`);
@@ -452,8 +757,10 @@ export function ${frontendDashboardPageName}() {
       'components',
       frontendDashboardComponentFileName,
     );
+    const frontendSidebarComponentPath = path.join(frontendModuleDir, 'components', frontendSidebarComponentFileName);
     const frontendDashboardPagePath = path.join(frontendModuleDir, 'pages', frontendDashboardPageFileName);
     const frontendAppRoutePagePath = path.join(frontendRouteDir, 'page.tsx');
+    const frontendAppRouteLayoutPath = path.join(frontendRouteDir, 'layout.tsx');
     const frontendDashboardPageImportPath = toImportPath(frontendRouteDir, frontendDashboardPagePath);
     const frontendAppRoutePageTsx = `import { ${frontendDashboardPageName} } from "${frontendDashboardPageImportPath}";
 
@@ -462,6 +769,7 @@ export default function Page() {
 }
 `;
     const frontendModuleIndexTs = `export * from "./components/${moduleName}-dashboard.component";
+export * from "./components/${moduleName}-navigation.component";
 export * from "./data/${moduleName}-menu.data";
 export * from "./pages/dashboard.page";
 `;
@@ -504,6 +812,8 @@ export * from "./pages/dashboard.page";
 
     await writeFile(frontendDashboardComponentPath, frontendDashboardComponentTsx);
     logger.step(`criou arquivo: ${frontendDashboardComponentPath}`);
+    await writeFile(frontendSidebarComponentPath, frontendNavigationComponentTsx);
+    logger.step(`criou arquivo: ${frontendSidebarComponentPath}`);
     await writeFile(frontendMenuDataPath, frontendMenuDataTs);
     logger.step(`criou arquivo: ${frontendMenuDataPath}`);
     await writeFile(frontendDashboardPagePath, frontendDashboardPageTsx);
@@ -512,6 +822,13 @@ export * from "./pages/dashboard.page";
     logger.step(`criou arquivo: ${frontendModuleIndexPath}`);
     await writeFile(frontendAppRoutePagePath, frontendAppRoutePageTsx);
     logger.step(`criou arquivo: ${frontendAppRoutePagePath}`);
+    await writeFile(frontendAppRouteLayoutPath, frontendModuleLayoutTsx);
+    logger.step(`criou arquivo: ${frontendAppRouteLayoutPath}`);
+    await ensureFrontendMainMenuRegistryEntry({
+      mainMenuRegistryPath: frontendMainMenuRegistryPath,
+      moduleName,
+      logger,
+    });
     logger.step(`Estrutura frontend criada em ${frontendModuleDir}.`);
 
     await ensurePackageDependency({

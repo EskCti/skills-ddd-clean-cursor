@@ -1,5 +1,4 @@
 export * from './admin-route.component';
-export * from './auth-navigation.component';
 export * from './auth-screen-layout.component';
 export * from './private-route.component';
 export * from './public-only-route.component';

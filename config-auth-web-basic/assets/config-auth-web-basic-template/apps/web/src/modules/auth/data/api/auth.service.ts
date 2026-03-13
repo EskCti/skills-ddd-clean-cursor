@@ -1,4 +1,4 @@
-import type { CreateUserIn, LoginIn, UserDTO } from '__AUTH_PACKAGE_NAME__';
+import type { CreateUserIn, LoginIn, UserDTO } from '@poupig/auth';
 import { apiRequest } from './http-client';
 
 export type LoginResponse = {

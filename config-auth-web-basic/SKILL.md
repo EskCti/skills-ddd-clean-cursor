@@ -10,26 +10,32 @@ description: Criar/recriar de forma deterministica o modulo de autenticacao web 
 Executar setup idempotente da autenticacao web no `apps/web`, cobrindo:
 
 - modulo `src/modules/auth` completo:
-  - `components` (private/public/admin route, navegacao, avatar, cards/forms, indicador admin)
+  - `components` (private/public/admin route, navegacao por `SidebarMenu`, avatar, cards/forms, indicador admin)
   - `data` (contexto de auth, hooks, services HTTP, schemas de auth/user, menu)
-  - `pages` (`sign-in`, `sign-up`, `auth-dashboard`, `users`, `profile`)
+  - `template` com `PrivateAppShell` para composicao de rotas privadas (tipagem via `ComponentProps<typeof AppShell>`, sem depender de export `AppShellProps`)
+  - `pages` (`sign-in`, `sign-up`, `auth-dashboard`, `users`, `profile`), com `auth-dashboard` usando `EmptyDashboardState` com `moduleName`
 - integracao no App Router:
   - rotas publicas em `src/app/(public)/auth/*`
   - rotas privadas/admin em `src/app/(private)/auth/*`
-  - layout privado com menu condicional do modulo auth
+  - `src/app/(private)/layout.tsx` com `ShellProvider` + `PrivateRoute` (sem shell visual acoplado)
+  - `src/app/(private)/auth/layout.tsx` usando `PrivateAppShell` com `AuthSidebarMenu`
+- convergencia automatica dos layouts privados:
+  - todo `src/app/(private)/*/layout.tsx` (subpastas diretas) que ainda nao usa `PrivateAppShell` passa a envolver `{children}` com `PrivateAppShell` automaticamente
+  - `src/app/(private)/layout.tsx` (layout raiz do grupo privado) nao deve ser envolvido por `PrivateAppShell`
+  - a convergencia tambem vale para layouts criados por outras skills/modulos
 - integracao de provider global:
   - `src/app/providers.tsx`
   - `src/app/layout.tsx` envolvendo `AppProviders`
 - dependencia de workspace do core auth em `apps/web/package.json`
-- validacao de pre-requisitos do shared-web (`src/shared`, dashboard/examples e validator)
+- validacao de pre-requisitos do shared-web (`src/shared`, `validator`, `AppShell` e `SidebarMenu`)
 
 A skill aplica arquivos canonicos por template versionado e faz replace automatico de:
 
 - `__AUTH_PACKAGE_NAME__` -> `<scope>/auth`
 - `__SHARED_PACKAGE_NAME__` -> `<scope>/shared`
-- `__PROJECT_SCOPE_SLUG__` -> slug do scope para chaves locais (ex.: `poupig`)
+- `__PROJECT_SCOPE_SLUG__` -> slug do scope para chaves locais (ex.: `application`)
 
-O script tambem valida placeholders obrigatorios do template antes da aplicacao e garante dependencias usadas diretamente pelo modulo (`react-hook-form`, `sonner`, `lucide-react`).
+O script valida placeholders canonicos do template e, quando ausentes, aplica fallback automatico por literais conhecidos, mantendo a aplicacao idempotente. Tambem garante dependencias usadas diretamente pelo modulo (`react-hook-form`, `sonner`, `lucide-react`).
 
 ## Workflow
 

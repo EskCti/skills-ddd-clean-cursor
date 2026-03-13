@@ -9,8 +9,9 @@ Garantir que o frontend tenha o modulo de autenticacao web basico funcional, com
 - `apps/web/src/shared/index.ts` deve existir.
 - `apps/web/src/shared/i18n/index.ts` deve existir.
 - `apps/web/src/shared/components/form/validator/index.ts` deve existir.
-- `apps/web/src/modules/dashboard/components/empty-dashboard-state.component.tsx` deve existir.
-- `apps/web/src/modules/examples/components/example-navigation.component.tsx` deve existir.
+- `apps/web/src/shared/components/ui/empty-dashboard-state.tsx` deve existir.
+- `apps/web/src/shared/components/ui/sidebar-menu.component.tsx` deve existir.
+- `apps/web/src/shared/template/app-shell.component.tsx` deve existir.
 
 ## Artefatos obrigatorios
 
@@ -26,6 +27,8 @@ Garantir que o frontend tenha o modulo de autenticacao web basico funcional, com
 - `apps/web/src/app/(private)/auth/page.tsx`
 - `apps/web/src/app/(private)/auth/users/page.tsx`
 - `apps/web/src/app/(private)/auth/profile/page.tsx`
+- `apps/web/src/modules/auth/template/private-app-shell.component.tsx`
+- `apps/web/src/modules/auth/template/index.ts`
 
 ## Arquivos convergidos
 
@@ -57,10 +60,16 @@ Garantir que o frontend tenha o modulo de autenticacao web basico funcional, com
   - `PublicOnlyRoute`
   - `AdminRoute`
   - `RequireAdmin`
+- Composicao de shell privado:
+  - `PrivateAppShell` em `modules/auth/template/private-app-shell.component.tsx`
+  - `app/(private)/layout.tsx` deve aplicar apenas `ShellProvider` + `PrivateRoute`
+  - `app/(private)/auth/layout.tsx` deve aplicar `AdminRoute` + `PrivateAppShell` com `AuthSidebarMenu`
+  - `AuthSidebarMenu` deve usar `shared/components/ui/sidebar-menu.component.tsx`
+  - qualquer `app/(private)/*/layout.tsx` (subpastas diretas) que nao estiver usando `PrivateAppShell` deve ser convergido automaticamente para usar
 - Telas do modulo auth:
   - `SignInPage`
   - `SignUpPage`
-  - `AuthDashboardPage`
+  - `AuthDashboardPage` (renderizando `EmptyDashboardState` com `moduleName` de autenticacao)
   - `UsersPage` (com dialogs modais de criar/editar/visualizar)
   - `ProfilePage` (dados do usuario, troca de senha e avatar)
 - Campos de usuario com suporte a:
@@ -77,4 +86,4 @@ Garantir que o frontend tenha o modulo de autenticacao web basico funcional, com
 - Rotas auth publicas devem funcionar sem shell privado.
 - Rotas privadas e administrativas devem respeitar autenticacao e perfil admin.
 - Chave de token local deve usar slug de scope (`__PROJECT_SCOPE_SLUG__.access_token`) apos replace.
-- Template deve manter placeholders `__AUTH_PACKAGE_NAME__`, `__SHARED_PACKAGE_NAME__` e `__PROJECT_SCOPE_SLUG__` para substituicao dinamica por namespace.
+- Preferencialmente o template deve manter placeholders `__AUTH_PACKAGE_NAME__`, `__SHARED_PACKAGE_NAME__` e `__PROJECT_SCOPE_SLUG__`; quando ausentes, a skill aplica fallback de replace por literais conhecidos.

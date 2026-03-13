@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import type { UserDTO } from '__AUTH_PACKAGE_NAME__';
+import type { UserDTO } from '@poupig/auth';
 import { Pencil, Plus, Trash2, UserRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/i18n';

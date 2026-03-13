@@ -40,7 +40,7 @@ export function AdminShell({
   userName = 'Usuario',
   userEmail = 'usuario@aplicacao.local',
   userAvatarUrl,
-  profileHref = '/profile',
+  profileHref = '/auth/profile',
   onLogout,
 }: AdminShellProps) {
   const router = useRouter();

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Poupig Web Shell',
+  title: 'Application Web Shell',
   description: 'Base compartilhada para aplicacao administrativa',
 };
 

@@ -1,4 +1,4 @@
-import { Email, PersonName, StrongPassword, URL } from '__SHARED_PACKAGE_NAME__';
+import { Email, PersonName, StrongPassword, URL } from '@poupig/shared';
 import { v } from '@/shared/components/form/validator';
 
 export const createUserSchema = v.defineObject({

@@ -1,5 +1,5 @@
-import type { CreateUserIn, UserDTO } from '__AUTH_PACKAGE_NAME__';
-import type { PaginatedResultDTO } from '__SHARED_PACKAGE_NAME__';
+import type { CreateUserIn, UserDTO } from '@poupig/auth';
+import type { PaginatedResultDTO } from '@poupig/shared';
 import { apiRequest } from './http-client';
 
 export type ChangePasswordPayload = {

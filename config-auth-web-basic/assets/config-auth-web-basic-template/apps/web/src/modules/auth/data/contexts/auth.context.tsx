@@ -1,6 +1,6 @@
 'use client';
 
-import type { UserDTO } from '__AUTH_PACKAGE_NAME__';
+import type { UserDTO } from '@poupig/auth';
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import { getMe, login as loginRequest, register as registerRequest } from '../api/auth.service';
 import {
@@ -14,10 +14,10 @@ import {
 } from '../api/user.service';
 import type { LoginFormData, RegisterFormData } from '../schemas/auth';
 import type { ChangePasswordFormData, CreateUserFormData } from '../schemas/user';
-import type { PaginatedResultDTO } from '__SHARED_PACKAGE_NAME__';
+import type { PaginatedResultDTO } from '@poupig/shared';
 import type { FindAllUsersIn, UpdateUserPayload } from '../api/user.service';
 
-const ACCESS_TOKEN_STORAGE_KEY = '__PROJECT_SCOPE_SLUG__.access_token';
+const ACCESS_TOKEN_STORAGE_KEY = 'poupig.access_token';
 
 type AuthContextType = {
   user: UserDTO | null;

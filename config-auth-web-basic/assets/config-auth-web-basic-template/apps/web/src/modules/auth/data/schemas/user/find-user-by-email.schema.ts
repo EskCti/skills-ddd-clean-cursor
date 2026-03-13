@@ -1,4 +1,4 @@
-import { Email } from '__SHARED_PACKAGE_NAME__';
+import { Email } from '@poupig/shared';
 import { v } from '@/shared/components/form/validator';
 
 export const findUserByEmailSchema = v.defineObject({
