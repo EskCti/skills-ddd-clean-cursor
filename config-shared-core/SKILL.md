@@ -1,6 +1,6 @@
 ---
 name: config-shared-core
-description: Inicializar o módulo `packages/shared` completo de forma determinística no padrão do projeto Workspace, incluindo estrutura de código (`src/base`, `src/db`, `src/dto`, `src/vo`, `src/index.ts`) e testes (`test/base`, `test/vo`, `test/data`) com VO `HashPassword` para hashes bcrypt, `ResultValidator` em `src/base` e `TransactionManager` em `src/db`. Usar quando o pedido envolver bootstrap do pacote shared, recriação do shared em novo projeto, reset da base compartilhada ou scaffolding completo do core compartilhado com configs (`package.json`, `tsconfig.json`, `jest.config.ts`).
+description: Inicializar o módulo `packages/shared` completo de forma determinística no padrão do projeto Workspace, incluindo estrutura de código (`src/base`, `src/db`, `src/dto`, `src/vo`, `src/index.ts`) e testes (`test/base`, `test/vo`, `test/data`) com VOs `HashPassword`, `DotSeparatedName` e `Name`, além de `ResultValidator` em `src/base` e `TransactionManager` em `src/db`. Usar quando o pedido envolver bootstrap do pacote shared, recriação do shared em novo projeto, reset da base compartilhada ou scaffolding completo do core compartilhado com configs (`package.json`, `tsconfig.json`, `jest.config.ts`).
 ---
 
 # Config Shared Core
@@ -10,7 +10,8 @@ description: Inicializar o módulo `packages/shared` completo de forma determin�
 Criar ou recriar o pacote no caminho de `sharedModulePath` (padrão: `packages/shared`) com template versionado dentro da própria skill, sem depender do sistema operacional.
 Executar o script Node da skill para gerar toda a estrutura de código e testes do módulo shared.
 O namespace e diretórios padrão devem ser resolvidos por configuração global compartilhada em `skills.config.json` (`.agents/skills/.env`, `.cloud/skills/.env` ou `.env/`).
-O template inclui obrigatoriamente o VO `HashPassword` (`src/vo/hash-password.vo.ts`), teste correspondente (`test/vo/hash-password.vo.test.ts`) e export em `src/vo/index.ts`, validando hash bcrypt no formato `$2a$|$2b$|$2y$` com rounds de dois dígitos e payload base64 bcrypt.
+O template inclui obrigatoriamente os VOs `HashPassword` (`src/vo/hash-password.vo.ts`), `DotSeparatedName` (`src/vo/dot-separated-name.vo.ts`) e `Name` (`src/vo/name.vo.ts`), com testes correspondentes em `test/vo/` e exports em `src/vo/index.ts`.
+`HashPassword` valida hash bcrypt no formato `$2a$|$2b$|$2y$` com rounds de dois dígitos e payload base64 bcrypt.
 Também inclui obrigatoriamente `ResultValidator` (`src/base/result-validator.ts`, `test/base/result-validator.test.ts`) e `TransactionManager` (`src/db/transaction.manager.ts`, exportado em `src/db/index.ts`).
 
 ## Workflow

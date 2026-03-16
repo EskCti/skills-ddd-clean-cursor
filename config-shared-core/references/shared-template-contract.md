@@ -7,9 +7,15 @@ Inicializar `<sharedModulePath>` com o baseline completo do projeto:
 - configs do pacote (`package.json`, `tsconfig.json`, `jest.config.ts`)
 - código fonte (`src/base`, `src/db`, `src/dto`, `src/vo`, `src/index.ts`)
 - testes (`test/base`, `test/vo`, `test/data`)
-- VO obrigatório no template: `src/vo/hash-password.vo.ts` com validação de hash bcrypt (`$2a$|$2b$|$2y$`, rounds com dois dígitos, payload `[./A-Za-z0-9]{53}`)
-- teste obrigatório correspondente: `test/vo/hash-password.vo.test.ts`
-- export obrigatório em `src/vo/index.ts` para disponibilizar `HashPassword` via `src/index.ts`
+- VOs obrigatórios no template:
+  - `src/vo/hash-password.vo.ts` com validação de hash bcrypt (`$2a$|$2b$|$2y$`, rounds com dois dígitos, payload `[./A-Za-z0-9]{53}`)
+  - `src/vo/dot-separated-name.vo.ts`
+  - `src/vo/name.vo.ts`
+- testes obrigatórios correspondentes:
+  - `test/vo/hash-password.vo.test.ts`
+  - `test/vo/dot-separated-name.vo.test.ts`
+  - `test/vo/name.vo.test.ts`
+- exports obrigatórios em `src/vo/index.ts` para disponibilizar `HashPassword`, `DotSeparatedName` e `Name` via `src/index.ts`
 - utilitário obrigatório de validação de resultado: `src/base/result-validator.ts` + `test/base/result-validator.test.ts` + export em `src/base/index.ts`
 - contrato obrigatório de transação em `src/db/transaction.manager.ts` + export em `src/db/index.ts`
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Auth Core Full'
+  short_description: 'Criar módulo auth core full sem auditoria e sincronizar dependências backend/frontend'
+  default_prompt: 'Crie ou recrie o módulo auth core full com node .agents/skills/confg-auth-core-full/scripts/create-auth-core-full.mjs, detectando automaticamente se o destino correto é packages/auth ou packages/auth/core, gerando user/password/application/role/permission/oauth + testes unitários, removendo qualquer referência a audit, resolvendo namespace por configuração global e sincronizando dependência <scope>/auth em apps/backend e apps/web.'
