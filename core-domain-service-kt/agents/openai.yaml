@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Domain Service (Kotlin)'
+  short_description: 'Criar serviços de domínio em Kotlin'
+  default_prompt: 'Crie ou revise um serviço de domínio em Kotlin no padrão DDD, com regras puras, sem I/O, sem framework e com testes.'
