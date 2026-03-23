@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Query CQRS (Kotlin)'
+  short_description: 'Criar queries de leitura CQRS em Kotlin'
+  default_prompt: 'Crie ou revise queries CQRS de leitura em Kotlin, com DTOs orientados ao consumo e separação clara de comandos.'
