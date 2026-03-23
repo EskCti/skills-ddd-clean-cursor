@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Auth Backend Basic (Kotlin)'
+  short_description: 'Reconciliar módulo auth backend Spring Boot/JWT/JPA'
+  default_prompt: 'Implemente ou reconcilie o módulo backend de autenticação Spring Boot Kotlin com AuthController (register/login/me/users/change-password), SecurityConfig com JWT filter, JwtTokenProvider, RequireAdmin annotation+aspect, adapters JPA (UserJpaEntity/PasswordJpaEntity/BcryptPasswordCryptoAdapter), integração com auth core Kotlin, migrations Flyway e seed com usuário admin padrão.'
