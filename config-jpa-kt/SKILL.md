@@ -45,13 +45,47 @@ Equivalente ao `config-prisma` do stack TypeScript, adaptado para o ecossistema 
 - `docker-compose.yml`
 - `.env` / `.env.example`
 
+## Commands
+
+Simular alterações (dry-run):
+
+```bash
+node config-jpa-kt/scripts/init-jpa-backend-kt.mjs --dry-run
+```
+
+> Se instalado como submódulo: `node .agents/skills/config-jpa-kt/scripts/init-jpa-backend-kt.mjs --dry-run`
+
+Aplicar alterações:
+
+```bash
+node config-jpa-kt/scripts/init-jpa-backend-kt.mjs --apply
+```
+
+Criar migrations para módulos:
+
+```bash
+node config-jpa-kt/scripts/init-jpa-backend-kt.mjs --apply --module auth --module product
+```
+
+Customizar path do backend:
+
+```bash
+node config-jpa-kt/scripts/init-jpa-backend-kt.mjs --apply --backend-path apps/api-kt
+```
+
+## Resources
+
+- `scripts/init-jpa-backend-kt.mjs`: script de setup JPA/Flyway.
+- `references/jpa-init-checklist-kt.md`: checklist operacional.
+- Log local de execução: `.log/skills.log`.
+
 ## Scaffold de módulos
 
-Para cada novo módulo de domínio, criar migration Flyway:
+Para cada novo módulo de domínio, o script cria migration Flyway automaticamente com `--module`:
 
 ```
-src/main/resources/db/migration/V2__create_products.sql
-src/main/resources/db/migration/V3__create_branches.sql
+src/main/resources/db/migration/V2__create_users.sql
+src/main/resources/db/migration/V3__create_products.sql
 ```
 
 ## Regra de escopo

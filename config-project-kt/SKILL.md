@@ -83,12 +83,47 @@ include("apps:backend-kt")
 include("packages:shared")
 ```
 
+## Commands
+
+Fluxo padrão:
+
+```bash
+node config-project-kt/scripts/project-init-kt.mjs
+```
+
+> Se instalado como submódulo: `node .agents/skills/config-project-kt/scripts/project-init-kt.mjs`
+
+Customizar namespace:
+
+```bash
+node config-project-kt/scripts/project-init-kt.mjs --scope @myorg
+```
+
+Simular sem alterar disco:
+
+```bash
+node config-project-kt/scripts/project-init-kt.mjs --dry-run
+```
+
+Customizar backend path e porta:
+
+```bash
+node config-project-kt/scripts/project-init-kt.mjs --backend-path apps/api-kt --backend-port 4100
+```
+
+## Resources
+
+- `scripts/project-init-kt.mjs`: script principal de bootstrap.
+- `references/bootstrap-contract-kt.md`: contrato dos arquivos gerados.
+- Log local de execução: `.log/skills.log`.
+
 ## Notes
 
 - O setup é idempotente: pula etapas já atendidas.
 - Módulos adicionais podem ser incluídos depois em `settings.gradle.kts`.
 - O backend depende do shared via `implementation(project(":packages:shared"))`.
 - Não usar Spring no módulo shared (manter domínio puro).
+- Após gerar, executar `gradle wrapper --gradle-version 8.8` se o wrapper não existir.
 
 ## References
 

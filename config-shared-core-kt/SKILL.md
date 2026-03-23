@@ -97,6 +97,41 @@ tasks.test {
 }
 ```
 
+## Commands
+
+Criar/recriar shared no namespace padrão:
+
+```bash
+node config-shared-core-kt/scripts/create-shared-kt.mjs
+```
+
+> Se instalado como submódulo: `node .agents/skills/config-shared-core-kt/scripts/create-shared-kt.mjs`
+
+Definir namespace explícito:
+
+```bash
+node config-shared-core-kt/scripts/create-shared-kt.mjs --scope @myorg
+```
+
+Sobrescrever diretório existente:
+
+```bash
+node config-shared-core-kt/scripts/create-shared-kt.mjs --force
+```
+
+Criar e executar testes:
+
+```bash
+node config-shared-core-kt/scripts/create-shared-kt.mjs --force --run-tests
+```
+
+## Resources
+
+- `scripts/create-shared-kt.mjs`: gerador determinístico.
+- `assets/shared-template-kt`: template completo do módulo shared (código + testes + config).
+- `references/shared-template-contract-kt.md`: contrato dos artefatos gerados.
+- Log local de execução: `.log/skills.log`.
+
 ## Regras
 
 - **Sem Spring** no módulo shared (domínio puro).
