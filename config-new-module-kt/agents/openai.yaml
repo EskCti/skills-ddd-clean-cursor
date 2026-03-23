@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config New Module (Kotlin)'
+  short_description: 'Criar módulo Kotlin full-stack (package Gradle + backend Spring Boot)'
+  default_prompt: 'Crie um novo módulo Kotlin com node .agents/skills/config-new-module-kt/scripts/create-module-kt.mjs gerando sub-projeto Gradle em packages/ com entidade de domínio e repository, módulo backend Spring Boot com RestController, JPA entity, Spring Data repository, Configuration e migration Flyway, atualizando settings.gradle.kts e o build.gradle.kts do backend.'
