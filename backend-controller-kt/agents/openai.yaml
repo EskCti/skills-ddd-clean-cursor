@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Backend Controller (Kotlin)'
+  short_description: 'Criar controllers Spring Boot em Kotlin'
+  default_prompt: 'Crie ou revise controllers HTTP em Kotlin/Spring Boot no padrão DDD, com injeção de use cases, mapeamento de Result para ResponseEntity e segurança.'
