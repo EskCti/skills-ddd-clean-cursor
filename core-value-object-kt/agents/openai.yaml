@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Value Object (Kotlin)'
+  short_description: 'Criar Value Objects em Kotlin'
+  default_prompt: 'Crie ou revise um Value Object em Kotlin seguindo o padrão DDD (value class ou data class, companion object, Result, validação e normalização).'
