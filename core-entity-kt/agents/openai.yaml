@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Entity (Kotlin)'
+  short_description: 'Criar entidades de domínio em Kotlin'
+  default_prompt: 'Crie ou revise uma entidade de domínio em Kotlin seguindo o padrão DDD (data class com companion object, Result, validação por VOs), com invariantes, equals/hashCode por id e testes.'
