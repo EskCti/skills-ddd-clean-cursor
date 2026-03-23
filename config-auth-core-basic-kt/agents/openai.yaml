@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Auth Core Basic (Kotlin)'
+  short_description: 'Criar módulo auth core básico Kotlin com user/password/application'
+  default_prompt: 'Crie ou recrie o módulo auth core básico Kotlin com node .agents/skills/config-auth-core-basic-kt/scripts/create-auth-core-basic-kt.mjs, detectando destino automático (packages/auth ou packages/auth/core), gerando user/password/application com testes unitários JUnit 5, criação de usuário transacional com TransactionManager, User com avatarUrl opcional e admin default false, Password validando HashPassword e política de troca em PasswordChangePolicyService.'
