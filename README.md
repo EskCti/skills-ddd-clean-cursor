@@ -136,7 +136,7 @@ Parâmetros principais disponíveis hoje:
 
 Convenção global de nomenclatura e padrões gerais:
 
-- `.agents/skills/skills-standards.md`
+- `skills-standards.md` (na raiz do repositório, ou `.agents/skills/skills-standards.md` quando usado como submódulo)
 
 ## Benefícios esperados
 

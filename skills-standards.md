@@ -67,7 +67,7 @@ When editing any skill (`*/SKILL.md`):
 - Document explicit exceptions in the skill itself when needed.
 - If a skill generates files via script, enforce this standard in generated paths.
 
-## 6. Quick Examples
+## 6. Quick Examples (TypeScript)
 
 - Backend controller: `apps/backend/src/modules/customer/customer.controller.ts`
 - Backend module: `apps/backend/src/modules/customer/customer.module.ts`
@@ -76,3 +76,55 @@ When editing any skill (`*/SKILL.md`):
 - Frontend hook: `apps/web/src/shared/hooks/shell.hook.ts`
 - Core entity: `packages/customer/core/src/entity/customer.entity.ts`
 - Core VO: `packages/customer/core/src/vo/customer-name.vo.ts`
+
+## 7. Kotlin Stack Standards
+
+### Naming Pattern
+
+Default format for Kotlin files:
+
+- `<NameInPascalCase>.<extension>`
+
+Base rules:
+
+- Packages: lowercase dot-separated (`com.example.customer.domain.entity`).
+- Directories: follow package structure (lowercase).
+- Files: PascalCase matching the primary class/interface name.
+- Skill directories: same kebab-case as TypeScript, with `-kt` suffix.
+
+### Recommended Type Suffixes (Kotlin)
+
+Kotlin files do not use dot-separated type suffixes in filenames. The type is expressed via the class name:
+
+- Entity: `Customer.kt` (class `Customer`)
+- Value Object: `CustomerName.kt` (value class or data class)
+- Use Case: `CreateCustomerUseCase.kt` (class `CreateCustomerUseCase`)
+- Repository interface: `CustomerRepository.kt` (interface `CustomerRepository`)
+- Repository impl: `CustomerJpaRepository.kt` or `CustomerExposedRepository.kt`
+- Query (CQRS): `FindCustomerByIdQuery.kt` (interface `FindCustomerByIdQuery`)
+- DTO: `CustomerDTO.kt` (data class `CustomerDTO`)
+- Service (domain): `CustomerPricingPolicy.kt`
+- Controller: `CustomerController.kt` (`@RestController`)
+- Spring module: `CustomerModule.kt` (`@Configuration`)
+- JPA model: `CustomerJpaEntity.kt` (`@Entity @Table`)
+
+### Structural Conventions (Kotlin)
+
+- Prefer feature/domain packages: `com.<org>.<module>.domain`, `com.<org>.<module>.application`, `com.<org>.<module>.infrastructure`.
+- Keep shared kernel under a dedicated module/package.
+- Use `sealed class` or `sealed interface` for domain error hierarchies.
+- Use `kotlin.Result` or Arrow `Either` for operation results.
+- Use `@JvmInline value class` for lightweight Value Objects.
+- Use `data class` for DTOs and Props.
+- Spring Boot DI via constructor injection (no `@Autowired` on fields).
+- Coroutines (`suspend fun`) for async operations when applicable.
+
+### Quick Examples (Kotlin)
+
+- Backend controller: `apps/backend-kt/src/main/kotlin/com/example/customer/infrastructure/web/CustomerController.kt`
+- Core entity: `packages/customer/src/main/kotlin/com/example/customer/domain/entity/Customer.kt`
+- Core VO: `packages/customer/src/main/kotlin/com/example/customer/domain/vo/CustomerName.kt`
+- Core use case: `packages/customer/src/main/kotlin/com/example/customer/application/usecase/CreateCustomerUseCase.kt`
+- Core repository: `packages/customer/src/main/kotlin/com/example/customer/domain/repository/CustomerRepository.kt`
+- JPA adapter: `apps/backend-kt/src/main/kotlin/com/example/customer/infrastructure/persistence/CustomerJpaRepository.kt`
+- DTO: `packages/customer/src/main/kotlin/com/example/customer/application/dto/CustomerDTO.kt`

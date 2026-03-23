@@ -43,6 +43,28 @@
 - Listagens paginadas recebem `page/pageSize` como query string e fazem parsing.
 - Alguns endpoints de listagem retornam fallback vazio em falha (padrão existente em auth/roles).
 
+## Exemplo mínimo
+
+```ts
+import {
+  Controller, Post, Body, Get, Param,
+  BadRequestException, NotFoundException,
+} from '@nestjs/common';
+import { CreateThingUseCase, CreateThingIn } from '@namespace/thing';
+
+@Controller('things')
+export class ThingController {
+  constructor(private readonly createThing: CreateThingUseCase) {}
+
+  @Post()
+  async create(@Body() body: CreateThingIn) {
+    const result = await this.createThing.execute(body);
+    if (result.isFailure) throw new BadRequestException(result.errors);
+    return result.instance;
+  }
+}
+```
+
 ## Armadilhas comuns
 
 - Colocar regra de domínio no controller.
