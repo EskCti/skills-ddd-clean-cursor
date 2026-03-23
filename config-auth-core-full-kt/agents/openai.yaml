@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Auth Core Full (Kotlin)'
+  short_description: 'Criar módulo auth core full Kotlin sem auditoria com role/permission/oauth'
+  default_prompt: 'Crie ou recrie o módulo auth core full Kotlin com node .agents/skills/config-auth-core-full-kt/scripts/create-auth-core-full-kt.mjs, detectando destino automático, gerando user/password/application/role/permission/oauth com testes JUnit 5, sem audit, resolvendo grupo por configuração global e atualizando settings.gradle.kts.'
