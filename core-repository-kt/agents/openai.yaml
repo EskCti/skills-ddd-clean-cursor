@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Repository (Kotlin)'
+  short_description: 'Criar repositórios em Kotlin no padrão DDD'
+  default_prompt: 'Crie ou revise contratos e implementações de repository em Kotlin no padrão DDD, com Result, mapeamento toDomain/fromDomain e separação de queries CQRS.'
