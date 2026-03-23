@@ -5,7 +5,7 @@
 Inicializar `packages/shared` em Kotlin com o baseline completo do kernel de domínio:
 
 - config do módulo (`build.gradle.kts`)
-- classes base de domínio (`domain/base/Entity.kt`, `domain/base/ValueObject.kt`)
+- classe base de domínio (`domain/base/Entity.kt`)
 - VOs obrigatórios (`domain/vo/Id.kt`, `domain/vo/Name.kt`, `domain/vo/Email.kt`, `domain/vo/HashPassword.kt`)
 - interface de aplicação (`application/UseCase.kt`, `application/dto/PagedResult.kt`)
 - contrato de transação (`infrastructure/TransactionManager.kt`)
@@ -161,12 +161,26 @@ interface UseCase<IN, OUT> {
 ```kotlin
 package com.example.shared.application.dto
 
-data class PagedResult<T>(
-    val items: List<T>,
-    val total: Long,
-    val page: Int,
-    val pageSize: Int
+data class PaginatedInput(
+    val page: Int = 1,
+    val pageSize: Int = 20
 )
+
+data class PaginationMeta(
+    val page: Int,
+    val pageSize: Int,
+    val total: Long,
+    val totalPages: Int
+)
+
+data class PagedResult<T>(
+    val data: List<T>,
+    val meta: PaginationMeta
+) {
+    companion object {
+        fun <T> of(items: List<T>, total: Long, page: Int, pageSize: Int): PagedResult<T>
+    }
+}
 ```
 
 ## TransactionManager.kt

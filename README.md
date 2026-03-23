@@ -31,7 +31,11 @@ Principais skills disponíveis neste repositório:
 
 - `config-project`: inicialização de monorepo com TurboRepo (web + backend)
 - `config-new-module`, `config-shared-core` e `config-shared-web`: scaffolding de módulos/pacotes e shell web compartilhado
-- `config-prisma`: setup inicial e padronização de Prisma no backend
+- `config-prisma`: setup inicial e padronização de Prisma no backend (script `.js`)
+- `config-auth-core-basic`: auth core básico TypeScript (user, password, application)
+- `config-auth-core-full`: auth core completo TypeScript (basic + role, permission, oauth)
+- `config-auth-backend-basic`: auth backend NestJS (JWT, Passport, Prisma adapters)
+- `config-auth-web-basic`: auth web Next.js (sign-in, sign-up, dashboard, users, profile)
 - `core-entity`: modelagem de entidades de domínio
 - `core-value-object`: criação de objetos de valor
 - `core-domain-service`: regras de domínio transversais

@@ -39,6 +39,7 @@ class CreateUserUseCaseTest {
     fun `should create user successfully`() = runBlocking {
         val userExists = object : UserExistsQuery {
             override suspend fun existsByEmail(email: String) = false
+            override suspend fun existsById(id: String) = false
         }
         val useCase = CreateUserUseCase(fakeUserRepo, fakePasswordRepo, userExists, fakeCrypto, fakeTx)
         val result = useCase.execute(CreateUserInput(name = "John", email = "john@example.com", password = "Pass123!"))
@@ -49,6 +50,7 @@ class CreateUserUseCaseTest {
     fun `should fail when user already exists`() = runBlocking {
         val userExists = object : UserExistsQuery {
             override suspend fun existsByEmail(email: String) = true
+            override suspend fun existsById(id: String) = false
         }
         val useCase = CreateUserUseCase(fakeUserRepo, fakePasswordRepo, userExists, fakeCrypto, fakeTx)
         val result = useCase.execute(CreateUserInput(name = "John", email = "john@example.com", password = "Pass123!"))

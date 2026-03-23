@@ -5,22 +5,28 @@ import com.example.auth.password.entity.Password
 import com.example.auth.password.provider.PasswordCryptoProvider
 import com.example.auth.password.repository.PasswordRepository
 import com.example.auth.password.service.PasswordChangePolicyService
+import com.example.shared.application.UseCase
+
+data class ChangePasswordInput(
+    val userId: String,
+    val newPlainPassword: String
+)
 
 class ChangePasswordUseCase(
     private val userExists: UserExistsQuery,
     private val passwordRepository: PasswordRepository,
     private val crypto: PasswordCryptoProvider,
     private val policy: PasswordChangePolicyService
-) {
-    suspend fun execute(userId: String, newPlainPassword: String): Result<Unit> {
-        if (!userExists.existsByEmail(userId)) {
+) : UseCase<ChangePasswordInput, Unit> {
+    override suspend fun execute(data: ChangePasswordInput): Result<Unit> {
+        if (!userExists.existsById(data.userId)) {
             return Result.failure(IllegalArgumentException("USER_NOT_FOUND"))
         }
-        val recentPasswords = passwordRepository.findRecentByUserId(userId)
-        policy.validate(newPlainPassword, recentPasswords).getOrElse { return Result.failure(it) }
+        val recentPasswords = passwordRepository.findRecentByUserId(data.userId)
+        policy.validate(data.newPlainPassword, recentPasswords).getOrElse { return Result.failure(it) }
 
-        val hash = crypto.hash(newPlainPassword)
-        val password = Password.create(userId = userId, hash = hash)
+        val hash = crypto.hash(data.newPlainPassword)
+        val password = Password.create(userId = data.userId, hash = hash)
         return passwordRepository.create(password)
     }
 }

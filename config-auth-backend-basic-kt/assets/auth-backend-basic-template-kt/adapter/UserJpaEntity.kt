@@ -6,25 +6,34 @@ import java.util.UUID
 
 @Entity
 @Table(name = "users")
-data class UserJpaEntity(
+open class UserJpaEntity(
     @Id
-    val id: UUID = UUID.randomUUID(),
+    @Column(columnDefinition = "uuid")
+    open var id: UUID = UUID.randomUUID(),
 
     @Column(nullable = false)
-    val name: String = "",
+    open var name: String = "",
 
     @Column(nullable = false, unique = true)
-    val email: String = "",
+    open var email: String = "",
 
     @Column(nullable = false)
-    val admin: Boolean = false,
+    open var admin: Boolean = false,
 
     @Column(name = "avatar_url")
-    val avatarUrl: String? = null,
+    open var avatarUrl: String? = null,
 
-    @Column(name = "created_at", nullable = false)
-    val createdAt: Instant = Instant.now(),
+    @Column(name = "created_at", nullable = false, updatable = false)
+    open var createdAt: Instant = Instant.now(),
 
     @Column(name = "updated_at", nullable = false)
-    val updatedAt: Instant = Instant.now()
-)
+    open var updatedAt: Instant = Instant.now()
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is UserJpaEntity) return false
+        return id == other.id
+    }
+
+    override fun hashCode(): Int = id.hashCode()
+}
