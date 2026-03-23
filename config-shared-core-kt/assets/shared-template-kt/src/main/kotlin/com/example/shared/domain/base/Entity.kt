@@ -6,7 +6,8 @@ import java.time.Instant
 abstract class Entity<T : Entity<T>>(
     val id: Id,
     val createdAt: Instant = Instant.now(),
-    val updatedAt: Instant? = null
+    val updatedAt: Instant = Instant.now(),
+    val deletedAt: Instant? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
