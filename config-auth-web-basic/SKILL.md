@@ -1,5 +1,6 @@
 ---
 name: config-auth-web-basic
+stack: typescript
 description: Criar/recriar de forma deterministica o modulo de autenticacao web no Next.js (sign-in/sign-up/dashboard/users/profile), com contexto de auth, schemas/formularios, rotas App Router e componentes de controle de acesso (private/public/admin), refletindo o estado atual do `apps/web` e compatibilidade com a infraestrutura base do shared-web. Usar quando o pedido envolver bootstrap/rebootstrap da camada web de autenticacao.
 ---
 

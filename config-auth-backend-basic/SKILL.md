@@ -1,5 +1,6 @@
 ---
 name: config-auth-backend-basic
+stack: typescript
 description: Criar/recriar de forma determinística o módulo de autenticação do backend NestJS com endpoints HTTP (register/login/me/usuários/senha), JWT com Passport, controle de acesso admin, adapters Prisma compatíveis com `@namespace/auth`, integração com `PrismaService`/`TransactionManager`, modelo Prisma de auth, migrations SQL e seed JSON com usuários padrão. Usar quando o pedido envolver bootstrap/rebootstrap da camada backend auth completa no `apps/backend`.
 ---
 

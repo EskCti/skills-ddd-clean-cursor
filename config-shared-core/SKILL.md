@@ -1,5 +1,6 @@
 ---
 name: config-shared-core
+stack: typescript
 description: Inicializar o módulo `packages/shared` completo de forma determinística no padrão do projeto Workspace, incluindo estrutura de código (`src/base`, `src/db`, `src/dto`, `src/vo`, `src/index.ts`) e testes (`test/base`, `test/vo`, `test/data`) com VOs `HashPassword`, `DotSeparatedName` e `Name`, além de `ResultValidator` em `src/base` e `TransactionManager` em `src/db`. Usar quando o pedido envolver bootstrap do pacote shared, recriação do shared em novo projeto, reset da base compartilhada ou scaffolding completo do core compartilhado com configs (`package.json`, `tsconfig.json`, `jest.config.ts`).
 ---
 

@@ -1,5 +1,6 @@
 ---
 name: core-query-cqrs
+stack: typescript
 description: Criar, revisar ou orientar queries no padrão CQRS de leitura no Genérico. Usar quando o pedido envolver interfaces `*Query`, arquivos `*.query.ts`, use cases de leitura (`find-*`), projeções/DTOs para consumo da API/front, paginação/filtros/agregações e separação entre leitura (query) e escrita (repository/comando).
 ---
 

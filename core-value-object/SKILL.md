@@ -1,5 +1,6 @@
 ---
 name: core-value-object
+stack: typescript
 description: Criar, revisar ou orientar a implementação de Value Objects no projeto Genérico. Usar quando o pedido envolver "value object", "objeto de valor", "VO", regras de validação e normalização para atributos de domínio, ou criação de novos arquivos em `packages/shared/src/vo` com padrão `ValueObject` + `Result`.
 ---
 

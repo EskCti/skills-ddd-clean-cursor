@@ -1,5 +1,6 @@
 ---
 name: config-auth-core-basic
+stack: typescript
 description: Criar/recriar o módulo de autenticação básico de forma determinística no padrão Genérico, refletindo o estado atual do pacote `auth` com foco em `user`, `password` e `application`, incluindo código e testes unitários. A skill detecta automaticamente se o monorepo usa pacotes diretos (`packages/*`) ou aninhados (`packages/*/*`) e cria no caminho correto (`packages/auth` ou `packages/auth/core`). Usar quando o pedido envolver bootstrap/rebootstrap do auth core mínimo, sem perfil e sem permissões, com `Password` validando `HashPassword`, fluxo de criação de usuário transacional via `TransactionManager` e política de troca de senha centralizada em serviço de domínio.
 ---
 

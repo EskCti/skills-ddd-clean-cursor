@@ -1,5 +1,6 @@
 ---
 name: core-repository
+stack: typescript
 description: 'Criar, revisar ou orientar contratos e implementações de repositório no padrão Genérico. Usar quando o pedido envolver arquivos `*.repository.ts`, operações de persistência de entidades (create/update/findById/findAll/delete), adaptação de infraestrutura (ex.: Prisma) para contratos de core, tratamento de erros com `Result` e mapeamentos `toDomain/fromDomain`.'
 ---
 

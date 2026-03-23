@@ -1,5 +1,6 @@
 ---
 name: config-new-module
+stack: typescript
 description: Criar um novo módulo de forma determinística no padrão do projeto Workspace, gerando scaffold em `packages/*`, `apps/backend/src/modules/*` e `apps/web` (modules + rota principal). Usar quando o pedido envolver criação de módulo full-stack no monorepo com package TypeScript, módulo NestJS e dashboard inicial no web.
 ---
 

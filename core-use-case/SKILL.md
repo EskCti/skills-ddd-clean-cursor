@@ -1,5 +1,6 @@
 ---
 name: core-use-case
+stack: typescript
 description: Criar, revisar ou orientar a implementação de casos de uso (application services) no padrão Genérico. Usar quando o pedido envolver "caso de uso", "use case", arquivos `*.usecase.ts`, orquestração de entidades/repositórios/queries, regras de negócio de aplicação, mapeamento de falhas com `Result`, ou criação/ajuste de testes de use case.
 ---
 

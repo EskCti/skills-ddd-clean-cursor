@@ -1,5 +1,6 @@
 ---
 name: config-shared-web
+stack: typescript
 description: 'Inicializar e padronizar a camada web compartilhada para apps admin em Next.js com scaffold base agnostico de biblioteca de componentes, grupos de rotas `app/(private)` e `app/(public)`, estrutura `src/shared` (incluindo i18n e form validator), modulo `src/modules/examples` e adapter de UI selecionavel (default: Shadcn). Usar quando o pedido envolver bootstrap/rebootstrap do shell web, criacao de layout dashboard reutilizavel e setup inicial de componentes/paginas de referencia.'
 ---
 

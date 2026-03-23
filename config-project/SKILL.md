@@ -1,5 +1,6 @@
 ---
 name: config-project
+stack: typescript
 description: Inicializar ou continuar um projeto no padrão TurboRepo com frontend (Next.js) e backend (NestJS sem git interno), criando/reconciliando a estrutura base via `npx create-turbo@latest` no diretório atual quando necessário e aplicando setup idempotente por `skills.config.json` (com override via CLI). Usar quando o pedido envolver bootstrap de monorepo web+backend, setup inicial Next+Nest, reaplicação segura do setup sem sobrescrever, ou padronização das tasks de `test/build` no Turbo.
 ---
 

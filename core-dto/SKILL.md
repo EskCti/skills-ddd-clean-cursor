@@ -1,5 +1,6 @@
 ---
 name: core-dto
+stack: typescript
 description: 'Criar, revisar ou orientar Data Transfer Objects no padrão Genérico. Usar quando o pedido envolver arquivos `dto/*.ts`, contratos de entrada (`InDTO`), saída (`OutDTO`), DTOs de query CQRS para leitura, paginação/filtros/metadados e adaptação de tipagem para consumo da API/front sem vazar detalhes de entidade/ORM.'
 ---
 

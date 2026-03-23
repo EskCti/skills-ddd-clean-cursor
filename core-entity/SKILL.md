@@ -1,5 +1,6 @@
 ---
 name: core-entity
+stack: typescript
 description: Criar, revisar ou orientar a implementação de Entidades de domínio no padrão Genérico. Usar quando o pedido envolver "entidade", "entity", arquivos `*.entity.ts`, modelagem de regras de negócio com `Entity`, validação com `Result`, composição com Value Objects/Entidades aninhadas, ou criação/ajuste de testes de entidade.
 ---
 

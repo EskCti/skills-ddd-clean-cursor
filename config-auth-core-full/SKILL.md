@@ -1,5 +1,6 @@
 ---
 name: config-auth-core-full
+stack: typescript
 description: Criar/recriar o módulo de autenticação core completo de forma determinística no padrão Genérico, refletindo o estado atual do pacote `auth` com `user`, `password`, `application`, `role`, `permission` e `oauth`, incluindo código e testes unitários, sem auditoria. Usar quando o pedido envolver bootstrap/rebootstrap do auth core full (email/senha + OAuth no core), mantendo detecção automática de destino (`packages/auth` ou `packages/auth/core`) e sincronização opcional de dependência nos apps.
 ---
 
