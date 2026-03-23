@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Backend Data (Kotlin)'
+  short_description: 'Modelar persistência JPA em Kotlin'
+  default_prompt: 'Crie ou revise entidades JPA, Spring Data repositories, migrations e adapters de persistência em Kotlin no padrão DDD, com mapeamento toDomain/fromDomain e Result.'
