@@ -6,6 +6,7 @@ import com.example.auth.user.usecase.DeleteUserUseCase
 import com.example.auth.user.usecase.FindByEmailUseCase
 import com.example.auth.user.usecase.FindByIdUseCase
 import com.example.auth.user.usecase.LoginUseCase
+import com.example.auth.password.usecase.ChangePasswordInput
 import com.example.auth.password.usecase.ChangePasswordUseCase
 import com.example.modules.auth.dto.AuthResponse
 import com.example.modules.auth.dto.ChangePasswordRequest
@@ -86,7 +87,7 @@ class AuthController(
     suspend fun changePasswordEndpoint(@RequestBody body: ChangePasswordRequest): ResponseEntity<Any> {
         val userId = SecurityContextHolder.getContext().authentication?.name
             ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
-        val result = changePassword.execute(userId, body.newPassword)
+        val result = changePassword.execute(ChangePasswordInput(userId = userId, newPlainPassword = body.newPassword))
         return result.fold(
             onSuccess = { ResponseEntity.ok(mapOf("message" to "Password changed")) },
             onFailure = { e -> ResponseEntity.badRequest().body(mapOf("error" to e.message)) }
