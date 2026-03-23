@@ -1,0 +1,4 @@
+export enum RoleErrors {
+	NOT_FOUND = "ROLE_NOT_FOUND",
+	NAME_ALREADY_EXISTS = "ROLE_NAME_ALREADY_EXISTS",
+}
