@@ -1,5 +1,6 @@
 ---
 name: backend-controller
+stack: typescript
 description: 'Criar, revisar ou orientar controllers HTTP do backend NestJS no padrão Genérico. Usar quando o pedido envolver arquivos `*.controller.ts`, definição de rotas e verbos HTTP, aplicação de guards/permissões, binding de `@Body/@Param/@Query`, orquestração de use cases e mapeamento de falhas para exceções HTTP (`BadRequestException`, `NotFoundException`, etc.).'
 ---
 
