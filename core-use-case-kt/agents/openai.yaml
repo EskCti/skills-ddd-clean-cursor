@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Use Case (Kotlin)'
+  short_description: 'Criar casos de uso em Kotlin'
+  default_prompt: 'Crie ou revise um caso de uso em Kotlin seguindo o padrão DDD (UseCase interface, Result, orquestração de entidades e providers), com testes.'

@@ -41,6 +41,21 @@ Principais skills disponíveis neste repositório:
 - `backend-prisma-data`: schema/migrações/adapters Prisma
 - `core-query-cqrs`: consultas de leitura no padrão CQRS
 - `backend-controller`: camada HTTP/NestJS
+- `frontend-form-schema`: formulários React Hook Form + validação
+
+### Skills Kotlin (sufixo `-kt`)
+
+- `core-entity-kt`: entidades de domínio em Kotlin (data class, companion object, Result)
+- `core-value-object-kt`: Value Objects em Kotlin (value class, data class)
+- `core-domain-service-kt`: serviços de domínio puros em Kotlin
+- `core-use-case-kt`: casos de uso em Kotlin (UseCase interface, suspend, Result)
+- `core-dto-kt`: Data Transfer Objects em Kotlin (data class)
+- `core-repository-kt`: contratos e implementações de repositório em Kotlin
+- `core-query-cqrs-kt`: queries CQRS de leitura em Kotlin
+- `backend-controller-kt`: controllers Spring Boot em Kotlin (@RestController)
+- `backend-data-kt`: persistência JPA, Spring Data, migrations em Kotlin
+
+### Skills utilitárias (OpenSpec)
 
 Também existem skills utilitárias para fluxo OpenSpec:
 
