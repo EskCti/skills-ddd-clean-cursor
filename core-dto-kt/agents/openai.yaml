@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core DTO (Kotlin)'
+  short_description: 'Criar DTOs em Kotlin no padrão DDD'
+  default_prompt: 'Crie ou revise DTOs em Kotlin (data class) para entrada/saída e query CQRS, com tipagem adequada ao consumo e sem vazar entidade/ORM.'
