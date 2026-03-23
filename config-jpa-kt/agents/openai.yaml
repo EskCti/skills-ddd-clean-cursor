@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config JPA (Kotlin)'
+  short_description: 'Inicializar JPA/Spring Data e banco no backend Kotlin'
+  default_prompt: 'Inicialize e padronize a infraestrutura JPA/Spring Data no backend Kotlin com application.yml configurado, Flyway migrations, Docker Compose para Postgres e dependências JPA no build.gradle.kts.'

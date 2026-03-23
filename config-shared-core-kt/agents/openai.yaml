@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Shared Core (Kotlin)'
+  short_description: 'Inicializar kernel compartilhado de domínio em Kotlin'
+  default_prompt: 'Crie ou recrie o módulo packages/shared em Kotlin com classes base (Entity, ValueObject), VOs (Id, Name, Email, HashPassword), interface UseCase, PagedResult, TransactionManager e testes unitários completos.'

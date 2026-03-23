@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Project (Kotlin)'
+  short_description: 'Inicializar projeto Kotlin multi-módulo com Spring Boot'
+  default_prompt: 'Inicialize (ou continue) um projeto Kotlin multi-módulo com Gradle, Spring Boot no apps/backend-kt e módulo shared puro em packages/shared, com Docker Compose, Flyway, .env e estrutura Clean Architecture.'

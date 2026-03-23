@@ -45,6 +45,9 @@ Principais skills disponíveis neste repositório:
 
 ### Skills Kotlin (sufixo `-kt`)
 
+- `config-project-kt`: bootstrap projeto Kotlin multi-módulo com Gradle + Spring Boot
+- `config-shared-core-kt`: kernel compartilhado de domínio (Entity, VO, Result, UseCase)
+- `config-jpa-kt`: setup JPA/Spring Data, Flyway, Docker Compose
 - `core-entity-kt`: entidades de domínio em Kotlin (data class, companion object, Result)
 - `core-value-object-kt`: Value Objects em Kotlin (value class, data class)
 - `core-domain-service-kt`: serviços de domínio puros em Kotlin
