@@ -48,6 +48,10 @@ Principais skills disponíveis neste repositório:
 - `config-project-kt`: bootstrap projeto Kotlin multi-módulo com Gradle + Spring Boot
 - `config-shared-core-kt`: kernel compartilhado de domínio (Entity, VO, Result, UseCase)
 - `config-jpa-kt`: setup JPA/Spring Data, Flyway, Docker Compose
+- `config-new-module-kt`: criação de módulo Kotlin (package Gradle + módulo Spring Boot)
+- `config-auth-core-basic-kt`: auth core básico Kotlin (user, password, application + testes)
+- `config-auth-core-full-kt`: auth core completo Kotlin (basic + role, permission, oauth)
+- `config-auth-backend-basic-kt`: auth backend Spring Boot (JWT, Security, JPA adapters, Flyway)
 - `core-entity-kt`: entidades de domínio em Kotlin (data class, companion object, Result)
 - `core-value-object-kt`: Value Objects em Kotlin (value class, data class)
 - `core-domain-service-kt`: serviços de domínio puros em Kotlin
