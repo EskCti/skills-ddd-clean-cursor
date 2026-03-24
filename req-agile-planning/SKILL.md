@@ -101,9 +101,61 @@ Regras para Tasks:
 
 ---
 
-## Artefatos de Saída
+## Diretório de Saída
 
-Gerar artefatos em `openspec/planning/<nome-do-projeto>/`.
+Os artefatos são salvos no diretório **do projeto consumidor** (não do repositório de skills):
+
+```
+<projectRoot>/
+├── <docsPath>/                          ← configurável via skills.config.json
+│   └── planning/
+│       └── <nome-do-projeto>/           ← kebab-case do nome do projeto
+│           ├── backlog.md               ← backlog completo (obrigatório)
+│           ├── epics-summary.md         ← visão executiva (opcional)
+│           └── sprint-plan.md           ← plano de sprint (quando solicitado)
+```
+
+### Resolução do caminho
+
+O `docsPath` é resolvido pela precedência:
+
+1. Argumento explícito do usuário: "salve em `docs/planejamento`"
+2. `skills.config.json` → `defaults.docsPath` (ex.: `"docs"`)
+3. `skills.config.local.json` → override local
+4. Fallback: `docs`
+
+Exemplo concreto — se o projeto se chama "meu-erp" e `docsPath = "docs"`:
+
+```
+meu-projeto/
+├── docs/
+│   ├── discovery/
+│   │   └── meu-erp/
+│   │       └── requirements.md          ← entrada (do req-discovery)
+│   └── planning/
+│       └── meu-erp/
+│           ├── backlog.md
+│           ├── epics-summary.md
+│           └── sprint-plan.md
+├── apps/
+├── packages/
+└── ...
+```
+
+> Se o diretório `<docsPath>/planning/` não existir, crie-o automaticamente.
+
+### Quando vem do `req-discovery`
+
+Se o `requirements.md` veio do skill `req-discovery`, use o mesmo `<nome-do-sistema>` como `<nome-do-projeto>` para manter a rastreabilidade:
+
+```
+docs/discovery/meu-erp/requirements.md   ← entrada
+docs/planning/meu-erp/backlog.md          ← saída
+```
+
+---
+
+## Artefatos de Saída
 
 ### `backlog.md` (obrigatório — documento unificado)
 

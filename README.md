@@ -166,6 +166,7 @@ Parâmetros principais disponíveis hoje:
 - `backendPort`: porta padrão da app backend
 - `frontendApiUrlEnvVar`: nome da env var de URL de API no frontend
 - `backendPortEnvVar`: nome da env var de porta no backend
+- `docsPath`: caminho relativo para documentação gerada (ex.: `docs`), usado por `req-discovery` e `req-agile-planning`
 
 Convenção global de nomenclatura e padrões gerais:
 

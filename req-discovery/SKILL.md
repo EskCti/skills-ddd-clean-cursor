@@ -74,7 +74,49 @@ Organizar os achados em categorias:
 
 ### Fase 3 — Documentação
 
-Gerar o artefato de saída no diretório `openspec/discovery/<nome-do-sistema>/`.
+Gerar os artefatos de saída no diretório configurado.
+
+---
+
+## Diretório de Saída
+
+Os artefatos são salvos no diretório **do projeto consumidor** (não do repositório de skills):
+
+```
+<projectRoot>/
+├── <docsPath>/                          ← configurável via skills.config.json
+│   └── discovery/
+│       └── <nome-do-sistema>/           ← kebab-case do nome do sistema
+│           ├── requirements.md          ← requisitos (obrigatório)
+│           ├── screens.md               ← mapeamento de telas (se via browser)
+│           └── domain-model.md          ← modelo de domínio (se via código)
+```
+
+### Resolução do caminho
+
+O `docsPath` é resolvido pela precedência:
+
+1. Argumento explícito do usuário: "salve em `docs/analise`"
+2. `skills.config.json` → `defaults.docsPath` (ex.: `"docs"`)
+3. `skills.config.local.json` → override local
+4. Fallback: `docs`
+
+Exemplo concreto — se o sistema se chama "meu-erp" e `docsPath = "docs"`:
+
+```
+meu-projeto/
+├── docs/
+│   └── discovery/
+│       └── meu-erp/
+│           ├── requirements.md
+│           ├── screens.md
+│           └── domain-model.md
+├── apps/
+├── packages/
+└── ...
+```
+
+> Se o diretório `<docsPath>/discovery/` não existir, crie-o automaticamente.
 
 ---
 
