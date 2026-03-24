@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Requirement Discovery'
+  short_description: 'Levantar requisitos de sistema existente via URL ou codebase'
+  default_prompt: 'Analise o sistema fornecido (URL ou caminho local) e extraia os requisitos funcionais e não-funcionais. Mapeie telas, endpoints, entidades, regras de negócio, integrações e perfis de acesso. Gere requirements.md, screens.md (se via browser) e domain-model.md (se via código) em openspec/discovery/<nome-do-sistema>/. Use diagramas ASCII para visualizar a arquitetura. Ao final, ofereça a opção de organizar os requisitos em planejamento ágil via req-agile-planning.'
