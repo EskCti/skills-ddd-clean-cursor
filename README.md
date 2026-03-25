@@ -66,12 +66,12 @@ Principais skills disponíveis neste repositório:
 - `backend-controller-kt`: controllers Spring Boot em Kotlin (@RestController)
 - `backend-data-kt`: persistência JPA, Spring Data, migrations em Kotlin
 
-### Skills de Requisitos e Planejamento
+### Skills de Requisitos e Planejamento (agnóstico de linguagem)
 
-Skills para levantamento de requisitos e planejamento ágil:
+Skills para análise de sistemas existentes e planejamento ágil em DDD/Clean Architecture:
 
-- `req-discovery`: levantar requisitos de sistema existente via URL (browser) ou caminho local (codebase)
-- `req-agile-planning`: organizar requisitos em épicos, user stories e tasks no padrão ágil
+- `req-discovery`: analisar sistema existente (**qualquer linguagem** — PHP, Go, Python, Java, etc.) via URL ou caminho local, documentando requisitos em DDD/Clean Architecture
+- `req-agile-planning`: organizar requisitos em épicos, stories e tasks DDD, com referência aos **skills TS/KT deste repositório** para implementação
 
 ### Skills utilitárias (OpenSpec)
 
