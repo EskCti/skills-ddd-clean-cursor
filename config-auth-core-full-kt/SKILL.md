@@ -51,8 +51,10 @@ node .agents/skills/config-auth-core-full-kt/scripts/create-auth-core-full-kt.mj
 ## Resources
 
 - `scripts/create-auth-core-full-kt.mjs`: gerador determinístico cross-platform.
-- `assets/auth-core-full-template-kt`: template completo do auth core full Kotlin.
+- `assets/auth-core-full-template-kt`: template dos domínios extras (role, permission, oauth). O script compõe automaticamente com o template do `config-auth-core-basic-kt` (user, password, application) antes de aplicar os extras.
 - `references/auth-core-full-contract-kt.md`: contrato dos artefatos gerados.
+
+**Importante:** O template full depende do basic. O script copia primeiro `config-auth-core-basic-kt/assets/` e depois sobrepõe com `config-auth-core-full-kt/assets/`. Não execute o template full isoladamente sem o basic disponível.
 
 ## Output Contract
 

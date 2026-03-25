@@ -31,7 +31,11 @@ Principais skills disponíveis neste repositório:
 
 - `config-project`: inicialização de monorepo com TurboRepo (web + backend)
 - `config-new-module`, `config-shared-core` e `config-shared-web`: scaffolding de módulos/pacotes e shell web compartilhado
-- `config-prisma`: setup inicial e padronização de Prisma no backend
+- `config-prisma`: setup inicial e padronização de Prisma no backend (script `.js`)
+- `config-auth-core-basic`: auth core básico TypeScript (user, password, application)
+- `config-auth-core-full`: auth core completo TypeScript (basic + role, permission, oauth)
+- `config-auth-backend-basic`: auth backend NestJS (JWT, Passport, Prisma adapters)
+- `config-auth-web-basic`: auth web Next.js (sign-in, sign-up, dashboard, users, profile)
 - `core-entity`: modelagem de entidades de domínio
 - `core-value-object`: criação de objetos de valor
 - `core-domain-service`: regras de domínio transversais
@@ -61,6 +65,13 @@ Principais skills disponíveis neste repositório:
 - `core-query-cqrs-kt`: queries CQRS de leitura em Kotlin
 - `backend-controller-kt`: controllers Spring Boot em Kotlin (@RestController)
 - `backend-data-kt`: persistência JPA, Spring Data, migrations em Kotlin
+
+### Skills de Requisitos e Planejamento
+
+Skills para levantamento de requisitos e planejamento ágil:
+
+- `req-discovery`: levantar requisitos de sistema existente via URL (browser) ou caminho local (codebase)
+- `req-agile-planning`: organizar requisitos em épicos, user stories e tasks no padrão ágil
 
 ### Skills utilitárias (OpenSpec)
 
@@ -155,6 +166,7 @@ Parâmetros principais disponíveis hoje:
 - `backendPort`: porta padrão da app backend
 - `frontendApiUrlEnvVar`: nome da env var de URL de API no frontend
 - `backendPortEnvVar`: nome da env var de porta no backend
+- `docsPath`: caminho relativo para documentação gerada (ex.: `docs`), usado por `req-discovery` e `req-agile-planning`
 
 Convenção global de nomenclatura e padrões gerais:
 

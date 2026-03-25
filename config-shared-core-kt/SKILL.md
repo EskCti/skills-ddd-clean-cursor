@@ -1,14 +1,14 @@
 ---
 name: config-shared-core-kt
 stack: kotlin
-description: 'Inicializar o módulo `packages/shared` em Kotlin com baseline completo do domínio compartilhado, incluindo classes base (Entity, ValueObject, Result, UseCase), VOs obrigatórios (Id, Name, Email, HashPassword), interface TransactionManager e testes unitários. Usar quando o pedido envolver bootstrap do pacote shared Kotlin, recriação do shared em novo projeto, ou scaffolding completo do kernel compartilhado de domínio.'
+description: 'Inicializar o módulo `packages/shared` em Kotlin com baseline completo do domínio compartilhado, incluindo classe base Entity, UseCase interface, VOs obrigatórios (Id, Name, Email, HashPassword), interface TransactionManager e testes unitários. Usar quando o pedido envolver bootstrap do pacote shared Kotlin, recriação do shared em novo projeto, ou scaffolding completo do kernel compartilhado de domínio.'
 ---
 
 # Config Shared Core (Kotlin)
 
 ## Overview
 
-Criar ou recriar o módulo shared em Kotlin como biblioteca pura (sem Spring) contendo as abstrações base para DDD/Clean Architecture: Entity, ValueObject, Result helpers, UseCase interface, VOs obrigatórios e TransactionManager.
+Criar ou recriar o módulo shared em Kotlin como biblioteca pura (sem Spring) contendo as abstrações base para DDD/Clean Architecture: Entity, UseCase interface, VOs obrigatórios (com `tryCreate`/`create` usando `Result`) e TransactionManager.
 Equivalente ao `config-shared-core` do stack TypeScript, adaptado para Kotlin.
 
 ## Estrutura alvo
@@ -20,8 +20,7 @@ packages/shared/
     ├── main/kotlin/com/example/shared/
     │   ├── domain/
     │   │   ├── base/
-    │   │   │   ├── Entity.kt
-    │   │   │   └── ValueObject.kt
+    │   │   │   └── Entity.kt
     │   │   └── vo/
     │   │       ├── Id.kt
     │   │       ├── Name.kt
@@ -50,7 +49,7 @@ packages/shared/
 
 1. Confirmar que `settings.gradle.kts` inclui `packages:shared`.
 2. Criar `packages/shared/build.gradle.kts` como biblioteca Kotlin pura.
-3. Criar classes base de domínio (`Entity`, `ValueObject`).
+3. Criar classe base de domínio (`Entity`).
 4. Criar VOs obrigatórios: `Id`, `Name`, `Email`, `HashPassword`.
 5. Criar interface `UseCase<IN, OUT>` na camada de aplicação.
 6. Criar `PagedResult<T>` como DTO genérico de paginação.
@@ -62,10 +61,9 @@ packages/shared/
 
 ### Classes base
 
-- `Entity.kt` — classe base com `id`, `createdAt`, `updatedAt`, `equals`/`hashCode` por `id`.
-- `ValueObject.kt` — classe base (ou marker interface) para VOs.
+- `Entity.kt` — classe base com `id`, `createdAt`, `updatedAt`, `deletedAt?`, `equals`/`hashCode` por `id`.
 - `UseCase.kt` — `interface UseCase<IN, OUT> { suspend fun execute(data: IN): Result<OUT> }`.
-- `PagedResult.kt` — `data class PagedResult<T>(items: List<T>, total: Long, page: Int, pageSize: Int)`.
+- `PagedResult.kt` — `data class PagedResult<T>(data: List<T>, meta: PaginationMeta)` + `PaginatedInput` + `PaginationMeta` + factory `PagedResult.of()`.
 - `TransactionManager.kt` — `interface TransactionManager { suspend fun <T> runInTransaction(block: suspend () -> T): T }`.
 
 ### VOs obrigatórios

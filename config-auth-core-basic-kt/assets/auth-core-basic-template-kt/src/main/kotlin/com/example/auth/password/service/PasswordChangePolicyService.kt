@@ -2,6 +2,7 @@ package com.example.auth.password.service
 
 import com.example.auth.password.entity.Password
 import com.example.auth.password.provider.PasswordCryptoProvider
+import com.example.shared.domain.vo.StrongPassword
 
 class PasswordChangePolicyService(
     private val crypto: PasswordCryptoProvider
@@ -10,16 +11,9 @@ class PasswordChangePolicyService(
         newPlainPassword: String,
         recentPasswords: List<Password>
     ): Result<Unit> {
-        if (newPlainPassword.length < 8) {
-            return Result.failure(IllegalArgumentException("PASSWORD_TOO_SHORT"))
-        }
-        if (!newPlainPassword.any { it.isUpperCase() } ||
-            !newPlainPassword.any { it.isLowerCase() } ||
-            !newPlainPassword.any { it.isDigit() } ||
-            !newPlainPassword.any { !it.isLetterOrDigit() }
-        ) {
-            return Result.failure(IllegalArgumentException("WEAK_PASSWORD"))
-        }
+        StrongPassword.tryCreate(newPlainPassword)
+            .getOrElse { return Result.failure(it) }
+
         for (recent in recentPasswords) {
             if (crypto.compare(newPlainPassword, recent.hash.value)) {
                 return Result.failure(IllegalArgumentException("PASSWORD_RECENTLY_USED"))

@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Agile Planning'
+  short_description: 'Organizar requisitos em épicos, stories e tasks ágeis'
+  default_prompt: 'Organize os requisitos fornecidos (arquivo requirements.md, descrição livre ou URL de issues) em um backlog ágil completo. Crie épicos agrupados por domínio, quebre em user stories no formato Como/Quero/Para com critérios de aceitação Given/When/Then, decomponha em tasks técnicas estimáveis (dev/test/infra/docs), priorize com MoSCoW e estime com Fibonacci. Gere backlog.md e epics-summary.md em <docsPath>/planning/<nome-do-projeto>/ (docsPath vem de skills.config.json, fallback: docs). Crie o diretório automaticamente se não existir. Valide a estrutura de épicos com o usuário antes de detalhar stories. Ao final, ofereça integração com openspec-propose para iniciar implementação.'

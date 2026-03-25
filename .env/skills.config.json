@@ -8,6 +8,7 @@
     "frontendPort": 3000,
     "backendPort": 4000,
     "frontendApiUrlEnvVar": "NEXT_PUBLIC_API_URL",
-    "backendPortEnvVar": "PORT"
+    "backendPortEnvVar": "PORT",
+    "docsPath": "docs"
   }
 }
