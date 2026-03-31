@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Project (C#)'
+  short_description: 'Inicializar projeto .NET com Clean Architecture'
+  default_prompt: 'Inicialize ou ajuste a estrutura de um projeto .NET (C#) seguindo os padrões de Clean Architecture, Solução (.sln) e Projetos (.csproj).'

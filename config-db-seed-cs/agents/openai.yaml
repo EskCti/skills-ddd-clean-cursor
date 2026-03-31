@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config DB Seed (C#)'
+  short_description: 'Configurar seeding de banco de dados com EF Core'
+  default_prompt: 'Configure o mecanismo de seeding de dados no projeto .NET. Crie DataSeeder.cs como orquestrador, seeds por módulo em Modules/, garanta idempotência, e registre a execução em Program.cs para ambientes de desenvolvimento. Siga o padrão em references/seed-pattern-cs.md.'
