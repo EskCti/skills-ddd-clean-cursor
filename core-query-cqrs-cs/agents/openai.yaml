@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Query CQRS (C#)'
+  short_description: 'Criar queries de leitura em C#'
+  default_prompt: 'Crie ou revise uma query de leitura (CQRS) em C# seguindo o padrão do projeto (projeção DTO, PascalCase, performance).'
