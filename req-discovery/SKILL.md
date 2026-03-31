@@ -10,7 +10,7 @@ Analisar um sistema existente (**qualquer linguagem ou arquitetura**) e extrair 
 
 **IMPORTANTE: Este skill é de análise, não de implementação.** Você pode navegar, ler código, capturar telas e investigar, mas NÃO deve alterar o sistema analisado.
 
-**Fluxo**: o sistema fonte pode ser PHP/MVC, Go, Python, Java, monolito — qualquer coisa. A saída é **sempre** estruturada em Bounded Contexts, Entities, Value Objects e camadas Clean Architecture, pronta para ser implementada com os skills deste repositório (TypeScript ou Kotlin). Consultar `references/ddd-clean-mapping.md` para o mapa completo.
+**Fluxo**: o sistema fonte pode ser PHP/MVC, Go, Python, Java, monolito — qualquer coisa. A saída é **sempre** estruturada em Bounded Contexts, Entities, Value Objects e camadas Clean Architecture, pronta para ser implementada com os skills deste repositório (TypeScript, Kotlin ou C#). Consultar `references/ddd-clean-mapping.md` para o mapa completo.
 
 ---
 
@@ -18,11 +18,11 @@ Analisar um sistema existente (**qualquer linguagem ou arquitetura**) e extrair 
 
 O usuário deve fornecer **uma das seguintes fontes**:
 
-| Tipo | Exemplo | Método de análise |
-|------|---------|-------------------|
-| **URL** (web app) | `https://app.example.com` | Navegação via browser, captura de telas, mapeamento de fluxos |
+| Tipo                         | Exemplo                           | Método de análise                                                  |
+| ---------------------------- | --------------------------------- | ------------------------------------------------------------------ |
+| **URL** (web app)            | `https://app.example.com`         | Navegação via browser, captura de telas, mapeamento de fluxos      |
 | **Caminho local** (codebase) | `/home/user/projetos/meu-sistema` | Leitura de código, estrutura de diretórios, modelos, rotas, testes |
-| **Ambos** | URL + path | Análise combinada (mais completa) |
+| **Ambos**                    | URL + path                        | Análise combinada (mais completa)                                  |
 
 Se o usuário não especificar, pergunte:
 
@@ -61,29 +61,29 @@ Se o usuário não especificar, pergunte:
 
 > O sistema analisado pode seguir MVC, monolito, ou qualquer padrão. A tabela abaixo indica **onde procurar** no código-fonte os equivalentes que serão traduzidos para conceitos DDD na saída.
 
-| Stack do sistema fonte | Onde estão as Entities | Onde estão as regras de negócio | Onde estão as rotas | Onde está a persistência |
-|------------------------|----------------------|-------------------------------|--------------------|-----------------------|
-| **PHP/Laravel** | `app/Models/*.php` (Eloquent) | Models, FormRequest, Services | `routes/api.php`, `routes/web.php` | Eloquent, `database/migrations/` |
-| **PHP/Symfony** | `src/Entity/*.php` (Doctrine) | Services, Validators | `src/Controller/*.php` | `src/Repository/*.php` |
-| **Go** | structs em `model/`, `domain/`, `internal/` | functions/methods em `service/` | `handler/`, `routes.go`, mux/gin | `repository/`, `store/` |
-| **Python/Django** | `models.py` | views, forms, validators | `urls.py` | Django ORM, `migrations/` |
-| **Python/FastAPI** | Pydantic/SQLAlchemy models | depends, services | `@app.get/post()`, `routers/` | SQLAlchemy, Alembic |
-| **Java/Spring** | `@Entity` classes | `@Service` classes | `@RestController` | `@Repository`, JPA |
-| **Ruby/Rails** | `app/models/*.rb` (ActiveRecord) | Models, Concerns, Services | `config/routes.rb` | ActiveRecord, `db/migrate/` |
-| **TypeScript/Node** | `*.entity.ts`, `*.model.ts` | `*.service.ts`, `*.usecase.ts` | `*.controller.ts`, `routes/` | Prisma, TypeORM, Mongoose |
+| Stack do sistema fonte | Onde estão as Entities                      | Onde estão as regras de negócio | Onde estão as rotas                | Onde está a persistência         |
+| ---------------------- | ------------------------------------------- | ------------------------------- | ---------------------------------- | -------------------------------- |
+| **PHP/Laravel**        | `app/Models/*.php` (Eloquent)               | Models, FormRequest, Services   | `routes/api.php`, `routes/web.php` | Eloquent, `database/migrations/` |
+| **PHP/Symfony**        | `src/Entity/*.php` (Doctrine)               | Services, Validators            | `src/Controller/*.php`             | `src/Repository/*.php`           |
+| **Go**                 | structs em `model/`, `domain/`, `internal/` | functions/methods em `service/` | `handler/`, `routes.go`, mux/gin   | `repository/`, `store/`          |
+| **Python/Django**      | `models.py`                                 | views, forms, validators        | `urls.py`                          | Django ORM, `migrations/`        |
+| **Python/FastAPI**     | Pydantic/SQLAlchemy models                  | depends, services               | `@app.get/post()`, `routers/`      | SQLAlchemy, Alembic              |
+| **Java/Spring**        | `@Entity` classes                           | `@Service` classes              | `@RestController`                  | `@Repository`, JPA               |
+| **Ruby/Rails**         | `app/models/*.rb` (ActiveRecord)            | Models, Concerns, Services      | `config/routes.rb`                 | ActiveRecord, `db/migrate/`      |
+| **TypeScript/Node**    | `*.entity.ts`, `*.model.ts`                 | `*.service.ts`, `*.usecase.ts`  | `*.controller.ts`, `routes/`       | Prisma, TypeORM, Mongoose        |
 
 **Tradução MVC → DDD** (para sistemas que não seguem DDD):
 
-| Conceito no MVC | Equivalente DDD na saída |
-|-----------------|-------------------------|
-| Model (Eloquent, ActiveRecord, etc.) | Entity + Repository port |
-| Controller action | Use Case |
-| Form validation / FormRequest | Value Object + DTO |
-| Service class | Domain Service ou Use Case |
-| Migration | Schema do Infrastructure |
-| View/Template | Interface (frontend) |
-| Middleware | Cross-cutting concern (auth, logging) |
-| Route definition | Controller endpoint |
+| Conceito no MVC                      | Equivalente DDD na saída              |
+| ------------------------------------ | ------------------------------------- |
+| Model (Eloquent, ActiveRecord, etc.) | Entity + Repository port              |
+| Controller action                    | Use Case                              |
+| Form validation / FormRequest        | Value Object + DTO                    |
+| Service class                        | Domain Service ou Use Case            |
+| Migration                            | Schema do Infrastructure              |
+| View/Template                        | Interface (frontend)                  |
+| Middleware                           | Cross-cutting concern (auth, logging) |
+| Route definition                     | Controller endpoint                   |
 
 > A saída (requirements.md, ddd-analysis.md) é **sempre em DDD/Clean Architecture**, independente do padrão do sistema fonte. O objetivo é documentar o domínio para reimplementação usando os skills deste repositório.
 
@@ -112,13 +112,13 @@ Mapear os achados para conceitos de DDD e camadas da Clean Architecture:
 
 Cada contexto é um limite de domínio autônomo. Sinais:
 
-| Sinal observado | Indica |
-|----------------|--------|
-| Menu/seção separada na UI | Possível bounded context |
-| Grupo de tabelas relacionadas | Aggregate candidate |
-| API com prefixo de rota diferente (`/auth/*`, `/orders/*`) | Bounded context |
-| Módulo/package separado no código | Bounded context explícito |
-| Vocabulário/termos diferentes para conceitos similares | Linguagem ubíqua diferente |
+| Sinal observado                                            | Indica                     |
+| ---------------------------------------------------------- | -------------------------- |
+| Menu/seção separada na UI                                  | Possível bounded context   |
+| Grupo de tabelas relacionadas                              | Aggregate candidate        |
+| API com prefixo de rota diferente (`/auth/*`, `/orders/*`) | Bounded context            |
+| Módulo/package separado no código                          | Bounded context explícito  |
+| Vocabulário/termos diferentes para conceitos similares     | Linguagem ubíqua diferente |
 
 Cada Bounded Context identificado → 1 módulo no código → 1 Épico no planejamento.
 
@@ -150,23 +150,23 @@ Para cada Bounded Context:
 
 Critérios de classificação:
 
-| Conceito | Critério de identificação |
-|----------|--------------------------|
-| **Entity** | Tem ID único, ciclo de vida, aparece em CRUD |
-| **Value Object** | Sem ID, definido por seus atributos, validação encapsulada |
-| **Aggregate** | Entity raiz que controla acesso a entities filhas |
-| **Domain Service** | Regra de negócio que envolve múltiplas entities/VOs |
+| Conceito           | Critério de identificação                                  |
+| ------------------ | ---------------------------------------------------------- |
+| **Entity**         | Tem ID único, ciclo de vida, aparece em CRUD               |
+| **Value Object**   | Sem ID, definido por seus atributos, validação encapsulada |
+| **Aggregate**      | Entity raiz que controla acesso a entities filhas          |
+| **Domain Service** | Regra de negócio que envolve múltiplas entities/VOs        |
 
 #### 3.3 — Mapear Camadas de Aplicação
 
 Para cada funcionalidade identificada, classificar por camada:
 
-| Camada | O que identificar |
-|--------|-------------------|
-| **Domain** | Entities, VOs, Domain Services, Repository ports |
-| **Application** | Use Cases, DTOs, Queries CQRS |
+| Camada             | O que identificar                                     |
+| ------------------ | ----------------------------------------------------- |
+| **Domain**         | Entities, VOs, Domain Services, Repository ports      |
+| **Application**    | Use Cases, DTOs, Queries CQRS                         |
 | **Infrastructure** | Persistence adapters, integrações externas, messaging |
-| **Interface** | Controllers/Routes (API), Forms/Pages (UI) |
+| **Interface**      | Controllers/Routes (API), Forms/Pages (UI)            |
 
 #### 3.4 — Gerar Diagrama de Contexto
 
@@ -257,12 +257,12 @@ meu-projeto/
 
 ## Stack Tecnológica
 
-| Camada | Tecnologia |
-|--------|-----------|
-| Frontend | ... |
-| Backend | ... |
-| Banco de Dados | ... |
-| Infra | ... |
+| Camada         | Tecnologia |
+| -------------- | ---------- |
+| Frontend       | ...        |
+| Backend        | ...        |
+| Banco de Dados | ...        |
+| Infra          | ...        |
 
 ## Módulos Identificados
 
@@ -283,6 +283,7 @@ meu-projeto/
 - **RN-001**: <descrição da regra>
 
 ### <Módulo 2>
+
 ...
 
 ## Requisitos Não-Funcionais
@@ -291,23 +292,24 @@ meu-projeto/
 
 ## Integrações
 
-| Sistema | Tipo | Descrição |
-|---------|------|-----------|
-| ... | API REST / Webhook / ... | ... |
+| Sistema | Tipo                     | Descrição |
+| ------- | ------------------------ | --------- |
+| ...     | API REST / Webhook / ... | ...       |
 
 ## Perfis de Acesso
 
-| Perfil | Permissões |
-|--------|-----------|
-| Admin | ... |
-| Usuário | ... |
+| Perfil  | Permissões |
+| ------- | ---------- |
+| Admin   | ...        |
+| Usuário | ...        |
 
 ## Fluxos Principais
 
 ### <Fluxo 1>: <nome>
-
 ```
+
 Tela A → Ação → Tela B → Confirmação → Tela C
+
 ```
 
 <descrição do fluxo>
@@ -330,10 +332,12 @@ Tela A → Ação → Tela B → Confirmação → Tela C
 **Tipo**: dashboard / formulário / listagem / detalhe / ...
 
 ### Elementos
+
 - <elemento 1>: <tipo> — <descrição>
 - <elemento 2>: <tipo> — <descrição>
 
 ### Ações Disponíveis
+
 - <ação 1>: <o que faz> → <para onde vai>
 ```
 
@@ -358,72 +362,73 @@ Tela A → Ação → Tela B → Confirmação → Tela C
 
 #### Entities
 
-| Entity | Atributos Principais | Aggregate Root? |
-|--------|---------------------|-----------------|
-| Customer | id, name, email, status | Sim |
-| Address | id, street, city, zip | Não (child de Customer) |
+| Entity   | Atributos Principais    | Aggregate Root?         |
+| -------- | ----------------------- | ----------------------- |
+| Customer | id, name, email, status | Sim                     |
+| Address  | id, street, city, zip   | Não (child de Customer) |
 
 #### Value Objects
 
-| VO | Tipo | Validação |
-|----|------|-----------|
-| Email | string | formato email, lowercase |
-| Money | number + string | valor >= 0, moeda ISO |
-| CustomerName | string | não vazio, max 100 chars |
+| VO           | Tipo            | Validação                |
+| ------------ | --------------- | ------------------------ |
+| Email        | string          | formato email, lowercase |
+| Money        | number + string | valor >= 0, moeda ISO    |
+| CustomerName | string          | não vazio, max 100 chars |
 
 #### Domain Services
 
-| Service | Regra |
-|---------|-------|
+| Service       | Regra                              |
+| ------------- | ---------------------------------- |
 | PricingPolicy | Calcula desconto baseado em volume |
 
 #### Repository Ports
 
-| Repository | Operações |
-|-----------|-----------|
+| Repository         | Operações                                     |
+| ------------------ | --------------------------------------------- |
 | CustomerRepository | create, findById, findByEmail, update, delete |
 
 #### Use Cases
 
-| Use Case | Tipo | Descrição |
-|----------|------|-----------|
-| CreateCustomer | comando | Cadastra novo cliente com validações |
-| FindCustomerById | query | Busca cliente por ID |
-| ListCustomers | query | Lista paginada com filtros |
+| Use Case         | Tipo    | Descrição                            |
+| ---------------- | ------- | ------------------------------------ |
+| CreateCustomer   | comando | Cadastra novo cliente com validações |
+| FindCustomerById | query   | Busca cliente por ID                 |
+| ListCustomers    | query   | Lista paginada com filtros           |
 
 #### DTOs
 
-| DTO | Direção | Campos |
-|-----|---------|--------|
-| CreateCustomerInDTO | entrada | name, email, address |
-| CustomerOutDTO | saída | id, name, email, createdAt |
+| DTO                 | Direção | Campos                     |
+| ------------------- | ------- | -------------------------- |
+| CreateCustomerInDTO | entrada | name, email, address       |
+| CustomerOutDTO      | saída   | id, name, email, createdAt |
 
 #### Controllers/Endpoints
 
-| Verbo | Rota | Use Case |
-|-------|------|----------|
-| POST | /api/customers | CreateCustomer |
-| GET | /api/customers/:id | FindCustomerById |
-| GET | /api/customers | ListCustomers |
+| Verbo | Rota               | Use Case         |
+| ----- | ------------------ | ---------------- |
+| POST  | /api/customers     | CreateCustomer   |
+| GET   | /api/customers/:id | FindCustomerById |
+| GET   | /api/customers     | ListCustomers    |
 
 ### BC-002: <Nome do Contexto>
+
 ...
 
 ## Mapeamento de Camadas (Clean Architecture)
 
-| Camada | Artefatos Identificados | Skill Agnóstico |
-|--------|------------------------|-----------------|
-| Domain | Entities, VOs, Domain Services, Repository ports | core-entity, core-value-object, core-domain-service, core-repository |
-| Application | Use Cases, DTOs, Queries | core-use-case, core-dto, core-query-cqrs |
-| Infrastructure | Adapters de persistência, integrações | backend-prisma-data / backend-data-kt |
-| Interface | Controllers, Forms | backend-controller, frontend-form-schema |
+| Camada         | Artefatos Identificados                          | Skill Agnóstico                                                      |
+| -------------- | ------------------------------------------------ | -------------------------------------------------------------------- |
+| Domain         | Entities, VOs, Domain Services, Repository ports | core-entity, core-value-object, core-domain-service, core-repository |
+| Application    | Use Cases, DTOs, Queries                         | core-use-case, core-dto, core-query-cqrs                             |
+| Infrastructure | Adapters de persistência, integrações            | backend-prisma-data / backend-data-kt / backend-data-cs              |
+| Interface      | Controllers, Forms                               | backend-controller / backend-controller-cs / frontend-form-schema    |
 
 ## Dependências entre Contexts
 
-| De | Para | Tipo | Dados Compartilhados |
-|----|------|------|---------------------|
-| Orders | Auth | upstream/downstream | userId |
-| Orders | Catalog | shared kernel | productId, productName |
+| De     | Para    | Tipo                | Dados Compartilhados   |
+| ------ | ------- | ------------------- | ---------------------- |
+| Orders | Auth    | upstream/downstream | userId                 |
+| Orders | Catalog | shared kernel       | productId, productName |
 
 ## Recomendações Arquiteturais
 
@@ -441,6 +446,7 @@ Tela A → Ação → Tela B → Confirmação → Tela C
 ### BC-001: <Nome>
 
 #### <Entidade 1>
+
 - campo1: tipo (obrigatório) → candidato a VO: sim/não
 - campo2: tipo (opcional) → candidato a VO: sim/não
 - Relações: <relação com outras entidades>
@@ -453,10 +459,10 @@ Tela A → Ação → Tela B → Confirmação → Tela C
 
 ## Mapeamento Entity ↔ Tabela/Collection
 
-| Entity | Tabela/Collection | Observações |
-|--------|------------------|-------------|
-| Customer | customers | - |
-| Order | orders | FK: customer_id |
+| Entity   | Tabela/Collection | Observações     |
+| -------- | ----------------- | --------------- |
+| Customer | customers         | -               |
+| Order    | orders            | FK: customer_id |
 ```
 
 ---
@@ -492,23 +498,23 @@ Use diagramas ASCII extensivamente durante a análise:
 ```
 Sistema fonte               req-discovery              req-agile-planning            implementação
 (qualquer linguagem)        ─────────────              ──────────────────            ──────────────
-PHP MVC / Go / Python  ──▶  requirements.md     ──▶    backlog.md             ──▶   skills TS ou KT
-Java / Ruby / etc.          ddd-analysis.md            (tasks com skill ref)        openspec-propose
+PHP MVC / Go / Python  ──▶  requirements.md     ──▶    backlog.md             ──▶   skills TS, KT ou CS
+Java / Ruby / C# / etc.    ddd-analysis.md            (tasks com skill ref)        openspec-propose
                             domain-model.md            epics-summary.md             openspec-apply-change
                             screens.md                 sprint-plan.md
 ```
 
-> O sistema fonte é apenas **lido**. A saída é **sempre** DDD/Clean Architecture. A implementação usa **sempre** os skills deste repositório (TypeScript ou Kotlin).
+> O sistema fonte é apenas **lido**. A saída é **sempre** DDD/Clean Architecture. A implementação usa **sempre** os skills deste repositório (TypeScript, Kotlin ou C#).
 
 ### Próximos passos após discovery
 
-| Objetivo | Skill | Entrada |
-|----------|-------|---------|
-| Organizar em épicos/stories/tasks DDD | `req-agile-planning` | `requirements.md` + `ddd-analysis.md` |
-| Explorar aspecto específico | `openspec-explore` | Bounded Context ou módulo |
-| Implementar módulo (TS) | `config-new-module` | Bounded Context → módulo NestJS |
-| Implementar módulo (KT) | `config-new-module-kt` | Bounded Context → módulo Spring Boot |
-| Criar proposta de change | `openspec-propose` | Épico ou Story do backlog |
+| Objetivo                              | Skill                  | Entrada                               |
+| ------------------------------------- | ---------------------- | ------------------------------------- |
+| Organizar em épicos/stories/tasks DDD | `req-agile-planning`   | `requirements.md` + `ddd-analysis.md` |
+| Explorar aspecto específico           | `openspec-explore`     | Bounded Context ou módulo             |
+| Implementar módulo (TS)               | `config-new-module`    | Bounded Context → módulo NestJS       |
+| Implementar módulo (KT)               | `config-new-module-kt` | Bounded Context → módulo Spring Boot  |
+| Criar proposta de change              | `openspec-propose`     | Épico ou Story do backlog             |
 
 ### Tasks → Skills deste repositório
 
@@ -516,12 +522,13 @@ O `ddd-analysis.md` traduz conceitos do sistema fonte para DDD. O `req-agile-pla
 
 - **TypeScript**: skills sem sufixo → NestJS + Prisma + React
 - **Kotlin**: skills com sufixo `-kt` → Spring Boot + JPA + Gradle
+- **C#**: skills com sufixo `-cs` → ASP.NET Core + EF Core + .NET 8+
 
-Todos os conceitos DDD identificados (Entity, VO, Use Case, Repository, Controller) têm skill correspondente em ambas as stacks. Consultar `references/ddd-clean-mapping.md`.
+Todos os conceitos DDD identificados (Entity, VO, Use Case, Repository, Controller) têm skill correspondente nas 3 stacks. Consultar `references/ddd-clean-mapping.md`.
 
 Ofereça essas opções ao finalizar:
 
-> "Análise concluída! O sistema foi mapeado para DDD/Clean Architecture.\n> Próximos passos:\n> 1. Organizar em planejamento ágil (`req-agile-planning`) — épicos, stories e tasks referenciando skills TS ou KT\n> 2. Explorar um bounded context específico (`openspec-explore`)\n> 3. Começar a implementar um módulo (`config-new-module` para TS ou `config-new-module-kt` para KT)"
+> "Análise concluída! O sistema foi mapeado para DDD/Clean Architecture.\n> Próximos passos:\n> 1. Organizar em planejamento ágil (`req-agile-planning`) — épicos, stories e tasks referenciando skills TS, KT ou CS\n> 2. Explorar um bounded context específico (`openspec-explore`)\n> 3. Começar a implementar um módulo (`config-new-module` para TS, `config-new-module-kt` para KT ou `config-new-module-cs` para CS)"
 
 ---
 

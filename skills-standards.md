@@ -6,7 +6,8 @@ Centralize global standards used by all project skills.
 Use these rules as default when creating or updating files via automation scripts.
 
 This document covers:
-- Naming and structural conventions (TypeScript + Kotlin)
+
+- Naming and structural conventions (TypeScript + Kotlin + C#)
 - DDD/Clean Architecture layer mapping
 - Skill categorization and stack selection
 - Documentation output standards
@@ -72,30 +73,31 @@ When editing any skill (`*/SKILL.md`):
 - Reference this file (`./skills-standards.md`) as global standard source.
 - Document explicit exceptions in the skill itself when needed.
 - If a skill generates files via script, enforce this standard in generated paths.
-- Every `SKILL.md` frontmatter must include `stack:` field (`typescript`, `kotlin`, or `agnostic`).
+- Every `SKILL.md` frontmatter must include `stack:` field (`typescript`, `kotlin`, `csharp`, or `agnostic`).
 
 ### Skill Categories
 
-| Category | Prefix | Purpose | Stack |
-|----------|--------|---------|-------|
-| Config | `config-*` | Bootstrap/scaffolding de projeto, módulo ou infra | TS or KT |
-| Core | `core-*` | Padrões de domínio e aplicação (entity, VO, use case) | TS or KT |
-| Backend | `backend-*` | Camada de infraestrutura/interface do backend | TS or KT |
-| Frontend | `frontend-*` | Camada de interface web | TS |
-| Requisitos | `req-*` | Discovery e planejamento (DDD-aware, agnostic) | Agnostic |
-| OpenSpec | `openspec-*` | Fluxo de proposta/exploração/implementação | Agnostic |
+| Category   | Prefix       | Purpose                                               | Stack        |
+| ---------- | ------------ | ----------------------------------------------------- | ------------ |
+| Config     | `config-*`   | Bootstrap/scaffolding de projeto, módulo ou infra     | TS, KT or CS |
+| Core       | `core-*`     | Padrões de domínio e aplicação (entity, VO, use case) | TS, KT or CS |
+| Backend    | `backend-*`  | Camada de infraestrutura/interface do backend         | TS, KT or CS |
+| Frontend   | `frontend-*` | Camada de interface web                               | TS           |
+| Requisitos | `req-*`      | Discovery e planejamento (DDD-aware, agnostic)        | Agnostic     |
+| OpenSpec   | `openspec-*` | Fluxo de proposta/exploração/implementação            | Agnostic     |
 
 ### Stack Suffix Convention
 
-| Stack | Suffix | Framework | Automação |
-|-------|--------|-----------|-----------|
-| TypeScript | (none) | NestJS + Prisma + React | Templates + scripts |
-| Kotlin | `-kt` | Spring Boot + JPA + Gradle | Templates + scripts |
-| Language-agnostic | (none) | — | `req-discovery`, `req-agile-planning`, `openspec-*` |
+| Stack             | Suffix | Framework                  | Automação                                           |
+| ----------------- | ------ | -------------------------- | --------------------------------------------------- |
+| TypeScript        | (none) | NestJS + Prisma + React    | Templates + scripts                                 |
+| Kotlin            | `-kt`  | Spring Boot + JPA + Gradle | Templates + scripts                                 |
+| C#                | `-cs`  | ASP.NET Core + EF Core     | Templates + scripts                                 |
+| Language-agnostic | (none) | —                          | `req-discovery`, `req-agile-planning`, `openspec-*` |
 
 ### Source vs Target
 
-The `req-discovery` skill can **read** systems in any language (PHP, Go, Python, Java, Ruby, etc.). The output is always structured in DDD/Clean Architecture, and the tasks in the agile planning always reference implementation skills from this repository (TypeScript or Kotlin).
+The `req-discovery` skill can **read** systems in any language (PHP, Go, Python, Java, Ruby, etc.). The output is always structured in DDD/Clean Architecture, and the tasks in the agile planning always reference implementation skills from this repository (TypeScript, Kotlin or C#).
 
 ## 6. Quick Examples (TypeScript)
 
@@ -159,52 +161,97 @@ Kotlin files do not use dot-separated type suffixes in filenames. The type is ex
 - JPA adapter: `apps/backend-kt/src/main/kotlin/com/example/customer/infrastructure/persistence/CustomerJpaRepository.kt`
 - DTO: `packages/customer/src/main/kotlin/com/example/customer/application/dto/CustomerDTO.kt`
 
-## 8. DDD / Clean Architecture Standards
+## 8. C# Stack Standards
+
+### Naming Pattern
+
+Default format for C# files:
+
+- `<NameInPascalCase>.<extension>`
+
+Base rules:
+
+- Namespaces: PascalCase dot-separated (`Project.Module.Domain.Entities`).
+- Directories: follow namespace structure (PascalCase).
+- Files: PascalCase matching the primary class/interface/record name.
+- Skill directories: same kebab-case as TypeScript, with `-cs` suffix.
+
+### Recommended Type Suffixes (C#)
+
+C# files do not use dot-separated type suffixes in filenames. The type is expressed via the class name or interface prefix:
+
+- Entity: `Customer.cs` (class/record `Customer`)
+- Value Object: `CustomerName.cs` (record)
+- Use Case: `CreateCustomerUseCase.cs` (class)
+- Repository interface: `ICustomerRepository.cs` (interface)
+- Repository impl: `CustomerRepository.cs` (entity framework/dapper)
+- Query (CQRS): `GetCustomerByIdQuery.cs`
+- DTO: `CustomerDto.cs` (record/class)
+- Controller: `CustomerController.cs` (`[ApiController]`)
+
+### Structural Conventions (C#)
+
+- Prefer feature/domain namespaces: `Project.Module.Domain`, `Project.Module.Application`, `Project.Module.Infrastructure`.
+- Use `record` for Value Objects (built-in value-based equality).
+- Use `init` properties for imutability.
+- Use `Task<Result<T>>` for async operations returning results.
+
+### Quick Examples (C#)
+
+- Backend controller: `src/Project.Backend/Controllers/CustomerController.cs`
+- Core entity: `src/Project.Core/Domain/Entities/Customer.cs`
+- Core VO: `src/Project.Core/Domain/ValueObjects/CustomerName.cs`
+- Core use case: `src/Project.Core/Application/UseCases/CreateCustomerUseCase.cs`
+- Core repository: `src/Project.Core/Domain/Repositories/ICustomerRepository.cs`
+
+## 9. DDD / Clean Architecture Standards
 
 ### Layer Model
 
 All skills follow the same Clean Architecture layer model:
 
 ```
-Interface (API/UI)   →  backend-controller[-kt], frontend-form-schema
-Application          →  core-use-case[-kt], core-dto[-kt], core-query-cqrs[-kt]
-Domain               →  core-entity[-kt], core-value-object[-kt], core-domain-service[-kt], core-repository[-kt]
-Infrastructure       →  backend-prisma-data (TS) / backend-data-kt (KT), config-prisma (TS) / config-jpa-kt (KT)
+Interface (API/UI)   →  backend-controller[-kt|-cs], frontend-form-schema
+Application          →  core-use-case[-kt|-cs], core-dto[-kt|-cs], core-query-cqrs[-kt|-cs]
+Domain               →  core-entity[-kt|-cs], core-value-object[-kt|-cs], core-domain-service[-kt|-cs], core-repository[-kt|-cs]
+Infrastructure       →  backend-prisma-data (TS) / backend-data-kt (KT) / backend-data-cs (CS)
+                        config-prisma (TS) / config-jpa-kt (KT) / config-efcore-cs (CS)
 ```
 
 ### Implementation by Stack
 
-| Layer | Concept | Skill TS | Skill KT |
-|-------|---------|----------|----------|
-| Domain | Entity | `core-entity` | `core-entity-kt` |
-| Domain | Value Object | `core-value-object` | `core-value-object-kt` |
-| Domain | Domain Service | `core-domain-service` | `core-domain-service-kt` |
-| Domain | Repository port | `core-repository` | `core-repository-kt` |
-| Application | Use Case | `core-use-case` | `core-use-case-kt` |
-| Application | DTO | `core-dto` | `core-dto-kt` |
-| Application | Query CQRS | `core-query-cqrs` | `core-query-cqrs-kt` |
-| Infrastructure | Persistence adapter | `backend-prisma-data` | `backend-data-kt` |
-| Infrastructure | Migration | `config-prisma` | `config-jpa-kt` |
-| Interface | Controller | `backend-controller` | `backend-controller-kt` |
-| Interface | Form | `frontend-form-schema` | — |
+| Layer          | Concept             | Skill TS               | Skill KT                 | Skill CS                 |
+| -------------- | ------------------- | ---------------------- | ------------------------ | ------------------------ |
+| Domain         | Entity              | `core-entity`          | `core-entity-kt`         | `core-entity-cs`         |
+| Domain         | Value Object        | `core-value-object`    | `core-value-object-kt`   | `core-value-object-cs`   |
+| Domain         | Domain Service      | `core-domain-service`  | `core-domain-service-kt` | `core-domain-service-cs` |
+| Domain         | Repository port     | `core-repository`      | `core-repository-kt`     | `core-repository-cs`     |
+| Application    | Use Case            | `core-use-case`        | `core-use-case-kt`       | `core-use-case-cs`       |
+| Application    | DTO                 | `core-dto`             | `core-dto-kt`            | `core-dto-cs`            |
+| Application    | Query CQRS          | `core-query-cqrs`      | `core-query-cqrs-kt`     | `core-query-cqrs-cs`     |
+| Infrastructure | Persistence adapter | `backend-prisma-data`  | `backend-data-kt`        | `backend-data-cs`        |
+| Infrastructure | Migration           | `config-prisma`        | `config-jpa-kt`          | `config-efcore-cs`       |
+| Interface      | Controller          | `backend-controller`   | `backend-controller-kt`  | `backend-controller-cs`  |
+| Interface      | Form                | `frontend-form-schema` | —                        | —                        |
 
-> The `req-discovery` skill reads systems in any language/architecture. The agile planning and implementation always use the skills above (TS or KT).
+> The `req-discovery` skill reads systems in any language/architecture. The agile planning and implementation always use the skills above (TS, KT or CS).
 
 ### DDD Concept → Skill Mapping
 
-| DDD Concept | Skill (agnostic name) |
-|-------------|----------------------|
-| Bounded Context | `config-new-module` |
-| Entity | `core-entity` |
-| Value Object | `core-value-object` |
-| Aggregate | `core-entity` (root entity) |
-| Domain Service | `core-domain-service` |
-| Repository (port) | `core-repository` |
-| Repository (adapter) | `backend-prisma-data` / `backend-data-kt` |
-| Use Case | `core-use-case` |
-| DTO | `core-dto` |
-| Query (CQRS) | `core-query-cqrs` |
-| Controller | `backend-controller` |
+| DDD Concept          | Skill (agnostic name)                                         |
+| -------------------- | ------------------------------------------------------------- |
+| Bounded Context      | `config-new-module`                                           |
+| Entity               | `core-entity`                                                 |
+| Value Object         | `core-value-object`                                           |
+| Aggregate            | `core-entity` (root entity)                                   |
+| Domain Service       | `core-domain-service`                                         |
+| Repository (port)    | `core-repository`                                             |
+| Controller           | `backend-controller`                                          |
+| Repository (adapter) | `backend-prisma-data` / `backend-data-kt` / `backend-data-cs` |
+| Use Case             | `core-use-case`                                               |
+| DTO                  | `core-dto`                                                    |
+| Query (CQRS)         | `core-query-cqrs`                                             |
+| Controller           | `backend-controller`                                          |
 
 ### Implementation Order (inside-out)
 
@@ -228,24 +275,24 @@ When implementing a feature, follow this order:
 
 Tasks in backlogs generated by `req-agile-planning` use these layer prefixes:
 
-| Prefix | Layer | Examples |
-|--------|-------|----------|
-| `domain:vo` | Domain | Value Object creation |
-| `domain:entity` | Domain | Entity with business rules |
-| `domain:service` | Domain | Policy, calculator, validator |
-| `domain:repository` | Domain | Repository interface |
-| `app:dto` | Application | Input/output contracts |
-| `app:usecase` | Application | Use case orchestration |
-| `app:query` | Application | CQRS read query |
-| `infra:persistence` | Infrastructure | DB adapter |
-| `infra:migration` | Infrastructure | Schema, migration |
-| `infra:setup` | Infrastructure | Project bootstrap |
-| `infra:auth` | Infrastructure | Authentication setup |
-| `infra:db` | Infrastructure | Database config |
-| `interface:controller` | Interface | HTTP endpoint |
-| `interface:form` | Interface | Frontend form |
-| `test:unit` | Quality | Unit tests |
-| `test:e2e` | Quality | End-to-end tests |
+| Prefix                 | Layer          | Examples                      |
+| ---------------------- | -------------- | ----------------------------- |
+| `domain:vo`            | Domain         | Value Object creation         |
+| `domain:entity`        | Domain         | Entity with business rules    |
+| `domain:service`       | Domain         | Policy, calculator, validator |
+| `domain:repository`    | Domain         | Repository interface          |
+| `app:dto`              | Application    | Input/output contracts        |
+| `app:usecase`          | Application    | Use case orchestration        |
+| `app:query`            | Application    | CQRS read query               |
+| `infra:persistence`    | Infrastructure | DB adapter                    |
+| `infra:migration`      | Infrastructure | Schema, migration             |
+| `infra:setup`          | Infrastructure | Project bootstrap             |
+| `infra:auth`           | Infrastructure | Authentication setup          |
+| `infra:db`             | Infrastructure | Database config               |
+| `interface:controller` | Interface      | HTTP endpoint                 |
+| `interface:form`       | Interface      | Frontend form                 |
+| `test:unit`            | Quality        | Unit tests                    |
+| `test:e2e`             | Quality        | End-to-end tests              |
 
 ## 9. Documentation Output Standards
 
@@ -276,10 +323,37 @@ Skills that generate documentation (`req-discovery`, `req-agile-planning`) write
 
 ```
 Sistema fonte           req-discovery        req-agile-planning     openspec-propose     openspec-apply-change
-(qualquer linguagem) →  (leitura/análise) →  (planejamento DDD) →  (proposta change) →  (implementação TS/KT)
+(qualquer linguagem) →  (leitura/análise) →  (planejamento DDD) →  (proposta change) →  (implementação TS/KT/CS)
 ```
 
 - **Entrada**: qualquer sistema (PHP MVC, Go, Python, Java, monolito, etc.)
 - **Saída da discovery**: DDD/Clean Architecture (bounded contexts, entities, VOs, etc.)
-- **Saída do planning**: backlog com tasks referenciando skills TS ou KT
-- **Implementação**: sempre com os skills deste repositório — TS (sem sufixo) ou KT (sufixo `-kt`)
+- **Saída do planning**: backlog com tasks referenciando skills TS, KT ou CS
+- **Implementação**: sempre com os skills deste repositório — TS (sem sufixo), KT (sufixo `-kt`) ou CS (sufixo `-cs`)
+
+---
+
+## 10. Language Stack Comparison
+
+Comparativo detalhado das stacks suportadas para implementação de DDD/Clean Architecture.
+
+| Característica          | TypeScript (Node/Nest)          | Kotlin (JVM/Spring)             | C# (.NET 8+)             |
+| :---------------------- | :------------------------------ | :------------------------------ | :----------------------- |
+| **Principal Framework** | NestJS                          | Spring Boot                     | ASP.NET Core             |
+| **Persistência**        | Prisma / Zod                    | JPA / Hibernate                 | EF Core / Fluent API     |
+| **Seeding**             | Modular (Prisma Seed)           | Não padronizado                 | Modular (DataSeeder)     |
+| **Erros**               | Result Pattern                  | Exceptions / Result             | Result Pattern           |
+| **Tipagem de Dados**    | Interface / Type                | Data Class                      | Record / Class           |
+| **Imutabilidade**       | Manual / Readonly               | Nativa (val/data)               | Nativa (init/record)     |
+| **Erro Handling**       | Result Pattern (TS-Res)         | kotlin.Result / Arrow           | Result Pattern (Fluent)  |
+| **Concorrência**        | Async / Await                   | Coroutines (suspend)            | Async / Await (Task)     |
+| **Injeção Depend.**     | Nest DI                         | Spring beans                    | Microsoft.Extensions.DI  |
+| **Build Tool**          | npm / yarn / pnpm               | Gradle / Maven                  | dotnet CLI / MSBuild     |
+| **Ponto Forte**         | Performance I/O, Ecossistema    | Tipagem forte ríspida, JVM      | Performance, DX, LINQ    |
+| **Ponto Fraco**         | Tipos em runtime, Single thread | Curva inicial (Spring), Memória | Ecossistema menos aberto |
+
+### Quando escolher?
+
+- **TypeScript**: Se o time já domina JS/TS, precisa de alta performance em I/O asíncrono ou quer compartilhar tipos com o frontend.
+- **Kotlin**: Se precisa da maturidade e ecossistema da JVM, mas quer uma linguagem moderna e concisa com excelente suporte a programação funcional.
+- **C#**: Se busca a melhor DX (Developer Experience) do mercado, performance bruta de ponta com o runtime .NET moderno e forte integração com ecossistemas empresariais.

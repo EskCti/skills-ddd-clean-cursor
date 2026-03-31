@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Auth Core Full (C#)'
+  short_description: 'Configurar Auth Full no Core .NET'
+  default_prompt: 'Crie ou ajuste o sistema completo de autenticação e permissões no Core C# (RBAC, Multi-tenant auth, etc).'
