@@ -66,12 +66,32 @@ Principais skills disponíveis neste repositório:
 - `backend-controller-kt`: controllers Spring Boot em Kotlin (@RestController)
 - `backend-data-kt`: persistência JPA, Spring Data, migrations em Kotlin
 
+### Skills C# (sufixo `-cs`)
+
+- `config-project-cs`: bootstrap projeto .NET com solução (.sln) multi-projeto Clean Architecture
+- `config-shared-core-cs`: kernel compartilhado (Entity, ValueObject, Result, IUseCase, IRepository)
+- `config-efcore-cs`: setup Entity Framework Core, DbContext, Fluent API, migrations
+- `config-db-seed-cs`: seeding de dados com EF Core (DataSeeder, seeds por módulo)
+- `config-new-module-cs`: criação de módulo .NET (Core + Infrastructure + Backend controller)
+- `config-auth-core-basic-cs`: auth core básico C# (User, Password, Login/Register use cases)
+- `config-auth-core-full-cs`: auth core completo C# (basic + Role, Permission, RBAC)
+- `config-auth-backend-basic-cs`: auth backend ASP.NET Core (JWT, BCrypt, Register/Login/Me)
+- `core-entity-cs`: entidades de domínio em C# (Entity base, Result, Equals/GetHashCode)
+- `core-value-object-cs`: Value Objects em C# (record, ValueObject base)
+- `core-domain-service-cs`: serviços de domínio puros em C#
+- `core-use-case-cs`: casos de uso em C# (IUseCase, async, Result)
+- `core-dto-cs`: Data Transfer Objects em C# (record)
+- `core-repository-cs`: contratos de repositório em C# (IRepository, Result)
+- `core-query-cqrs-cs`: queries CQRS de leitura em C#
+- `backend-controller-cs`: controllers ASP.NET Core ([ApiController], ActionResult)
+- `backend-data-cs`: persistência EF Core, adapters, configurations
+
 ### Skills de Requisitos e Planejamento (agnóstico de linguagem)
 
 Skills para análise de sistemas existentes e planejamento ágil em DDD/Clean Architecture:
 
 - `req-discovery`: analisar sistema existente (**qualquer linguagem** — PHP, Go, Python, Java, etc.) via URL ou caminho local, documentando requisitos em DDD/Clean Architecture
-- `req-agile-planning`: organizar requisitos em épicos, stories e tasks DDD, com referência aos **skills TS/KT deste repositório** para implementação
+- `req-agile-planning`: organizar requisitos em épicos, stories e tasks DDD, com referência aos **skills TS/KT/CS deste repositório** para implementação
 
 ### Skills utilitárias (OpenSpec)
 

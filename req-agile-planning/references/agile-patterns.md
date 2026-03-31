@@ -104,13 +104,13 @@ Tasks são tipadas pela camada arquitetural e referenciam o skill agnóstico cor
 
 ### Infrastructure Layer
 
-| Tipo | Descrição | Skill TS | Skill KT |
-|------|-----------|----------|----------|
-| `infra:persistence` | Adapter de persistência | `backend-prisma-data` | `backend-data-kt` |
-| `infra:migration` | Schema/migration de banco | `config-prisma` | `config-jpa-kt` |
-| `infra:setup` | Setup de projeto/módulo | `config-project`, `config-new-module` | `config-project-kt`, `config-new-module-kt` |
-| `infra:auth` | Autenticação | `config-auth-core-basic`, `config-auth-backend-basic` | `config-auth-core-basic-kt`, `config-auth-backend-basic-kt` |
-| `infra:db` | Configuração de banco | `config-prisma` | `config-jpa-kt` |
+| Tipo | Skill TS | Skill KT | Skill CS |
+|------|----------|----------|----------|
+| `infra:persistence` | `backend-prisma-data` | `backend-data-kt` | `backend-data-cs` |
+| `infra:migration` | `config-prisma` | `config-jpa-kt` | `config-efcore-cs` |
+| `infra:setup` | `config-project`, `config-new-module` | `config-project-kt`, `config-new-module-kt` | `config-project-cs`, `config-new-module-cs` |
+| `infra:auth` | `config-auth-core-basic`, `config-auth-backend-basic` | `config-auth-core-basic-kt`, `config-auth-backend-basic-kt` | `config-auth-core-basic-cs`, `config-auth-backend-basic-cs` |
+| `infra:db` | `config-prisma` | `config-jpa-kt` | `config-efcore-cs` |
 
 ### Interface Layer
 
@@ -151,8 +151,9 @@ Tasks são tipadas pela camada arquitetural e referenciam o skill agnóstico cor
 |-------|--------|-----------|-----------|
 | **TypeScript** | (nenhum) | NestJS + Prisma + React | Templates + scripts |
 | **Kotlin** | `-kt` | Spring Boot + JPA + Gradle | Templates + scripts |
+| **C#** | `-cs` | ASP.NET Core + EF Core | Templates + scripts |
 
-> O sistema fonte analisado pelo `req-discovery` pode ser qualquer linguagem (PHP, Go, Python, Java, etc.). As tasks do backlog sempre referenciam skills TS ou KT deste repositório, pois o objetivo é reimplementar usando DDD/Clean Architecture.
+> O sistema fonte analisado pelo `req-discovery` pode ser qualquer linguagem (PHP, Go, Python, Java, etc.). As tasks do backlog referenciam skills TS, KT ou CS deste repositório, pois o objetivo é reimplementar usando DDD/Clean Architecture.
 
 ## Padrão de Rastreabilidade
 

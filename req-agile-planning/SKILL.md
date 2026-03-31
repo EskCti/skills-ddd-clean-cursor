@@ -1,14 +1,14 @@
 ---
 name: req-agile-planning
 stack: agnostic
-description: Organizar requisitos (de sistemas existentes em qualquer linguagem ou de descrições livres) em planejamento ágil com épicos, user stories e tasks alinhados a DDD/Clean Architecture, com tasks referenciando os skills TS/KT deste repositório. Usar quando o pedido envolver criação de backlog, planejamento de sprint ou organização de trabalho técnico por camada arquitetural.
+description: Organizar requisitos (de sistemas existentes em qualquer linguagem ou de descrições livres) em planejamento ágil com épicos, user stories e tasks alinhados a DDD/Clean Architecture, com tasks referenciando os skills TS/KT/CS deste repositório. Usar quando o pedido envolver criação de backlog, planejamento de sprint ou organização de trabalho técnico por camada arquitetural.
 ---
 
 # Agile Planning
 
 Transformar requisitos (documentados ou descritos) em um backlog ágil estruturado com Épicos, User Stories e Tasks, **alinhado a DDD e Clean Architecture**.
 
-**Fluxo**: o sistema fonte pode ter sido analisado em qualquer linguagem (PHP, Go, Python, etc. via `req-discovery`). As tasks do backlog sempre referenciam os **skills deste repositório**. Na implementação, o usuário escolhe **TypeScript** (sem sufixo) ou **Kotlin** (sufixo `-kt`). Consultar `req-discovery/references/ddd-clean-mapping.md`.
+**Fluxo**: o sistema fonte pode ter sido analisado em qualquer linguagem (PHP, Go, Python, etc. via `req-discovery`). As tasks do backlog sempre referenciam os **skills deste repositório**. Na implementação, o usuário escolhe **TypeScript** (sem sufixo), **Kotlin** (sufixo `-kt`) ou **C#** (sufixo `-cs`). Consultar `req-discovery/references/ddd-clean-mapping.md`.
 
 ---
 
@@ -16,13 +16,13 @@ Transformar requisitos (documentados ou descritos) em um backlog ágil estrutura
 
 O skill aceita **qualquer uma destas fontes**:
 
-| Fonte | Exemplo |
-|-------|---------|
-| Arquivo `requirements.md` do `req-discovery` | `<docsPath>/discovery/<sistema>/requirements.md` |
-| Arquivo `ddd-analysis.md` do `req-discovery` | `<docsPath>/discovery/<sistema>/ddd-analysis.md` |
-| Descrição livre do usuário | "Preciso de um sistema de e-commerce com carrinho, pagamento e entrega" |
-| URL de issue tracker | Link de GitHub Issues, Jira, etc. |
-| Documento existente | Qualquer `.md` ou `.txt` com requisitos |
+| Fonte                                        | Exemplo                                                                 |
+| -------------------------------------------- | ----------------------------------------------------------------------- |
+| Arquivo `requirements.md` do `req-discovery` | `<docsPath>/discovery/<sistema>/requirements.md`                        |
+| Arquivo `ddd-analysis.md` do `req-discovery` | `<docsPath>/discovery/<sistema>/ddd-analysis.md`                        |
+| Descrição livre do usuário                   | "Preciso de um sistema de e-commerce com carrinho, pagamento e entrega" |
+| URL de issue tracker                         | Link de GitHub Issues, Jira, etc.                                       |
+| Documento existente                          | Qualquer `.md` ou `.txt` com requisitos                                 |
 
 Se nenhuma fonte for fornecida, pergunte:
 
@@ -75,19 +75,22 @@ Adicionalmente, criar **Épicos Técnicos** (enablers) para infraestrutura compa
 ```
 
 Regras para Épicos:
+
 - Cada Bounded Context → 1 Épico funcional
 - Infra compartilhada → Épico técnico `[TECH]` (bootstrap, shared, banco, CI)
 - Um épico deve ser entregável de forma independente ou com dependências explícitas
 - Estimativa de alto nível: P (pequeno), M (médio), G (grande), GG (muito grande)
 
 **Épico técnico de bootstrap** (EP-000) deve sempre existir e incluir:
-- Setup do projeto (skill: `config-project` / `config-project-kt`)
-- Shared kernel (skill: `config-shared-core` / `config-shared-core-kt`)
-- Configuração de banco (skill: `config-prisma` / `config-jpa-kt`)
+
+- Setup do projeto (skill: `config-project` / `config-project-kt` / `config-project-cs`)
+- Shared kernel (skill: `config-shared-core` / `config-shared-core-kt` / `config-shared-core-cs`)
+- Configuração de banco (skill: `config-prisma` / `config-jpa-kt` / `config-efcore-cs`)
 
 **Épico de auth** (quando aplicável) deve usar:
-- Auth core (skill: `config-auth-core-basic` / `config-auth-core-basic-kt`)
-- Auth backend (skill: `config-auth-backend-basic` / `config-auth-backend-basic-kt`)
+
+- Auth core (skill: `config-auth-core-basic` / `config-auth-core-basic-kt` / `config-auth-core-basic-cs`)
+- Auth backend (skill: `config-auth-backend-basic` / `config-auth-backend-basic-kt` / `config-auth-backend-basic-cs`)
 
 ### Fase 3 — Quebra em User Stories
 
@@ -100,6 +103,7 @@ para que <benefício/valor>.
 ```
 
 Regras para Stories:
+
 - Cada story deve ser **independente e testável**
 - Incluir **critérios de aceitação** (Given/When/Then ou checklist)
 - Estimativa de complexidade: 1, 2, 3, 5, 8, 13 (Fibonacci)
@@ -138,26 +142,27 @@ Formato de task — **sempre agnóstico**, sem sufixo de stack:
 
 Na implementação, o desenvolvedor resolve o skill para a stack escolhida:
 
-| Prefixo na task | Skill TS | Skill KT |
-|----------------|----------|----------|
-| `domain:entity` | `core-entity` | `core-entity-kt` |
-| `domain:vo` | `core-value-object` | `core-value-object-kt` |
-| `domain:repository` | `core-repository` | `core-repository-kt` |
-| `app:usecase` | `core-use-case` | `core-use-case-kt` |
-| `app:dto` | `core-dto` | `core-dto-kt` |
-| `app:query` | `core-query-cqrs` | `core-query-cqrs-kt` |
-| `infra:persistence` | `backend-prisma-data` | `backend-data-kt` |
-| `infra:migration` | `config-prisma` | `config-jpa-kt` |
-| `interface:controller` | `backend-controller` | `backend-controller-kt` |
+| Prefixo na task        | Skill TS              | Skill KT                | Skill CS                |
+| ---------------------- | --------------------- | ----------------------- | ----------------------- |
+| `domain:entity`        | `core-entity`         | `core-entity-kt`        | `core-entity-cs`        |
+| `domain:vo`            | `core-value-object`   | `core-value-object-kt`  | `core-value-object-cs`  |
+| `domain:repository`    | `core-repository`     | `core-repository-kt`    | `core-repository-cs`    |
+| `app:usecase`          | `core-use-case`       | `core-use-case-kt`      | `core-use-case-cs`      |
+| `app:dto`              | `core-dto`            | `core-dto-kt`           | `core-dto-cs`           |
+| `app:query`            | `core-query-cqrs`     | `core-query-cqrs-kt`    | `core-query-cqrs-cs`    |
+| `infra:persistence`    | `backend-prisma-data` | `backend-data-kt`       | `backend-data-cs`       |
+| `infra:migration`      | `config-prisma`       | `config-jpa-kt`         | `config-efcore-cs`      |
+| `interface:controller` | `backend-controller`  | `backend-controller-kt` | `backend-controller-cs` |
 
 Regras para Tasks:
+
 - Cada task deve ser **completável em 1-4 horas**
 - Deve indicar a **camada DDD** como prefixo (`domain:`, `app:`, `infra:`, `interface:`, `test:`)
-- Deve referenciar o **skill** correspondente (sufixo `[-kt]` para indicar que existe em ambas as stacks)
-- A escolha TS ou KT é feita no momento da implementação, não no planejamento
+- Deve referenciar o **skill** correspondente (sufixo `[-kt/-cs]` para indicar que existe em múltiplas stacks)
+- A escolha TS, KT ou CS é feita no momento da implementação, não no planejamento
 - Deve ser atribuível a uma pessoa
 
-> **Nota**: o sistema fonte analisado pode ser qualquer linguagem (PHP, Go, Python, etc.). As tasks sempre referenciam os skills deste repositório (TS ou KT) porque o objetivo é **reimplementar** usando DDD/Clean Architecture.
+> **Nota**: o sistema fonte analisado pode ser qualquer linguagem (PHP, Go, Python, etc.). As tasks sempre referenciam os skills deste repositório (TS, KT ou CS) porque o objetivo é **reimplementar** usando DDD/Clean Architecture.
 
 ### Fase 5 — Priorização e Roadmap
 
@@ -233,18 +238,21 @@ docs/planning/meu-erp/backlog.md          ← saída (épicos + stories + tasks 
 **Análise DDD**: <ddd-analysis.md ou inferido>
 **Data**: <data>
 **Total**: <N> épicos (<B> bounded contexts + <T> técnicos), <M> stories, <P> tasks
-**Stack**: agnóstico (escolha TS ou KT na implementação)
+**Stack**: agnóstico (escolha TS, KT ou CS na implementação)
 
 ## Roadmap
 
 ### Release 0 — Bootstrap
+
 - EP-000 [TECH]: Setup do projeto e infraestrutura base
 
 ### Release 1 — MVP
+
 - EP-001: <Bounded Context 1>
 - EP-002: <Bounded Context 2>
 
 ### Release 2 — Expansão
+
 - EP-003: <Bounded Context 3>
 - EP-004: <Bounded Context 4>
 
@@ -262,10 +270,11 @@ docs/planning/meu-erp/backlog.md          ← saída (épicos + stories + tasks 
 > Como desenvolvedor, quero o projeto configurado, para que eu possa começar a implementar módulos.
 
 **Tasks**:
+
 - [ ] `infra:setup` Inicializar monorepo → skill: config-project (~2h)
 - [ ] `domain:shared` Criar shared kernel (Entity, VOs, UseCase) → skill: config-shared-core (~2h)
-- [ ] `infra:db` Configurar banco de dados → skill: config-prisma | config-jpa-kt (~1h)
-- [ ] `infra:auth` Setup de autenticação (se aplicável) → skill: config-auth-core-basic (~3h)
+- [ ] `infra:db` Configurar banco de dados → skill: config-prisma | config-jpa-kt | config-efcore-cs (~1h)
+- [ ] `infra:auth` Setup de autenticação (se aplicável) → skill: config-auth-core-basic | config-auth-core-basic-kt | config-auth-core-basic-cs (~3h)
 
 ---
 
@@ -286,29 +295,33 @@ docs/planning/meu-erp/backlog.md          ← saída (épicos + stories + tasks 
 **Ref**: RF-001, RF-002
 
 **Critérios de Aceitação**:
+
 - [ ] Dado <contexto>, quando <ação>, então <resultado>
 - [ ] Dado <contexto>, quando <ação>, então <resultado>
 
 **Tasks (inside-out)**:
+
 - [ ] `domain:vo` Criar VO <NomeVO> com validação → skill: core-value-object (~1h)
 - [ ] `domain:entity` Criar entidade <X> com VOs → skill: core-entity (~2h)
 - [ ] `domain:repository` Criar interface <X>Repository → skill: core-repository (~1h)
 - [ ] `app:dto` Criar Create<X>InDTO e <X>OutDTO → skill: core-dto (~1h)
 - [ ] `app:usecase` Criar Create<X>UseCase → skill: core-use-case (~2h)
 - [ ] `app:query` Criar Find<X>ByIdQuery → skill: core-query-cqrs (~1h)
-- [ ] `infra:persistence` Criar adapter de persistência → skill: backend-prisma-data | backend-data-kt (~2h)
-- [ ] `infra:migration` Criar migration/schema → skill: config-prisma | config-jpa-kt (~1h)
-- [ ] `interface:controller` Criar endpoints REST → skill: backend-controller (~2h)
+- [ ] `infra:persistence` Criar adapter de persistência → skill: backend-prisma-data | backend-data-kt | backend-data-cs (~2h)
+- [ ] `infra:migration` Criar migration/schema → skill: config-prisma | config-jpa-kt | config-efcore-cs (~1h)
+- [ ] `interface:controller` Criar endpoints REST → skill: backend-controller | backend-controller-kt | backend-controller-cs (~2h)
 - [ ] `interface:form` Criar formulário frontend → skill: frontend-form-schema (~2h)
 - [ ] `test:unit` Testes da entity, VOs e use case (~2h)
 - [ ] `test:e2e` Teste do fluxo completo (~2h)
 
 ### US-002: <Título da Story>
+
 ...
 
 ---
 
 ## EP-002: <Nome do Épico>
+
 ...
 ```
 
@@ -317,11 +330,11 @@ docs/planning/meu-erp/backlog.md          ← saída (épicos + stories + tasks 
 ```markdown
 # Resumo de Épicos — <Nome do Projeto>
 
-| ID | Épico | Tamanho | Stories | Tasks | Dep. | Release |
-|----|-------|---------|---------|-------|------|---------|
-| EP-001 | Auth & Usuários | M | 5 | 18 | - | 1 |
-| EP-002 | Catálogo | G | 8 | 30 | EP-001 | 1 |
-| EP-003 | Carrinho | M | 4 | 14 | EP-002 | 2 |
+| ID     | Épico           | Tamanho | Stories | Tasks | Dep.   | Release |
+| ------ | --------------- | ------- | ------- | ----- | ------ | ------- |
+| EP-001 | Auth & Usuários | M       | 5       | 18    | -      | 1       |
+| EP-002 | Catálogo        | G       | 8       | 30    | EP-001 | 1       |
+| EP-003 | Carrinho        | M       | 4       | 14    | EP-002 | 2       |
 
 **Totais**: X stories, Y tasks, ~Z horas estimadas
 ```
@@ -332,14 +345,15 @@ docs/planning/meu-erp/backlog.md          ← saída (épicos + stories + tasks 
 # Plano de Sprint — <Nome do Projeto>
 
 ## Sprint 1 (2 semanas)
+
 **Objetivo**: <objetivo da sprint>
 **Capacidade**: ~X pontos
 
-| Story | Pontos | Status |
-|-------|--------|--------|
-| US-001 | 5 | To Do |
-| US-002 | 3 | To Do |
-| US-003 | 5 | To Do |
+| Story  | Pontos | Status |
+| ------ | ------ | ------ |
+| US-001 | 5      | To Do  |
+| US-002 | 3      | To Do  |
+| US-003 | 5      | To Do  |
 
 **Total**: 13 pontos
 ```
@@ -360,17 +374,19 @@ Durante a criação do backlog, interaja ativamente:
 ## Integração com Outros Skills
 
 ### Antes (fontes):
+
 - **`req-discovery`** → fornece `requirements.md` como entrada principal
 - **`openspec-explore`** → investigação prévia do problema
 
 ### Depois (implementação):
+
 - **`openspec-propose`** → criar proposta de change para um épico específico
 - **`openspec-apply-change`** → implementar tasks de uma story
-- **`config-new-module`** / **`config-new-module-kt`** → scaffolding de módulos identificados nos épicos
+- **`config-new-module`** / **`config-new-module-kt`** / **`config-new-module-cs`** → scaffolding de módulos identificados nos épicos
 
 Ofereça essas integrações ao finalizar:
 
-> "Backlog criado! Próximos passos:\n> 1. Criar proposta de implementação para um épico (`openspec-propose`)\n> 2. Começar a implementar uma story diretamente\n> 3. Refinar stories específicas"
+> "Backlog criado! Próximos passos:\n> 1. Criar proposta de implementação para um épico (`openspec-propose`)\n> 2. Começar a implementar uma story diretamente\n> 3. Refinar stories específicas (TS, KT ou CS)"
 
 ---
 
