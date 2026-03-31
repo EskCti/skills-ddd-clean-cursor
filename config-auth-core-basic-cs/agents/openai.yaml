@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Auth Core (C#)'
+  short_description: 'Configurar Regras de Auth no Core .NET'
+  default_prompt: 'Crie ou ajuste as regras de negócio de autenticação no Core C# (User, LoginUseCase, RegisterUseCase).'

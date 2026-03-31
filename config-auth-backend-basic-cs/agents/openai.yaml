@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Auth Backend (C#)'
+  short_description: 'Configurar Auth no Backend .NET'
+  default_prompt: 'Configure o módulo de autenticação no backend C# (ASP.NET Core Identity, JWT, Controllers), garantindo integração com o banco de dados.'
