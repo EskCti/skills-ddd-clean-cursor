@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config EF Core (C#)'
+  short_description: 'Configurar DbContext e Migrations em C#'
+  default_prompt: 'Configure ou ajuste DbContext, Fluent API ou Migrations em C# seguindo os padrões do EF Core e do projeto.'

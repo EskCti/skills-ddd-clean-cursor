@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config New Module (C#)'
+  short_description: 'Criar novo módulo/projeto em .NET'
+  default_prompt: 'Crie um novo módulo (projeto Class Library) em C# seguindo os padrões do projeto, adicionando-o à solução e configurando as referências necessárias.'

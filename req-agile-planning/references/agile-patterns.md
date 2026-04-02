@@ -59,11 +59,13 @@ então <resultado esperado>.
 
 ## Templates de Épico
 
-### Épico Funcional (feature)
+### Épico Funcional (= Bounded Context)
 ```
 EP-XXX: <Nome>
-Descrição: <o que este épico entrega>
+Bounded Context: BC-XXX
+Descrição: <o que este contexto de domínio entrega>
 Valor: <por que é importante>
+Entities: <lista de entities identificadas>
 Dependências: <outros épicos necessários>
 Tamanho: P/M/G/GG
 Stories: N
@@ -71,22 +73,87 @@ Stories: N
 
 ### Épico Técnico (enabler)
 ```
-EP-XXX: [TECH] <Nome>
-Descrição: <infraestrutura ou refatoração necessária>
+EP-000: [TECH] Bootstrap
+Descrição: Setup do projeto, shared kernel, banco
+Skills: config-project, config-shared-core, config-prisma / config-jpa-kt
 Justificativa: <quais épicos funcionais desbloqueiam>
 Tamanho: P/M/G/GG
 Tasks: N
 ```
 
-## Tipos de Task
+## Tipos de Task (por camada DDD / Clean Architecture)
 
-| Tipo | Prefixo | Exemplos |
-|------|---------|----------|
-| `dev` | Implementação | Criar entidade, endpoint, tela |
-| `test` | Teste | Teste unitário, e2e, integração |
-| `infra` | Infraestrutura | CI/CD, deploy, Docker, env |
+Tasks são tipadas pela camada arquitetural e referenciam o skill agnóstico correspondente.
+
+### Domain Layer
+
+| Tipo | Descrição | Skill | Exemplos |
+|------|-----------|-------|----------|
+| `domain:vo` | Value Object | core-value-object | Criar Email, Money, CustomerName |
+| `domain:entity` | Entidade de domínio | core-entity | Criar Customer, Order, Product |
+| `domain:service` | Serviço de domínio | core-domain-service | PricingPolicy, ShippingCalculator |
+| `domain:repository` | Contrato de repositório (port) | core-repository | CustomerRepository interface |
+
+### Application Layer
+
+| Tipo | Descrição | Skill | Exemplos |
+|------|-----------|-------|----------|
+| `app:dto` | Data Transfer Object | core-dto | CreateCustomerInDTO, CustomerOutDTO |
+| `app:usecase` | Caso de uso | core-use-case | CreateCustomerUseCase |
+| `app:query` | Query CQRS (leitura) | core-query-cqrs | FindCustomerByIdQuery |
+
+### Infrastructure Layer
+
+| Tipo | Skill TS | Skill KT | Skill CS |
+|------|----------|----------|----------|
+| `infra:persistence` | `backend-prisma-data` | `backend-data-kt` | `backend-data-cs` |
+| `infra:migration` | `config-prisma` | `config-jpa-kt` | `config-efcore-cs` |
+| `infra:setup` | `config-project`, `config-new-module` | `config-project-kt`, `config-new-module-kt` | `config-project-cs`, `config-new-module-cs` |
+| `infra:auth` | `config-auth-core-basic`, `config-auth-backend-basic` | `config-auth-core-basic-kt`, `config-auth-backend-basic-kt` | `config-auth-core-basic-cs`, `config-auth-backend-basic-cs` |
+| `infra:db` | `config-prisma` | `config-jpa-kt` | `config-efcore-cs` |
+
+### Interface Layer
+
+| Tipo | Descrição | Skill | Exemplos |
+|------|-----------|-------|----------|
+| `interface:controller` | Endpoint HTTP | backend-controller | POST /api/customers |
+| `interface:form` | Formulário frontend | frontend-form-schema | CustomerForm + schema |
+
+### Qualidade
+
+| Tipo | Descrição | Exemplos |
+|------|-----------|----------|
+| `test:unit` | Teste unitário | Entity, VO, UseCase |
+| `test:e2e` | Teste end-to-end | Fluxo completo |
 | `docs` | Documentação | API docs, README, ADR |
-| `design` | Design | Wireframe, protótipo, UX review |
+
+### Ordem de implementação (inside-out)
+
+```
+1. domain:vo         → Validações fundamentais
+2. domain:entity     → Modelo de domínio
+3. domain:service    → Regras transversais
+4. domain:repository → Contrato de persistência
+5. app:dto           → Contratos de API
+6. app:usecase       → Orquestração
+7. app:query         → Leitura otimizada
+8. infra:persistence → Adapter real
+9. infra:migration   → Schema de banco
+10. interface:controller → Endpoints
+11. interface:form    → UI
+12. test:unit         → Testes de domínio/app
+13. test:e2e          → Testes de fluxo
+```
+
+### Escolha de stack (na implementação)
+
+| Stack | Sufixo | Framework | Automação |
+|-------|--------|-----------|-----------|
+| **TypeScript** | (nenhum) | NestJS + Prisma + React | Templates + scripts |
+| **Kotlin** | `-kt` | Spring Boot + JPA + Gradle | Templates + scripts |
+| **C#** | `-cs` | ASP.NET Core + EF Core | Templates + scripts |
+
+> O sistema fonte analisado pelo `req-discovery` pode ser qualquer linguagem (PHP, Go, Python, Java, etc.). As tasks do backlog referenciam skills TS, KT ou CS deste repositório, pois o objetivo é reimplementar usando DDD/Clean Architecture.
 
 ## Padrão de Rastreabilidade
 

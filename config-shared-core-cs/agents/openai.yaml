@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Shared Core (C#)'
+  short_description: 'Gerenciar Shared Kernel em C#'
+  default_prompt: 'Crie ou ajuste abstrações base no Shared Kernel em C# (Entity, ValueObject, Result), garantindo consistência técnica em toda a solução.'
