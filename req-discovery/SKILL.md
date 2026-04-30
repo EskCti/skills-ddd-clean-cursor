@@ -496,25 +496,26 @@ Use diagramas ASCII extensivamente durante a análise:
 ### Pipeline completo
 
 ```
-Sistema fonte               req-discovery              req-agile-planning            implementação
-(qualquer linguagem)        ─────────────              ──────────────────            ──────────────
-PHP MVC / Go / Python  ──▶  requirements.md     ──▶    backlog.md             ──▶   skills TS, KT ou CS
-Java / Ruby / C# / etc.    ddd-analysis.md            (tasks com skill ref)        openspec-propose
-                            domain-model.md            epics-summary.md             openspec-apply-change
-                            screens.md                 sprint-plan.md
+Sistema fonte            req-discovery       req-ddd-modeling          req-agile-planning       implementação
+(qualquer linguagem) →   (leitura) →         (modelagem DDD) →        (planejamento ágil) →    skills TS/KT/CS
+                         requirements.md     ddd-strategic-model.md   backlog.md
+                         ddd-analysis.md     ddd-tactical-model.md    epics-summary.md
+                         domain-model.md     ddd-operational-notes.md sprint-plan.md
+                         screens.md
 ```
 
 > O sistema fonte é apenas **lido**. A saída é **sempre** DDD/Clean Architecture. A implementação usa **sempre** os skills deste repositório (TypeScript, Kotlin ou C#).
 
 ### Próximos passos após discovery
 
-| Objetivo                              | Skill                  | Entrada                               |
-| ------------------------------------- | ---------------------- | ------------------------------------- |
-| Organizar em épicos/stories/tasks DDD | `req-agile-planning`   | `requirements.md` + `ddd-analysis.md` |
-| Explorar aspecto específico           | `openspec-explore`     | Bounded Context ou módulo             |
-| Implementar módulo (TS)               | `config-new-module`    | Bounded Context → módulo NestJS       |
-| Implementar módulo (KT)               | `config-new-module-kt` | Bounded Context → módulo Spring Boot  |
-| Criar proposta de change              | `openspec-propose`     | Épico ou Story do backlog             |
+| Objetivo                                         | Skill                  | Entrada                               |
+| ------------------------------------------------ | ---------------------- | ------------------------------------- |
+| Modelar domínio (subdomínios, BCs, context map)  | `req-ddd-modeling`     | `requirements.md` + `ddd-analysis.md` |
+| Organizar em épicos/stories/tasks DDD            | `req-agile-planning`   | `requirements.md` + `ddd-analysis.md` |
+| Explorar aspecto específico                      | `openspec-explore`     | Bounded Context ou módulo             |
+| Implementar módulo (TS)                          | `config-new-module`    | Bounded Context → módulo NestJS       |
+| Implementar módulo (KT)                          | `config-new-module-kt` | Bounded Context → módulo Spring Boot  |
+| Criar proposta de change                         | `openspec-propose`     | Épico ou Story do backlog             |
 
 ### Tasks → Skills deste repositório
 
@@ -528,7 +529,12 @@ Todos os conceitos DDD identificados (Entity, VO, Use Case, Repository, Controll
 
 Ofereça essas opções ao finalizar:
 
-> "Análise concluída! O sistema foi mapeado para DDD/Clean Architecture.\n> Próximos passos:\n> 1. Organizar em planejamento ágil (`req-agile-planning`) — épicos, stories e tasks referenciando skills TS, KT ou CS\n> 2. Explorar um bounded context específico (`openspec-explore`)\n> 3. Começar a implementar um módulo (`config-new-module` para TS, `config-new-module-kt` para KT ou `config-new-module-cs` para CS)"
+> "Análise concluída! O sistema foi mapeado para DDD/Clean Architecture.
+> Próximos passos:
+> 1. Aprofundar modelagem DDD (`req-ddd-modeling`) — subdomínios, bounded contexts, context map, linguagem ubíqua
+> 2. Organizar em planejamento ágil (`req-agile-planning`) — épicos, stories e tasks referenciando skills TS, KT ou CS
+> 3. Explorar um bounded context específico (`openspec-explore`)
+> 4. Começar a implementar um módulo (`config-new-module` para TS, `config-new-module-kt` para KT ou `config-new-module-cs` para CS)"
 
 ---
 

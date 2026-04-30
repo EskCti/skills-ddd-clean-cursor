@@ -16,13 +16,14 @@ Transformar requisitos (documentados ou descritos) em um backlog ágil estrutura
 
 O skill aceita **qualquer uma destas fontes**:
 
-| Fonte                                        | Exemplo                                                                 |
-| -------------------------------------------- | ----------------------------------------------------------------------- |
-| Arquivo `requirements.md` do `req-discovery` | `<docsPath>/discovery/<sistema>/requirements.md`                        |
-| Arquivo `ddd-analysis.md` do `req-discovery` | `<docsPath>/discovery/<sistema>/ddd-analysis.md`                        |
-| Descrição livre do usuário                   | "Preciso de um sistema de e-commerce com carrinho, pagamento e entrega" |
-| URL de issue tracker                         | Link de GitHub Issues, Jira, etc.                                       |
-| Documento existente                          | Qualquer `.md` ou `.txt` com requisitos                                 |
+| Fonte                                              | Exemplo                                                                 |
+| -------------------------------------------------- | ----------------------------------------------------------------------- |
+| Saída do `req-ddd-modeling`                         | `<docsPath>/modeling/<projeto>/ddd-strategic-model.md` + `ddd-tactical-model.md` |
+| Arquivo `requirements.md` do `req-discovery`       | `<docsPath>/discovery/<sistema>/requirements.md`                        |
+| Arquivo `ddd-analysis.md` do `req-discovery`       | `<docsPath>/discovery/<sistema>/ddd-analysis.md`                        |
+| Descrição livre do usuário                         | "Preciso de um sistema de e-commerce com carrinho, pagamento e entrega" |
+| URL de issue tracker                               | Link de GitHub Issues, Jira, etc.                                       |
+| Documento existente                                | Qualquer `.md` ou `.txt` com requisitos                                 |
 
 Se nenhuma fonte for fornecida, pergunte:
 
@@ -35,8 +36,9 @@ Se nenhuma fonte for fornecida, pergunte:
 ### Fase 1 — Compreensão
 
 1. **Ler/receber os requisitos** da fonte fornecida
-2. **Ler `ddd-analysis.md`** se existir — os Bounded Contexts já mapeados viram Épicos diretamente
-3. **Identificar domínios/módulos** — agrupar funcionalidades relacionadas (se não houver `ddd-analysis.md`, inferir Bounded Contexts dos requisitos)
+2. **Ler saída do `req-ddd-modeling`** se existir — `ddd-strategic-model.md` (subdomínios, BCs, context map) e `ddd-tactical-model.md` (entities, VOs, events por BC) são a fonte mais rica
+3. **Senão, ler `ddd-analysis.md`** se existir — os Bounded Contexts já mapeados viram Épicos diretamente
+4. **Identificar domínios/módulos** — agrupar funcionalidades relacionadas (se nenhum modelo DDD existir, inferir Bounded Contexts dos requisitos)
 4. **Mapear dependências** — quais funcionalidades dependem de outras
 5. **Identificar MVP** — perguntar ao usuário o que é prioridade
 
@@ -375,6 +377,7 @@ Durante a criação do backlog, interaja ativamente:
 
 ### Antes (fontes):
 
+- **`req-ddd-modeling`** → fornece `ddd-strategic-model.md` + `ddd-tactical-model.md` (fonte mais rica, com subdomínios, BCs, context map e padrões táticos)
 - **`req-discovery`** → fornece `requirements.md` como entrada principal
 - **`openspec-explore`** → investigação prévia do problema
 
@@ -419,3 +422,4 @@ gh issue create --title "US-001: <título>" --body "<corpo>" --label "epic:<nome
 ## Global Standards
 
 - Consultar `../skills-standards.md` para padroes globais de nomenclatura e convencoes gerais entre skills.
+ra e convencoes gerais entre skills.
