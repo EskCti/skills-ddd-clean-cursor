@@ -5,7 +5,10 @@ Este documento mapeia conceitos de DDD/Clean Architecture para os skills deste r
 **Premissa**: o sistema fonte pode ser qualquer linguagem/arquitetura (PHP MVC, Go, Python, Java, monolito, etc.). A **saída** é sempre DDD/Clean Architecture. A **implementação** usa sempre os skills deste repositório (TypeScript, Kotlin ou C#).
 
 ```
-Sistema fonte (qualquer)  ──▶  Discovery (leitura)  ──▶  DDD/Clean (saída)  ──▶  Skills TS, KT ou CS (implementação)
+Sistema fonte     req-discovery     req-ddd-modeling       req-agile-planning     Skills TS/KT/CS
+(qualquer)   ──▶  (leitura)    ──▶  (modelagem DDD)  ──▶   (planejamento)   ──▶  (implementação)
+                  requirements.md   ddd-strategic-model.md backlog.md
+                  ddd-analysis.md   ddd-tactical-model.md  epics-summary.md
 ```
 
 ## Camadas da Clean Architecture → Skills
@@ -69,22 +72,22 @@ Quando uma funcionalidade é identificada, as tasks seguem a ordem inside-out:
 
 ```
 1. DOMAIN (de dentro para fora)
-   ├── 1.1  Value Objects    → core-value-object[-kt]
-   ├── 1.2  Entity           → core-entity[-kt]
-   ├── 1.3  Domain Service   → core-domain-service[-kt]  (se houver)
-   └── 1.4  Repository port  → core-repository[-kt]
+   ├── 1.1  Value Objects    → core-value-object[-kt|-cs]
+   ├── 1.2  Entity           → core-entity[-kt|-cs]
+   ├── 1.3  Domain Service   → core-domain-service[-kt|-cs]  (se houver)
+   └── 1.4  Repository port  → core-repository[-kt|-cs]
 
 2. APPLICATION
-   ├── 2.1  DTOs (in/out)    → core-dto[-kt]
-   ├── 2.2  Use Case         → core-use-case[-kt]
-   └── 2.3  Query (CQRS)     → core-query-cqrs[-kt]
+   ├── 2.1  DTOs (in/out)    → core-dto[-kt|-cs]
+   ├── 2.2  Use Case         → core-use-case[-kt|-cs]
+   └── 2.3  Query (CQRS)     → core-query-cqrs[-kt|-cs]
 
 3. INFRASTRUCTURE
-   ├── 3.1  Persistence      → backend-prisma-data (TS) / backend-data-kt (KT)
-   └── 3.2  Schema/Migration → config-prisma (TS) / config-jpa-kt (KT)
+   ├── 3.1  Persistence      → backend-prisma-data (TS) / backend-data-kt (KT) / backend-data-cs (CS)
+   └── 3.2  Schema/Migration → config-prisma (TS) / config-jpa-kt (KT) / config-efcore-cs (CS)
 
 4. INTERFACE
-   ├── 4.1  Controller       → backend-controller[-kt]
+   ├── 4.1  Controller       → backend-controller[-kt|-cs]
    └── 4.2  Form/Page        → frontend-form-schema
 
 5. QUALITY
@@ -131,3 +134,19 @@ Sinais para identificar Bounded Contexts no sistema fonte:
 | Termos/vocabulário diferentes | Linguagem ubíqua diferente |
 
 Cada Bounded Context identificado → 1 Épico no planejamento → 1 módulo na implementação.
+
+## Modelagem DDD (req-ddd-modeling)
+
+Quando disponível, o `req-ddd-modeling` fornece análise mais profunda que a discovery:
+
+| Conceito | Discovery (`ddd-analysis.md`) | Modelagem (`ddd-strategic-model.md` + `ddd-tactical-model.md`) |
+|----------|-------------------------------|----------------------------------------------------------------|
+| Subdomínios (Core/Supporting/Generic) | Não inclui | Classificação completa |
+| Cardinalidade Subdomínio ↔ BC (1:1, 1:N, N:1) | Não inclui | Análise detalhada |
+| Context Map com relações tipadas | Básico | Completo (OHS, ACL, Shared Kernel, etc.) |
+| Linguagem Ubíqua | Não inclui | Glossário por BC |
+| Domain Events | Não inclui | Identificados por BC |
+| Topologia (monólito/microserviços) | Não inclui | Recomendação com justificativa |
+
+O `req-agile-planning` usa a saída do `req-ddd-modeling` como fonte preferencial quando disponível.
+1 Épico no planejamento → 1 módulo na implementação.

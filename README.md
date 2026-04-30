@@ -88,9 +88,10 @@ Principais skills disponíveis neste repositório:
 
 ### Skills de Requisitos e Planejamento (agnóstico de linguagem)
 
-Skills para análise de sistemas existentes e planejamento ágil em DDD/Clean Architecture:
+Skills para análise de sistemas existentes, modelagem DDD e planejamento ágil:
 
 - `req-discovery`: analisar sistema existente (**qualquer linguagem** — PHP, Go, Python, Java, etc.) via URL ou caminho local, documentando requisitos em DDD/Clean Architecture
+- `req-ddd-modeling`: aplicar o **Roadmap DDD** (Estratégico → Tático → Operacional) sobre requisitos — subdomínios (Core/Supporting/Generic), bounded contexts com cardinalidade (1:1, 1:N, N:1), context map, linguagem ubíqua, padrões táticos (entities, VOs, domain events) e recomendação de topologia (monólito modular vs microserviços)
 - `req-agile-planning`: organizar requisitos em épicos, stories e tasks DDD, com referência aos **skills TS/KT/CS deste repositório** para implementação
 
 ### Skills utilitárias (OpenSpec)
