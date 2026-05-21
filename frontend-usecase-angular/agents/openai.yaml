@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Frontend UseCase (Angular)'
+  short_description: 'Angular service como caso de uso com Promise<Result<T>>'
+  default_prompt: 'Crie o caso de uso Angular para a operação indicada. Use @Injectable service com inject() para receber o repository, retorne Promise<Result<T>> em todos os métodos, encapsule lógica de negócio (email único, validações) e nunca lance exceções. Consultar references/angular-usecase-pattern.md.'

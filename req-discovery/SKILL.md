@@ -496,45 +496,44 @@ Use diagramas ASCII extensivamente durante a análise:
 ### Pipeline completo
 
 ```
-Sistema fonte            req-discovery       req-ddd-modeling          req-agile-planning       implementação
-(qualquer linguagem) →   (leitura) →         (modelagem DDD) →        (planejamento ágil) →    skills TS/KT/CS
-                         requirements.md     ddd-strategic-model.md   backlog.md
-                         ddd-analysis.md     ddd-tactical-model.md    epics-summary.md
-                         domain-model.md     ddd-operational-notes.md sprint-plan.md
+Sistema fonte            req-discovery       req-ddd-modeling          req-migration-strategy   req-agile-planning       implementação
+(qualquer linguagem) →   (leitura) →         (modelagem DDD) →        [opcional]         →    (planejamento) →         config-project-fullstack
+                         requirements.md     ddd-strategic-model.md   migration-strategy.md  backlog.md               + openspec-propose/apply-change
+                         ddd-analysis.md     ddd-tactical-model.md  acl-design.md          epics-summary.md         + config-docker + config-cicd
+                         domain-model.md     ddd-operational-notes.md sprint-plan.md           + core-* / frontend-* / mobile-*
                          screens.md
 ```
 
-> O sistema fonte é apenas **lido**. A saída é **sempre** DDD/Clean Architecture. A implementação usa **sempre** os skills deste repositório (TypeScript, Kotlin ou C#).
+> O sistema fonte é apenas **lido**. A saída é **sempre** DDD/Clean Architecture. A implementação usa os skills deste repositório (TS, KT, CS + frontend/mobile).
 
 ### Próximos passos após discovery
 
-| Objetivo                                         | Skill                  | Entrada                               |
-| ------------------------------------------------ | ---------------------- | ------------------------------------- |
-| Modelar domínio (subdomínios, BCs, context map)  | `req-ddd-modeling`     | `requirements.md` + `ddd-analysis.md` |
-| Organizar em épicos/stories/tasks DDD            | `req-agile-planning`   | `requirements.md` + `ddd-analysis.md` |
-| Explorar aspecto específico                      | `openspec-explore`     | Bounded Context ou módulo             |
-| Implementar módulo (TS)                          | `config-new-module`    | Bounded Context → módulo NestJS       |
-| Implementar módulo (KT)                          | `config-new-module-kt` | Bounded Context → módulo Spring Boot  |
-| Criar proposta de change                         | `openspec-propose`     | Épico ou Story do backlog             |
+| Objetivo | Skill | Entrada |
+| -------- | ----- | ------- |
+| Modelar domínio (subdomínios, BCs, context map) | `req-ddd-modeling` | `requirements.md` + `ddd-analysis.md` |
+| Estratégia de migração (se legado) | `req-migration-strategy` | `ddd-analysis.md` + `ddd-strategic-model.md` |
+| Organizar em épicos/stories/tasks DDD | `req-agile-planning` | modelagem DDD ou discovery |
+| Projeto full-stack do zero | `config-project-fullstack` | decisões de stack + backlog EP-000 |
+| Explorar aspecto específico | `openspec-explore` | Bounded Context ou módulo |
+| Criar proposta de change | `openspec-propose` | Épico ou `bootstrap-<nome>` |
 
 ### Tasks → Skills deste repositório
 
-O `ddd-analysis.md` traduz conceitos do sistema fonte para DDD. O `req-agile-planning` gera tasks que referenciam os skills deste repositório. Na implementação, o usuário escolhe a stack:
+- **TypeScript**: skills sem sufixo → NestJS + Prisma
+- **Kotlin**: skills `-kt` → Spring Boot + JPA
+- **C#**: skills `-cs` → ASP.NET Core + EF Core
+- **Frontend**: `-angular` / `-vue` com entity → usecase → repository → page/form
+- **Mobile**: `-flutter` / `-android` com entity → usecase → repository → screen/form
 
-- **TypeScript**: skills sem sufixo → NestJS + Prisma + React
-- **Kotlin**: skills com sufixo `-kt` → Spring Boot + JPA + Gradle
-- **C#**: skills com sufixo `-cs` → ASP.NET Core + EF Core + .NET 8+
-
-Todos os conceitos DDD identificados (Entity, VO, Use Case, Repository, Controller) têm skill correspondente nas 3 stacks. Consultar `references/ddd-clean-mapping.md`.
+Consultar `references/ddd-clean-mapping.md`.
 
 Ofereça essas opções ao finalizar:
 
-> "Análise concluída! O sistema foi mapeado para DDD/Clean Architecture.
-> Próximos passos:
-> 1. Aprofundar modelagem DDD (`req-ddd-modeling`) — subdomínios, bounded contexts, context map, linguagem ubíqua
-> 2. Organizar em planejamento ágil (`req-agile-planning`) — épicos, stories e tasks referenciando skills TS, KT ou CS
-> 3. Explorar um bounded context específico (`openspec-explore`)
-> 4. Começar a implementar um módulo (`config-new-module` para TS, `config-new-module-kt` para KT ou `config-new-module-cs` para CS)"
+> "Análise concluída! Próximos passos:
+> 1. Aprofundar modelagem DDD (`req-ddd-modeling`)
+> 2. [Se legado] Definir estratégia de migração (`req-migration-strategy`)
+> 3. Gerar backlog com docker/cicd no bootstrap (`req-agile-planning`)
+> 4. Criar projeto full-stack (`config-project-fullstack` + `openspec-propose \"bootstrap-<nome>\"`)"
 
 ---
 

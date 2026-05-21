@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Docker (TypeScript)'
+  short_description: 'Dockerfiles multi-stage para NestJS backend e Next.js frontend'
+  default_prompt: 'Crie Dockerfiles multi-stage otimizados para producao no monorepo TurboRepo com backend NestJS e frontend Next.js. Gere apps/backend/Dockerfile (node:20-alpine, builder + runner), apps/web/Dockerfile (node:20-alpine, builder + runner standalone), .dockerignore na raiz e docker-compose.prod.yml orquestrando backend + web + postgres. Consultar references/docker-pattern.md para os templates completos. Verificar se next.config.ts tem output: standalone.'

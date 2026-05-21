@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config CI/CD (C#)'
+  short_description: 'GitHub Actions para dotnet test, build Docker e deploy em ASP.NET Core'
+  default_prompt: 'Crie workflows GitHub Actions para backend C# com ASP.NET Core .NET 8+. Gere .github/workflows/ci.yml (dotnet restore + build + test com postgres service, separando UnitTests e IntegrationTests) e .github/workflows/cd.yml (build Docker + push para GHCR + deploy). Perguntar o registry e ambiente de deploy. Substituir ProjectName pelo nome real do projeto. Consultar references/cicd-pattern-cs.md para os templates completos.'

@@ -151,7 +151,13 @@ export function AdminShell({
             </div>
           </header>
 
-          <main className="flex-1 p-4 md:p-6">{children}</main>
+          <main class="flex-1 p-4 md:p-6">{children}</main>
+
+          <footer className="border-t border-border bg-card/80 px-4 py-3 text-center text-xs text-muted-foreground md:px-6">
+            <p>
+              &copy; {new Date().getFullYear()} {brandText}. Todos os direitos reservados.
+            </p>
+          </footer>
         </div>
       </div>
     </div>

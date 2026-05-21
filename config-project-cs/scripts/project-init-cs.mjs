@@ -119,5 +119,6 @@ console.log(`\n[next steps]`);
 console.log(`  cd ${path.relative(process.cwd(), target)}`);
 console.log(`  dotnet restore`);
 console.log(`  dotnet build`);
+console.log(`  dotnet test`);
 console.log(`  cp .env.example .env`);
 console.log(`  docker compose up -d\n`);

@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Mobile Screen (Flutter)'
+  short_description: 'Tela Flutter com ConsumerWidget + Riverpod AsyncNotifier'
+  default_prompt: 'Crie a tela Flutter para a feature indicada usando ConsumerWidget, AsyncNotifierProvider para estado assíncrono, tratando loading/error/data com when(), ListView.builder com RefreshIndicator para listagens e navegação via go_router (context.push/pop). Consultar references/flutter-screen-pattern.md.'

@@ -2,13 +2,17 @@
 
 Este documento mapeia conceitos de DDD/Clean Architecture para os skills deste repositório.
 
-**Premissa**: o sistema fonte pode ser qualquer linguagem/arquitetura (PHP MVC, Go, Python, Java, monolito, etc.). A **saída** é sempre DDD/Clean Architecture. A **implementação** usa sempre os skills deste repositório (TypeScript, Kotlin ou C#).
+**Premissa**: o sistema fonte pode ser qualquer linguagem/arquitetura (PHP MVC, Go, Python, Java, monolito, etc.). A **saída** é sempre DDD/Clean Architecture. A **implementação** usa sempre os skills deste repositório.
+
+## Pipeline completo
 
 ```
-Sistema fonte     req-discovery     req-ddd-modeling       req-agile-planning     Skills TS/KT/CS
-(qualquer)   ──▶  (leitura)    ──▶  (modelagem DDD)  ──▶   (planejamento)   ──▶  (implementação)
-                  requirements.md   ddd-strategic-model.md backlog.md
-                  ddd-analysis.md   ddd-tactical-model.md  epics-summary.md
+Sistema fonte     req-discovery     req-ddd-modeling       req-migration-strategy   req-agile-planning     implementação
+(qualquer)   ──▶  (leitura)    ──▶  (modelagem DDD)  ──▶  [opcional — legado]  ──▶  (backlog)        ──▶  config-project-fullstack
+                  requirements.md   ddd-strategic-model.md  migration-strategy.md   backlog.md              + openspec-propose
+                  ddd-analysis.md   ddd-tactical-model.md   acl-design.md           epics-summary.md        + openspec-apply-change
+                                                                                                              + config-docker + config-cicd
+                                                                                                              + core-* / backend-* / frontend-* / mobile-*
 ```
 
 ## Camadas da Clean Architecture → Skills
@@ -16,137 +20,114 @@ Sistema fonte     req-discovery     req-ddd-modeling       req-agile-planning   
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
 │                           INTERFACE (API/UI)                            │
-│  Skills: backend-controller[-kt|-cs] · frontend-form-schema             │
+│  backend-controller[-kt|-cs]                                             │
+│  frontend-entity/usecase/repository/page/form[-angular|-vue]             │
+│  mobile-entity/usecase/repository/screen/form[-flutter|-android]         │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                          APPLICATION                                    │
-│  Skills: core-use-case[-kt|-cs] · core-dto[-kt|-cs]                    │
-│          core-query-cqrs[-kt|-cs]                                       │
+│  core-use-case[-kt|-cs] · core-dto[-kt|-cs] · core-query-cqrs[-kt|-cs]  │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                            DOMAIN                                       │
-│  Skills: core-entity[-kt|-cs] · core-value-object[-kt|-cs]             │
-│          core-domain-service[-kt|-cs] · core-repository[-kt|-cs]        │
+│  core-entity[-kt|-cs] · core-value-object[-kt|-cs]                       │
+│  core-domain-service[-kt|-cs] · core-repository[-kt|-cs]                │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                         INFRASTRUCTURE                                  │
-│  TS: backend-prisma-data · config-prisma                                │
-│  KT: backend-data-kt · config-jpa-kt                                   │
-│  CS: backend-data-cs · config-efcore-cs                                 │
+│  backend-prisma-data / backend-data-kt / backend-data-cs                 │
+│  config-prisma / config-jpa-kt / config-efcore-cs                       │
+│  config-docker[-kt|-cs] · config-cicd[-kt|-cs]                          │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Conceitos DDD → Skills de Implementação
+## Conceitos DDD → Skills (backend)
 
-| Conceito DDD | O que é | Skill TS | Skill KT | Skill CS |
-|-------------|---------|----------|----------|----------|
-| **Bounded Context** | Limite de domínio → 1 módulo | `config-new-module` | `config-new-module-kt` | `config-new-module-cs` |
-| **Entity** | Objeto com identidade e ciclo de vida | `core-entity` | `core-entity-kt` | `core-entity-cs` |
-| **Value Object** | Objeto imutável sem identidade | `core-value-object` | `core-value-object-kt` | `core-value-object-cs` |
-| **Aggregate** | Cluster de entities com raiz | `core-entity` | `core-entity-kt` | `core-entity-cs` |
-| **Domain Service** | Regra entre múltiplas entities | `core-domain-service` | `core-domain-service-kt` | `core-domain-service-cs` |
-| **Repository (port)** | Contrato de persistência | `core-repository` | `core-repository-kt` | `core-repository-cs` |
-| **Repository (adapter)** | Implementação de persistência | `backend-prisma-data` | `backend-data-kt` | `backend-data-cs` |
-| **Use Case** | Orquestração de aplicação | `core-use-case` | `core-use-case-kt` | `core-use-case-cs` |
-| **DTO** | Contrato de entrada/saída | `core-dto` | `core-dto-kt` | `core-dto-cs` |
-| **Query (CQRS)** | Leitura otimizada | `core-query-cqrs` | `core-query-cqrs-kt` | `core-query-cqrs-cs` |
-| **Controller** | Endpoint HTTP | `backend-controller` | `backend-controller-kt` | `backend-controller-cs` |
-| **Form/Schema** | Validação frontend | `frontend-form-schema` | — | — |
+| Conceito DDD | Skill TS | Skill KT | Skill CS |
+|-------------|----------|----------|----------|
+| **Bounded Context** | `config-new-module` | `config-new-module-kt` | `config-new-module-cs` |
+| **Entity / Aggregate** | `core-entity` | `core-entity-kt` | `core-entity-cs` |
+| **Value Object** | `core-value-object` | `core-value-object-kt` | `core-value-object-cs` |
+| **Domain Service** | `core-domain-service` | `core-domain-service-kt` | `core-domain-service-cs` |
+| **Repository (port)** | `core-repository` | `core-repository-kt` | `core-repository-cs` |
+| **Use Case** | `core-use-case` | `core-use-case-kt` | `core-use-case-cs` |
+| **DTO** | `core-dto` | `core-dto-kt` | `core-dto-cs` |
+| **Query (CQRS)** | `core-query-cqrs` | `core-query-cqrs-kt` | `core-query-cqrs-cs` |
+| **Repository (adapter)** | `backend-prisma-data` | `backend-data-kt` | `backend-data-cs` |
+| **Controller** | `backend-controller` | `backend-controller-kt` | `backend-controller-cs` |
+| **Bootstrap full-stack** | `config-project-fullstack` | (orquestrador agnóstico) | — |
+| **Docker / CI/CD** | `config-docker` / `config-cicd` | `config-docker-kt` / `config-cicd-kt` | `config-docker-cs` / `config-cicd-cs` |
 
-## Leitura do Sistema Fonte — Como Identificar Conceitos
+## Frontend e Mobile (Clean Architecture completa)
 
-O sistema sendo analisado pode ser MVC, monolito, microservices, ou qualquer padrão. A tabela abaixo mapeia o que existe no sistema fonte para o conceito DDD que será usado na saída:
-
-| No sistema fonte (MVC) | Conceito DDD na saída | Skill de implementação |
-|------------------------|----------------------|----------------------|
-| Model (Eloquent, ActiveRecord, GORM, etc.) | Entity + Repository port | `core-entity` + `core-repository` |
-| Controller action / handler | Use Case | `core-use-case` |
-| Form validation / FormRequest / struct tags | Value Object + DTO | `core-value-object` + `core-dto` |
-| Service class / business logic | Domain Service ou Use Case | `core-domain-service` ou `core-use-case` |
-| Migration / schema | Infrastructure (migration) | `config-prisma` / `config-jpa-kt` |
-| View / Template / frontend | Interface layer | `frontend-form-schema` |
-| Middleware / guard | Cross-cutting concern | `config-auth-*` |
-| Route definition | Controller endpoint | `backend-controller` |
-| Seção/módulo separado | Bounded Context | `config-new-module` |
+| Camada | Angular | Vue | Flutter | Android |
+|--------|---------|-----|---------|---------|
+| Domain | `frontend-entity-angular` | `frontend-entity-vue` | `mobile-entity-flutter` | `mobile-entity-android` |
+| Application | `frontend-usecase-angular` | `frontend-usecase-vue` | `mobile-usecase-flutter` | `mobile-usecase-android` |
+| Infrastructure | `frontend-repository-angular` | `frontend-repository-vue` | `mobile-repository-flutter` | `mobile-repository-android` |
+| Presentation | `frontend-page-angular` + `frontend-form-angular` | `frontend-page-vue` + `frontend-form-vue` | `mobile-screen-flutter` + `mobile-form-flutter` | `mobile-screen-android` + `mobile-form-android` |
 
 ## Fluxo de Task por Funcionalidade
 
-Quando uma funcionalidade é identificada, as tasks seguem a ordem inside-out:
-
 ```
-1. DOMAIN (de dentro para fora)
-   ├── 1.1  Value Objects    → core-value-object[-kt|-cs]
-   ├── 1.2  Entity           → core-entity[-kt|-cs]
-   ├── 1.3  Domain Service   → core-domain-service[-kt|-cs]  (se houver)
-   └── 1.4  Repository port  → core-repository[-kt|-cs]
+── BACKEND (inside-out) ─────────────────────────────────────
+1. domain:vo → domain:entity → domain:service → domain:repository
+2. app:dto → app:usecase → app:query
+3. infra:persistence → infra:migration → interface:controller
 
-2. APPLICATION
-   ├── 2.1  DTOs (in/out)    → core-dto[-kt|-cs]
-   ├── 2.2  Use Case         → core-use-case[-kt|-cs]
-   └── 2.3  Query (CQRS)     → core-query-cqrs[-kt|-cs]
+── FRONTEND WEB ─────────────────────────────────────────────
+4. interface:entity → interface:usecase → interface:repository
+5. interface:page → interface:form-web
 
-3. INFRASTRUCTURE
-   ├── 3.1  Persistence      → backend-prisma-data (TS) / backend-data-kt (KT) / backend-data-cs (CS)
-   └── 3.2  Schema/Migration → config-prisma (TS) / config-jpa-kt (KT) / config-efcore-cs (CS)
+── MOBILE ───────────────────────────────────────────────────
+6. interface:mobile-entity → interface:mobile-usecase → interface:mobile-repository
+7. interface:mobile → interface:mobile-form
 
-4. INTERFACE
-   ├── 4.1  Controller       → backend-controller[-kt|-cs]
-   └── 4.2  Form/Page        → frontend-form-schema
-
-5. QUALITY
-   ├── 5.1  Testes unitários (entity, VO, use case)
-   └── 5.2  Teste e2e (fluxo completo)
+── QUALIDADE (meta ≥95% domain + application) ───────────────
+8. test:unit → test:coverage → test:e2e
 ```
+
+## Skills de teste
+
+| Task | Skill TS | Skill KT | Skill CS |
+|------|----------|----------|----------|
+| `test:unit` / `test:coverage` | `test-unit` | `test-unit-kt` | `test-unit-cs` |
+| `test:e2e` | `test-e2e` | `test-e2e-kt` | `test-e2e-cs` |
 
 ## Notação de Task
 
-Nas tasks do `req-agile-planning`, usar o formato:
-
 ```markdown
-- [ ] `domain:entity` Criar entidade Customer com VOs Name e Email → skill: core-entity[-kt|-cs] (~2h)
-- [ ] `domain:vo` Criar VO CustomerName com validação → skill: core-value-object[-kt|-cs] (~1h)
-- [ ] `app:usecase` Criar CreateCustomerUseCase → skill: core-use-case[-kt|-cs] (~2h)
-- [ ] `app:dto` Criar CreateCustomerInDTO e CustomerOutDTO → skill: core-dto[-kt|-cs] (~1h)
-- [ ] `infra:persistence` Criar adapter para CustomerRepository → skill: backend-prisma-data|backend-data-kt|backend-data-cs (~2h)
-- [ ] `interface:controller` Criar POST /api/customers → skill: backend-controller[-kt|-cs] (~2h)
-- [ ] `test:unit` Testes unitários da entidade e VOs (~1h)
-- [ ] `test:e2e` Teste e2e do fluxo de cadastro (~2h)
+- [ ] `domain:entity` Criar entidade Customer → skill: core-entity[-kt|-cs] (~2h)
+- [ ] `interface:entity` Customer entity frontend → skill: frontend-entity-vue (~1h)
+- [ ] `infra:docker` Dockerfile multi-stage → skill: config-docker (~1h)
+- [ ] `test:unit` Testes entity + VOs + use case (~2h)
+- [ ] `test:coverage` Validar ≥95% domain + application (~30min)
+- [ ] `test:e2e` Fluxo completo (~2h)
 ```
 
-O `[-kt|-cs]` significa: sem sufixo para TS, `-kt` para Kotlin, `-cs` para C#. A escolha é feita no momento da implementação.
+## OpenSpec no ciclo
+
+| Momento | Mudança | Skills no apply |
+|---------|---------|-----------------|
+| Bootstrap | `bootstrap-<nome>` | config-project-*, config-docker, config-cicd, config-shared-core |
+| Por BC | `ep-XXX-<bc>` ou `bc-<nome>` | core-*, backend-*, frontend-*, mobile-* |
+| Por feature UI | `feat-<nome>-<framework>` | frontend-entity → page/form ou mobile-* |
 
 ## Escolha da Stack
 
-| Stack | Skills disponíveis | Framework |
-|-------|-------------------|-----------|
-| **TypeScript** | Todos sem sufixo | NestJS + Prisma + React |
-| **Kotlin** | Todos com `-kt` | Spring Boot + JPA + Gradle |
-| **C#** | Todos com `-cs` | ASP.NET Core + EF Core |
+| Stack | Skills | Framework |
+|-------|--------|-----------|
+| **TypeScript** | sem sufixo | NestJS + Prisma + Next.js/Angular/Vue |
+| **Kotlin** | `-kt` | Spring Boot + JPA |
+| **C#** | `-cs` | ASP.NET Core + EF Core |
+| **Angular** | `-angular` | Angular 17+ + Tailwind + PrimeNG (widgets) |
+| **Vue** | `-vue` | Vue 3 + Tailwind + PrimeVue |
+| **Flutter** | `-flutter` | Flutter + Riverpod |
+| **Android** | `-android` | Compose + Hilt |
 
 ## Bounded Contexts na Discovery
-
-Sinais para identificar Bounded Contexts no sistema fonte:
 
 | Sinal no sistema fonte | Indica |
 |------------------------|--------|
 | Menu/seção separada na UI | Possível bounded context |
-| Grupo de tabelas relacionadas | Aggregate |
-| Prefixo de rota diferente (`/auth/*`, `/orders/*`) | Bounded context |
+| Prefixo de rota (`/auth/*`, `/orders/*`) | Bounded context |
 | Módulo/package/namespace separado | Bounded context explícito |
-| Equipe diferente mantém | Bounded context organizacional |
-| Termos/vocabulário diferentes | Linguagem ubíqua diferente |
 
-Cada Bounded Context identificado → 1 Épico no planejamento → 1 módulo na implementação.
-
-## Modelagem DDD (req-ddd-modeling)
-
-Quando disponível, o `req-ddd-modeling` fornece análise mais profunda que a discovery:
-
-| Conceito | Discovery (`ddd-analysis.md`) | Modelagem (`ddd-strategic-model.md` + `ddd-tactical-model.md`) |
-|----------|-------------------------------|----------------------------------------------------------------|
-| Subdomínios (Core/Supporting/Generic) | Não inclui | Classificação completa |
-| Cardinalidade Subdomínio ↔ BC (1:1, 1:N, N:1) | Não inclui | Análise detalhada |
-| Context Map com relações tipadas | Básico | Completo (OHS, ACL, Shared Kernel, etc.) |
-| Linguagem Ubíqua | Não inclui | Glossário por BC |
-| Domain Events | Não inclui | Identificados por BC |
-| Topologia (monólito/microserviços) | Não inclui | Recomendação com justificativa |
-
-O `req-agile-planning` usa a saída do `req-ddd-modeling` como fonte preferencial quando disponível.
-1 Épico no planejamento → 1 módulo na implementação.
+Cada Bounded Context → 1 Épico (`req-agile-planning`) → 1 mudança OpenSpec → 1 módulo (`config-new-module`).

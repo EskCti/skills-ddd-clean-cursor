@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Mobile UseCase (Android)'
+  short_description: 'Caso de uso Android Kotlin puro com UseCase<Params, R> + suspend + Result<T>'
+  default_prompt: 'Crie o caso de uso Android para a operação indicada. Use interface UseCase<in Params, out R> com suspend operator fun invoke(), receba o repository no construtor via @Inject, encapsule parâmetros em data class Params e retorne Result<R>. Consultar references/android-usecase-pattern.md.'

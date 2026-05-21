@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Mobile Repository (Android)'
+  short_description: 'Repositório Android: IRepository + Retrofit ApiService + DTO + Impl com Result'
+  default_prompt: 'Crie o repositório Android para o BC indicado: (1) interface IRepository com suspend funs retornando Result<T>, (2) DTO data class com Gson annotations, (3) ApiService Retrofit, (4) RepositoryImpl @Inject que captura exceções e retorna Result.failure(). Consultar references/android-repository-pattern.md.'

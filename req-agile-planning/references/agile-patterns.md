@@ -74,86 +74,147 @@ Stories: N
 ### Épico Técnico (enabler)
 ```
 EP-000: [TECH] Bootstrap
-Descrição: Setup do projeto, shared kernel, banco
-Skills: config-project, config-shared-core, config-prisma / config-jpa-kt
+Descrição: Setup full-stack, shared kernel, Docker (produção) e CI/CD
+Skills: config-project-fullstack → config-project-* + config-docker + config-cicd + config-shared-core
+OpenSpec: openspec-propose "bootstrap-<nome>"
 Justificativa: <quais épicos funcionais desbloqueiam>
-Tamanho: P/M/G/GG
+Tamanho: M
 Tasks: N
 ```
 
 ## Tipos de Task (por camada DDD / Clean Architecture)
 
-Tasks são tipadas pela camada arquitetural e referenciam o skill agnóstico correspondente.
+Tasks são tipadas pela camada arquitetural e incluem o **agent Cursor** a acionar e um **prompt sugerido**.
+
+### Formato padrão de task
+
+```markdown
+- [ ] `<prefixo>` <descrição da tarefa> (~<tempo>)
+  - **Agent:** `<display_name do agent>` (ou TS | KT | CS se stack não definida)
+  - **Prompt:** "<instrução específica para o agent — classe, VOs, comportamento>"
+```
 
 ### Domain Layer
 
-| Tipo | Descrição | Skill | Exemplos |
-|------|-----------|-------|----------|
-| `domain:vo` | Value Object | core-value-object | Criar Email, Money, CustomerName |
-| `domain:entity` | Entidade de domínio | core-entity | Criar Customer, Order, Product |
-| `domain:service` | Serviço de domínio | core-domain-service | PricingPolicy, ShippingCalculator |
-| `domain:repository` | Contrato de repositório (port) | core-repository | CustomerRepository interface |
+| Tipo | Descrição | Agent TS | Agent KT | Agent CS |
+|------|-----------|----------|----------|----------|
+| `domain:vo` | Value Object | `Core Value Object` | `Core Value Object (Kotlin)` | `Core Value Object (C#)` |
+| `domain:entity` | Entidade de domínio | `Core Entity` | `Core Entity (Kotlin)` | `Core Entity (C#)` |
+| `domain:service` | Serviço de domínio | `Core Domain Service` | `Core Domain Service (Kotlin)` | `Core Domain Service (C#)` |
+| `domain:repository` | Contrato de repositório (port) | `Core Repository` | `Core Repository (Kotlin)` | `Core Repository (C#)` |
+| `domain:shared` | Shared Kernel | `Config Shared Core` | `Config Shared Core (Kotlin)` | `Config Shared Core (C#)` |
 
 ### Application Layer
 
-| Tipo | Descrição | Skill | Exemplos |
-|------|-----------|-------|----------|
-| `app:dto` | Data Transfer Object | core-dto | CreateCustomerInDTO, CustomerOutDTO |
-| `app:usecase` | Caso de uso | core-use-case | CreateCustomerUseCase |
-| `app:query` | Query CQRS (leitura) | core-query-cqrs | FindCustomerByIdQuery |
+| Tipo | Descrição | Agent TS | Agent KT | Agent CS |
+|------|-----------|----------|----------|----------|
+| `app:dto` | Data Transfer Object | `Core DTO` | `Core DTO (Kotlin)` | `Core DTO (C#)` |
+| `app:usecase` | Caso de uso | `Core Use Case` | `Core Use Case (Kotlin)` | `Core Use Case (C#)` |
+| `app:query` | Query CQRS (leitura) | `Core Query CQRS` | `Core Query CQRS (Kotlin)` | `Core Query CQRS (C#)` |
 
 ### Infrastructure Layer
 
-| Tipo | Skill TS | Skill KT | Skill CS |
+| Tipo | Agent TS | Agent KT | Agent CS |
 |------|----------|----------|----------|
-| `infra:persistence` | `backend-prisma-data` | `backend-data-kt` | `backend-data-cs` |
-| `infra:migration` | `config-prisma` | `config-jpa-kt` | `config-efcore-cs` |
-| `infra:setup` | `config-project`, `config-new-module` | `config-project-kt`, `config-new-module-kt` | `config-project-cs`, `config-new-module-cs` |
-| `infra:auth` | `config-auth-core-basic`, `config-auth-backend-basic` | `config-auth-core-basic-kt`, `config-auth-backend-basic-kt` | `config-auth-core-basic-cs`, `config-auth-backend-basic-cs` |
-| `infra:db` | `config-prisma` | `config-jpa-kt` | `config-efcore-cs` |
+| `infra:persistence` | `Backend Prisma Data` | `Backend Data (Kotlin)` | `Backend Data (C#)` |
+| `infra:migration` | `Config Prisma` | `Config JPA (Kotlin)` | `Config EF Core (C#)` |
+| `infra:setup` | `Config Project` | `Config Project (Kotlin)` | `Config Project (C#)` |
+| `infra:auth` | `Config Auth Core Basic` | `Config Auth Core Basic (Kotlin)` | `Config Auth Core (C#)` |
+| `infra:db` | `Config Prisma` | `Config JPA (Kotlin)` | `Config EF Core (C#)` |
+| `infra:docker` | `Config Docker (TypeScript)` | `Config Docker (Kotlin)` | `Config Docker (C#)` |
+| `infra:cicd` | `Config CI/CD (TypeScript)` | `Config CI/CD (Kotlin)` | `Config CI/CD (C#)` |
 
 ### Interface Layer
 
-| Tipo | Descrição | Skill | Exemplos |
-|------|-----------|-------|----------|
-| `interface:controller` | Endpoint HTTP | backend-controller | POST /api/customers |
-| `interface:form` | Formulário frontend | frontend-form-schema | CustomerForm + schema |
+| Tipo | Descrição | Agent TS | Agent KT | Agent CS |
+|------|-----------|----------|----------|----------|
+| `interface:controller` | Endpoint HTTP | `Backend Controller` | `Backend Controller (Kotlin)` | `Backend Controller (C#)` |
+| `interface:form` | Formulário frontend (Next.js) | `(frontend-form-schema)` | — | — |
+| `interface:entity` | Entidade de domínio frontend | `Frontend Entity (Angular)` ou `Frontend Entity (Vue)` | — | — |
+| `interface:usecase` | Caso de uso frontend (application) | `Frontend UseCase (Angular)` ou `Frontend UseCase (Vue)` | — | — |
+| `interface:repository` | Repositório HTTP frontend | `Frontend Repository (Angular)` ou `Frontend Repository (Vue)` | — | — |
+| `interface:page` | Página/listagem frontend | `Frontend Page (Angular)` ou `Frontend Page (Vue)` | — | — |
+| `interface:form-web` | Formulário frontend (Angular/Vue) | `Frontend Form (Angular)` ou `Frontend Form (Vue)` | — | — |
+| `interface:mobile-entity` | Entidade de domínio mobile | `Mobile Entity (Flutter)` ou `Mobile Entity (Android)` | — | — |
+| `interface:mobile-usecase` | Caso de uso mobile (application) | `Mobile UseCase (Flutter)` ou `Mobile UseCase (Android)` | — | — |
+| `interface:mobile-repository` | Repositório HTTP mobile | `Mobile Repository (Flutter)` ou `Mobile Repository (Android)` | — | — |
+| `interface:mobile` | Tela mobile (apresentação) | `Mobile Screen (Flutter)` ou `Mobile Screen (Android)` | — | — |
+| `interface:mobile-form` | Formulário mobile | `Mobile Form (Flutter)` ou `Mobile Form (Android)` | — | — |
 
 ### Qualidade
 
-| Tipo | Descrição | Exemplos |
-|------|-----------|----------|
-| `test:unit` | Teste unitário | Entity, VO, UseCase |
-| `test:e2e` | Teste end-to-end | Fluxo completo |
+| Tipo | Descrição | Agent / meta |
+|------|-----------|--------------|
+| `test:unit` | Teste unitário | `Unit Tests (TypeScript/Kotlin/C#)` |
+| `test:coverage` | Gate ≥95% domain+app | `Unit Tests (...)` + `scripts/check-coverage.mjs` |
+| `test:e2e` | Teste end-to-end | **Agent:** `E2E Tests (TS/KT/CS)` — Supertest, MockMvc ou WebApplicationFactory (+ Playwright se UI) |
 | `docs` | Documentação | API docs, README, ADR |
+
+### Exemplo de task completa (stack C# definida)
+
+```markdown
+- [ ] `domain:entity` Criar entidade Order com VOs Money e OrderStatus (~2h)
+  - **Agent:** `Core Entity (C#)`
+  - **Prompt:** "Crie a entidade Order em C# com VOs Money (valor + moeda) e OrderStatus (enum). Aggregate root com OrderItems como filhos. Métodos AddItem(), PlaceOrder(). Create() retornando Result<T>."
+```
+
+### Exemplo de task (stack não definida)
+
+```markdown
+- [ ] `domain:entity` Criar entidade Order com VOs Money e OrderStatus (~2h)
+  - **Agent TS:** `Core Entity` | **KT:** `Core Entity (Kotlin)` | **CS:** `Core Entity (C#)`
+  - **Prompt:** "Crie a entidade Order com VOs Money e OrderStatus. Aggregate root com AddItem() e PlaceOrder()."
+```
 
 ### Ordem de implementação (inside-out)
 
 ```
-1. domain:vo         → Validações fundamentais
-2. domain:entity     → Modelo de domínio
-3. domain:service    → Regras transversais
-4. domain:repository → Contrato de persistência
-5. app:dto           → Contratos de API
-6. app:usecase       → Orquestração
-7. app:query         → Leitura otimizada
-8. infra:persistence → Adapter real
-9. infra:migration   → Schema de banco
-10. interface:controller → Endpoints
-11. interface:form    → UI
-12. test:unit         → Testes de domínio/app
-13. test:e2e          → Testes de fluxo
+── BACKEND (camadas internas primeiro) ──────────────────────
+1. domain:vo              → Validações fundamentais
+2. domain:entity          → Modelo de domínio
+3. domain:service         → Regras transversais
+4. domain:repository      → Contrato de persistência
+5. app:dto                → Contratos de API
+6. app:usecase            → Orquestração
+7. app:query              → Leitura otimizada
+8. infra:persistence      → Adapter real
+9. infra:migration        → Schema de banco
+10. interface:controller  → Endpoints HTTP
+
+── FRONTEND WEB (Clean Architecture igual ao backend) ───────
+11. interface:entity      → Entidade domínio TypeScript (Result<T>)
+12. interface:usecase     → UseCase (injeta IRepository, Promise<Result>)
+13. interface:repository  → HttpRepository (DTO mapping, try/catch → err)
+14. interface:page        → Listagem (injeta UseCase, não HTTP direto)
+15. interface:form-web    → Formulário (exibe result.error de negócio)
+16. interface:form        → Formulário Next.js (se aplicável)
+
+── MOBILE (Clean Architecture igual ao backend) ─────────────
+17. interface:mobile-entity      → Entidade Dart/Kotlin pura (sealed Result)
+18. interface:mobile-usecase     → UseCase (injeta IRepository, Future<Result>)
+19. interface:mobile-repository  → RepositoryImpl (Dio/Retrofit, catch → Failure)
+20. interface:mobile             → Tela (notifier/ViewModel injeta UseCase)
+21. interface:mobile-form        → Formulário (trata result.when/onSuccess)
+
+── QUALIDADE ─────────────────────────────────────────────────
+22. test:unit             → Testes de domínio/app (entity, VO, use case)
+23. test:coverage         → Validar ≥95% coverage em domain + application
+24. test:e2e              → Testes de fluxo
 ```
 
 ### Escolha de stack (na implementação)
 
 | Stack | Sufixo | Framework | Automação |
 |-------|--------|-----------|-----------|
-| **TypeScript** | (nenhum) | NestJS + Prisma + React | Templates + scripts |
+| **TypeScript** | (nenhum) | NestJS + Prisma + Next.js | Templates + scripts |
 | **Kotlin** | `-kt` | Spring Boot + JPA + Gradle | Templates + scripts |
 | **C#** | `-cs` | ASP.NET Core + EF Core | Templates + scripts |
+| **Angular** | `-angular` | Angular 17+ + Tailwind + PrimeNG (widgets) | Templates |
+| **Vue** | `-vue` | Vue 3 + Tailwind + PrimeVue + Pinia | Templates |
+| **Flutter** | `-flutter` | Flutter + Riverpod + Dio | Templates |
+| **Android** | `-android` | Jetpack Compose + Hilt + Retrofit | Templates |
 
-> O sistema fonte analisado pelo `req-discovery` pode ser qualquer linguagem (PHP, Go, Python, Java, etc.). As tasks do backlog referenciam skills TS, KT ou CS deste repositório, pois o objetivo é reimplementar usando DDD/Clean Architecture.
+> O sistema fonte analisado pelo `req-discovery` pode ser qualquer linguagem (PHP, Go, Python, Java, etc.). As tasks do backlog referenciam skills TS, KT, CS e/ou frontend/mobile deste repositório, pois o objetivo é reimplementar usando DDD/Clean Architecture + frontend/mobile moderno.
 
 ## Padrão de Rastreabilidade
 

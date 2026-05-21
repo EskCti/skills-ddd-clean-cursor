@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Unit Tests (TypeScript)'
+  short_description: 'Testes unitários domain+application com Jest e coverage ≥95%'
+  default_prompt: 'Crie ou revise testes unitários Jest para as camadas domain e application do módulo indicado (VOs, entities, use cases, queries). Mockar repositórios. Cobrir fluxos felizes e erros de negócio. Garantir coverage ≥95% lines no escopo domain+application. Consultar references/unit-test-pattern.md.'

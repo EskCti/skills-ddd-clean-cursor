@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Unit Tests (C#)'
+  short_description: 'Testes unitários Domain+Application com xUnit e Coverlet ≥95%'
+  default_prompt: 'Crie testes unitários C# (xUnit + Moq) para Domain e Application do módulo indicado. Configure Coverlet. Cobrir VOs, entities e use cases. Meta ≥95% lines. Consultar references/unit-test-pattern-cs.md.'

@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Mobile Screen (Android)'
+  short_description: 'Tela Jetpack Compose com ViewModel + StateFlow + Hilt'
+  default_prompt: 'Crie a tela Android Jetpack Compose para a feature indicada. Use @HiltViewModel com MutableStateFlow<UiState> (sealed class Loading/Success/Error), LazyColumn para listagens, collectAsStateWithLifecycle() na Screen e tratamento explícito de todos os estados com when(). Consultar references/android-screen-pattern.md.'

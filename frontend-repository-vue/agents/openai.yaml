@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Frontend Repository (Vue)'
+  short_description: 'Repository Vue com fetch + DTO mapping + Promise<Result<T>>'
+  default_prompt: 'Crie a implementação do repositório Vue para o BC indicado. Use fetch nativo com async/await, DTO interface para resposta da API, mapeamento DTO → CustomerEntity.create(), trate erros HTTP com try/catch retornando err(mensagem). Instanciar na Pinia store. Consultar references/vue-repository-pattern.md.'
