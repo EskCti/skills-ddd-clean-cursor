@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Unit Tests (Kotlin)'
+  short_description: 'Testes unitários domain+application com JUnit 5 e JaCoCo ≥95%'
+  default_prompt: 'Crie testes unitários Kotlin (JUnit 5 + MockK) para domain e application do módulo indicado. Configure JaCoCo com mínimo 95% lines. Cobrir VOs, entities e use cases com fluxos felizes e erros. Consultar references/unit-test-pattern-kt.md.'

@@ -1,0 +1,4 @@
+interface:
+  display_name: 'E2E Tests (TypeScript)'
+  short_description: 'Testes E2E API (Supertest) e web (Playwright) para fluxos críticos'
+  default_prompt: 'Estenda testes E2E para o BC indicado. Use node test-e2e/scripts/create-e2e-spec.mjs <module> --template crud --create-fields <campos> --web quando houver UI. Ajuste assertions ao contrato real. API: apps/backend/test/<module>.e2e-spec.ts. Web: e2e/<module>.spec.ts. Consultar references/e2e-test-pattern.md.'

@@ -1,0 +1,44 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
+import * as request from 'supertest';
+import { AppModule } from '../src/app.module';
+
+describe('{{ModuleName}} (e2e)', () => {
+  let app: INestApplication;
+
+  beforeAll(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+
+    app = moduleFixture.createNestApplication();
+    await app.init();
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  it('POST /{{moduleName}} then GET /{{moduleName}}/:id', async () => {
+    const create = await request(app.getHttpServer())
+      .post('/{{moduleName}}')
+      .send({{createPayload}})
+      .expect(201);
+
+    const id = create.body.id;
+    expect(id).toBeDefined();
+
+    await request(app.getHttpServer())
+      .get(`/{{moduleName}}/${id}`)
+      .expect(200)
+      .expect((res) => {
+{{createAssertions}}
+      });
+  });
+
+  it('GET /{{moduleName}}/:id returns 404 when not found', () => {
+    return request(app.getHttpServer())
+      .get('/{{moduleName}}/00000000-0000-0000-0000-000000000000')
+      .expect(404);
+  });
+});

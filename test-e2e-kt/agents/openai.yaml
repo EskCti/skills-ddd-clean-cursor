@@ -1,0 +1,4 @@
+interface:
+  display_name: 'E2E Tests (Kotlin)'
+  short_description: 'Testes E2E API Spring Boot com MockMvc e Postgres'
+  default_prompt: 'Crie testes E2E Kotlin com @SpringBootTest e MockMvc para o fluxo HTTP indicado (POST criar, GET buscar, erros 400/404). Consultar references/e2e-test-pattern-kt.md.'
