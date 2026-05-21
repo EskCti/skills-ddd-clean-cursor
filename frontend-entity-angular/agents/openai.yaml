@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Frontend Entity (Angular)'
+  short_description: 'Entidade de domínio Angular TypeScript puro com Result<T, E>'
+  default_prompt: 'Crie a entidade de domínio Angular para a entidade indicada. Use TypeScript puro (sem Angular), type Result<T, E> com helpers ok()/err(), construtor privado + static create() retornando Result<Entity, string>, validações que retornam err() em vez de throw. Consultar references/angular-entity-pattern.md.'

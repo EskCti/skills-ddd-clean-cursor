@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Frontend Page (Angular)'
+  short_description: 'Criar página/componente Angular 17+ standalone com PrimeNG'
+  default_prompt: 'Crie o componente Angular 17+ standalone para a feature indicada. Use signals para estado reativo, PrimeNG para UI (p-table para listagens, p-card para detalhes), serviço com HttpClient injetado via inject(), e rota lazy. Consultar references/angular-page-pattern.md.'

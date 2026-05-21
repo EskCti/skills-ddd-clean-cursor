@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Frontend UseCase (Vue)'
+  short_description: 'Caso de uso Vue classe TypeScript com Promise<Result<T>>'
+  default_prompt: 'Crie o caso de uso Vue para a operação indicada. Use classe TypeScript simples (não composable) que recebe IRepository no construtor, retorne Promise<Result<T>> em todos os métodos, implemente lógica de negócio (email único, validações). A Pinia store instancia e usa o use case. Consultar references/vue-usecase-pattern.md.'

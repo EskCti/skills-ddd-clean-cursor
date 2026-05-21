@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Frontend Page (Vue)'
+  short_description: 'Criar página/componente Vue 3 com PrimeVue 4 e Pinia'
+  default_prompt: 'Crie o componente Vue 3 com script setup + TypeScript para a feature indicada. Use PrimeVue DataTable para listagens, Pinia store para estado global e serviço com fetch/axios para chamadas à API. Consultar references/vue-page-pattern.md.'

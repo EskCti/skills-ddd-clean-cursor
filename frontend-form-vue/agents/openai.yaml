@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Frontend Form (Vue)'
+  short_description: 'Formulário Vue 3 com vee-validate + PrimeVue inputs'
+  default_prompt: 'Crie o formulário Vue 3 com script setup + vee-validate para a entidade indicada. Use schema Zod com toTypedSchema para validação, PrimeVue inputs (InputText, Password, Dropdown), Field + ErrorMessage para erros inline e handleSubmit para submissão. Consultar references/vue-form-pattern.md.'
