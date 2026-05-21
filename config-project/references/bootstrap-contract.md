@@ -65,6 +65,14 @@ Com defaults obtidos de `skills.config.json`:
    - `app.enableCors()`
    - leitura de `process.env.<backendPortEnvVar>` (default `<backendPort>`)
    - `import "dotenv/config"`
+14. Scaffold E2E (via `scripts/ensure-e2e-scaffold.mjs`, idempotente):
+   - `<backendAppPath>/test/jest-e2e.json` e `test/app.e2e-spec.ts` (Supertest smoke)
+   - `<backendAppPath>/package.json`: script `test:e2e`
+   - root `package.json`: scripts `test:e2e` (delega ao backend) e `test:e2e:web` (Playwright)
+   - root `playwright.config.ts` + `e2e/smoke.spec.ts` (detecta Next/Angular/Vue para webServer)
+   - devDependencies: `supertest`, `@types/supertest` (backend); `@playwright/test` (root)
+   - `turbo.json`: task `test:e2e` com `cache: false`
+   - `.gitignore`: `playwright-report/`, `test-results/`
 
 ## Notes
 

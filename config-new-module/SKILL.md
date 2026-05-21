@@ -25,8 +25,10 @@ O namespace e diretórios padrão devem ser resolvidos por configuração global
 4. Conferir a estrutura criada em:
    - `<dirname(sharedModulePath)>/<module-name>`
    - `<backendAppPath>/src/modules/<module-name>`
-   - `<backendAppPath>/prisma/models/<module-name>.model.prisma`
-   - `<frontendAppPath>/src/modules/<module-name>` **ou** `<frontendAppPath>/modules/<module-name>` (conforme existência da pasta `src`)
+- `<backendAppPath>/prisma/models/<module-name>.model.prisma`
+- `<backendAppPath>/test/<module-name>.e2e-spec.ts`
+- `e2e/<module-name>.spec.ts`
+- `<frontendAppPath>/src/modules/<module-name>` **ou** `<frontendAppPath>/modules/<module-name>` (conforme existência da pasta `src`)
    - `<frontendAppPath>/<app-base>/(private)/<module-name>` **ou** `<frontendAppPath>/<app-base>/<module-name>` (fallback)
 5. Confirmar que o package contém API mínima (`getModuleName`) e teste `index.test.ts`.
 6. Confirmar que o backend contém `<module-name>.module.ts`, `<module-name>.controller.ts`, `<module-name>.prisma.ts`, e que o módulo foi registrado no `app.module.ts`.
@@ -40,8 +42,9 @@ O namespace e diretórios padrão devem ser resolvidos por configuração global
    - o menu lateral do módulo não deve depender de arquivos `data/*-menu.data.ts` nem de `*-navigation.component.tsx`.
    - o menu principal da aplicação deve ser atualizado em `app/(private)/dashboard/layout.tsx`, adicionando o novo módulo em `moduleItems` com `href`, `label` (PT-BR) e ícone determinístico do `lucide-react`.
 8. Confirmar que `apps/backend/package.json` e `apps/web/package.json` possuem a dependência `<scope>/<module-name>`.
-9. Executar análise semântica determinística (heurística de IA local) para ordenar o menu principal por frequência provável de uso e mover módulos administrativos para a parte inferior.
-10. Registrar execução em `.log/skills.log` com título da skill e lista simples dos comandos/ações relevantes (sem timestamps e sem status), garantindo `.log/` no `.gitignore`.
+9. Confirmar specs E2E gerados: `apps/backend/test/<module-name>.e2e-spec.ts` e `e2e/<module-name>.spec.ts` (web).
+10. Executar análise semântica determinística (heurística de IA local) para ordenar o menu principal por frequência provável de uso e mover módulos administrativos para a parte inferior.
+11. Registrar execução em `.log/skills.log` com título da skill e lista simples dos comandos/ações relevantes (sem timestamps e sem status), garantindo `.log/` no `.gitignore`.
 
 ## Commands
 
@@ -85,6 +88,8 @@ O script deve gerar exatamente:
 - `<backendAppPath>/src/modules/<module-name>/<module-name>.module.ts`
 - `<backendAppPath>/src/modules/<module-name>/index.ts`
 - `<backendAppPath>/prisma/models/<module-name>.model.prisma`
+- `<backendAppPath>/test/<module-name>.e2e-spec.ts` (template `module-get`)
+- `e2e/<module-name>.spec.ts` (Playwright web)
 - atualização em `<backendAppPath>/src/app.module.ts` para importar e registrar `<ModuleName>Module`
 - `<frontendAppPath>/src/modules/<module-name>/components/<module-name>-dashboard.component.tsx` **ou** `<frontendAppPath>/modules/<module-name>/components/<module-name>-dashboard.component.tsx`
 - `<frontendAppPath>/src/modules/<module-name>/pages/dashboard.page.tsx` **ou** `<frontendAppPath>/modules/<module-name>/pages/dashboard.page.tsx`

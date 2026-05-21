@@ -27,7 +27,10 @@ As configurações padrão são lidas de `skills.config.json` (em `.agents/skill
 9. Ajustar `next.config.ts|js|mjs` do frontend para garantir `images.remotePatterns` liberando imagens remotas em `http` e `https` com `hostname: "**"` (idempotente).
 10. Atualizar `.env` e `.env.example` de frontend/backend via upsert (sem apagar chaves extras existentes).
 11. Ajustar `main.ts` do backend de forma incremental (`dotenv/config`, `app.enableCors()`, porta via `backendPortEnvVar`).
-12. Registrar execução em `.log/skills.log` com título da skill e lista simples dos comandos/ações relevantes (sem timestamps e sem status), garantindo `.log/` no `.gitignore`.
+12. Scaffold E2E idempotente via `ensure-e2e-scaffold.mjs`:
+    - backend: `test/jest-e2e.json`, `test/app.e2e-spec.ts`, `supertest`, script `test:e2e`
+    - root: `playwright.config.ts`, `e2e/smoke.spec.ts`, scripts `test:e2e` e `test:e2e:web`
+13. Registrar execução em `.log/skills.log` com título da skill e lista simples dos comandos/ações relevantes (sem timestamps e sem status), garantindo `.log/` no `.gitignore`.
 
 ## Commands
 
@@ -69,9 +72,21 @@ Sobrescrever namespace por CLI:
 node .agents/skills/config-project/scripts/project-init.mjs --scope @namespace
 ```
 
+Scaffold E2E standalone (Angular/Vue ou reaplicar após bootstrap):
+
+```bash
+node .agents/skills/config-project/scripts/ensure-e2e-scaffold.mjs \
+  --backend-path apps/backend \
+  --frontend-path apps/web-angular \
+  --frontend-port 4200 \
+  --backend-port 4000
+```
+
 ## Resources
 
 - `scripts/project-init.mjs`: script principal de bootstrap.
+- `scripts/ensure-e2e-scaffold.mjs`: scaffold idempotente de Supertest + Playwright.
+- `assets/e2e-scaffold/`: templates de `jest-e2e.json`, `app.e2e-spec.ts`, Playwright.
 - `references/bootstrap-contract.md`: contrato dos arquivos e alterações que o bootstrap aplica.
 - Log local de execução: `.log/skills.log` (não versionado; `.log/` é adicionado ao `.gitignore` automaticamente, sem metadados extras).
 

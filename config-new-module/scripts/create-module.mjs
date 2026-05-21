@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { resolveNamespace, resolveSkillPaths } from '../../utils/resolve-skill-config.mjs';
 import { createSkillRunLogger } from '../../utils/skill-run-log.mjs';
 import { createSkillRunOps } from '../../utils/skill-run-ops.mjs';
+import { createE2eSpec } from '../../test-e2e/scripts/create-e2e-spec.mjs';
 
 let activeRunOps = null;
 
@@ -696,10 +697,26 @@ async function main() {
 
     const jestConfig = `import type { Config } from "jest";
 
+const COVERAGE_MIN = 95;
+
 const config: Config = {
 \tverbose: true,
 \tpreset: "ts-jest",
 \ttestMatch: ["**/test/**/*.test.ts"],
+\tcollectCoverage: true,
+\tcollectCoverageFrom: [
+\t\t"src/**/*.ts",
+\t\t"!src/**/index.ts",
+\t],
+\tcoveragePathIgnorePatterns: ["/node_modules/", "/dist/", "/test/"],
+\tcoverageThreshold: {
+\t\tglobal: {
+\t\t\tlines: COVERAGE_MIN,
+\t\t\tbranches: COVERAGE_MIN,
+\t\t\tfunctions: COVERAGE_MIN,
+\t\t\tstatements: COVERAGE_MIN,
+\t\t},
+\t},
 };
 
 export default config;
@@ -925,6 +942,21 @@ export * from "./pages/dashboard.page";
       dependencyVersion: '*',
       logger,
       label: 'Frontend package',
+    });
+
+    await createE2eSpec({
+      rootDir,
+      moduleName,
+      backendPath: backendAppPath,
+      template: 'module-get',
+      web: true,
+      moduleLabel: frontendDashboardModuleName,
+      logger: {
+        log: (message) => {
+          console.log(message);
+          logger.step(message);
+        },
+      },
     });
 
     console.log(`Created module at: ${targetDir}`);
