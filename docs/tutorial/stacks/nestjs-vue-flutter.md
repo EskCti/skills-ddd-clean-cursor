@@ -6,32 +6,34 @@
 
 **Cenário de referência**: Migração do legado PHP (`loja-php`) — mesmo fluxo do [Tutorial 04](../04-ciclo-completo-openspec.md), focado nesta combinação.
 
-Agents: `config-project-fullstack` → `config-project-vue` → `config-shared-web-vue` → `config-project-flutter` → `config-docker` → `config-cicd` → `config-shared-core` → `core-*` → `frontend-*-vue` → `mobile-*-flutter` → `test-unit` → `test-e2e`
+> **Formato de tasks**: use sempre **Agent** (`display_name`) + **Prompt** — ver `req-agile-planning`.
+
+Agents: `Config Project Full-Stack` → `Config Project (Vue)` → `Config Shared Web (Vue)` → `Config Project (Flutter)` → `Config Docker (TypeScript)` → `Config CI/CD (TypeScript)` → `Config Shared Core` → `Core *` → `Frontend * (Vue)` → `Mobile * (Flutter)` → `Unit Tests (TypeScript)` → `E2E Tests (TypeScript)`
 
 ---
 
-## Etapa 0 — Orquestração (`config-project-fullstack`)
+## Etapa 0 — Orquestração
 
-> Backlog em `docs/planning/loja-nova/backlog.md`. Projeto `loja-nova`: NestJS + Vue 3 + PrimeVue + Flutter. Docker e CI/CD no bootstrap. OpenSpec.
+> Backlog em `docs/planning/loja-nova/backlog.md`. Projeto `loja-nova`: NestJS + Vue 3 + Flutter. Docker e CI/CD no bootstrap. OpenSpec.
 
 **Sequência EP-000:**
 
 ```
 openspec-propose "bootstrap-loja-nova"
 openspec-apply-change "bootstrap-loja-nova"
-├── config-project-vue      → apps/backend + apps/web-vue + docker-compose dev
-├── config-shared-web-vue   → shell Tailwind (sidebar, topbar, rodapé)
-├── config-project-flutter    → app Flutter (Dio, Riverpod, go_router)
-├── config-docker             → Dockerfiles produção
-├── config-cicd               → GitHub Actions (test ≥95% + test:e2e)
-└── config-shared-core        → packages/shared kernel DDD
+├── Config Project (Vue)           → apps/backend + apps/web-vue + docker-compose dev
+├── Config Shared Web (Vue)        → shell Tailwind (sidebar, topbar, rodapé)
+├── Config Project (Flutter)       → app Flutter (Dio, Riverpod, go_router)
+├── Config Docker (TypeScript)     → Dockerfiles produção
+├── Config CI/CD (TypeScript)      → GitHub Actions (test ≥95% + test:e2e)
+└── Config Shared Core             → packages/shared kernel DDD
 ```
 
 ---
 
-## Etapa 1B — Shell admin (`config-shared-web-vue`)
+## Etapa 1B — Shell admin
 
-> Agent: `Config Shared Web (Vue)`
+**Agent:** `Config Shared Web (Vue)`
 
 ```bash
 node .agents/skills/config-shared-web-vue/scripts/init-shared-web-vue.mjs \
@@ -42,9 +44,11 @@ Integrar `shell.routes.ts` no router e configurar `@tailwindcss/vite` no Vite.
 
 ---
 
-## Etapa 1 — Bootstrap Web (`config-project-vue`)
+## Etapa 1 — Bootstrap Web
 
-> Bootstrap monorepo NestJS + Vue 3 + PrimeVue 4 (tema Aura), Pinia, proxy Vite `/api` → backend.
+**Agent:** `Config Project (Vue)`
+
+> Bootstrap monorepo NestJS + Vue 3 + PrimeVue 4 (tema Aura), Pinia, proxy Vite `/api` → backend (porta padrão **4000**).
 
 **Estrutura:**
 
@@ -60,7 +64,7 @@ loja-nova/
 └── package.json            # workspaces
 ```
 
-**E2E scaffold** (automático via `config-project` / `ensure-e2e-scaffold.mjs`):
+**E2E scaffold** (automático via `Config Project (Vue)` / `ensure-e2e-scaffold.mjs`):
 
 ```bash
 npm run test:e2e        # Supertest (backend)
@@ -69,7 +73,9 @@ npm run test:e2e:web    # Playwright
 
 ---
 
-## Etapa 2 — Bootstrap Mobile (`config-project-flutter`)
+## Etapa 2 — Bootstrap Mobile
+
+**Agent:** `Config Project (Flutter)`
 
 > App Flutter consumindo `http://localhost:4000`, clean architecture por feature, Riverpod + Dio.
 
@@ -77,13 +83,13 @@ npm run test:e2e:web    # Playwright
 
 ## Etapa 3 — BC Customers (backend)
 
-Mesma ordem inside-out do tutorial NestJS+Angular — skills **sem sufixo**:
+Mesma ordem inside-out do [Tutorial 04](../04-ciclo-completo-openspec.md) — uma task por camada com **Agent** + **Prompt**:
 
 ```
 openspec-propose "bc-customers"
-core-value-object → core-entity → core-repository → core-dto
-core-use-case → core-query-cqrs → backend-prisma-data → backend-controller
-test-unit → test-e2e (create-e2e-spec.mjs customers --template crud --web)
+Core Value Object → Core Entity → Core Repository → Core DTO
+Core Use Case → Core Query CQRS → Backend Prisma Data → Backend Controller
+Unit Tests (TypeScript) → E2E Tests (TypeScript)
 ```
 
 ```bash
@@ -97,14 +103,14 @@ node test-e2e/scripts/create-e2e-spec.mjs customers \
 
 ```
 openspec-propose "feat-customer-vue"
-frontend-entity-vue       → Customer + Result<T>
-frontend-usecase-vue      → CreateCustomerUseCase, ListCustomersUseCase
-frontend-repository-vue   → CustomerHttpRepository
-frontend-page-vue         → listagem PrimeVue DataTable
-frontend-form-vue         → vee-validate + PrimeVue Form
+Frontend Entity (Vue)       → Customer + Result<T>
+Frontend UseCase (Vue)      → CreateCustomerUseCase, ListCustomersUseCase
+Frontend Repository (Vue)   → CustomerHttpRepository
+Frontend Page (Vue)         → listagem PrimeVue DataTable
+Frontend Form (Vue)         → vee-validate + PrimeVue Form
 ```
 
-**Agent `frontend-page-vue`:**
+**Agent:** `Frontend Page (Vue)`
 
 > Crie CustomerListView com PrimeVue DataTable, paginação lazy, consumindo ListCustomersUseCase via Pinia.
 
@@ -113,26 +119,30 @@ frontend-form-vue         → vee-validate + PrimeVue Form
 ## Etapa 5 — Feature Flutter (`feat-customer-flutter`)
 
 ```
-mobile-entity-flutter → mobile-usecase-flutter → mobile-repository-flutter
-mobile-screen-flutter → mobile-form-flutter
+Mobile Entity (Flutter)     → Customer + sealed Result
+Mobile UseCase (Flutter)    → CreateCustomerUseCase, ListCustomersUseCase
+Mobile Repository (Flutter) → CustomerRepositoryImpl (Dio)
+Mobile Screen (Flutter)     → CustomerListPage
+Mobile Form (Flutter)       → CustomerFormPage
 ```
 
-Detalhes de implementação: [NestJS + Angular + Flutter](./nestjs-angular-flutter.md) (mesmo padrão Clean Architecture, skills `-flutter`).
+Detalhes de implementação: [NestJS + Angular + Flutter](./nestjs-angular-flutter.md) (mesmo padrão Clean Architecture).
 
 ---
 
 ## Checklist
 
-- [ ] Tutorial 01 concluído — `backlog.md` com EP-000..N
-- [ ] Bootstrap Vue + Flutter + Docker + CI/CD + shared-core
-- [ ] BC Customers backend + test:unit ≥95% + test:e2e
-- [ ] Feature Vue: listagem + formulário
-- [ ] Feature Flutter: listagem + formulário
-- [ ] `openspec-archive-change` nas mudanças concluídas
+- [ ] Análise (01) → backlog com Agent + Prompt
+- [ ] Bootstrap: Config Project (Vue) + Flutter + Docker + CI/CD + shared-core + shell
+- [ ] BC Customers + Unit Tests ≥95% + E2E Tests
+- [ ] Frontend Entity → Form (Vue)
+- [ ] Mobile Entity → Screen (Flutter)
+- [ ] OpenSpec archive nas mudanças
 
 ---
 
 ## Próximos passos
 
-- [Tutorial 04 — Ciclo OpenSpec](../04-ciclo-completo-openspec.md) (narrativa completa legado → esta stack)
-- [Hub Full-Stack](../02-fullstack-project-setup.md) — outras combinações
+- [Tutorial 04 — Ciclo OpenSpec](../04-ciclo-completo-openspec.md)
+- [NestJS + Angular + Flutter](./nestjs-angular-flutter.md) — referência detalhada
+- [Hub Full-Stack](../02-fullstack-project-setup.md)

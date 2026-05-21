@@ -6,7 +6,9 @@
 
 **Quando usar**: Ecossistema JVM maduro, Spring Boot no backend, UI Vue produtiva, Flutter cross-platform.
 
-Agents: `config-project-fullstack` → `config-project-kt` → `config-project-vue` → `config-shared-web-vue` → `config-project-flutter` → `config-docker-kt` → `config-cicd-kt` → `config-shared-core-kt` → skills **`-kt`** (backend) + Vue/Flutter (sem sufixo)
+> **Formato de tasks**: use sempre **Agent** (`display_name`) + **Prompt** — ver `req-agile-planning`.
+
+Agents: `Config Project Full-Stack` → `Config Project (Kotlin)` → `Config Project (Vue)` → `Config Shared Web (Vue)` → `Config Project (Flutter)` → `Config Docker (Kotlin)` → `Config CI/CD (Kotlin)` → `Config Shared Core (Kotlin)` → `Core * (Kotlin)` + `Frontend * (Vue)` + `Mobile * (Flutter)`
 
 ---
 
@@ -16,20 +18,22 @@ Agents: `config-project-fullstack` → `config-project-kt` → `config-project-v
 
 ```
 openspec-apply-change "bootstrap-<nome>"
-├── config-project-kt       → Gradle multi-módulo + Spring Boot
-├── config-project-vue      → apps/web-vue (monorepo ou repo sibling)
-├── config-shared-web-vue   → shell Tailwind (sidebar, topbar, rodapé)
-├── config-project-flutter
-├── config-docker-kt
-├── config-cicd-kt          → JaCoCo ≥95% domain+application
-└── config-shared-core-kt
+├── Config Project (Kotlin)       → Gradle multi-módulo + Spring Boot
+├── Config Project (Vue)          → apps/web-vue (monorepo ou repo sibling)
+├── Config Shared Web (Vue)       → shell Tailwind (sidebar, topbar, rodapé)
+├── Config Project (Flutter)
+├── Config Docker (Kotlin)
+├── Config CI/CD (Kotlin)         → JaCoCo ≥95% domain+application
+└── Config Shared Core (Kotlin)
 ```
 
-> Vue e Flutter rodam em monorepo npm **ou** repositórios separados — o `config-project-fullstack` define a estrutura. O importante é API Kotlin em `:8080` (ou porta do `skills.config.json`).
+> Vue e Flutter rodam em monorepo npm **ou** repositórios separados — o `Config Project Full-Stack` define a estrutura. O importante é API Kotlin em `:8080` (ou porta do `skills.config.json`).
 
 ---
 
-## Etapa 1 — Bootstrap Backend (`config-project-kt`)
+## Etapa 1 — Bootstrap Backend
+
+**Agent:** `Config Project (Kotlin)`
 
 ```bash
 node config-project-kt/scripts/project-init-kt.mjs --project-name=<nome>
@@ -42,29 +46,29 @@ node config-project-kt/scripts/project-init-kt.mjs --project-name=<nome>
 ├── build.gradle.kts
 ├── src/main/kotlin/          # API Spring Boot
 ├── docker-compose.yml
-└── apps/web-vue/             # após config-project-vue
+└── apps/web-vue/             # após Config Project (Vue)
 ```
 
 ---
 
 ## Etapa 2 — Bootstrap Vue + Flutter
 
-Sequência igual ao [NestJS + Vue + Flutter](./nestjs-vue-flutter.md#etapa-1--bootstrap-web-config-project-vue) — agents **sem sufixo** (`config-project-vue`, `config-project-flutter`).
+Sequência igual ao [NestJS + Vue + Flutter](./nestjs-vue-flutter.md) — agents `Config Project (Vue)`, `Config Project (Flutter)`, `Config Shared Web (Vue)`.
 
 Proxy Vite: `/api` → `http://localhost:8080`
 
 ---
 
-## Etapa 3 — BC Customers (backend `-kt`)
+## Etapa 3 — BC Customers (backend Kotlin)
 
 ```
 openspec-propose "bc-customers"
-core-value-object-kt → core-entity-kt → core-repository-kt → core-dto-kt
-core-use-case-kt → core-query-cqrs-kt → backend-data-kt → backend-controller-kt
-test-unit-kt → test-e2e-kt
+Core Value Object (Kotlin) → Core Entity (Kotlin) → Core Repository (Kotlin) → Core DTO (Kotlin)
+Core Use Case (Kotlin) → Core Query CQRS (Kotlin) → Backend Data (Kotlin) → Backend Controller (Kotlin)
+Unit Tests (Kotlin) → E2E Tests (Kotlin)
 ```
 
-**Agent `E2E Tests (Kotlin)`:**
+**Agent:** `E2E Tests (Kotlin)`
 
 > MockMvc: POST /customers → GET /customers/{id}. `@SpringBootTest` + Postgres via docker-compose.
 
@@ -72,7 +76,7 @@ test-unit-kt → test-e2e-kt
 
 ## Etapa 4 — Feature Vue
 
-Skills Vue (sem sufixo): `frontend-entity-vue` → … → `frontend-form-vue`
+Agents Vue: `Frontend Entity (Vue)` → `Frontend UseCase (Vue)` → `Frontend Repository (Vue)` → `Frontend Page (Vue)` → `Frontend Form (Vue)`
 
 Ver [NestJS + Vue + Flutter — Etapa 4](./nestjs-vue-flutter.md#etapa-4--feature-vue-feat-customer-vue).
 
@@ -80,16 +84,16 @@ Ver [NestJS + Vue + Flutter — Etapa 4](./nestjs-vue-flutter.md#etapa-4--featur
 
 ## Etapa 5 — Feature Flutter
 
-Skills `mobile-*-flutter` — ver [NestJS + Angular + Flutter](./nestjs-angular-flutter.md) (seção mobile).
+Agents `Mobile Entity (Flutter)` → … → `Mobile Screen (Flutter)` — ver [NestJS + Angular + Flutter](./nestjs-angular-flutter.md) (seção mobile).
 
 ---
 
 ## Checklist
 
-- [ ] Análise → backlog com sufixo `-kt` nas tasks de backend
+- [ ] Análise → backlog com Agent `(Kotlin)` no backend
 - [ ] Spring Boot + Vue + Flutter + Docker + CI/CD
 - [ ] BC Customers: JaCoCo ≥95% + MockMvc E2E
-- [ ] UI Vue + app Flutter
+- [ ] UI Vue + app Flutter (agents por camada)
 - [ ] EP-000 arquivado no OpenSpec
 
 ---

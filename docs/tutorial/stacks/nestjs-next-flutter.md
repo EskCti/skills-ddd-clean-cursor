@@ -6,7 +6,9 @@
 
 **Quando usar**: Time full TypeScript, SSR/SEO, tipos compartilhados entre monorepo TurboRepo e app Flutter.
 
-Agents: `config-project-fullstack` → `config-project` → `config-shared-web` → `config-project-flutter` → `config-docker` → `config-cicd` → `config-shared-core` → `frontend-form-schema` → `mobile-*-flutter` → `test-unit` → `test-e2e`
+> **Formato de tasks**: use sempre **Agent** (`display_name`) + **Prompt** — ver `req-agile-planning`.
+
+Agents: `Config Project Full-Stack` → `Config Project` → `Config Shared Web` → `Config Project (Flutter)` → `Config Docker (TypeScript)` → `Config CI/CD (TypeScript)` → `Config Shared Core` → `Frontend Form Schema` → `Mobile * (Flutter)` → `Unit Tests (TypeScript)` → `E2E Tests (TypeScript)`
 
 ---
 
@@ -16,15 +18,17 @@ Agents: `config-project-fullstack` → `config-project` → `config-shared-web` 
 
 ```
 openspec-apply-change "bootstrap-<nome>"
-├── config-project          → TurboRepo apps/web (Next.js) + apps/backend (NestJS)
-├── config-shared-web       → shell Tailwind + Shadcn (sidebar, topbar, rodapé)
-├── config-project-flutter
-├── config-docker + config-cicd + config-shared-core
+├── Config Project              → TurboRepo apps/web (Next.js) + apps/backend (NestJS)
+├── Config Shared Web           → shell Tailwind + Shadcn (sidebar, topbar, rodapé)
+├── Config Project (Flutter)
+├── Config Docker (TypeScript) + Config CI/CD (TypeScript) + Config Shared Core
 ```
 
-O `config-project` inclui scaffold E2E (`jest-e2e.json`, `playwright.config.ts`, `test:e2e`).
+O `Config Project` inclui scaffold E2E (`jest-e2e.json`, `playwright.config.ts`, `test:e2e`).
 
-## Etapa 1B — Shell admin (`config-shared-web`)
+## Etapa 1B — Shell admin
+
+**Agent:** `Config Shared Web`
 
 ```bash
 node .agents/skills/config-shared-web/scripts/init-shared-web.mjs \
@@ -33,11 +37,13 @@ node .agents/skills/config-shared-web/scripts/init-shared-web.mjs \
 
 ---
 
-## Etapa 1 — Bootstrap (`config-project`)
+## Etapa 1 — Bootstrap
+
+**Agent:** `Config Project`
 
 ```bash
 node config-project/scripts/project-init.mjs
-# defaults: apps/web (Next.js) + apps/backend (NestJS)
+# defaults: apps/web (Next.js) + apps/backend (NestJS), backend porta 4000
 ```
 
 **Estrutura:**
@@ -46,8 +52,8 @@ node config-project/scripts/project-init.mjs
 <nome>/
 ├── apps/web/               # Next.js (src/)
 ├── apps/backend/           # NestJS
-├── apps/mobile-flutter/    # Flutter (config-project-flutter)
-├── packages/shared/        # config-shared-core
+├── apps/mobile-flutter/    # Flutter (Config Project Flutter)
+├── packages/shared/        # Config Shared Core
 ├── e2e/smoke.spec.ts
 └── turbo.json
 ```
@@ -56,7 +62,7 @@ node config-project/scripts/project-init.mjs
 
 ## Etapa 2 — BC Customers (backend)
 
-Ordem inside-out padrão (sem sufixo). Após controller:
+Ordem inside-out padrão — tasks com **Agent** + **Prompt**. Após `Backend Controller`:
 
 ```bash
 node test-e2e/scripts/create-e2e-spec.mjs customers \
@@ -68,17 +74,17 @@ npm run test:e2e
 
 ## Etapa 3 — Feature Web Next.js
 
-Next.js neste repositório usa principalmente **`frontend-form-schema`** (RHF + Zod) para formulários.
+Next.js neste repositório usa **`Frontend Form Schema`** (RHF + Zod) para formulários.
 
 ```
 openspec-propose "feat-customer-next"
-frontend-form-schema      → schema Zod + React Hook Form
-config-new-module         → scaffold packages/customers + rota app/(private)/customers
+Frontend Form Schema      → schema Zod + React Hook Form
+Config New Module         → scaffold packages/customers + rota app/(private)/customers
 ```
 
-Para **listagem**, estender o módulo web com Server Components ou Client Component + fetch à API — padrão similar ao dashboard gerado por `config-new-module`.
+Para **listagem**, estender o módulo web com Server Components ou Client Component + fetch à API — padrão similar ao dashboard gerado por `Config New Module`.
 
-**Agent `frontend-form-schema`:**
+**Agent:** `Frontend Form Schema`
 
 > Crie formulário de cadastro de Customer com RHF + Zod: name, email, cpf. POST /customers via server action ou API route proxy.
 
@@ -92,17 +98,17 @@ npm run test:e2e:web
 
 ## Etapa 4 — Feature Flutter
 
-Mesmo fluxo mobile do [NestJS + Angular + Flutter](./nestjs-angular-flutter.md) (Etapa 8 — Mobile Flutter) — skills `mobile-*-flutter`.
+Mesmo fluxo mobile do [NestJS + Angular + Flutter](./nestjs-angular-flutter.md) (Etapa 8 — Mobile Flutter) — agents `Mobile Entity (Flutter)` → `Mobile Screen (Flutter)`.
 
 ---
 
 ## Checklist
 
-- [ ] Análise (01) → backlog
-- [ ] `config-project` + Flutter + Docker + CI/CD + shared-core
-- [ ] BC Customers + unit ≥95% + e2e API
-- [ ] Formulário Next.js (frontend-form-schema)
-- [ ] Telas Flutter
+- [ ] Análise (01) → backlog com Agent + Prompt
+- [ ] Config Project + Flutter + Docker + CI/CD + shared-core + shell
+- [ ] BC Customers + Unit Tests ≥95% + E2E Tests
+- [ ] Formulário Next.js (`Frontend Form Schema`)
+- [ ] Telas Flutter (`Mobile Screen (Flutter)`)
 - [ ] CI: lint + test + coverage gate + test:e2e
 
 ---

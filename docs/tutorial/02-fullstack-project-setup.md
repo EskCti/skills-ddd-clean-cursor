@@ -2,7 +2,7 @@
 
 **Objetivo**: Depois da [análise (Tutorial 01)](./01-pipeline-discovery-planning.md), escolher backend + frontend + mobile e seguir o guia da combinação — sempre orquestrado por `config-project-fullstack`.
 
-> **Regra**: Nenhum setup full-stack começa “no escuro”. O `backlog.md` (épicos, BCs, tasks por camada) vem do pipeline `req-*`. O agent **`config-project-fullstack`** traduz a combinação escolhida na sequência exata de agents.
+> **Regra**: Nenhum setup full-stack começa “no escuro”. O `backlog.md` (épicos, BCs, tasks por camada) vem do pipeline `req-*`. O agent **`Config Project Full-Stack`** traduz a combinação escolhida na sequência exata de agents. Cada task usa **Agent** (`display_name`) + **Prompt**.
 
 ---
 
@@ -15,20 +15,16 @@ Tutorial 01 — req-discovery → req-ddd-modeling → req-migration-strategy �
                            backlog.md + epics-summary.md
                                     │
                                     ▼
-              config-project-fullstack  ← informar backend + frontend + mobile
+              Config Project Full-Stack  ← informar backend + frontend + mobile
                                     │
                     ┌───────────────┼───────────────────────┐
                     ▼               ▼                       ▼
-            config-project-*   config-shared-web*     config-docker + config-cicd
-            (bootstrap)        shell Tailwind           + config-shared-core
-            stacks/*           sidebar/topbar/rodapé
+            Config Project (*)  Config Shared Web (*)   Config Docker + Config CI/CD
+            (bootstrap)         shell Tailwind          + Config Shared Core
+            stacks/*            sidebar/topbar/rodapé
                     │
                     ▼
-         Por BC (inside-out): core-* → backend-* → test-unit-* → test-e2e-*
-                    │
-         Por feature web: frontend-entity → usecase → repository → page/form
-                    │
-         Por tela mobile: mobile-entity → usecase → repository → screen/form
+         Por BC (inside-out): Core * → Backend * → Frontend * → Mobile * → Unit/E2E Tests
                     │
                     ▼
          [Opcional] Tutorial 04 — OpenSpec (propose → apply → archive)
@@ -51,8 +47,8 @@ O agent responde com: agents de bootstrap, sufixo de skills (`-kt`, `-cs` ou nen
 
 | Backend | Frontend | Mobile | Quando usar | Tutorial |
 |---------|----------|--------|-------------|----------|
-| **NestJS** | **Angular** | **Flutter** | Enterprise TS, PrimeNG, app iOS+Android | [nestjs-angular-flutter](./stacks/nestjs-angular-flutter.md) |
-| **NestJS** | **Vue 3** | **Flutter** | Produtividade UI (PrimeVue), legado PHP→TS | [nestjs-vue-flutter](./stacks/nestjs-vue-flutter.md) |
+| **NestJS** | **Angular** | **Flutter** | Enterprise TS, Tailwind + PrimeNG (widgets), iOS+Android | [nestjs-angular-flutter](./stacks/nestjs-angular-flutter.md) |
+| **NestJS** | **Vue 3** | **Flutter** | Produtividade UI (Tailwind + PrimeVue), legado PHP→TS | [nestjs-vue-flutter](./stacks/nestjs-vue-flutter.md) |
 | **NestJS** | **Next.js** | **Flutter** | SSR/SEO, time full TS, tipos compartilhados | [nestjs-next-flutter](./stacks/nestjs-next-flutter.md) |
 | **Spring Boot** | **Vue 3** | **Flutter** | Ecossistema JVM + UI Vue | [spring-vue-flutter](./stacks/spring-vue-flutter.md) |
 | **ASP.NET Core** | **Angular** | **Android** | .NET enterprise + nativo Android | [dotnet-angular-android](./stacks/dotnet-angular-android.md) |
@@ -69,25 +65,26 @@ Independente da combinação, o **req-agile-planning** deve gerar tasks semelhan
 ```markdown
 ## EP-000: [TECH] Bootstrap do Projeto
 
-- [ ] infra:setup       → config-project-fullstack + config-project-* da combinação
-- [ ] infra:shell-web   → config-shared-web | config-shared-web-angular | config-shared-web-vue
-- [ ] infra:docker      → config-docker[-kt|-cs]
-- [ ] infra:cicd        → config-cicd[-kt|-cs]
-- [ ] infra:shared-core → config-shared-core[-kt|-cs]
-- [ ] infra:e2e-scaffold → ensure-e2e-scaffold / create-e2e-spec (TS) ou test-e2e-kt / test-e2e-cs
+- [ ] `infra:fullstack` → **Agent:** `Config Project Full-Stack`
+- [ ] `infra:setup`     → **Agent:** `Config Project` / `(Angular)` / `(Vue)` / `(Kotlin)` / `(C#)`
+- [ ] `infra:shell-web` → **Agent:** `Config Shared Web` / `(Angular)` / `(Vue)`
+- [ ] `infra:docker`    → **Agent:** `Config Docker (TypeScript|Kotlin|C#)`
+- [ ] `infra:cicd`      → **Agent:** `Config CI/CD (TypeScript|Kotlin|C#)`
+- [ ] `domain:shared`   → **Agent:** `Config Shared Core` / `(Kotlin)` / `(C#)`
 ```
 
 ---
 
 ## Fases por camada (referência rápida)
 
-| Fase | Agents | OpenSpec (opcional) |
-|------|--------|---------------------|
-| Bootstrap | `config-project-*`, `config-shared-web*`, `config-docker*`, `config-cicd*`, `config-shared-core*` | `openspec-propose "bootstrap-<nome>"` |
-| BC backend | `core-*`, `backend-*`, `test-unit-*`, `test-e2e-*` | `openspec-propose "bc-<nome>"` |
-| Feature web | `frontend-entity-*`, `frontend-usecase-*`, `frontend-repository-*`, `frontend-page-*`, `frontend-form-*` | `openspec-propose "feat-<nome>-<fw>"` |
-| Feature mobile | `mobile-entity-*`, `mobile-usecase-*`, `mobile-repository-*`, `mobile-screen-*`, `mobile-form-*` | `openspec-propose "feat-<nome>-<mobile>"` |
-| Auth | `config-auth-core-*`, `config-auth-backend-*`, `config-auth-web-*` | `openspec-propose "feat-auth"` |
+| Fase | Agents (display_name) | OpenSpec (opcional) |
+|------|------------------------|---------------------|
+| Bootstrap | Config Project (*), Config Shared Web (*), Config Docker, Config CI/CD, Config Shared Core | `openspec-propose "bootstrap-<nome>"` |
+| BC full-stack | Core *, Backend *, Frontend *, Mobile *, Unit Tests, E2E Tests | `openspec-propose "ep-XXX-<bc>"` |
+| Feature web (isolada) | Frontend Entity → UseCase → Repository → Page → Form | `openspec-propose "feat-<nome>-<fw>"` |
+| Feature mobile (isolada) | Mobile Entity → UseCase → Repository → Screen → Form | `openspec-propose "feat-<nome>-<mobile>"` |
+| Auth backend | Config Auth Core Basic, Config Auth Backend Basic | `openspec-propose "feat-auth"` |
+| Auth web | Config Auth Web Basic (**somente Next.js**) | — |
 
 Ordem inside-out detalhada: [README — Ordem de Implementação](./README.md#ordem-de-implementação-inside-out)
 
@@ -101,7 +98,7 @@ Ordem inside-out detalhada: [README — Ordem de Implementação](./README.md#or
 | **Legado** com migração por BC | 01 → **backend-incremental** → depois combinação full-stack para UI |
 | Legado + OpenSpec integrado | 01 → 02 → [nestjs-vue-flutter](./stacks/nestjs-vue-flutter.md) **ou** [Tutorial 04](./04-ciclo-completo-openspec.md) (narrativa) |
 | Já tem backend, falta frontend/mobile | 01 → combinação escolhida (pular bootstrap backend se existir) |
-| Dúvida de stack | `config-project-fullstack` + matriz acima |
+| Dúvida de stack | `Config Project Full-Stack` + matriz acima |
 
 ---
 
