@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Frontend Entity (Vue)'
+  short_description: 'Entidade de domínio Vue TypeScript puro com Result<T, E>'
+  default_prompt: 'Crie a entidade de domínio Vue para a entidade indicada. Use TypeScript puro (sem Vue/Pinia), type Result<T, E> com helpers ok()/err(), construtor privado + static create() retornando Result<Entity, string>. Consultar references/vue-entity-pattern.md.'

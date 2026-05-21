@@ -8,6 +8,19 @@ description: Organizar requisitos (de sistemas existentes em qualquer linguagem 
 
 Transformar requisitos (documentados ou descritos) em um backlog ágil estruturado com Épicos, User Stories e Tasks, **alinhado a DDD e Clean Architecture**.
 
+**Fluxo completo (recomendado)**:
+
+```
+req-discovery → req-ddd-modeling → [req-migration-strategy] → req-agile-planning
+       ↓
+  backlog.md (EP-000 bootstrap inclui docker + cicd)
+       ↓
+openspec-propose "bootstrap-<nome>" → openspec-apply-change
+  (config-project-fullstack orquestra: config-project-* + config-docker + config-cicd + config-shared-core)
+       ↓
+Por BC/épico: openspec-propose → openspec-apply-change → openspec-archive-change
+```
+
 **Fluxo**: o sistema fonte pode ter sido analisado em qualquer linguagem (PHP, Go, Python, etc. via `req-discovery`). As tasks do backlog sempre referenciam os **skills deste repositório**. Na implementação, o usuário escolhe **TypeScript** (sem sufixo), **Kotlin** (sufixo `-kt`) ou **C#** (sufixo `-cs`). Consultar `req-discovery/references/ddd-clean-mapping.md`.
 
 ---
@@ -83,16 +96,24 @@ Regras para Épicos:
 - Um épico deve ser entregável de forma independente ou com dependências explícitas
 - Estimativa de alto nível: P (pequeno), M (médio), G (grande), GG (muito grande)
 
-**Épico técnico de bootstrap** (EP-000) deve sempre existir e incluir:
+**Épico técnico de bootstrap** (EP-000) deve sempre existir e incluir **Docker + CI/CD no setup** (não deixar para o final):
 
-- Setup do projeto (skill: `config-project` / `config-project-kt` / `config-project-cs`)
-- Shared kernel (skill: `config-shared-core` / `config-shared-core-kt` / `config-shared-core-cs`)
-- Configuração de banco (skill: `config-prisma` / `config-jpa-kt` / `config-efcore-cs`)
+- Orquestração → `config-project-fullstack` (quando backend + frontend e/ou mobile)
+- Backend → `config-project` / `config-project-kt` / `config-project-cs`
+- Frontend → `config-project-angular` / `config-project-vue` (se aplicável)
+- Mobile → `config-project-flutter` / `config-project-android` (se aplicável)
+- Docker produção → `config-docker` / `config-docker-kt` / `config-docker-cs`
+- CI/CD → `config-cicd` / `config-cicd-kt` / `config-cicd-cs`
+- Shared kernel → `config-shared-core` / `config-shared-core-kt` / `config-shared-core-cs`
+- Banco → `config-prisma` / `config-jpa-kt` / `config-efcore-cs`
+
+> Com OpenSpec: agrupar EP-000 na mudança `bootstrap-<nome>` via `openspec-propose` → `openspec-apply-change`.
 
 **Épico de auth** (quando aplicável) deve usar:
 
-- Auth core (skill: `config-auth-core-basic` / `config-auth-core-basic-kt` / `config-auth-core-basic-cs`)
-- Auth backend (skill: `config-auth-backend-basic` / `config-auth-backend-basic-kt` / `config-auth-backend-basic-cs`)
+- Auth core → **Agent:** `Config Auth Core Basic` | `Config Auth Core Basic (Kotlin)` | `Config Auth Core (C#)`
+- Auth backend → **Agent:** `Config Auth Backend Basic` | `Config Auth Backend Basic (Kotlin)` | `Config Auth Backend Basic (C#)`
+- Auth web (somente Next.js) → **Agent:** `Config Auth Web Basic`
 
 ### Fase 3 — Quebra em User Stories
 
@@ -117,51 +138,120 @@ Para cada Story, criar Tasks técnicas **tipadas por camada arquitetural**, segu
 
 ```
 Ordem de implementação (inside-out):
-1. domain:vo         → core-value-object
-2. domain:entity     → core-entity
-3. domain:service    → core-domain-service
-4. domain:repository → core-repository
-5. app:dto           → core-dto
-6. app:usecase       → core-use-case
-7. app:query         → core-query-cqrs
-8. infra:persistence → backend-data (adapter de persistência)
-9. infra:migration   → config-db (schema/migration)
-10. interface:controller → backend-controller
-11. interface:form    → frontend-form-schema
-12. test:unit         → (testes da camada domain + app)
-13. test:e2e          → (teste de fluxo completo)
+── BACKEND ──────────────────────────────────────────────────
+1.  domain:vo              → core-value-object
+2.  domain:entity          → core-entity
+3.  domain:service         → core-domain-service
+4.  domain:repository      → core-repository
+5.  app:dto                → core-dto
+6.  app:usecase            → core-use-case
+7.  app:query              → core-query-cqrs
+8.  infra:persistence      → backend-data (adapter de persistência)
+9.  infra:migration        → config-db (schema/migration)
+10. interface:controller   → backend-controller
+
+── FRONTEND WEB (Clean Architecture completa) ───────────────
+11. interface:entity       → frontend-entity-angular | frontend-entity-vue
+12. interface:usecase      → frontend-usecase-angular | frontend-usecase-vue
+13. interface:repository   → frontend-repository-angular | frontend-repository-vue
+14. interface:page         → frontend-page-angular | frontend-page-vue
+15. interface:form-web     → frontend-form-angular | frontend-form-vue
+16. interface:form         → Frontend Form Schema (Next.js)
+
+── MOBILE (Clean Architecture completa) ─────────────────────
+17. interface:mobile-entity     → mobile-entity-flutter | mobile-entity-android
+18. interface:mobile-usecase    → mobile-usecase-flutter | mobile-usecase-android
+19. interface:mobile-repository → mobile-repository-flutter | mobile-repository-android
+20. interface:mobile            → mobile-screen-flutter | mobile-screen-android
+21. interface:mobile-form       → mobile-form-flutter | mobile-form-android
+
+── QUALIDADE (meta: ≥95% domain + application) ──────────────
+22. test:unit              → testes unitários (entity, VO, use case)
+23. test:coverage          → validar cobertura ≥95% em domain + application
+24. test:e2e               → teste de fluxo completo
 ```
 
-Formato de task — **sempre agnóstico**, sem sufixo de stack:
+> **OpenSpec**: para features que envolvem múltiplas camadas (backend + frontend + mobile), recomenda-se usar `openspec-propose` antes de iniciar a implementação. O `tasks.md` deve copiar o formato do backlog (**Agent** + **Prompt** por task). O `openspec-apply-change` aciona cada **Agent** listado na ordem inside-out.
+
+Formato de task — **inclui o agent Cursor a acionar e o prompt sugerido**:
+
+Se a stack já foi definida (ex.: C#), gerar com agent e prompt específicos:
 
 ```markdown
-- [ ] `domain:entity` Criar entidade Customer com VOs Name e Email → skill: core-entity (~2h)
-- [ ] `domain:vo` Criar VO CustomerName com validação → skill: core-value-object (~1h)
-- [ ] `app:usecase` Criar CreateCustomerUseCase → skill: core-use-case (~2h)
-- [ ] `infra:persistence` Criar adapter para CustomerRepository → skill: backend-data (~2h)
-- [ ] `interface:controller` Criar POST /api/customers → skill: backend-controller (~2h)
+- [ ] `domain:entity` Criar entidade Customer com VOs CustomerName, Email, CPF (~2h)
+  - **Agent:** `Core Entity (C#)`
+  - **Prompt:** "Crie a entidade Customer em C# com os VOs CustomerName, Email e CPF. Aggregate root com método Create() retornando Result<T> e Equals/GetHashCode por Id."
+
+- [ ] `domain:vo` Criar VO CustomerName com validação 2-100 chars (~1h)
+  - **Agent:** `Core Value Object (C#)`
+  - **Prompt:** "Crie o VO CustomerName em C# — record, construtor privado, Create() com Result<T>, validação: não vazio, trim, 2-100 chars."
+
+- [ ] `app:usecase` Criar CreateCustomerUseCase (~2h)
+  - **Agent:** `Core Use Case (C#)`
+  - **Prompt:** "Crie o CreateCustomerUseCase em C# que verifica CPF duplicado via ICustomerRepository, cria Customer, persiste e retorna CustomerOutDto."
+
+- [ ] `infra:persistence` Criar adapter CustomerEfRepository (~2h)
+  - **Agent:** `Backend Data (C#)`
+  - **Prompt:** "Crie CustomerEfRepository em C# implementando ICustomerRepository com EF Core. Separar CustomerDbo do domínio com mapeamentos ToDomain/FromDomain."
+
+- [ ] `interface:controller` Criar POST /api/customers e GET /api/customers/{id} (~2h)
+  - **Agent:** `Backend Controller (C#)`
+  - **Prompt:** "Crie CustomerController em C# com POST /api/customers (CreateCustomerUseCase) e GET /api/customers/{id} (FindCustomerByIdQuery). Retornar 201 no POST e 404 quando não encontrado."
 ```
 
-Na implementação, o desenvolvedor resolve o skill para a stack escolhida:
+Se a stack **não foi escolhida ainda**, mostrar as 3 opções:
 
-| Prefixo na task        | Skill TS              | Skill KT                | Skill CS                |
-| ---------------------- | --------------------- | ----------------------- | ----------------------- |
-| `domain:entity`        | `core-entity`         | `core-entity-kt`        | `core-entity-cs`        |
-| `domain:vo`            | `core-value-object`   | `core-value-object-kt`  | `core-value-object-cs`  |
-| `domain:repository`    | `core-repository`     | `core-repository-kt`    | `core-repository-cs`    |
-| `app:usecase`          | `core-use-case`       | `core-use-case-kt`      | `core-use-case-cs`      |
-| `app:dto`              | `core-dto`            | `core-dto-kt`           | `core-dto-cs`           |
-| `app:query`            | `core-query-cqrs`     | `core-query-cqrs-kt`    | `core-query-cqrs-cs`    |
-| `infra:persistence`    | `backend-prisma-data` | `backend-data-kt`       | `backend-data-cs`       |
-| `infra:migration`      | `config-prisma`       | `config-jpa-kt`         | `config-efcore-cs`      |
-| `interface:controller` | `backend-controller`  | `backend-controller-kt` | `backend-controller-cs` |
+```markdown
+- [ ] `domain:entity` Criar entidade Customer com VOs Name e Email (~2h)
+  - **Agent TS:** `Core Entity` | **KT:** `Core Entity (Kotlin)` | **CS:** `Core Entity (C#)`
+  - **Prompt:** "Crie a entidade Customer com os VOs CustomerName e Email. Aggregate root."
+```
+
+### Mapeamento: Prefixo de Task → Agent Cursor
+
+| Prefixo | Agent TS | Agent KT | Agent CS |
+| ---------------------- | ----------------------- | -------------------------------- | ----------------------- |
+| `domain:vo` | `Core Value Object` | `Core Value Object (Kotlin)` | `Core Value Object (C#)` |
+| `domain:entity` | `Core Entity` | `Core Entity (Kotlin)` | `Core Entity (C#)` |
+| `domain:service` | `Core Domain Service` | `Core Domain Service (Kotlin)` | `Core Domain Service (C#)` |
+| `domain:repository` | `Core Repository` | `Core Repository (Kotlin)` | `Core Repository (C#)` |
+| `app:dto` | `Core DTO` | `Core DTO (Kotlin)` | `Core DTO (C#)` |
+| `app:usecase` | `Core Use Case` | `Core Use Case (Kotlin)` | `Core Use Case (C#)` |
+| `app:query` | `Core Query CQRS` | `Core Query CQRS (Kotlin)` | `Core Query CQRS (C#)` |
+| `infra:persistence` | `Backend Prisma Data` | `Backend Data (Kotlin)` | `Backend Data (C#)` |
+| `infra:migration` | `Config Prisma` | `Config JPA (Kotlin)` | `Config EF Core (C#)` |
+| `infra:setup` | `Config Project` | `Config Project (Kotlin)` | `Config Project (C#)` |
+| `infra:shell-web` | `Config Shared Web` / `(Angular)` / `(Vue)` | — | — |
+| `domain:shared` | `Config Shared Core` | `Config Shared Core (Kotlin)` | `Config Shared Core (C#)` |
+| `infra:auth` | `Config Auth Core Basic` | `Config Auth Core Basic (Kotlin)` | `Config Auth Core (C#)` |
+| `interface:controller` | `Backend Controller` | `Backend Controller (Kotlin)` | `Backend Controller (C#)` |
+| `interface:form` | `Frontend Form Schema` | — | — |
+| `interface:entity` | `Frontend Entity (Angular)` ou `Frontend Entity (Vue)` | — | — |
+| `interface:usecase` | `Frontend UseCase (Angular)` ou `Frontend UseCase (Vue)` | — | — |
+| `interface:repository` | `Frontend Repository (Angular)` ou `Frontend Repository (Vue)` | — | — |
+| `interface:page` | `Frontend Page (Angular)` ou `Frontend Page (Vue)` | — | — |
+| `interface:form-web` | `Frontend Form (Angular)` ou `Frontend Form (Vue)` | — | — |
+| `interface:mobile-entity` | `Mobile Entity (Flutter)` ou `Mobile Entity (Android)` | — | — |
+| `interface:mobile-usecase` | `Mobile UseCase (Flutter)` ou `Mobile UseCase (Android)` | — | — |
+| `interface:mobile-repository` | `Mobile Repository (Flutter)` ou `Mobile Repository (Android)` | — | — |
+| `interface:mobile` | `Mobile Screen (Flutter)` ou `Mobile Screen (Android)` | — | — |
+| `interface:mobile-form` | `Mobile Form (Flutter)` ou `Mobile Form (Android)` | — | — |
+| `infra:docker` | `Config Docker (TypeScript)` | `Config Docker (Kotlin)` | `Config Docker (C#)` |
+| `infra:cicd` | `Config CI/CD (TypeScript)` | `Config CI/CD (Kotlin)` | `Config CI/CD (C#)` |
+| `infra:fullstack` | `Config Project Full-Stack` | `Config Project Full-Stack` | `Config Project Full-Stack` |
+| `test:unit` | `Unit Tests (TypeScript)` | `Unit Tests (Kotlin)` | `Unit Tests (C#)` |
+| `test:coverage` | `Unit Tests (TypeScript)` | `Unit Tests (Kotlin)` | `Unit Tests (C#)` |
+| `test:e2e` | `E2E Tests (TypeScript)` | `E2E Tests (Kotlin)` | `E2E Tests (C#)` |
 
 Regras para Tasks:
 
 - Cada task deve ser **completável em 1-4 horas**
 - Deve indicar a **camada DDD** como prefixo (`domain:`, `app:`, `infra:`, `interface:`, `test:`)
-- Deve referenciar o **skill** correspondente (sufixo `[-kt/-cs]` para indicar que existe em múltiplas stacks)
-- A escolha TS, KT ou CS é feita no momento da implementação, não no planejamento
+- **Sempre incluir o nome exato do agent Cursor** (`display_name` do `agents/openai.yaml` do skill) — **nunca** cite pasta de skill (`core-entity`, `frontend-entity-vue`) no lugar do Agent
+- Em projetos full-stack, cada BC com frontend/mobile deve incluir **todas** as tasks `interface:entity` → `interface:form-web` e/ou `interface:mobile-*` (uma task por camada, cada uma com seu Agent)
+- **Sempre incluir um prompt sugerido** — específico o suficiente para o agent entregar o código correto sem ambiguidade
+- Se a stack foi definida pelo usuário, usar apenas o agent da stack escolhida
+- O prompt deve incluir: nome da classe, VOs/dependências envolvidas, comportamento esperado
 - Deve ser atribuível a uma pessoa
 
 > **Nota**: o sistema fonte analisado pode ser qualquer linguagem (PHP, Go, Python, etc.). As tasks sempre referenciam os skills deste repositório (TS, KT ou CS) porque o objetivo é **reimplementar** usando DDD/Clean Architecture.
@@ -262,21 +352,42 @@ docs/planning/meu-erp/backlog.md          ← saída (épicos + stories + tasks 
 
 ## EP-000 [TECH]: Bootstrap e Infraestrutura
 
-**Descrição**: Setup inicial do projeto, shared kernel e banco de dados
+**Descrição**: Setup inicial do projeto full-stack, shared kernel, Docker de produção e CI/CD
 **Tamanho**: M
 **Dependências**: nenhuma
 **Release**: 0
+**OpenSpec**: mudança sugerida `bootstrap-<nome-projeto>`
 
 ### US-000: Setup do Projeto
 
-> Como desenvolvedor, quero o projeto configurado, para que eu possa começar a implementar módulos.
+> Como desenvolvedor, quero o projeto configurado com Docker e CI/CD, para começar a implementar módulos com entrega contínua desde o início.
 
 **Tasks**:
 
-- [ ] `infra:setup` Inicializar monorepo → skill: config-project (~2h)
-- [ ] `domain:shared` Criar shared kernel (Entity, VOs, UseCase) → skill: config-shared-core (~2h)
-- [ ] `infra:db` Configurar banco de dados → skill: config-prisma | config-jpa-kt | config-efcore-cs (~1h)
-- [ ] `infra:auth` Setup de autenticação (se aplicável) → skill: config-auth-core-basic | config-auth-core-basic-kt | config-auth-core-basic-cs (~3h)
+- [ ] `infra:fullstack` Orquestrar setup completo (~1h)
+  - **Agent:** `Config Project Full-Stack`
+  - **Prompt:** "Configure projeto <Nome>: backend <TS/KT/CS>, frontend <Angular/Vue/Next>, mobile <Flutter/Android/nenhum>. Docker e CI/CD no bootstrap. Usar OpenSpec."
+- [ ] `infra:setup` Bootstrap backend + frontend (~2h)
+  - **Agent TS:** `Config Project` / `Config Project (Angular)` / `Config Project (Vue)` | **KT:** `Config Project (Kotlin)` | **CS:** `Config Project (C#)`
+  - **Prompt:** "Bootstrap monorepo com docker-compose dev (Postgres)."
+- [ ] `infra:shell-web` Shell admin Tailwind (~1h)
+  - **Agent Next.js:** `Config Shared Web` | **Angular:** `Config Shared Web (Angular)` | **Vue:** `Config Shared Web (Vue)`
+  - **Prompt:** "Configure shell: sidebar colapsável, topbar, rodapé, dashboard vazio. Mescle rotas do shell."
+- [ ] `infra:setup` Bootstrap mobile (se aplicável) (~2h)
+  - **Agent:** `Config Project (Flutter)` ou `Config Project (Android)`
+  - **Prompt:** "Configure app mobile apontando para API local."
+- [ ] `infra:docker` Dockerfiles multi-stage de produção (~1h)
+  - **Agent TS:** `Config Docker (TypeScript)` | **KT:** `Config Docker (Kotlin)` | **CS:** `Config Docker (C#)`
+  - **Prompt:** "Crie Dockerfile multi-stage + docker-compose.prod.yml."
+- [ ] `infra:cicd` Pipeline GitHub Actions (~2h)
+  - **Agent TS:** `Config CI/CD (TypeScript)` | **KT:** `Config CI/CD (Kotlin)` | **CS:** `Config CI/CD (C#)`
+  - **Prompt:** "CI em PR (lint + test + coverage ≥95% domain/app). CD em main (build Docker + deploy)."
+- [ ] `domain:shared` Criar shared kernel (~2h)
+  - **Agent TS:** `Config Shared Core` | **KT:** `Config Shared Core (Kotlin)` | **CS:** `Config Shared Core (C#)`
+  - **Prompt:** "Configure Shared Kernel: Entity, ValueObject, Result<T>, IUseCase, IRepository."
+- [ ] `infra:db` Configurar banco de dados (~1h)
+  - **Agent TS:** `Config Prisma` | **KT:** `Config JPA (Kotlin)` | **CS:** `Config EF Core (C#)`
+  - **Prompt:** "Configure Postgres + migrations iniciais."
 
 ---
 
@@ -303,18 +414,72 @@ docs/planning/meu-erp/backlog.md          ← saída (épicos + stories + tasks 
 
 **Tasks (inside-out)**:
 
-- [ ] `domain:vo` Criar VO <NomeVO> com validação → skill: core-value-object (~1h)
-- [ ] `domain:entity` Criar entidade <X> com VOs → skill: core-entity (~2h)
-- [ ] `domain:repository` Criar interface <X>Repository → skill: core-repository (~1h)
-- [ ] `app:dto` Criar Create<X>InDTO e <X>OutDTO → skill: core-dto (~1h)
-- [ ] `app:usecase` Criar Create<X>UseCase → skill: core-use-case (~2h)
-- [ ] `app:query` Criar Find<X>ByIdQuery → skill: core-query-cqrs (~1h)
-- [ ] `infra:persistence` Criar adapter de persistência → skill: backend-prisma-data | backend-data-kt | backend-data-cs (~2h)
-- [ ] `infra:migration` Criar migration/schema → skill: config-prisma | config-jpa-kt | config-efcore-cs (~1h)
-- [ ] `interface:controller` Criar endpoints REST → skill: backend-controller | backend-controller-kt | backend-controller-cs (~2h)
-- [ ] `interface:form` Criar formulário frontend → skill: frontend-form-schema (~2h)
+- [ ] `domain:vo` Criar VO <NomeVO> com validação (~1h)
+  - **Agent TS:** `Core Value Object` | **KT:** `Core Value Object (Kotlin)` | **CS:** `Core Value Object (C#)`
+  - **Prompt:** "Crie o VO <NomeVO> com validação: <regra>. Imutável, Create() com Result<T>."
+- [ ] `domain:entity` Criar entidade <X> com VOs <lista> (~2h)
+  - **Agent TS:** `Core Entity` | **KT:** `Core Entity (Kotlin)` | **CS:** `Core Entity (C#)`
+  - **Prompt:** "Crie a entidade <X> com os VOs <lista>. Aggregate root. Método Create() com Result<T>."
+- [ ] `domain:repository` Criar interface <X>Repository (~1h)
+  - **Agent TS:** `Core Repository` | **KT:** `Core Repository (Kotlin)` | **CS:** `Core Repository (C#)`
+  - **Prompt:** "Crie a interface I<X>Repository com operações: create, findById, <outras>."
+- [ ] `app:dto` Criar Create<X>InDTO e <X>OutDTO (~1h)
+  - **Agent TS:** `Core DTO` | **KT:** `Core DTO (Kotlin)` | **CS:** `Core DTO (C#)`
+  - **Prompt:** "Crie Create<X>InDto (campos de entrada) e <X>OutDto (campos de saída)."
+- [ ] `app:usecase` Criar Create<X>UseCase (~2h)
+  - **Agent TS:** `Core Use Case` | **KT:** `Core Use Case (Kotlin)` | **CS:** `Core Use Case (C#)`
+  - **Prompt:** "Crie Create<X>UseCase que <descrição do fluxo: validações, criação, persistência, retorno>."
+- [ ] `app:query` Criar Find<X>ByIdQuery (~1h)
+  - **Agent TS:** `Core Query CQRS` | **KT:** `Core Query CQRS (Kotlin)` | **CS:** `Core Query CQRS (C#)`
+  - **Prompt:** "Crie Find<X>ByIdQuery retornando <X>OutDto por ID."
+- [ ] `infra:persistence` Criar adapter de persistência (~2h)
+  - **Agent TS:** `Backend Prisma Data` | **KT:** `Backend Data (Kotlin)` | **CS:** `Backend Data (C#)`
+  - **Prompt:** "Crie o adapter <X>Repository implementando I<X>Repository. Separar entidade de persistência do domínio."
+- [ ] `infra:migration` Criar migration/schema (~1h)
+  - **Agent TS:** `Config Prisma` | **KT:** `Config JPA (Kotlin)` | **CS:** `Config EF Core (C#)`
+  - **Prompt:** "Crie a migration para a tabela <X> com campos: <lista>."
+- [ ] `interface:controller` Criar endpoints REST (~2h)
+  - **Agent TS:** `Backend Controller` | **KT:** `Backend Controller (Kotlin)` | **CS:** `Backend Controller (C#)`
+  - **Prompt:** "Crie <X>Controller com POST /api/<xs> e GET /api/<xs>/{id}. Usar Create<X>UseCase e Find<X>ByIdQuery."
+- [ ] `interface:entity` Criar entidade frontend <X> (~1h)
+  - **Agent Angular:** `Frontend Entity (Angular)` | **Vue:** `Frontend Entity (Vue)` | **Next.js:** `Frontend Form Schema`
+  - **Prompt:** "Crie entidade <X> frontend com Result<T>, espelhando o domínio do backend."
+- [ ] `interface:usecase` Criar use cases frontend (~2h)
+  - **Agent Angular:** `Frontend UseCase (Angular)` | **Vue:** `Frontend UseCase (Vue)`
+  - **Prompt:** "Crie Create<X>UseCase e List<X>sUseCase injetando I<X>Repository. Retornar Promise<Result>."
+- [ ] `interface:repository` Criar repositório HTTP (~2h)
+  - **Agent Angular:** `Frontend Repository (Angular)` | **Vue:** `Frontend Repository (Vue)`
+  - **Prompt:** "Crie <X>HttpRepository implementando I<X>Repository. Mapear DTOs; try/catch → Result.err."
+- [ ] `interface:page` Criar página de listagem (~2h)
+  - **Agent Angular:** `Frontend Page (Angular)` | **Vue:** `Frontend Page (Vue)`
+  - **Prompt:** "Listagem de <xs> injetando List<X>sUseCase. Tabela PrimeNG/PrimeVue; sem HTTP direto."
+- [ ] `interface:form-web` Criar formulário de cadastro/edição (~2h)
+  - **Agent Angular:** `Frontend Form (Angular)` | **Vue:** `Frontend Form (Vue)`
+  - **Prompt:** "Formulário com validação; injeta Create<X>UseCase; exibe erros de negócio (Result)."
+- [ ] `interface:mobile-entity` Criar entidade mobile <X> (~1h)
+  - **Agent Flutter:** `Mobile Entity (Flutter)` | **Android:** `Mobile Entity (Android)`
+  - **Prompt:** "Entidade <X> Dart/Kotlin pura com sealed Result."
+- [ ] `interface:mobile-usecase` Criar use cases mobile (~2h)
+  - **Agent Flutter:** `Mobile UseCase (Flutter)` | **Android:** `Mobile UseCase (Android)`
+  - **Prompt:** "Create<X>UseCase e List<X>sUseCase injetando I<X>Repository."
+- [ ] `interface:mobile-repository` Criar repositório HTTP mobile (~2h)
+  - **Agent Flutter:** `Mobile Repository (Flutter)` | **Android:** `Mobile Repository (Android)`
+  - **Prompt:** "RepositoryImpl com Dio/Retrofit; mapear DTOs; catch → Failure."
+- [ ] `interface:mobile` Criar tela de listagem mobile (~2h)
+  - **Agent Flutter:** `Mobile Screen (Flutter)` | **Android:** `Mobile Screen (Android)`
+  - **Prompt:** "Tela de listagem de <xs>; notifier/ViewModel injeta UseCase; pull-to-refresh."
+- [ ] `interface:mobile-form` Criar formulário mobile (~2h)
+  - **Agent Flutter:** `Mobile Form (Flutter)` | **Android:** `Mobile Form (Android)`
+  - **Prompt:** "Formulário de cadastro; trata result.when/onSuccess; exibe erros de negócio."
 - [ ] `test:unit` Testes da entity, VOs e use case (~2h)
+  - **Agent TS:** `Unit Tests (TypeScript)` | **KT:** `Unit Tests (Kotlin)` | **CS:** `Unit Tests (C#)`
+  - **Prompt:** "Crie testes unitários para VOs, Entity e Create<X>UseCase. Mock repository. Cobrir fluxo feliz e erros de negócio."
+- [ ] `test:coverage` Validar cobertura ≥95% em domain + application (~30min)
+  - **Agent:** mesmo de test:unit
+  - **Prompt:** "Execute testes com coverage. Ajuste até ≥95% lines em domain+application. CI usa scripts/check-coverage.mjs."
 - [ ] `test:e2e` Teste do fluxo completo (~2h)
+  - **Agent TS:** `E2E Tests (TypeScript)` | **KT:** `E2E Tests (Kotlin)` | **CS:** `E2E Tests (C#)`
+  - **Prompt:** "Crie E2E: API POST criar → GET buscar (Supertest/MockMvc/WebApplicationFactory). Se houver UI, Playwright para fluxo principal."
 
 ### US-002: <Título da Story>
 
@@ -383,13 +548,15 @@ Durante a criação do backlog, interaja ativamente:
 
 ### Depois (implementação):
 
-- **`openspec-propose`** → criar proposta de change para um épico específico
-- **`openspec-apply-change`** → implementar tasks de uma story
-- **`config-new-module`** / **`config-new-module-kt`** / **`config-new-module-cs`** → scaffolding de módulos identificados nos épicos
+- **`config-project-fullstack`** → orquestra bootstrap (backend + frontend + mobile + docker + cicd)
+- **`openspec-propose`** → criar proposta de change (`bootstrap-<nome>` ou `ep-XXX-<bc>`)
+- **`openspec-apply-change`** → implementar tasks de uma story/épico
+- **`openspec-archive-change`** → fechar mudança completada
+- **`config-new-module`** / **`config-new-module-kt`** / **`config-new-module-cs`** → scaffolding de módulos
 
 Ofereça essas integrações ao finalizar:
 
-> "Backlog criado! Próximos passos:\n> 1. Criar proposta de implementação para um épico (`openspec-propose`)\n> 2. Começar a implementar uma story diretamente\n> 3. Refinar stories específicas (TS, KT ou CS)"
+> "Backlog criado! Próximos passos:\n> 1. Criar mudança de bootstrap (`openspec-propose \"bootstrap-<nome>\"`) com docker + cicd\n> 2. Implementar via `openspec-apply-change` ou agents diretos\n> 3. Por BC: propose → apply → archive"
 
 ---
 
@@ -422,4 +589,3 @@ gh issue create --title "US-001: <título>" --body "<corpo>" --label "epic:<nome
 ## Global Standards
 
 - Consultar `../skills-standards.md` para padroes globais de nomenclatura e convencoes gerais entre skills.
-ra e convencoes gerais entre skills.

@@ -6,6 +6,9 @@
     <RootNamespace>ProjectName.Backend</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\ProjectName.Infrastructure\ProjectName.Infrastructure.csproj" />
     <ProjectReference Include="..\ProjectName.Core\ProjectName.Core.csproj" />
   </ItemGroup>

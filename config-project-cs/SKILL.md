@@ -29,8 +29,8 @@ project-root/
 │   └── ProjectName.Shared.Kernel/ # Kernel compartilhado
 │       └── ProjectName.Shared.Kernel.csproj
 └── tests/
-    ├── ProjectName.UnitTests/
-    └── ProjectName.IntegrationTests/
+    ├── ProjectName.UnitTests/        ← xUnit + Moq + Coverlet (≥95% domain/app)
+    └── ProjectName.IntegrationTests/ ← WebApplicationFactory — E2E API
 ```
 
 ## Workflow
@@ -44,7 +44,7 @@ project-root/
    - Middlewares padrão (Swagger, CORS, etc.).
    - Injeção de dependências das outras camadas.
 7. Configurar `.env`, `.env.example`, `.gitignore` e `docker-compose.yml`.
-8. Validar build: `dotnet build`.
+8. Validar build e testes: `dotnet build` && `dotnet test`.
 
 ## Commands
 

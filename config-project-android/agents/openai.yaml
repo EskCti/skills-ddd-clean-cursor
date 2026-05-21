@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Project (Android)'
+  short_description: 'Bootstrap projeto Android Kotlin com Jetpack Compose + Hilt + Retrofit'
+  default_prompt: 'Configure o projeto Android Kotlin com Jetpack Compose, Hilt para DI (@HiltAndroidApp, @AndroidEntryPoint), Retrofit para HTTP ao backend REST e ViewModel com StateFlow. Criar NetworkModule com URL base do backend, AppNavGraph com Navigation Compose e estrutura clean por feature (data/domain/presentation). Consultar references/android-project-pattern.md.'

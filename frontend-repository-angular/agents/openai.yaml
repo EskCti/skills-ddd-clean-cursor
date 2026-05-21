@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Frontend Repository (Angular)'
+  short_description: 'Repository Angular com HttpClient + DTO mapping + Promise<Result<T>>'
+  default_prompt: 'Crie a implementação do repositório Angular para o BC indicado. Use HttpClient via inject(), DTO interface para resposta da API, mapeamento DTO → CustomerEntity.create(), e trate erros HTTP com try/catch retornando err(mensagem). Registrar no provider como { provide: CUSTOMER_REPOSITORY, useClass: CustomerHttpRepository }. Consultar references/angular-repository-pattern.md.'

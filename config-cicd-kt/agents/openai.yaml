@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config CI/CD (Kotlin)'
+  short_description: 'GitHub Actions para testes Gradle, build Docker e deploy em Spring Boot'
+  default_prompt: 'Crie workflows GitHub Actions para backend Kotlin com Spring Boot e Gradle multi-modulo. Gere .github/workflows/ci.yml (gradle build + test com postgres service) e .github/workflows/cd.yml (build Docker + push para GHCR + deploy). Perguntar o registry e ambiente de deploy. Consultar references/cicd-pattern-kt.md para os templates completos.'

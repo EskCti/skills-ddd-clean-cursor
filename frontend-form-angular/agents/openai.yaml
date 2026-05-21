@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Frontend Form (Angular)'
+  short_description: 'Formulário Angular 17+ com Reactive Forms e inputs PrimeNG'
+  default_prompt: 'Crie o formulário Angular 17+ standalone com Reactive Forms para a entidade indicada. Use FormBuilder (injetado via inject()), PrimeNG inputs (p-inputtext, p-dropdown, p-password), validadores (required, email, minLength) e mensagens de erro inline. Consultar references/angular-form-pattern.md.'

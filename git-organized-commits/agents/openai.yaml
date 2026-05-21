@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Organized Git Commits'
+  short_description: 'Commits atomicos por area de implementacao, sem git add ., com PR body'
+  default_prompt: 'Organize e crie commits Git deste repositorio seguindo git-organized-commits/SKILL.md. REGRAS: (1) NUNCA git add . — staging seletivo por pasta/skill; (2) rode git status, git diff e git log antes; (3) agrupe por intencao (req-*, config-*, test-*, frontend-*, mobile-*, docs, chore); (4) mensagem convencional com corpo explicando o porquê, via HEREDOC; (5) um commit por area coerente, em ordem logica; (6) git status apos cada commit; (7) nao push unless pedido; (8) ao final, liste hashes e mensagens; (9) se pedido, gere descricao de PR dentro de bloco com 4 crases (````) usando references/pr-body-template.md. Nao commitar secrets (.env). Consultar references/commit-groups.md.'

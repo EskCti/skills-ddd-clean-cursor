@@ -71,6 +71,7 @@ Implement tasks from an OpenSpec change.
 
    For each pending task:
    - Show which task is being worked on
+   - Read the **Agent** field from the task (display_name from `agents/openai.yaml`) and invoke that agent with the task **Prompt**
    - Make the code changes required
    - Keep changes minimal and focused
    - Mark task complete in the tasks file: `- [ ]` → `- [x]`
@@ -145,6 +146,8 @@ What would you like to do?
 
 - Keep going through tasks until done or blocked
 - Always read context files before starting (from the apply instructions output)
+- Each task in `tasks.md` must list **Agent** (display_name) + **Prompt** — never skill folder names (`core-entity`, `frontend-entity-vue`)
+- Invoke the Agent named in each task; do not implement without matching the backlog format from `req-agile-planning`
 - If task is ambiguous, pause and ask before implementing
 - If implementation reveals issues, pause and suggest artifact updates
 - Keep code changes minimal and scoped to each task

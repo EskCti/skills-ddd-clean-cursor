@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Shared Web (Angular)'
+  short_description: 'Shell admin Angular com Tailwind — sidebar, topbar, rodapé e rotas'
+  default_prompt: 'Configure o shell web admin Angular com Tailwind CSS v4: sidebar colapsável, topbar com menu do usuário, rodapé, dashboard vazio e rotas de referência. Execute init-shared-web-angular.mjs em apps/web-angular e mescle app.routes.shell.ts em app.routes.ts. Consultar SKILL.md e references/integrate-shell.md.'

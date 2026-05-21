@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Mobile Form (Android)'
+  short_description: 'Formulário Jetpack Compose com OutlinedTextField + validação + ViewModel'
+  default_prompt: 'Crie o formulário Android Jetpack Compose para a entidade indicada. Use remember/mutableStateOf para estado dos campos e erros, OutlinedTextField com isError e supportingText, função validate() que retorna Boolean, submissão via ViewModel e LaunchedEffect para navegação quando submitState for Success. Consultar references/android-form-pattern.md.'

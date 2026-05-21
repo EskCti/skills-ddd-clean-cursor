@@ -8,6 +8,7 @@ import { spawn } from 'node:child_process';
 import { loadSkillConfig, resolveNamespace } from '../../utils/resolve-skill-config.mjs';
 import { createSkillRunLogger } from '../../utils/skill-run-log.mjs';
 import { createSkillRunOps } from '../../utils/skill-run-ops.mjs';
+import { ensureE2eScaffold } from './ensure-e2e-scaffold.mjs';
 
 let activeRunLogger = null;
 let activeRunOps = null;
@@ -1432,6 +1433,20 @@ async function main() {
       console.log('Env files already configured.');
       logger.step('Arquivos de ambiente já estavam configurados.');
     }
+
+    await ensureE2eScaffold({
+      rootDir,
+      backendPath,
+      frontendPath,
+      backendPort,
+      frontendPort,
+      logger: {
+        log: (message) => {
+          console.log(message);
+          logger.step(message);
+        },
+      },
+    });
 
     console.log('TurboRepo initialization completed (idempotent mode).');
     logger.step('Inicialização do TurboRepo concluída em modo idempotente.');

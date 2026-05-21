@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Docker (Kotlin)'
+  short_description: 'Dockerfile multi-stage para Spring Boot com JRE alpine'
+  default_prompt: 'Crie Dockerfile multi-stage para producao em backend Kotlin com Spring Boot. Use gradle:8.8-jdk21-alpine como builder (gradle bootJar) e eclipse-temurin:21-jre-alpine como runner. Gere apps/backend-kt/Dockerfile, .dockerignore e docker-compose.prod.yml com postgres. Consultar references/docker-pattern-kt.md para os templates completos.'

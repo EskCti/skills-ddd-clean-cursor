@@ -1,0 +1,12 @@
+import { test, expect } from '@playwright/test';
+
+test('{{moduleName}} feature loads', async ({ page }) => {
+  await page.goto('/{{moduleName}}');
+  await expect(page).toHaveURL(/\/{{moduleName}}/);
+});
+
+test('navigate to {{moduleName}} from dashboard', async ({ page }) => {
+  await page.goto('/dashboard');
+  await page.getByRole('link', { name: /{{moduleLabel}}/i }).click();
+  await expect(page).toHaveURL(/\/{{moduleName}}/);
+});

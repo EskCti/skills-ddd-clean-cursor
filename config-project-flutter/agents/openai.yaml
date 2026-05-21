@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Project (Flutter)'
+  short_description: 'Bootstrap projeto Flutter com clean architecture + Riverpod + Dio'
+  default_prompt: 'Configure o projeto Flutter com estrutura clean por feature (data/domain/presentation), Riverpod para estado, Dio para HTTP com interceptors de auth, go_router para navegação e flutter_dotenv para configuração de ambiente. Consultar references/flutter-project-pattern.md.'

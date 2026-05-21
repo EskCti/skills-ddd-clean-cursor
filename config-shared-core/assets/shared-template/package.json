@@ -14,7 +14,8 @@
     "dev": "tsc --watch",
     "build": "tsc",
     "test": "jest --coverage",
-    "test:watch": "jest --watchAll"
+    "test:watch": "jest --watchAll",
+    "test:coverage": "jest --coverage && node ../../scripts/check-coverage.mjs 95 domain application entity vo use-case use-cases queries"
   },
   "dependencies": {
     "uuid": "^11.0.0"

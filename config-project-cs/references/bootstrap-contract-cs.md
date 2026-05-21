@@ -36,7 +36,11 @@ Padronizar o bootstrap de uma solução .NET (C#) com Clean Architecture para:
    - `Jwt__Secret=change-me-to-a-very-long-secret-key`
    - `PORT=5000`
 8. Criar `docker-compose.yml` com Postgres.
-9. Validar build: `dotnet build`.
+9. Criar projetos de teste:
+   - `tests/*.UnitTests` — xUnit + Moq + Coverlet (referência `test-unit-cs`)
+   - `tests/*.IntegrationTests` — `WebApplicationFactory<Program>` (referência `test-e2e-cs`)
+10. Expor `public partial class Program { }` no Backend para integration tests.
+11. Validar: `dotnet build` && `dotnet test`.
 
 ## `.gitignore` esperado
 

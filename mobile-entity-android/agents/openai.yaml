@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Mobile Entity (Android)'
+  short_description: 'Entidade de domínio Android Kotlin com sealed Failure + kotlin.Result'
+  default_prompt: 'Crie a entidade de domínio Android para a entidade indicada. Use Kotlin puro (sem Android/Hilt), construtor privado + companion fun create() retornando kotlin.Result<Entity>, sealed class Failure : Exception() com variantes específicas do BC. Consultar references/android-entity-pattern.md.'
