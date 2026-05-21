@@ -4,7 +4,7 @@
 
 **Pré-requisito**: [Tutorial 01 — Análise](../01-pipeline-discovery-planning.md) · Use quando o [Hub Full-Stack](../02-fullstack-project-setup.md) indicar migração Strangler Fig ou EP de backend antes da UI
 
-Agents usados: `config-project[-kt|-cs]` → `config-shared-core[-kt|-cs]` → `config-new-module[-kt|-cs]` → `core-*` → `backend-*` → `test-unit-*` → `test-e2e-*`
+Agents usados: `Config Project Full-Stack` → `Config Project (C#)` → `Config Shared Core (C#)` → `Config New Module (C#)` → `Core * (C#)` → `Backend * (C#)` → `Unit Tests (C#)` → `E2E Tests (C#)`
 
 **Cenário**: Backlog gerado no Tutorial 01. Implementamos o **EP-002: BC Customers** em **C#** (ASP.NET Core + EF Core). Para projeto completo com frontend e mobile, escolha uma combinação no [Hub Full-Stack](../02-fullstack-project-setup.md).
 
@@ -14,7 +14,7 @@ Agents usados: `config-project[-kt|-cs]` → `config-shared-core[-kt|-cs]` → `
 
 Antes de qualquer módulo, o projeto precisa da estrutura base.
 
-### Agente: config-project-cs
+### Agent: `Config Project (C#)`
 
 > Inicialize o projeto C# com solução multi-projeto Clean Architecture. Nome do projeto: `LojaDDD`.
 
@@ -42,7 +42,7 @@ dotnet restore && dotnet build && dotnet test
 
 O template já inclui `ResultTests` (unit) e `HealthEndpointTests` (integration via `WebApplicationFactory`).
 
-### Agente: config-shared-core-cs
+### Agent: `Config Shared Core (C#)`
 
 > Configure o Shared Kernel com as classes base: Entity, ValueObject, Result, IUseCase, IRepository.
 
@@ -64,7 +64,7 @@ public abstract record ValueObject;
 public class Result<T> { ... }
 ```
 
-### Agente: config-efcore-cs
+### Agent: `Config EF Core (C#)`
 
 > Configure o EF Core com DbContext, appsettings.json e docker-compose para Postgres.
 
@@ -72,7 +72,7 @@ public class Result<T> { ... }
 
 ## Passo 1 — Scaffold do Módulo
 
-### Agente: config-new-module-cs
+### Agent: `Config New Module (C#)`
 
 > Crie o módulo Customers no projeto LojaDDD em C#.
 
@@ -107,7 +107,7 @@ src/LojaDDD.Backend/
 
 ## Passo 2 — Domain Layer (inside-out)
 
-### 2.1 — Agente: core-value-object-cs
+### 2.1 — Agent: `Core Value Object (C#)`
 
 **Prompt para criar o VO Email:**
 
@@ -138,7 +138,7 @@ public record CustomerName : ValueObject
 
 **Repita** para `Email`, `CPF` (com validação de dígitos verificadores).
 
-### 2.2 — Agente: core-entity-cs
+### 2.2 — Agent: `Core Entity (C#)`
 
 **Prompt:**
 
@@ -179,7 +179,7 @@ public class Customer : Entity
 }
 ```
 
-### 2.3 — Agente: core-repository-cs
+### 2.3 — Agent: `Core Repository (C#)`
 
 **Prompt:**
 
@@ -200,7 +200,7 @@ public interface ICustomerRepository
 
 ## Passo 3 — Application Layer
 
-### 3.1 — Agente: core-dto-cs
+### 3.1 — Agent: `Core DTO (C#)`
 
 **Prompt:**
 
@@ -212,7 +212,7 @@ public record CreateCustomerInDto(string Name, string Email, string CPF);
 public record CustomerOutDto(Guid Id, string Name, string Email, string CPF, bool IsActive);
 ```
 
-### 3.2 — Agente: core-use-case-cs
+### 3.2 — Agent: `Core Use Case (C#)`
 
 **Prompt:**
 
@@ -252,7 +252,7 @@ public class CreateCustomerUseCase : IUseCase<CreateCustomerInDto, CustomerOutDt
 }
 ```
 
-### 3.3 — Agente: core-query-cqrs-cs
+### 3.3 — Agent: `Core Query CQRS (C#)`
 
 **Prompt:**
 
@@ -262,7 +262,7 @@ public class CreateCustomerUseCase : IUseCase<CreateCustomerInDto, CustomerOutDt
 
 ## Passo 4 — Infrastructure Layer
 
-### Agente: backend-data-cs
+### Agent: `Backend Data (C#)`
 
 **Prompt:**
 
@@ -317,7 +317,7 @@ public class CustomerDbo
 
 ## Passo 5 — Interface Layer
 
-### Agente: backend-controller-cs
+### Agent: `Backend Controller (C#)`
 
 **Prompt:**
 
@@ -396,19 +396,19 @@ Os mesmos prompts funcionam com os sufixos correspondentes:
 
 | Passo | C# | Kotlin | TypeScript |
 |-------|----|--------|-----------|
-| Bootstrap | `config-project-cs` | `config-project-kt` | `config-project` |
-| Shared Kernel | `config-shared-core-cs` | `config-shared-core-kt` | `config-shared-core` |
-| Scaffold módulo | `config-new-module-cs` | `config-new-module-kt` | `config-new-module` |
-| VO | `core-value-object-cs` | `core-value-object-kt` | `core-value-object` |
-| Entity | `core-entity-cs` | `core-entity-kt` | `core-entity` |
-| Repository | `core-repository-cs` | `core-repository-kt` | `core-repository` |
-| DTO | `core-dto-cs` | `core-dto-kt` | `core-dto` |
-| Use Case | `core-use-case-cs` | `core-use-case-kt` | `core-use-case` |
-| Query CQRS | `core-query-cqrs-cs` | `core-query-cqrs-kt` | `core-query-cqrs` |
-| Persistence | `backend-data-cs` | `backend-data-kt` | `backend-prisma-data` |
-| Controller | `backend-controller-cs` | `backend-controller-kt` | `backend-controller` |
-| Unit tests | `test-unit-cs` | `test-unit-kt` | `test-unit` |
-| E2E tests | `test-e2e-cs` | `test-e2e-kt` | `test-e2e` |
+| Bootstrap | `Config Project (C#)` | `Config Project (Kotlin)` | `Config Project` |
+| Shared Kernel | `Config Shared Core (C#)` | `Config Shared Core (Kotlin)` | `Config Shared Core` |
+| Scaffold módulo | `Config New Module (C#)` | `Config New Module (Kotlin)` | `Config New Module` |
+| VO | `Core Value Object (C#)` | `Core Value Object (Kotlin)` | `Core Value Object` |
+| Entity | `Core Entity (C#)` | `Core Entity (Kotlin)` | `Core Entity` |
+| Repository | `Core Repository (C#)` | `Core Repository (Kotlin)` | `Core Repository` |
+| DTO | `Core DTO (C#)` | `Core DTO (Kotlin)` | `Core DTO` |
+| Use Case | `Core Use Case (C#)` | `Core Use Case (Kotlin)` | `Core Use Case` |
+| Query CQRS | `Core Query CQRS (C#)` | `Core Query CQRS (Kotlin)` | `Core Query CQRS` |
+| Persistence | `Backend Data (C#)` | `Backend Data (Kotlin)` | `Backend Prisma Data` |
+| Controller | `Backend Controller (C#)` | `Backend Controller (Kotlin)` | `Backend Controller` |
+| Unit tests | `Unit Tests (C#)` | `Unit Tests (Kotlin)` | `Unit Tests (TypeScript)` |
+| E2E tests | `E2E Tests (C#)` | `E2E Tests (Kotlin)` | `E2E Tests (TypeScript)` |
 
 > [Tutorial 04 — Ciclo OpenSpec](../04-ciclo-completo-openspec.md) — padrão OpenSpec após implementar BCs
 

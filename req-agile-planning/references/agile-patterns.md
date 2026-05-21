@@ -74,8 +74,8 @@ Stories: N
 ### Épico Técnico (enabler)
 ```
 EP-000: [TECH] Bootstrap
-Descrição: Setup full-stack, shared kernel, Docker (produção) e CI/CD
-Skills: config-project-fullstack → config-project-* + config-docker + config-cicd + config-shared-core
+Descrição: Setup full-stack, shared kernel, shell web, Docker (produção) e CI/CD
+Agents: Config Project Full-Stack → Config Project (*) + Config Shared Web (*) + Config Docker + Config CI/CD + Config Shared Core
 OpenSpec: openspec-propose "bootstrap-<nome>"
 Justificativa: <quais épicos funcionais desbloqueiam>
 Tamanho: M
@@ -119,6 +119,8 @@ Tasks são tipadas pela camada arquitetural e incluem o **agent Cursor** a acion
 | `infra:persistence` | `Backend Prisma Data` | `Backend Data (Kotlin)` | `Backend Data (C#)` |
 | `infra:migration` | `Config Prisma` | `Config JPA (Kotlin)` | `Config EF Core (C#)` |
 | `infra:setup` | `Config Project` | `Config Project (Kotlin)` | `Config Project (C#)` |
+| `infra:shell-web` | `Config Shared Web` / `(Angular)` / `(Vue)` | — | — |
+| `domain:shared` | `Config Shared Core` | `Config Shared Core (Kotlin)` | `Config Shared Core (C#)` |
 | `infra:auth` | `Config Auth Core Basic` | `Config Auth Core Basic (Kotlin)` | `Config Auth Core (C#)` |
 | `infra:db` | `Config Prisma` | `Config JPA (Kotlin)` | `Config EF Core (C#)` |
 | `infra:docker` | `Config Docker (TypeScript)` | `Config Docker (Kotlin)` | `Config Docker (C#)` |
@@ -129,7 +131,7 @@ Tasks são tipadas pela camada arquitetural e incluem o **agent Cursor** a acion
 | Tipo | Descrição | Agent TS | Agent KT | Agent CS |
 |------|-----------|----------|----------|----------|
 | `interface:controller` | Endpoint HTTP | `Backend Controller` | `Backend Controller (Kotlin)` | `Backend Controller (C#)` |
-| `interface:form` | Formulário frontend (Next.js) | `(frontend-form-schema)` | — | — |
+| `interface:form` | Formulário frontend (Next.js) | `Frontend Form Schema` | — | — |
 | `interface:entity` | Entidade de domínio frontend | `Frontend Entity (Angular)` ou `Frontend Entity (Vue)` | — | — |
 | `interface:usecase` | Caso de uso frontend (application) | `Frontend UseCase (Angular)` ou `Frontend UseCase (Vue)` | — | — |
 | `interface:repository` | Repositório HTTP frontend | `Frontend Repository (Angular)` ou `Frontend Repository (Vue)` | — | — |

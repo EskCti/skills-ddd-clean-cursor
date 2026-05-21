@@ -105,7 +105,7 @@ Após o bootstrap, configurar o kernel compartilhado de domínio:
 > ```
 > Agent: openspec-propose
 > Prompt: "Crie a mudança 'bc-customers' para implementar o Bounded Context de Clientes: Customer entity, VOs (Name, Email, CPF), CreateCustomerUseCase, CustomerRepository."
-> Depois: openspec-apply-change → chama core-entity, core-value-object, core-use-case, etc.
+> Depois: openspec-apply-change → aciona Core Entity, Core Value Object, Core Use Case, Backend Controller, Frontend Entity (*), etc. (conforme tasks.md com **Agent** + **Prompt**)
 > ```
 
 ---
@@ -133,16 +133,16 @@ Após o endpoint do backend estar pronto:
 
 | Framework | Domínio + Aplicação + Infra | Apresentação |
 |-----------|----------------------------|--------------|
-| Next.js | `frontend-form-schema` (adaptar para listagem) | `frontend-form-schema` |
-| Angular | `frontend-entity-angular` → `frontend-usecase-angular` → `frontend-repository-angular` | `frontend-page-angular`, `frontend-form-angular` |
-| Vue | `frontend-entity-vue` → `frontend-usecase-vue` → `frontend-repository-vue` | `frontend-page-vue`, `frontend-form-vue` |
+| Next.js | `Frontend Form Schema` | `Frontend Form Schema` |
+| Angular | `Frontend Entity (Angular)` → `Frontend UseCase (Angular)` → `Frontend Repository (Angular)` | `Frontend Page (Angular)`, `Frontend Form (Angular)` |
+| Vue | `Frontend Entity (Vue)` → `Frontend UseCase (Vue)` → `Frontend Repository (Vue)` | `Frontend Page (Vue)`, `Frontend Form (Vue)` |
 
 > **OpenSpec aqui**: Para features novas no frontend:
 > ```
 > Agent: openspec-propose
 > Prompt: "Crie a mudança 'feat-customer-list-angular' para implementar a listagem de clientes em Angular com DataTable PrimeNG, CustomerService e rota lazy."
-> Depois: openspec-apply-change → chama frontend-entity, frontend-usecase, frontend-repository, frontend-page.
-> ```
+> Depois: openspec-apply-change → aciona Frontend Entity (Angular), Frontend UseCase (Angular), Frontend Repository (Angular), Frontend Page (Angular) — uma task por camada no tasks.md.
+```
 
 ### 3B — Mobile (por tela/feature)
 
@@ -150,14 +150,14 @@ Após a API estar pronta:
 
 | Framework | Domínio + Aplicação + Infra | Apresentação |
 |-----------|----------------------------|--------------|
-| Flutter | `mobile-entity-flutter` → `mobile-usecase-flutter` → `mobile-repository-flutter` | `mobile-screen-flutter`, `mobile-form-flutter` |
-| Android | `mobile-entity-android` → `mobile-usecase-android` → `mobile-repository-android` | `mobile-screen-android`, `mobile-form-android` |
+| Flutter | `Mobile Entity (Flutter)` → `Mobile UseCase (Flutter)` → `Mobile Repository (Flutter)` | `Mobile Screen (Flutter)`, `Mobile Form (Flutter)` |
+| Android | `Mobile Entity (Android)` → `Mobile UseCase (Android)` → `Mobile Repository (Android)` | `Mobile Screen (Android)`, `Mobile Form (Android)` |
 
 > **OpenSpec aqui**: Para features novas no mobile:
 > ```
 > Agent: openspec-propose
 > Prompt: "Crie a mudança 'feat-customer-list-flutter' para tela de listagem de clientes Flutter com Riverpod AsyncNotifier, ListView e RefreshIndicator."
-> Depois: openspec-apply-change → chama mobile-entity, mobile-usecase, mobile-repository, mobile-screen.
+> Depois: openspec-apply-change → aciona Mobile Entity (Flutter), Mobile UseCase (Flutter), Mobile Repository (Flutter), Mobile Screen (Flutter).
 > ```
 
 ---
@@ -176,11 +176,11 @@ Após a API estar pronta:
 
 | Momento | Mudança sugerida | Agents envolvidos no apply |
 |---------|-----------------|---------------------------|
-| Bootstrap do projeto | `bootstrap-<nome>` | Config Project, Config Docker, Config CI/CD, Config Shared Core |
-| Novo Bounded Context | `bc-<nome>` | core-entity, core-value-object, core-use-case, backend-controller |
-| Feature frontend | `feat-<nome>-<framework>` | frontend-entity, frontend-usecase, frontend-repository, frontend-page, frontend-form |
-| Feature mobile | `feat-<nome>-<mobile>` | mobile-entity, mobile-usecase, mobile-repository, mobile-screen, mobile-form |
-| Autenticação | `feat-auth` | Config Auth Core, Config Auth Backend |
+| Bootstrap do projeto | `bootstrap-<nome>` | Config Project (*), Config Shared Web (*), Config Docker, Config CI/CD, Config Shared Core |
+| Novo Bounded Context | `bc-<nome>` ou `ep-XXX-<bc>` | Core *, Backend *, Frontend *, Mobile *, Unit Tests, E2E Tests |
+| Feature frontend | `feat-<nome>-<framework>` | Frontend Entity → UseCase → Repository → Page → Form |
+| Feature mobile | `feat-<nome>-<mobile>` | Mobile Entity → UseCase → Repository → Screen → Form |
+| Autenticação | `feat-auth` | Config Auth Core Basic, Config Auth Backend Basic (+ Config Auth Web Basic se Next.js) |
 
 > O OpenSpec é **opcional mas recomendado** para times de 2+ pessoas ou projetos com múltiplas features em paralelo. Para projetos solo ou protótipos, usar os agents diretamente é mais rápido.
 

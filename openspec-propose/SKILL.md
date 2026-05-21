@@ -106,6 +106,7 @@ After completing all artifacts, summarize:
 - The schema defines what each artifact should contain - follow it
 - Read dependency artifacts for context before creating new ones
 - Use `template` as the structure for your output file - fill in its sections
+- For `tasks.md`: copy tasks from `backlog.md` when available — each task must include prefix, **Agent** (display_name from `agents/openai.yaml`), and **Prompt** (format from `req-agile-planning`)
 - **IMPORTANT**: `context` and `rules` are constraints for YOU, not content for the file
   - Do NOT copy `<context>`, `<rules>`, `<project_context>` blocks into the artifact
   - These guide what you write, but should never appear in the output

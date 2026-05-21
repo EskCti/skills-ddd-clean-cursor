@@ -238,7 +238,7 @@ EP-003: BC Catalog (Catálogo de Produtos)
 EP-004: BC Orders + Pricing (Pedidos + Precificação)
 ```
 
-Para cada story, gera tasks **inside-out** com referência ao skill C#:
+Para cada story, gera tasks **inside-out** com **Agent** (`display_name`) e **Prompt**:
 
 ```markdown
 ## EP-002: BC Customers
@@ -252,27 +252,55 @@ Para cada story, gera tasks **inside-out** com referência ao skill C#:
 - Dado CPF já cadastrado, quando cadastrar, então retornar erro "CPF já existe"
 
 **Tasks:**
-- [ ] `domain:vo` Criar VO Email → skill: core-value-object-cs (~1h)
-- [ ] `domain:vo` Criar VO CPF com validação de dígitos → skill: core-value-object-cs (~1h)
-- [ ] `domain:vo` Criar VO CustomerName → skill: core-value-object-cs (~1h)
-- [ ] `domain:entity` Criar entidade Customer com VOs → skill: core-entity-cs (~2h)
-- [ ] `domain:repository` Criar ICustomerRepository → skill: core-repository-cs (~1h)
-- [ ] `app:dto` Criar CreateCustomerInDto e CustomerOutDto → skill: core-dto-cs (~1h)
-- [ ] `app:usecase` Criar CreateCustomerUseCase → skill: core-use-case-cs (~2h)
-- [ ] `app:query` Criar FindCustomerByIdQuery → skill: core-query-cqrs-cs (~1h)
-- [ ] `infra:persistence` Criar CustomerEfRepository → skill: backend-data-cs (~2h)
-- [ ] `infra:migration` Criar migration Customers → skill: config-efcore-cs (~1h)
-- [ ] `interface:controller` Criar CustomerController → skill: backend-controller-cs (~2h)
-- [ ] `test:unit` Testes de Customer, CPF, Email → skill: `test-unit-cs` (~2h)
+- [ ] `domain:vo` Criar VO Email (~1h)
+  - **Agent:** `Core Value Object (C#)`
+  - **Prompt:** "Crie Email VO com validação de formato."
+- [ ] `domain:vo` Criar VO CPF com validação de dígitos (~1h)
+  - **Agent:** `Core Value Object (C#)`
+  - **Prompt:** "Crie CPF VO com algoritmo de dígitos verificadores."
+- [ ] `domain:vo` Criar VO CustomerName (~1h)
+  - **Agent:** `Core Value Object (C#)`
+  - **Prompt:** "Crie CustomerName VO: 2-100 chars, trim."
+- [ ] `domain:entity` Criar entidade Customer com VOs (~2h)
+  - **Agent:** `Core Entity (C#)`
+  - **Prompt:** "Aggregate root Customer com Email, CPF, CustomerName."
+- [ ] `domain:repository` Criar ICustomerRepository (~1h)
+  - **Agent:** `Core Repository (C#)`
+  - **Prompt:** "Interface ICustomerRepository: create, findById, findByCpf."
+- [ ] `app:dto` Criar CreateCustomerInDto e CustomerOutDto (~1h)
+  - **Agent:** `Core DTO (C#)`
+  - **Prompt:** "DTOs de entrada e saída para Customer."
+- [ ] `app:usecase` Criar CreateCustomerUseCase (~2h)
+  - **Agent:** `Core Use Case (C#)`
+  - **Prompt:** "Verifica CPF duplicado; cria Customer; persiste."
+- [ ] `app:query` Criar FindCustomerByIdQuery (~1h)
+  - **Agent:** `Core Query CQRS (C#)`
+  - **Prompt:** "Query retornando CustomerOutDto por ID."
+- [ ] `infra:persistence` Criar CustomerEfRepository (~2h)
+  - **Agent:** `Backend Data (C#)`
+  - **Prompt:** "EF Core implementando ICustomerRepository."
+- [ ] `infra:migration` Criar migration Customers (~1h)
+  - **Agent:** `Config EF Core (C#)`
+  - **Prompt:** "Migration tabela Customers."
+- [ ] `interface:controller` Criar CustomerController (~2h)
+  - **Agent:** `Backend Controller (C#)`
+  - **Prompt:** "POST /api/customers e GET /api/customers/{id}."
+- [ ] `test:unit` Testes de Customer, CPF, Email (~2h)
+  - **Agent:** `Unit Tests (C#)`
+  - **Prompt:** "Mock repository; fluxo feliz e CPF duplicado."
 - [ ] `test:coverage` Validar ≥95% domain+application (~30min)
-- [ ] `test:e2e` POST /api/customers → GET /api/customers/{id} → skill: `test-e2e-cs` (~2h)
+  - **Agent:** `Unit Tests (C#)`
+  - **Prompt:** "Executar coverage; ajustar até ≥95%."
+- [ ] `test:e2e` POST /api/customers → GET /api/customers/{id} (~2h)
+  - **Agent:** `E2E Tests (C#)`
+  - **Prompt:** "WebApplicationFactory; POST criar → GET buscar."
 ```
 
 ### Artefatos gerados
 
 ```
 docs/planning/loja-php/
-├── backlog.md        ← épicos + stories + tasks com skills C# referenciados
+├── backlog.md        ← épicos + stories + tasks com Agent + Prompt
 └── epics-summary.md  ← visão executiva com estimativas
 ```
 

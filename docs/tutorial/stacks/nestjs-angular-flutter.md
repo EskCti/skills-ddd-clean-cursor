@@ -4,7 +4,9 @@
 
 **Pré-requisito**: [Tutorial 01 — Análise e Planejamento](../01-pipeline-discovery-planning.md) (`backlog.md` pronto) · [Tutorial 02 — Hub Full-Stack](../02-fullstack-project-setup.md)
 
-Agents usados: `config-project-fullstack` → `config-project-angular` → `config-shared-web-angular` → `config-project-flutter` → `config-docker` → `config-cicd` → `config-shared-core` → `openspec-propose` → `openspec-apply-change` → `test-unit` → `test-e2e`
+> **Formato de tasks**: use sempre **Agent** (`display_name`) + **Prompt** — ver `req-agile-planning`.
+
+Agents usados: `Config Project Full-Stack` → `Config Project (Angular)` → `Config Shared Web (Angular)` → `Config Project (Flutter)` → `Config Docker (TypeScript)` → `Config CI/CD (TypeScript)` → `Config Shared Core` → `openspec-propose` → `openspec-apply-change` → `Unit Tests (TypeScript)` → `E2E Tests (TypeScript)`
 
 **Cenário**: Você vai criar do zero um sistema de gestão de clientes chamado `clientes-app` com NestJS (TypeScript) como backend, Angular 17+ com PrimeNG como frontend web e Flutter como aplicativo mobile. Autenticação JWT básica e rastreamento de mudanças com OpenSpec.
 
@@ -25,46 +27,44 @@ O agent retorna a sequência de chamadas a fazer:
    → Registrar a mudança de bootstrap no OpenSpec
 
 2. openspec-apply-change "bootstrap-clientes-app"
-   ├── config-project-angular   → Monorepo NestJS + Angular 17+ + Tailwind + docker-compose (dev)
-   ├── config-shared-web-angular → Shell admin (sidebar, topbar, rodapé)
-   ├── config-project-flutter   → App Flutter com Riverpod + Dio + go_router
-   ├── config-docker            → Dockerfiles multi-stage de produção + docker-compose.prod.yml
-   ├── config-cicd              → GitHub Actions (CI em PR + CD em main)
-   └── config-shared-core       → Shared kernel DDD: Entity, ValueObject, Result<T>, IUseCase, IRepository
+   ├── Config Project (Angular)      → Monorepo NestJS + Angular 17+ + Tailwind + docker-compose (dev)
+   ├── Config Shared Web (Angular)   → Shell admin (sidebar, topbar, rodapé)
+   ├── Config Project (Flutter)      → App Flutter com Riverpod + Dio + go_router
+   ├── Config Docker (TypeScript)    → Dockerfiles multi-stage de produção + docker-compose.prod.yml
+   ├── Config CI/CD (TypeScript)     → GitHub Actions (CI em PR + CD em main)
+   └── Config Shared Core            → Shared kernel DDD: Entity, ValueObject, Result<T>, IUseCase, IRepository
 
-3. [Por Bounded Context]
+3. [Por Bounded Context — backend + frontend + mobile na mesma change, recomendado]
    openspec-propose "bc-customers"
    → openspec-apply-change "bc-customers"
-      ├── core-value-object      → CustomerName, Email, CPF
-      ├── core-entity            → Customer
-      ├── core-repository        → ICustomerRepository
-      ├── core-dto               → CreateCustomerInputDto, CustomerOutputDto
-      ├── core-use-case          → CreateCustomerUseCase
-      ├── core-query-cqrs        → GetCustomerByIdQuery
-      ├── backend-prisma-data    → CustomerPrismaRepository
-      └── backend-controller     → CustomerController
-      ├── test-unit              → VOs, Entity, UseCase (≥95% domain+application)
-      └── test-e2e               → Supertest POST/GET; Playwright após frontend
+      ├── Core Value Object           → CustomerName, Email, CPF
+      ├── Core Entity                 → Customer
+      ├── Core Repository             → ICustomerRepository
+      ├── Core DTO                    → CreateCustomerInputDto, CustomerOutputDto
+      ├── Core Use Case               → CreateCustomerUseCase
+      ├── Core Query CQRS             → GetCustomerByIdQuery
+      ├── Backend Prisma Data         → CustomerPrismaRepository
+      ├── Backend Controller          → CustomerController
+      ├── Frontend Entity (Angular)   → Customer entity + Result<T>
+      ├── Frontend UseCase (Angular)  → CreateCustomerUseCase, ListCustomersUseCase
+      ├── Frontend Repository (Angular) → CustomerHttpRepository
+      ├── Frontend Page (Angular)     → CustomerListComponent
+      ├── Frontend Form (Angular)     → CustomerFormComponent
+      ├── Mobile Entity (Flutter)     → Customer entity + sealed Result
+      ├── Mobile UseCase (Flutter)    → CreateCustomerUseCase, ListCustomersUseCase
+      ├── Mobile Repository (Flutter) → CustomerRepositoryImpl (Dio)
+      ├── Mobile Screen (Flutter)     → CustomerListPage
+      ├── Mobile Form (Flutter)       → CustomerFormPage
+      ├── Unit Tests (TypeScript)     → VOs, Entity, UseCase (≥95% domain+application)
+      └── E2E Tests (TypeScript)      → Supertest POST/GET; Playwright após frontend
 
-4. [Frontend — Clean Architecture completa]
+4. [Alternativa — feature UI isolada após API pronta]
    openspec-propose "feat-customer-angular"
-   → openspec-apply-change "feat-customer-angular"
-      ├── frontend-entity-angular     → Customer entity + Result<T>
-      ├── frontend-usecase-angular    → CreateCustomerUseCase, ListCustomersUseCase
-      ├── frontend-repository-angular → CustomerHttpRepository
-      ├── frontend-page-angular       → CustomerListComponent
-      └── frontend-form-angular       → CustomerFormComponent
+   → Frontend Entity (Angular) → … → Frontend Form (Angular)
 
-5. [Mobile — Clean Architecture completa]
-   openspec-propose "feat-customer-flutter"
-   → openspec-apply-change "feat-customer-flutter"
-      ├── mobile-entity-flutter     → Customer entity + sealed Result
-      ├── mobile-usecase-flutter    → CreateCustomerUseCase, ListCustomersUseCase
-      ├── mobile-repository-flutter → CustomerRepositoryImpl (Dio)
-      ├── mobile-screen-flutter     → CustomerListPage
-      └── mobile-form-flutter       → CustomerFormPage
-
-6. config-auth-core-basic → config-auth-backend-basic → config-auth-web-basic
+5. [Auth JWT — somente backend nesta stack Angular]
+   Config Auth Core Basic → Config Auth Backend Basic
+   (UI de login Angular: implementar manualmente ou change feat-auth-angular)
 ```
 
 > **Consulte `config-project-fullstack/references/fullstack-stack-matrix.md`** para a tabela completa de decisão de stack e quando usar OpenSpec.
@@ -96,7 +96,7 @@ clientes-app/
 │   ├── backend/                    ← NestJS (TypeScript)
 │   │   ├── src/
 │   │   │   ├── app.module.ts
-│   │   │   ├── main.ts             ← porta 3000
+│   │   │   ├── main.ts             ← porta 4000
 │   │   │   └── shared/
 │   │   │       └── kernel/         ← placeholder para shared kernel
 │   │   ├── prisma/
@@ -114,7 +114,7 @@ clientes-app/
 │       │   │   ├── app.routes.ts
 │       │   │   └── app.routes.shell.ts
 │       │   └── environments/
-│       ├── proxy.conf.json         ← redireciona /api → localhost:3000
+│       ├── proxy.conf.json         ← redireciona /api → localhost:4000
 │       ├── angular.json
 │       └── package.json
 ├── docker-compose.yml              ← Postgres 16 para dev local
@@ -131,7 +131,7 @@ clientes-app/
 ```json
 {
   "/api": {
-    "target": "http://localhost:3000",
+    "target": "http://localhost:4000",
     "secure": false,
     "changeOrigin": true
   }
@@ -156,7 +156,7 @@ O proxy está configurado no `angular.json`:
 # Subir o banco local
 docker-compose up -d
 
-# Backend (porta 3000)
+# Backend (porta 4000)
 cd apps/backend && npm run start:dev
 
 # Frontend (porta 4200, proxy ativo)
@@ -179,7 +179,7 @@ npm run test:e2e:web
 
 ### Agent: `Config Project (Flutter)`
 
-> Configure o app Flutter consumindo a API em http://localhost:3000, estrutura clean por feature, Riverpod, Dio, go_router. Nome do app: clientes_app.
+> Configure o app Flutter consumindo a API em http://localhost:4000, estrutura clean por feature, Riverpod, Dio, go_router. Nome do app: clientes_app.
 
 ### Estrutura gerada
 
@@ -197,7 +197,7 @@ mobile-flutter/
 │       └── .gitkeep                ← features adicionadas por módulo
 ├── test/
 ├── pubspec.yaml
-└── .env                            ← API_URL=http://localhost:3000
+└── .env                            ← API_URL=http://localhost:4000
 ```
 
 ### Exemplo do `pubspec.yaml` (dependências principais)
@@ -231,7 +231,7 @@ class DioClient {
   DioClient() {
     _dio = Dio(
       BaseOptions(
-        baseUrl: dotenv.env['API_URL'] ?? 'http://localhost:3000',
+        baseUrl: dotenv.env['API_URL'] ?? 'http://localhost:4000',
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 10),
         headers: {'Content-Type': 'application/json'},
@@ -247,25 +247,43 @@ class DioClient {
 
 ## Etapa 3 — Docker e CI/CD (durante o setup)
 
-> **Importante**: Docker e CI/CD fazem parte do bootstrap do projeto — não deixe para o final. O `docker-compose.yml` de **dev** já vem do `config-project-angular`; aqui configuramos **produção** (Dockerfiles multi-stage) e o pipeline GitHub Actions.
+> **Importante**: Docker e CI/CD fazem parte do bootstrap do projeto — não deixe para o final. O `docker-compose.yml` de **dev** já vem do `Config Project (Angular)`; aqui configuramos **produção** (Dockerfiles multi-stage) e o pipeline GitHub Actions.
 
 ### Via OpenSpec (recomendado)
 
 Se você criou a mudança `bootstrap-clientes-app` na Etapa 0, o `tasks.md` deve incluir:
 
 ```markdown
-- [ ] config-project-angular → monorepo + docker-compose dev
-- [ ] config-project-flutter → app mobile
-- [ ] config-docker → Dockerfile multi-stage NestJS + docker-compose.prod.yml
-- [ ] config-cicd → GitHub Actions CI + CD
-- [ ] config-shared-core → shared kernel DDD
+- [ ] `infra:setup` Bootstrap Angular monorepo (~2h)
+  - **Agent:** `Config Project (Angular)`
+  - **Prompt:** "Monorepo NestJS + Angular 17+ + docker-compose dev."
+
+- [ ] `infra:shell-web` Shell admin Tailwind (~1h)
+  - **Agent:** `Config Shared Web (Angular)`
+  - **Prompt:** "Sidebar, topbar, rodapé, dashboard vazio."
+
+- [ ] `infra:setup` Bootstrap Flutter (~2h)
+  - **Agent:** `Config Project (Flutter)`
+  - **Prompt:** "App Flutter + Riverpod + Dio."
+
+- [ ] `infra:docker` Dockerfiles multi-stage (~1h)
+  - **Agent:** `Config Docker (TypeScript)`
+  - **Prompt:** "Dockerfile multi-stage NestJS + docker-compose.prod.yml."
+
+- [ ] `infra:cicd` GitHub Actions (~2h)
+  - **Agent:** `Config CI/CD (TypeScript)`
+  - **Prompt:** "CI em PR; CD em main."
+
+- [ ] `domain:shared` Shared kernel DDD (~2h)
+  - **Agent:** `Config Shared Core`
+  - **Prompt:** "Entity, VO, Result<T>, IUseCase, IRepository."
 ```
 
 **Agent**: `openspec-apply-change`
 
-> Implemente a mudança 'bootstrap-clientes-app'. Tasks pendentes: config-docker e config-cicd.
+> Implemente a mudança 'bootstrap-clientes-app'. Tasks pendentes: Config Docker (TypeScript) e Config CI/CD (TypeScript).
 
-### Agent: `config-docker`
+### Agent: `Config Docker (TypeScript)`
 
 > Crie os Dockerfiles multi-stage de produção para o projeto clientes-app (NestJS). Projeto backend em `apps/backend/`.
 
@@ -288,7 +306,7 @@ RUN adduser -u 1001 -D appuser
 USER appuser
 COPY --from=builder /app/apps/backend/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
-EXPOSE 3000
+EXPOSE 4000
 CMD ["node", "dist/main.js"]
 ```
 
@@ -320,7 +338,7 @@ services:
       context: .
       dockerfile: apps/backend/Dockerfile
     ports:
-      - "3000:3000"
+      - "4000:4000"
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
     depends_on:
@@ -337,7 +355,7 @@ docker build -f apps/backend/Dockerfile -t clientes-app-backend .
 docker-compose -f docker-compose.prod.yml up
 ```
 
-### Agent: `config-cicd`
+### Agent: `Config CI/CD (TypeScript)`
 
 > Crie os workflows GitHub Actions para clientes-app. Registry: GHCR. Deploy: Fly.io. CI deve falhar se coverage de domain + application for < 95%.
 
@@ -431,9 +449,9 @@ jobs:
 | `FLY_APP_BACKEND` | Nome do app em `flyctl apps create` |
 | `GITHUB_TOKEN` | Automático — não precisa criar |
 
-> O script `scripts/check-coverage.mjs` é copiado do skill `config-cicd` (`assets/check-coverage.mjs`) e valida **≥95% lines** em paths de domain/application.
+> O script `scripts/check-coverage.mjs` é copiado do skill `Config CI/CD (TypeScript)` (`assets/check-coverage.mjs`) e valida **≥95% lines** em paths de domain/application.
 
-> Para stacks Kotlin ou C#, use `config-docker-kt`/`config-docker-cs` e `config-cicd-kt`/`config-cicd-cs` com os mesmos prompts, ajustando o caminho do projeto.
+> Para stacks Kotlin ou C#, use `Config Docker (Kotlin)`/`Config Docker (C#)` e `Config CI/CD (Kotlin)`/`Config CI/CD (C#)` com os mesmos prompts, ajustando o caminho do projeto.
 
 ---
 
@@ -574,34 +592,70 @@ Interface Layer
 VO → Entity → Repository port → DTO → UseCase → Infra → Controller
 ```
 
-**`tasks.md`** — tasks formatadas por agent:
+**`tasks.md`** — tasks formatadas por agent (**Agent** + **Prompt**):
 
 ```markdown
 # Tasks: bc-customers
 
-- [ ] `domain:vo` CustomerName, Email, CPF
-  Agent: Core Value Object
+- [ ] `domain:vo` CustomerName, Email, CPF (~2h)
+  - **Agent:** `Core Value Object`
+  - **Prompt:** "Crie VOs CustomerName, Email e CPF com Create() → Result<T>."
 
-- [ ] `domain:entity` Customer aggregate root
-  Agent: Core Entity
+- [ ] `domain:entity` Customer aggregate root (~2h)
+  - **Agent:** `Core Entity`
+  - **Prompt:** "Aggregate root Customer com VOs; create() e deactivate()."
 
-- [ ] `domain:repository` ICustomerRepository interface
-  Agent: Core Repository
+- [ ] `domain:repository` ICustomerRepository interface (~1h)
+  - **Agent:** `Core Repository`
+  - **Prompt:** "Port ICustomerRepository: create, findById, findByCPF, findAll."
 
-- [ ] `app:dto` CreateCustomerInputDto, CustomerOutputDto
-  Agent: Core DTO
+- [ ] `app:dto` CreateCustomerInputDto, CustomerOutputDto (~1h)
+  - **Agent:** `Core DTO`
+  - **Prompt:** "DTOs de entrada e saída para Customer."
 
-- [ ] `app:usecase` CreateCustomerUseCase
-  Agent: Core Use Case
+- [ ] `app:usecase` CreateCustomerUseCase (~2h)
+  - **Agent:** `Core Use Case`
+  - **Prompt:** "Verifica CPF duplicado; persiste Customer."
 
-- [ ] `app:query` GetCustomerByIdQuery
-  Agent: Core Query CQRS
+- [ ] `app:query` GetCustomerByIdQuery (~1h)
+  - **Agent:** `Core Query CQRS`
+  - **Prompt:** "Query retornando CustomerOutputDto por ID."
 
-- [ ] `infra:persistence` CustomerPrismaRepository
-  Agent: Backend Data
+- [ ] `infra:persistence` CustomerPrismaRepository (~2h)
+  - **Agent:** `Backend Prisma Data`
+  - **Prompt:** "Implemente ICustomerRepository com Prisma."
 
-- [ ] `interface:controller` CustomerController
-  Agent: Backend Controller
+- [ ] `interface:controller` CustomerController (~2h)
+  - **Agent:** `Backend Controller`
+  - **Prompt:** "POST /customers e GET /customers/:id."
+
+- [ ] `interface:entity` Customer entity Angular (~1h)
+  - **Agent:** `Frontend Entity (Angular)`
+  - **Prompt:** "Entidade Customer com Result<T>."
+
+- [ ] `interface:usecase` CreateCustomer + ListCustomers Angular (~2h)
+  - **Agent:** `Frontend UseCase (Angular)`
+  - **Prompt:** "Use cases injetando ICustomerRepository."
+
+- [ ] `interface:repository` CustomerHttpRepository (~2h)
+  - **Agent:** `Frontend Repository (Angular)`
+  - **Prompt:** "HTTP para /customers; mapear DTOs."
+
+- [ ] `interface:page` CustomerListComponent (~2h)
+  - **Agent:** `Frontend Page (Angular)`
+  - **Prompt:** "Listagem PrimeNG DataTable; lazy load."
+
+- [ ] `interface:form-web` CustomerFormComponent (~2h)
+  - **Agent:** `Frontend Form (Angular)`
+  - **Prompt:** "Reactive Forms; exibe erros de Result."
+
+- [ ] `test:unit` + `test:coverage` VOs, Entity, UseCase ≥95% (~2h)
+  - **Agent:** `Unit Tests (TypeScript)`
+  - **Prompt:** "Mock repository; fluxo feliz e CPF duplicado."
+
+- [ ] `test:e2e` POST/GET /customers (~2h)
+  - **Agent:** `E2E Tests (TypeScript)`
+  - **Prompt:** "Supertest CRUD; Playwright após frontend."
 ```
 
 ---
@@ -614,7 +668,7 @@ VO → Entity → Repository port → DTO → UseCase → Infra → Controller
 
 ### Sequência interna do apply
 
-O agent lê o `tasks.md` e chama os agents de domínio na ordem correta:
+O agent lê o `tasks.md` e aciona cada **Agent** na ordem correta:
 
 #### 1. `Core Value Object` → CustomerName, Email, CPF
 
@@ -774,7 +828,7 @@ export class GetCustomerByIdQuery {
 }
 ```
 
-#### 7. `Backend Data` → CustomerPrismaRepository
+#### 7. `Backend Prisma Data` → CustomerPrismaRepository
 
 ```typescript
 @Injectable()
@@ -865,13 +919,13 @@ export class CustomerController {
 
 ```bash
 # Criar cliente
-curl -X POST http://localhost:3000/customers \
+curl -X POST http://localhost:4000/customers \
   -H "Content-Type: application/json" \
   -d '{"name":"João Silva","email":"joao@example.com","cpf":"12345678901"}'
 # → {"id":"uuid...","name":"João Silva","email":"joao@example.com","cpf":"12345678901","isActive":true}
 
 # Buscar por ID
-curl http://localhost:3000/customers/uuid-gerado
+curl http://localhost:4000/customers/uuid-gerado
 # → {"id":"uuid...","name":"João Silva",...}
 ```
 
@@ -879,7 +933,7 @@ curl http://localhost:3000/customers/uuid-gerado
 
 Após implementar o BC, acione os agents de qualidade **antes** de arquivar a mudança OpenSpec:
 
-#### Agent: `Unit Tests (TypeScript)` (`test-unit`)
+#### Agent: `Unit Tests (TypeScript)`
 
 > Crie testes unitários para o BC Customers: CPF VO (validação), Customer entity (create/deactivate), CreateCustomerUseCase (CPF duplicado). Meta: ≥95% lines em `domain/` e `application/`.
 
@@ -888,7 +942,7 @@ npm test --workspace=apps/backend -- --coverage
 node scripts/check-coverage.mjs 95 domain application
 ```
 
-#### Agent: `E2E Tests (TypeScript)` (`test-e2e`)
+#### Agent: `E2E Tests (TypeScript)`
 
 > Gere e ajuste specs E2E para o BC Customers após o controller estar pronto.
 
@@ -912,7 +966,7 @@ npm run test:e2e:web   # após frontend Angular pronto
 
 ### Agent: `openspec-propose`
 
-> Crie a mudança 'feat-customer-angular' para implementar a feature de clientes no Angular com Clean Architecture completa: `frontend-entity-angular` (Customer + Result), `frontend-usecase-angular` (CreateCustomer, ListCustomers), `frontend-repository-angular` (HttpRepository), `frontend-page-angular` (listagem DataTable PrimeNG) e `frontend-form-angular` (Reactive Forms).
+> Crie a mudança 'feat-customer-angular' para implementar clientes no Angular com Clean Architecture: Frontend Entity (Angular), Frontend UseCase (Angular), Frontend Repository (Angular), Frontend Page (Angular) e Frontend Form (Angular) — uma task por camada no tasks.md.
 
 ### Implementação
 
@@ -920,15 +974,15 @@ npm run test:e2e:web   # após frontend Angular pronto
 
 > Implemente a mudança 'feat-customer-angular'.
 
-O apply chama internamente (domínio → aplicação → infra → apresentação):
+O apply aciona cada **Agent** (domínio → aplicação → infra → apresentação):
 
-#### 1. `frontend-entity-angular` → Customer entity + Result
+#### 1. `Frontend Entity (Angular)` → Customer entity + Result
 
-#### 2. `frontend-usecase-angular` → CreateCustomerUseCase, ListCustomersUseCase
+#### 2. `Frontend UseCase (Angular)` → CreateCustomerUseCase, ListCustomersUseCase
 
-#### 3. `frontend-repository-angular` → CustomerHttpRepository
+#### 3. `Frontend Repository (Angular)` → CustomerHttpRepository
 
-#### 4. `frontend-page-angular` → CustomerListComponent
+#### 4. `Frontend Page (Angular)` → CustomerListComponent
 
 ```typescript
 // apps/web-angular/src/app/features/customers/list/customer-list.component.ts
@@ -1003,7 +1057,7 @@ export class CustomerListComponent {
 }
 ```
 
-#### 5. `frontend-form-angular` → CustomerFormComponent
+#### 5. `Frontend Form (Angular)` → CustomerFormComponent
 
 ```typescript
 // apps/web-angular/src/app/features/customers/form/customer-form.component.ts
@@ -1096,7 +1150,7 @@ export class CustomerFormComponent {
 
 ### Agent: `openspec-propose`
 
-> Crie a mudança 'feat-customer-flutter' para implementar clientes no Flutter com Clean Architecture: `mobile-entity-flutter`, `mobile-usecase-flutter`, `mobile-repository-flutter`, `mobile-screen-flutter` e `mobile-form-flutter`.
+> Crie a mudança 'feat-customer-flutter' para clientes no Flutter: Mobile Entity (Flutter), Mobile UseCase (Flutter), Mobile Repository (Flutter), Mobile Screen (Flutter) e Mobile Form (Flutter).
 
 ### Implementação
 
@@ -1104,15 +1158,15 @@ export class CustomerFormComponent {
 
 > Implemente 'feat-customer-flutter'.
 
-O apply chama internamente (domínio → aplicação → infra → apresentação):
+O apply aciona cada **Agent** (domínio → aplicação → infra → apresentação):
 
-#### 1. `mobile-entity-flutter` → Customer entity + sealed Result
+#### 1. `Mobile Entity (Flutter)` → Customer entity + sealed Result
 
-#### 2. `mobile-usecase-flutter` → CreateCustomerUseCase, ListCustomersUseCase
+#### 2. `Mobile UseCase (Flutter)` → CreateCustomerUseCase, ListCustomersUseCase
 
-#### 3. `mobile-repository-flutter` → CustomerRepositoryImpl (Dio)
+#### 3. `Mobile Repository (Flutter)` → CustomerRepositoryImpl (Dio)
 
-#### 4. `mobile-screen-flutter` → CustomerListPage
+#### 4. `Mobile Screen (Flutter)` → CustomerListPage
 
 ```dart
 // mobile-flutter/lib/features/customers/presentation/pages/customer_list_page.dart
@@ -1171,7 +1225,7 @@ class CustomerListPage extends ConsumerWidget {
 }
 ```
 
-#### 5. `mobile-form-flutter` → CustomerFormPage
+#### 5. `Mobile Form (Flutter)` → CustomerFormPage
 
 ```dart
 // mobile-flutter/lib/features/customers/presentation/pages/customer_form_page.dart
@@ -1318,16 +1372,17 @@ clientes-app/
 ```
 Bootstrap
 - [ ] openspec-propose "bootstrap-clientes-app" executado
-- [ ] config-project-angular: monorepo NestJS + Angular criado
+- [ ] Config Project (Angular): monorepo NestJS + Angular criado
+- [ ] Config Shared Web (Angular): shell Tailwind configurado
 - [ ] Scaffold E2E: `test/jest-e2e.json`, `playwright.config.ts`, `npm run test:e2e` passa
-- [ ] config-project-flutter: app Flutter criado
-- [ ] config-docker: Dockerfile multi-stage + docker-compose.prod.yml
-- [ ] config-cicd: GitHub Actions CI + CD configurados
-- [ ] config-shared-core: Entity, ValueObject, Result<T> disponíveis
+- [ ] Config Project (Flutter): app Flutter criado
+- [ ] Config Docker (TypeScript): Dockerfile multi-stage + docker-compose.prod.yml
+- [ ] Config CI/CD (TypeScript): GitHub Actions CI + CD configurados
+- [ ] Config Shared Core: Entity, ValueObject, Result<T> disponíveis
 - [ ] docker-compose up -d: banco Postgres rodando (dev)
 - [ ] docker build testado localmente
 
-BC Customers (backend)
+BC Customers (backend + frontend + mobile)
 - [ ] openspec-propose "bc-customers" executado: proposal.md, design.md, tasks.md criados
 - [ ] openspec-apply-change "bc-customers" executado
 - [ ] VOs: CustomerName, Email, CPF com validações
@@ -1346,21 +1401,19 @@ Qualidade (BC Customers)
 - [ ] **Agent `E2E Tests (TypeScript)`**: `create-e2e-spec.mjs customers --template crud --web`
 
 Frontend Angular
-- [ ] openspec-propose + apply "feat-customer-angular" executados
-- [ ] frontend-entity-angular: Customer entity + Result<T>
-- [ ] frontend-usecase-angular: CreateCustomerUseCase, ListCustomersUseCase
-- [ ] frontend-repository-angular: CustomerHttpRepository (HttpClient)
-- [ ] CustomerListComponent: p-table com lazy loading e paginação
-- [ ] CustomerFormComponent: Reactive Forms + PrimeNG inputs + validações
+- [ ] Frontend Entity (Angular): Customer entity + Result<T>
+- [ ] Frontend UseCase (Angular): CreateCustomerUseCase, ListCustomersUseCase
+- [ ] Frontend Repository (Angular): CustomerHttpRepository (HttpClient)
+- [ ] Frontend Page (Angular): CustomerListComponent — p-table lazy loading
+- [ ] Frontend Form (Angular): CustomerFormComponent — Reactive Forms + validações
 - [ ] Rotas configuradas: /customers, /customers/new
 
 Mobile Flutter
-- [ ] openspec-propose + apply "feat-customer-flutter" executados
-- [ ] mobile-entity-flutter: Customer entity + sealed Result
-- [ ] mobile-usecase-flutter: CreateCustomerUseCase, ListCustomersUseCase
-- [ ] mobile-repository-flutter: CustomerRepositoryImpl (Dio)
-- [ ] CustomerListPage: Riverpod AsyncNotifier + RefreshIndicator
-- [ ] CustomerFormPage: TextFormField com validações + submit
+- [ ] Mobile Entity (Flutter): Customer entity + sealed Result
+- [ ] Mobile UseCase (Flutter): CreateCustomerUseCase, ListCustomersUseCase
+- [ ] Mobile Repository (Flutter): CustomerRepositoryImpl (Dio)
+- [ ] Mobile Screen (Flutter): CustomerListPage — Riverpod + RefreshIndicator
+- [ ] Mobile Form (Flutter): CustomerFormPage — validações + submit
 ```
 
 ---

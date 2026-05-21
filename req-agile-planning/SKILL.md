@@ -111,8 +111,9 @@ Regras para Épicos:
 
 **Épico de auth** (quando aplicável) deve usar:
 
-- Auth core (skill: `config-auth-core-basic` / `config-auth-core-basic-kt` / `config-auth-core-basic-cs`)
-- Auth backend (skill: `config-auth-backend-basic` / `config-auth-backend-basic-kt` / `config-auth-backend-basic-cs`)
+- Auth core → **Agent:** `Config Auth Core Basic` | `Config Auth Core Basic (Kotlin)` | `Config Auth Core (C#)`
+- Auth backend → **Agent:** `Config Auth Backend Basic` | `Config Auth Backend Basic (Kotlin)` | `Config Auth Backend Basic (C#)`
+- Auth web (somente Next.js) → **Agent:** `Config Auth Web Basic`
 
 ### Fase 3 — Quebra em User Stories
 
@@ -155,7 +156,7 @@ Ordem de implementação (inside-out):
 13. interface:repository   → frontend-repository-angular | frontend-repository-vue
 14. interface:page         → frontend-page-angular | frontend-page-vue
 15. interface:form-web     → frontend-form-angular | frontend-form-vue
-16. interface:form         → frontend-form-schema (Next.js)
+16. interface:form         → Frontend Form Schema (Next.js)
 
 ── MOBILE (Clean Architecture completa) ─────────────────────
 17. interface:mobile-entity     → mobile-entity-flutter | mobile-entity-android
@@ -170,7 +171,7 @@ Ordem de implementação (inside-out):
 24. test:e2e               → teste de fluxo completo
 ```
 
-> **OpenSpec**: para features que envolvem múltiplas camadas (backend + frontend + mobile), recomenda-se usar `openspec-propose` antes de iniciar a implementação. O agente `openspec-apply-change` chamará os skills acima na ordem correta.
+> **OpenSpec**: para features que envolvem múltiplas camadas (backend + frontend + mobile), recomenda-se usar `openspec-propose` antes de iniciar a implementação. O `tasks.md` deve copiar o formato do backlog (**Agent** + **Prompt** por task). O `openspec-apply-change` aciona cada **Agent** listado na ordem inside-out.
 
 Formato de task — **inclui o agent Cursor a acionar e o prompt sugerido**:
 
@@ -220,10 +221,11 @@ Se a stack **não foi escolhida ainda**, mostrar as 3 opções:
 | `infra:persistence` | `Backend Prisma Data` | `Backend Data (Kotlin)` | `Backend Data (C#)` |
 | `infra:migration` | `Config Prisma` | `Config JPA (Kotlin)` | `Config EF Core (C#)` |
 | `infra:setup` | `Config Project` | `Config Project (Kotlin)` | `Config Project (C#)` |
+| `infra:shell-web` | `Config Shared Web` / `(Angular)` / `(Vue)` | — | — |
 | `domain:shared` | `Config Shared Core` | `Config Shared Core (Kotlin)` | `Config Shared Core (C#)` |
 | `infra:auth` | `Config Auth Core Basic` | `Config Auth Core Basic (Kotlin)` | `Config Auth Core (C#)` |
 | `interface:controller` | `Backend Controller` | `Backend Controller (Kotlin)` | `Backend Controller (C#)` |
-| `interface:form` | `(frontend-form-schema)` | — | — |
+| `interface:form` | `Frontend Form Schema` | — | — |
 | `interface:entity` | `Frontend Entity (Angular)` ou `Frontend Entity (Vue)` | — | — |
 | `interface:usecase` | `Frontend UseCase (Angular)` ou `Frontend UseCase (Vue)` | — | — |
 | `interface:repository` | `Frontend Repository (Angular)` ou `Frontend Repository (Vue)` | — | — |
@@ -245,7 +247,8 @@ Regras para Tasks:
 
 - Cada task deve ser **completável em 1-4 horas**
 - Deve indicar a **camada DDD** como prefixo (`domain:`, `app:`, `infra:`, `interface:`, `test:`)
-- **Sempre incluir o nome exato do agent Cursor** (`display_name` do `agents/openai.yaml` do skill)
+- **Sempre incluir o nome exato do agent Cursor** (`display_name` do `agents/openai.yaml` do skill) — **nunca** cite pasta de skill (`core-entity`, `frontend-entity-vue`) no lugar do Agent
+- Em projetos full-stack, cada BC com frontend/mobile deve incluir **todas** as tasks `interface:entity` → `interface:form-web` e/ou `interface:mobile-*` (uma task por camada, cada uma com seu Agent)
 - **Sempre incluir um prompt sugerido** — específico o suficiente para o agent entregar o código correto sem ambiguidade
 - Se a stack foi definida pelo usuário, usar apenas o agent da stack escolhida
 - O prompt deve incluir: nome da classe, VOs/dependências envolvidas, comportamento esperado
@@ -438,9 +441,36 @@ docs/planning/meu-erp/backlog.md          ← saída (épicos + stories + tasks 
 - [ ] `interface:controller` Criar endpoints REST (~2h)
   - **Agent TS:** `Backend Controller` | **KT:** `Backend Controller (Kotlin)` | **CS:** `Backend Controller (C#)`
   - **Prompt:** "Crie <X>Controller com POST /api/<xs> e GET /api/<xs>/{id}. Usar Create<X>UseCase e Find<X>ByIdQuery."
-- [ ] `interface:form-web` Criar formulário frontend Angular/Vue (~2h)
-  - **Agent:** `Frontend Form (Angular)` ou `Frontend Form (Vue)`
-  - **Prompt:** "Formulário com validação; injeta UseCase; exibe erros de negócio (Result)."
+- [ ] `interface:entity` Criar entidade frontend <X> (~1h)
+  - **Agent Angular:** `Frontend Entity (Angular)` | **Vue:** `Frontend Entity (Vue)` | **Next.js:** `Frontend Form Schema`
+  - **Prompt:** "Crie entidade <X> frontend com Result<T>, espelhando o domínio do backend."
+- [ ] `interface:usecase` Criar use cases frontend (~2h)
+  - **Agent Angular:** `Frontend UseCase (Angular)` | **Vue:** `Frontend UseCase (Vue)`
+  - **Prompt:** "Crie Create<X>UseCase e List<X>sUseCase injetando I<X>Repository. Retornar Promise<Result>."
+- [ ] `interface:repository` Criar repositório HTTP (~2h)
+  - **Agent Angular:** `Frontend Repository (Angular)` | **Vue:** `Frontend Repository (Vue)`
+  - **Prompt:** "Crie <X>HttpRepository implementando I<X>Repository. Mapear DTOs; try/catch → Result.err."
+- [ ] `interface:page` Criar página de listagem (~2h)
+  - **Agent Angular:** `Frontend Page (Angular)` | **Vue:** `Frontend Page (Vue)`
+  - **Prompt:** "Listagem de <xs> injetando List<X>sUseCase. Tabela PrimeNG/PrimeVue; sem HTTP direto."
+- [ ] `interface:form-web` Criar formulário de cadastro/edição (~2h)
+  - **Agent Angular:** `Frontend Form (Angular)` | **Vue:** `Frontend Form (Vue)`
+  - **Prompt:** "Formulário com validação; injeta Create<X>UseCase; exibe erros de negócio (Result)."
+- [ ] `interface:mobile-entity` Criar entidade mobile <X> (~1h)
+  - **Agent Flutter:** `Mobile Entity (Flutter)` | **Android:** `Mobile Entity (Android)`
+  - **Prompt:** "Entidade <X> Dart/Kotlin pura com sealed Result."
+- [ ] `interface:mobile-usecase` Criar use cases mobile (~2h)
+  - **Agent Flutter:** `Mobile UseCase (Flutter)` | **Android:** `Mobile UseCase (Android)`
+  - **Prompt:** "Create<X>UseCase e List<X>sUseCase injetando I<X>Repository."
+- [ ] `interface:mobile-repository` Criar repositório HTTP mobile (~2h)
+  - **Agent Flutter:** `Mobile Repository (Flutter)` | **Android:** `Mobile Repository (Android)`
+  - **Prompt:** "RepositoryImpl com Dio/Retrofit; mapear DTOs; catch → Failure."
+- [ ] `interface:mobile` Criar tela de listagem mobile (~2h)
+  - **Agent Flutter:** `Mobile Screen (Flutter)` | **Android:** `Mobile Screen (Android)`
+  - **Prompt:** "Tela de listagem de <xs>; notifier/ViewModel injeta UseCase; pull-to-refresh."
+- [ ] `interface:mobile-form` Criar formulário mobile (~2h)
+  - **Agent Flutter:** `Mobile Form (Flutter)` | **Android:** `Mobile Form (Android)`
+  - **Prompt:** "Formulário de cadastro; trata result.when/onSuccess; exibe erros de negócio."
 - [ ] `test:unit` Testes da entity, VOs e use case (~2h)
   - **Agent TS:** `Unit Tests (TypeScript)` | **KT:** `Unit Tests (Kotlin)` | **CS:** `Unit Tests (C#)`
   - **Prompt:** "Crie testes unitários para VOs, Entity e Create<X>UseCase. Mock repository. Cobrir fluxo feliz e erros de negócio."

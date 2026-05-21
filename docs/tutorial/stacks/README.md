@@ -14,3 +14,5 @@ Todos partem do [Tutorial 01 — Análise](../01-pipeline-discovery-planning.md)
 O tutorial [04 — Ciclo OpenSpec](../04-ciclo-completo-openspec.md) usa **NestJS + Vue + Flutter** como narrativa legado. Outras combinações têm tutoriais próprios nesta pasta.
 
 O guia **mais detalhado** é [nestjs-angular-flutter.md](./nestjs-angular-flutter.md) (referência para BC, testes, UI e mobile).
+
+> **Convenção**: tasks em `backlog.md` e `tasks.md` usam **Agent** (`display_name` do `agents/openai.yaml`) + **Prompt** — ver [req-agile-planning](../../../req-agile-planning/SKILL.md).
