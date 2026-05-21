@@ -199,6 +199,10 @@ Também existem skills utilitárias para fluxo OpenSpec:
 - `openspec-apply-change`
 - `openspec-archive-change`
 
+### Skills de workflow (Git)
+
+- `git-organized-commits`: commits **atômicos por área** (sem `git add .`), mensagens convencionais com corpo descritivo e template de PR em 4 crases — agent **`Organized Git Commits`**
+
 ## Como usar como submódulo
 
 Você pode instalar este repositório em `.agents` ou `.cloud`, conforme o runtime/agente utilizado no projeto.

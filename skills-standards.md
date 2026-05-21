@@ -114,6 +114,7 @@ When editing any skill (`*/SKILL.md`):
 | Requisitos | `req-*`      | Discovery, modelagem DDD, migração e planejamento                | Agnostic                     |
 | Qualidade  | `test-*`     | Testes unitários (≥95% domain/app) e E2E (fluxos críticos)       | TS, KT, CS                   |
 | OpenSpec   | `openspec-*` | Fluxo de proposta/exploração/implementação                       | Agnostic                     |
+| Workflow   | `git-*`      | Automação de fluxo de trabalho (commits organizados, etc.)       | Agnostic                     |
 
 ### Stack Suffix Convention
 
