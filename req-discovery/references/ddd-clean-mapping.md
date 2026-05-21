@@ -84,31 +84,42 @@ Sistema fonte     req-discovery     req-ddd-modeling       req-migration-strateg
 8. test:unit → test:coverage → test:e2e
 ```
 
-## Skills de teste
+## Mapeamento de testes (Agent)
 
-| Task | Skill TS | Skill KT | Skill CS |
+| Task | Agent TS | Agent KT | Agent CS |
 |------|----------|----------|----------|
-| `test:unit` / `test:coverage` | `test-unit` | `test-unit-kt` | `test-unit-cs` |
-| `test:e2e` | `test-e2e` | `test-e2e-kt` | `test-e2e-cs` |
+| `test:unit` / `test:coverage` | `Unit Tests (TypeScript)` | `Unit Tests (Kotlin)` | `Unit Tests (C#)` |
+| `test:e2e` | `E2E Tests (TypeScript)` | `E2E Tests (Kotlin)` | `E2E Tests (C#)` |
 
 ## Notação de Task
 
+Use sempre **Agent** (`display_name` do `agents/openai.yaml`) — nunca pasta de skill:
+
 ```markdown
-- [ ] `domain:entity` Criar entidade Customer → skill: core-entity[-kt|-cs] (~2h)
-- [ ] `interface:entity` Customer entity frontend → skill: frontend-entity-vue (~1h)
-- [ ] `infra:docker` Dockerfile multi-stage → skill: config-docker (~1h)
+- [ ] `domain:entity` Criar entidade Customer (~2h)
+  - **Agent:** `Core Entity`
+  - **Prompt:** "Crie a entidade Customer com VOs Name e Email. Aggregate root."
+
+- [ ] `interface:entity` Customer entity frontend (~1h)
+  - **Agent:** `Frontend Entity (Vue)`
+  - **Prompt:** "Entidade Customer com Result<T>."
+
+- [ ] `infra:docker` Dockerfile multi-stage (~1h)
+  - **Agent:** `Config Docker (TypeScript)`
+  - **Prompt:** "Crie Dockerfile multi-stage + docker-compose.prod.yml."
+
 - [ ] `test:unit` Testes entity + VOs + use case (~2h)
-- [ ] `test:coverage` Validar ≥95% domain + application (~30min)
-- [ ] `test:e2e` Fluxo completo (~2h)
+  - **Agent:** `Unit Tests (TypeScript)`
+  - **Prompt:** "Mock repository; fluxo feliz e erros de negócio."
 ```
 
 ## OpenSpec no ciclo
 
-| Momento | Mudança | Skills no apply |
+| Momento | Mudança | Agents no apply |
 |---------|---------|-----------------|
-| Bootstrap | `bootstrap-<nome>` | config-project-*, config-docker, config-cicd, config-shared-core |
-| Por BC | `ep-XXX-<bc>` ou `bc-<nome>` | core-*, backend-*, frontend-*, mobile-* |
-| Por feature UI | `feat-<nome>-<framework>` | frontend-entity → page/form ou mobile-* |
+| Bootstrap | `bootstrap-<nome>` | Config Project (*), Config Shared Web (*), Config Docker, Config CI/CD, Config Shared Core |
+| Por BC | `ep-XXX-<bc>` ou `bc-<nome>` | Core *, Backend *, Frontend *, Mobile *, Unit Tests, E2E Tests |
+| Por feature UI | `feat-<nome>-<framework>` | Frontend Entity → Page/Form ou Mobile * |
 
 ## Escolha da Stack
 
