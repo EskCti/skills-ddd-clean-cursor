@@ -1,0 +1,212 @@
+---
+name: config-project-fullstack
+stack: agnostic
+description: Orquestrar a criação de um projeto full-stack completo com backend (NestJS/Spring Boot/ASP.NET Core), frontend (Next.js/Angular/Vue com Tailwind CSS) e mobile opcional (Flutter/Android). Integrar OpenSpec para gerenciamento de mudanças ao longo do ciclo. Usar quando o pedido envolver criar um projeto do zero com múltiplas camadas, ou quando o usuário não sabe por onde começar.
+---
+
+# Config Project Full-Stack
+
+## Overview
+
+Guia o usuário pela criação de um projeto completo — backend + frontend + mobile — orquestrando os agents corretos em sequência e integrando o OpenSpec nos pontos de mudança.
+
+**Este skill não gera código diretamente.** Ele define QUAL agent chamar, em qual ORDEM e com qual PROMPT, incluindo os pontos onde o OpenSpec agrega valor.
+
+---
+
+## Etapa 0 — Definição do projeto
+
+Antes de iniciar, coletar as seguintes decisões:
+
+```
+1. Nome do projeto: <kebab-case>
+2. Backend: [ ] NestJS (TypeScript)  [ ] Spring Boot (Kotlin)  [ ] ASP.NET Core (C#)
+3. Frontend: [ ] Next.js (+ Tailwind/Shadcn)  [ ] Angular (+ Tailwind)  [ ] Vue 3 (+ Tailwind)  [ ] Nenhum
+4. Mobile:   [ ] Flutter  [ ] Android (Kotlin + Compose)  [ ] Ambos  [ ] Nenhum
+5. Autenticação: [ ] Básica (JWT)  [ ] Completa (RBAC)  [ ] Nenhuma por agora
+6. OpenSpec: [ ] Sim, quero rastrear mudanças com openspec  [ ] Não (agents diretos)
+```
+
+---
+
+## Etapa 1 — Bootstrap do Projeto
+
+### 1A — Projeto backend + frontend web
+
+Escolha o agent conforme a combinação:
+
+| Backend | Frontend | Agent a usar | Prompt sugerido |
+|---------|----------|--------------|-----------------|
+| NestJS (TS) | Next.js | `Config Project` → `Config Shared Web` | "Bootstrap monorepo NestJS + Next.js com TurboRepo, Prisma, docker-compose. Depois: Config Shared Web (Tailwind + Shadcn + shell admin)." |
+| NestJS (TS) | Angular | `Config Project (Angular)` → `Config Shared Web (Angular)` | "Bootstrap monorepo NestJS + Angular 17+ com Tailwind. Depois: Config Shared Web (Angular) para shell admin." |
+| NestJS (TS) | Vue 3 | `Config Project (Vue)` → `Config Shared Web (Vue)` | "Bootstrap monorepo NestJS + Vue 3 + Tailwind. Depois: Config Shared Web (Vue) para shell admin." |
+| Spring Boot (KT) | Angular | `Config Project (Kotlin)` + `Config Project (Angular)` → `Config Shared Web (Angular)` | Backend primeiro; depois frontend + shell. |
+| Spring Boot (KT) | Vue 3 | `Config Project (Kotlin)` + `Config Project (Vue)` → `Config Shared Web (Vue)` | Backend primeiro; depois frontend + shell. |
+| ASP.NET Core (CS) | Angular | `Config Project (C#)` + `Config Project (Angular)` → `Config Shared Web (Angular)` | Backend primeiro; depois frontend + shell. |
+| ASP.NET Core (CS) | Vue 3 | `Config Project (C#)` + `Config Project (Vue)` → `Config Shared Web (Vue)` | Backend primeiro; depois frontend + shell. |
+
+> **OpenSpec aqui**: Se usar OpenSpec, criar a mudança ANTES do bootstrap:
+> ```
+> Agent: openspec-propose
+> Prompt: "Crie a mudança 'bootstrap-<nome-projeto>' com proposta, design e tasks para setup do projeto <stack escolhida>."
+> Depois: openspec-apply-change → chama o Config Project correto.
+> ```
+
+### 1B — Shell web (Tailwind + layout profissional)
+
+Após `config-project-*` do frontend:
+
+| Frontend | Agent | Prompt sugerido |
+|----------|-------|-----------------|
+| Next.js | `Config Shared Web` | "Configure shell admin Tailwind + Shadcn: sidebar, topbar, rodapé, dashboard vazio." |
+| Angular | `Config Shared Web (Angular)` | "Execute init-shared-web-angular.mjs e mescle app.routes.shell.ts." |
+| Vue | `Config Shared Web (Vue)` | "Execute init-shared-web-vue.mjs, configure @tailwindcss/vite e mescle shell.routes.ts." |
+
+### 1C — Projeto mobile
+
+Após o backend estar configurado:
+
+| Mobile | Agent | Prompt sugerido |
+|--------|-------|-----------------|
+| Flutter | `Config Project (Flutter)` | "Configure o app Flutter consumindo a API em http://localhost:4000, estrutura clean por feature, Riverpod, Dio, go_router." |
+| Android | `Config Project (Android)` | "Configure o app Android com Compose, Hilt, Retrofit apontando para http://localhost:4000, Navigation Compose." |
+| Ambos | Rodar Flutter → Android | Executar em sequência, ambos apontando para o mesmo backend. |
+
+### 1D — Docker e CI/CD (durante o bootstrap)
+
+Após o bootstrap de backend + frontend (+ mobile, se houver), configure **produção e pipeline** antes de implementar BCs:
+
+| Stack | Docker | CI/CD |
+|-------|--------|-------|
+| TypeScript | `config-docker` | `config-cicd` |
+| Kotlin | `config-docker-kt` | `config-cicd-kt` |
+| C# | `config-docker-cs` | `config-cicd-cs` |
+
+> **OpenSpec aqui**: incluir `config-docker` e `config-cicd` na mudança `bootstrap-<nome>`:
+> ```
+> Agent: openspec-propose
+> Prompt: "Crie a mudança 'bootstrap-<nome>' com tasks para config-project, config-docker, config-cicd e config-shared-core."
+> Depois: openspec-apply-change → executa todos no bootstrap.
+> ```
+
+---
+
+## Etapa 2 — Shared Kernel e Módulo Base
+
+Após o bootstrap, configurar o kernel compartilhado de domínio:
+
+| Stack | Agent | Prompt |
+|-------|-------|--------|
+| TypeScript | `Config Shared Core` | "Crie o shared kernel com Entity, ValueObject, Result, IUseCase base." |
+| Kotlin | `Config Shared Core (Kotlin)` | "Crie o shared kernel Kotlin com Entity, VO, Result, UseCase, Repository interfaces." |
+| C# | `Config Shared Core (C#)` | "Crie o shared kernel C# com Entity, ValueObject, Result<T>, IUseCase, IRepository." |
+
+> **OpenSpec aqui**: Para cada Bounded Context novo, use `openspec-propose` antes de criar o módulo:
+> ```
+> Agent: openspec-propose
+> Prompt: "Crie a mudança 'bc-customers' para implementar o Bounded Context de Clientes: Customer entity, VOs (Name, Email, CPF), CreateCustomerUseCase, CustomerRepository."
+> Depois: openspec-apply-change → chama core-entity, core-value-object, core-use-case, etc.
+> ```
+
+---
+
+## Etapa 3 — Implementação Inside-Out (por Bounded Context)
+
+Para cada BC identificado no backlog, seguir esta ordem:
+
+```
+1. domain:vo          → core-value-object[-kt|-cs]
+2. domain:entity      → core-entity[-kt|-cs]
+3. domain:service     → core-domain-service[-kt|-cs]   (se necessário)
+4. domain:repository  → core-repository[-kt|-cs]
+5. app:dto            → core-dto[-kt|-cs]
+6. app:usecase        → core-use-case[-kt|-cs]
+7. app:query          → core-query-cqrs[-kt|-cs]
+8. infra:persistence  → backend-data[-kt|-cs]
+9. infra:migration    → config-prisma | config-jpa-kt | config-efcore-cs
+10. interface:controller → backend-controller[-kt|-cs]
+```
+
+### 3A — Frontend Web (por página/feature)
+
+Após o endpoint do backend estar pronto:
+
+| Framework | Domínio + Aplicação + Infra | Apresentação |
+|-----------|----------------------------|--------------|
+| Next.js | `frontend-form-schema` (adaptar para listagem) | `frontend-form-schema` |
+| Angular | `frontend-entity-angular` → `frontend-usecase-angular` → `frontend-repository-angular` | `frontend-page-angular`, `frontend-form-angular` |
+| Vue | `frontend-entity-vue` → `frontend-usecase-vue` → `frontend-repository-vue` | `frontend-page-vue`, `frontend-form-vue` |
+
+> **OpenSpec aqui**: Para features novas no frontend:
+> ```
+> Agent: openspec-propose
+> Prompt: "Crie a mudança 'feat-customer-list-angular' para implementar a listagem de clientes em Angular com DataTable PrimeNG, CustomerService e rota lazy."
+> Depois: openspec-apply-change → chama frontend-entity, frontend-usecase, frontend-repository, frontend-page.
+> ```
+
+### 3B — Mobile (por tela/feature)
+
+Após a API estar pronta:
+
+| Framework | Domínio + Aplicação + Infra | Apresentação |
+|-----------|----------------------------|--------------|
+| Flutter | `mobile-entity-flutter` → `mobile-usecase-flutter` → `mobile-repository-flutter` | `mobile-screen-flutter`, `mobile-form-flutter` |
+| Android | `mobile-entity-android` → `mobile-usecase-android` → `mobile-repository-android` | `mobile-screen-android`, `mobile-form-android` |
+
+> **OpenSpec aqui**: Para features novas no mobile:
+> ```
+> Agent: openspec-propose
+> Prompt: "Crie a mudança 'feat-customer-list-flutter' para tela de listagem de clientes Flutter com Riverpod AsyncNotifier, ListView e RefreshIndicator."
+> Depois: openspec-apply-change → chama mobile-entity, mobile-usecase, mobile-repository, mobile-screen.
+> ```
+
+---
+
+## Etapa 4 — Autenticação (opcional)
+
+| Stack | Auth Básica (JWT) | Auth Completa (RBAC) |
+|-------|-------------------|----------------------|
+| TypeScript | `Config Auth Core Basic` → `Config Auth Backend Basic` → `Config Auth Web Basic` | `Config Auth Core Full` |
+| Kotlin | `Config Auth Core Basic (Kotlin)` → `Config Auth Backend Basic (Kotlin)` | `Config Auth Core Full (Kotlin)` |
+| C# | `Config Auth Core (C#)` → `Config Auth Backend Basic (C#)` | `Config Auth Core Full (C#)` |
+
+---
+
+## Pontos de uso do OpenSpec (resumo)
+
+| Momento | Mudança sugerida | Agents envolvidos no apply |
+|---------|-----------------|---------------------------|
+| Bootstrap do projeto | `bootstrap-<nome>` | Config Project, Config Docker, Config CI/CD, Config Shared Core |
+| Novo Bounded Context | `bc-<nome>` | core-entity, core-value-object, core-use-case, backend-controller |
+| Feature frontend | `feat-<nome>-<framework>` | frontend-entity, frontend-usecase, frontend-repository, frontend-page, frontend-form |
+| Feature mobile | `feat-<nome>-<mobile>` | mobile-entity, mobile-usecase, mobile-repository, mobile-screen, mobile-form |
+| Autenticação | `feat-auth` | Config Auth Core, Config Auth Backend |
+
+> O OpenSpec é **opcional mas recomendado** para times de 2+ pessoas ou projetos com múltiplas features em paralelo. Para projetos solo ou protótipos, usar os agents diretamente é mais rápido.
+
+---
+
+## Workflow rápido (sem OpenSpec)
+
+```
+1. Tutorial 01 (req-*) → backlog.md
+2. Tutorial 02 Hub → escolher combinação (docs/tutorial/stacks/)
+3. config-project-fullstack → bootstrap + docker + cicd + shared-core
+4. Por BC: inside-out → test-unit-* → test-e2e-*
+5. Frontend/mobile por feature
+6. Config Auth (se necessário)
+```
+
+Tutoriais: [docs/tutorial/02-fullstack-project-setup.md](../docs/tutorial/02-fullstack-project-setup.md) · [docs/tutorial/stacks/](../docs/tutorial/stacks/)
+
+---
+
+## References
+
+- Consultar references/fullstack-stack-matrix.md para tabela completa de decisão de stack.
+- Tutoriais por combinação: docs/tutorial/02-fullstack-project-setup.md (hub) e docs/tutorial/stacks/.
+- Consultar ../skills-standards.md para convenções globais.
+
+## Global Standards
+
+- Consultar ../skills-standards.md para padrões globais de nomenclatura e convenções gerais entre skills.
