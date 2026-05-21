@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Project (Vue)'
+  short_description: 'Bootstrap monorepo NestJS backend + Vue 3 + PrimeVue frontend'
+  default_prompt: 'Inicialize o projeto full-stack com NestJS backend em apps/backend/ e Vue 3 com PrimeVue em apps/web-vue/. Instalar PrimeVue 4 com tema Aura, Pinia, Vue Router, configurar proxy Vite para /api, CORS no NestJS, docker-compose com Postgres. Consultar references/vue-project-pattern.md.'

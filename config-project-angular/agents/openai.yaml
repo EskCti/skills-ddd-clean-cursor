@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Project (Angular)'
+  short_description: 'Bootstrap monorepo NestJS backend + Angular 17+ standalone frontend'
+  default_prompt: 'Inicialize o projeto full-stack com NestJS backend em apps/backend/ e Angular 17+ standalone em apps/web-angular/. Instalar PrimeNG, configurar proxy Angular para /api, CORS no NestJS, docker-compose com Postgres e .env. Consultar references/angular-project-pattern.md.'
