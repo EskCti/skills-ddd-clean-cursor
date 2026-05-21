@@ -4,6 +4,8 @@ Agents usados: `req-discovery` → `req-ddd-modeling` → `req-migration-strateg
 
 **Cenário**: Sistema legado PHP/Laravel com módulos de Auth, Clientes e Pedidos será migrado para **NestJS** (backend) + **Vue 3 + PrimeVue** (frontend) + **Flutter** (mobile), usando OpenSpec para rastrear cada mudança.
 
+> **Formato de tasks**: em `backlog.md` e `tasks.md`, use sempre **Agent** (`display_name` do `agents/openai.yaml`) + **Prompt** — nunca pasta de skill (`core-entity`, `frontend-entity-vue`). Ver `req-agile-planning`.
+
 ## Como usar este tutorial
 
 | Caminho | Quando | Passos |
@@ -50,9 +52,9 @@ Agents usados: `req-discovery` → `req-ddd-modeling` → `req-migration-strateg
 │  openspec-propose "ep-XXX-<nome>"                                        │
 │       ↓                                                                  │
 │  openspec-apply-change "ep-XXX-<nome>"                                   │
-│  ├── core-* / backend-* (domain + application + infra)                  │
-│  ├── frontend-entity/usecase/repository/page/form (Vue)                 │
-│  └── mobile-entity/usecase/repository/screen/form (Flutter)             │
+│  ├── Core Value Object / Core Entity / Backend Controller (backend)     │
+│  ├── Frontend Entity → UseCase → Repository → Page → Form (Vue)         │
+│  └── Mobile Entity → UseCase → Repository → Screen → Form (Flutter)     │
 │       ↓                                                                  │
 │  openspec-archive-change "ep-XXX-<nome>"                                │
 │                                                                          │
@@ -135,44 +137,118 @@ ddd-tactical-model.md
 ```markdown
 ## EP-000: [TECH] Bootstrap do Projeto
 
-- [ ] `infra:setup` Setup projeto full-stack (~4h)
-  - **Skill:** `config-project-fullstack`
-  - **Prompt:** "Configure: backend NestJS, frontend Vue 3 + PrimeVue, mobile Flutter (Riverpod + Dio). Docker e CI/CD no bootstrap. Usar OpenSpec."
+- [ ] `infra:fullstack` Orquestrar setup completo (~1h)
+  - **Agent:** `Config Project Full-Stack`
+  - **Prompt:** "Configure: backend NestJS, frontend Vue 3 + Tailwind, mobile Flutter (Riverpod + Dio). Docker e CI/CD no bootstrap. Usar OpenSpec."
+
+- [ ] `infra:setup` Bootstrap Vue monorepo (~2h)
+  - **Agent:** `Config Project (Vue)`
+  - **Prompt:** "Bootstrap monorepo NestJS + Vue 3 + docker-compose dev (Postgres)."
+
+- [ ] `infra:shell-web` Shell admin Tailwind (~1h)
+  - **Agent:** `Config Shared Web (Vue)`
+  - **Prompt:** "Configure shell: sidebar colapsável, topbar, rodapé, dashboard vazio. Mescle rotas do shell."
+
+- [ ] `infra:setup` Bootstrap Flutter (~2h)
+  - **Agent:** `Config Project (Flutter)`
+  - **Prompt:** "Configure app Flutter apontando para API local."
 
 - [ ] `infra:docker` Dockerfiles multi-stage (~1h)
-  - **Skill:** `config-docker`
+  - **Agent:** `Config Docker (TypeScript)`
+  - **Prompt:** "Crie Dockerfile multi-stage + docker-compose.prod.yml."
+
 - [ ] `infra:cicd` GitHub Actions CI + CD (~2h)
-  - **Skill:** `config-cicd`
+  - **Agent:** `Config CI/CD (TypeScript)`
+  - **Prompt:** "CI em PR (lint + test + coverage ≥95% domain/app). CD em main (build Docker + deploy)."
+
+- [ ] `domain:shared` Shared kernel DDD (~2h)
+  - **Agent:** `Config Shared Core`
+  - **Prompt:** "Configure Entity, ValueObject, Result<T>, IUseCase, IRepository."
+
+- [ ] `infra:db` Prisma + Postgres (~1h)
+  - **Agent:** `Config Prisma`
+  - **Prompt:** "Configure Postgres + schema inicial."
 
 ## EP-001: Auth e Usuários
 
 - [ ] `domain:vo` Criar PasswordVO com hash bcrypt (~1h)
-  - **Skill:** `core-value-object`
+  - **Agent:** `Core Value Object`
+  - **Prompt:** "Crie PasswordVO com Create() retornando Result<T> e hash bcrypt."
+
 - [ ] `domain:entity` Criar User entity (~2h)
-  - **Skill:** `core-entity`
+  - **Agent:** `Core Entity`
+  - **Prompt:** "Crie User com Email e PasswordVO. Aggregate root."
+
+- [ ] `domain:repository` IUserRepository (~30min)
+  - **Agent:** `Core Repository`
+  - **Prompt:** "Interface IUserRepository: create, findByEmail."
+
+- [ ] `app:dto` LoginInputDto, RegisterInputDto, AuthOutputDto (~1h)
+  - **Agent:** `Core DTO`
+  - **Prompt:** "DTOs de login, registro e resposta com JWT."
+
 - [ ] `app:usecase` LoginUseCase + RegisterUseCase (~3h)
-  - **Skill:** `core-use-case`
+  - **Agent:** `Core Use Case`
+  - **Prompt:** "LoginUseCase valida credenciais; RegisterUseCase cria User e persiste."
+
+- [ ] `infra:persistence` UserPrismaRepository (~2h)
+  - **Agent:** `Backend Prisma Data`
+  - **Prompt:** "Implemente IUserRepository com Prisma."
+
 - [ ] `interface:controller` AuthController POST /auth/login e /auth/register (~2h)
-  - **Skill:** `backend-controller`
-- [ ] `interface:form-web` LoginView e RegisterView Vue (~3h)
-  - **Skills:** `frontend-entity-vue` → `frontend-usecase-vue` → `frontend-repository-vue` → `frontend-form-vue`
-- [ ] `interface:mobile` LoginPage Flutter (~3h)
-  - **Skills:** `mobile-entity-flutter` → `mobile-usecase-flutter` → `mobile-repository-flutter` → `mobile-screen-flutter`
+  - **Agent:** `Backend Controller`
+  - **Prompt:** "Endpoints JWT; usar LoginUseCase e RegisterUseCase."
+
+- [ ] `interface:entity` AuthUser entity Vue (~1h)
+  - **Agent:** `Frontend Entity (Vue)`
+  - **Prompt:** "Entidade AuthUser com Result<T>."
+
+- [ ] `interface:usecase` LoginUseCase + RegisterUseCase Vue (~2h)
+  - **Agent:** `Frontend UseCase (Vue)`
+  - **Prompt:** "Use cases injetando IAuthRepository."
+
+- [ ] `interface:repository` AuthHttpRepository Vue (~2h)
+  - **Agent:** `Frontend Repository (Vue)`
+  - **Prompt:** "HTTP para /auth/login e /auth/register; mapear DTOs."
+
+- [ ] `interface:page` LoginView Vue (~2h)
+  - **Agent:** `Frontend Page (Vue)`
+  - **Prompt:** "Tela de login injetando LoginUseCase."
+
+- [ ] `interface:form-web` RegisterView Vue (~2h)
+  - **Agent:** `Frontend Form (Vue)`
+  - **Prompt:** "Formulário de registro; exibe erros de Result."
+
+- [ ] `interface:mobile-entity` AuthUser entity Flutter (~1h)
+  - **Agent:** `Mobile Entity (Flutter)`
+  - **Prompt:** "Entidade AuthUser Dart pura com sealed Result."
+
+- [ ] `interface:mobile-usecase` LoginUseCase Flutter (~2h)
+  - **Agent:** `Mobile UseCase (Flutter)`
+  - **Prompt:** "LoginUseCase injetando IAuthRepository."
+
+- [ ] `interface:mobile-repository` AuthRepositoryImpl Flutter (~2h)
+  - **Agent:** `Mobile Repository (Flutter)`
+  - **Prompt:** "Dio para /auth/login; catch → Failure."
+
+- [ ] `interface:mobile` LoginPage Flutter (~2h)
+  - **Agent:** `Mobile Screen (Flutter)`
+  - **Prompt:** "Tela de login com Riverpod AsyncNotifier."
+
 - [ ] `test:unit` + `test:coverage` Testes domain+app ≥95% (~2h)
-  - **Skill:** `test-unit`
+  - **Agent:** `Unit Tests (TypeScript)`
+  - **Prompt:** "Testes de User, VOs e LoginUseCase; mock repository."
+
 - [ ] `test:e2e` Login API POST /auth/login (~2h)
-  - **Skill:** `test-e2e`
+  - **Agent:** `E2E Tests (TypeScript)`
+  - **Prompt:** "Supertest POST /auth/login; Playwright no fluxo Vue se aplicável."
 
 ## EP-002: Customers
 
 - [ ] `test:unit` + `test:coverage` VOs, Customer entity, CreateCustomerUseCase ≥95% (~2h)
-  - **Skill:** `test-unit`
+  - **Agent:** `Unit Tests (TypeScript)`
 - [ ] `test:e2e` POST /customers → GET /customers/:id (~2h)
-  - **Skill:** `test-e2e`
-
-## EP-003: Orders
-
-[...tasks mais complexas para Orders BC...]
+  - **Agent:** `E2E Tests (TypeScript)`
 ```
 
 ---
@@ -194,11 +270,13 @@ ddd-tactical-model.md
 
 2. Agent: openspec-apply-change "bootstrap-loja-nova"
    Tasks (em ordem):
-   ├── config-project-vue      → monorepo NestJS + Vue 3 + PrimeVue + docker-compose dev
-   ├── config-project-flutter  → app Flutter + Riverpod + Dio
-   ├── config-docker           → Dockerfile multi-stage + docker-compose.prod.yml
-   ├── config-cicd             → GitHub Actions CI + CD
-   └── config-shared-core      → Entity, ValueObject, Result<T>, IUseCase, IRepository
+   ├── Config Project (Vue)           → monorepo NestJS + Vue 3 + docker-compose dev
+   ├── Config Shared Web (Vue)      → shell admin Tailwind (sidebar, topbar, rodapé)
+   ├── Config Project (Flutter)     → app Flutter + Riverpod + Dio
+   ├── Config Docker (TypeScript)   → Dockerfile multi-stage + docker-compose.prod.yml
+   ├── Config CI/CD (TypeScript)    → GitHub Actions CI + CD
+   ├── Config Shared Core           → Entity, ValueObject, Result<T>, IUseCase, IRepository
+   └── Config Prisma                → schema inicial Postgres
 
 3. Agent: openspec-archive-change "bootstrap-loja-nova"
 ```
@@ -232,12 +310,33 @@ Base necessária para implementar todos os BCs funcionais com entrega contínua 
 
 ```markdown
 <!-- tasks.md -->
-- [ ] config-project-vue → monorepo + docker-compose dev
-- [ ] config-project-flutter → app Flutter
-- [ ] config-docker → Dockerfile multi-stage NestJS
-- [ ] config-cicd → GitHub Actions CI + CD
-- [ ] config-shared-core → kernel DDD
-- [ ] config-prisma → schema inicial
+- [ ] `infra:setup` Bootstrap Vue monorepo (~2h)
+  - **Agent:** `Config Project (Vue)`
+  - **Prompt:** "Monorepo NestJS + Vue 3 + docker-compose dev."
+
+- [ ] `infra:shell-web` Shell admin Tailwind (~1h)
+  - **Agent:** `Config Shared Web (Vue)`
+  - **Prompt:** "Sidebar, topbar, rodapé, dashboard vazio."
+
+- [ ] `infra:setup` Bootstrap Flutter (~2h)
+  - **Agent:** `Config Project (Flutter)`
+  - **Prompt:** "App Flutter + Riverpod + Dio."
+
+- [ ] `infra:docker` Dockerfiles multi-stage (~1h)
+  - **Agent:** `Config Docker (TypeScript)`
+  - **Prompt:** "Dockerfile multi-stage NestJS + docker-compose.prod.yml."
+
+- [ ] `infra:cicd` GitHub Actions (~2h)
+  - **Agent:** `Config CI/CD (TypeScript)`
+  - **Prompt:** "CI em PR; CD em main."
+
+- [ ] `domain:shared` Shared kernel DDD (~2h)
+  - **Agent:** `Config Shared Core`
+  - **Prompt:** "Entity, VO, Result<T>, IUseCase, IRepository."
+
+- [ ] `infra:db` Prisma + Postgres (~1h)
+  - **Agent:** `Config Prisma`
+  - **Prompt:** "Schema inicial Postgres."
 ```
 
 ### Etapa 2.3 — openspec-apply-change bootstrap
@@ -246,7 +345,7 @@ Base necessária para implementar todos os BCs funcionais com entrega contínua 
 
 > Implemente a mudança "bootstrap-loja-nova".
 
-O apply executa as tasks na ordem do `tasks.md`, chamando cada skill de config.
+O apply executa as tasks na ordem do `tasks.md`, acionando cada **Agent** listado.
 
 **Estrutura resultante:**
 
@@ -278,7 +377,7 @@ loja-nova/
 
 ```
 ✓ bootstrap-loja-nova arquivado
-  - 6/6 tasks completadas (inclui docker + cicd)
+  - 7/7 tasks completadas (inclui shell web, docker + cicd)
   - Duração: ~4h
 ```
 
@@ -296,37 +395,76 @@ loja-nova/
 
 ```markdown
 - [ ] `domain:vo` PasswordVO com hash bcrypt (~1h)
-  - Skill: core-value-object
+  - **Agent:** `Core Value Object`
+  - **Prompt:** "Crie PasswordVO com Create() retornando Result<T> e hash bcrypt."
 
 - [ ] `domain:entity` User entity com Email, PasswordVO (~2h)
-  - Skill: core-entity
+  - **Agent:** `Core Entity`
+  - **Prompt:** "Aggregate root User com Email e PasswordVO."
 
 - [ ] `domain:repository` IUserRepository (port) (~30min)
-  - Skill: core-repository
+  - **Agent:** `Core Repository`
+  - **Prompt:** "Interface IUserRepository: create, findByEmail."
 
 - [ ] `app:dto` LoginInputDto, RegisterInputDto, AuthOutputDto (~1h)
-  - Skill: core-dto
+  - **Agent:** `Core DTO`
+  - **Prompt:** "DTOs de login, registro e resposta JWT."
 
 - [ ] `app:usecase` LoginUseCase + RegisterUseCase (~3h)
-  - Skill: core-use-case
+  - **Agent:** `Core Use Case`
+  - **Prompt:** "LoginUseCase valida credenciais; RegisterUseCase cria User."
 
 - [ ] `infra:persistence` UserPrismaRepository (~2h)
-  - Skill: backend-prisma-data
+  - **Agent:** `Backend Prisma Data`
+  - **Prompt:** "Implemente IUserRepository com Prisma."
 
 - [ ] `interface:controller` AuthController POST /auth/login e POST /auth/register (~2h)
-  - Skill: backend-controller
+  - **Agent:** `Backend Controller`
+  - **Prompt:** "Endpoints JWT usando LoginUseCase e RegisterUseCase."
 
-- [ ] `interface:form-web` LoginView + RegisterView Vue (~3h)
-  - Skills: frontend-entity-vue → frontend-usecase-vue → frontend-repository-vue → frontend-form-vue
+- [ ] `interface:entity` AuthUser entity Vue (~1h)
+  - **Agent:** `Frontend Entity (Vue)`
+  - **Prompt:** "Entidade AuthUser com Result<T>."
 
-- [ ] `interface:mobile` LoginPage Flutter (~3h)
-  - Skills: mobile-entity-flutter → mobile-usecase-flutter → mobile-repository-flutter → mobile-screen-flutter
+- [ ] `interface:usecase` LoginUseCase + RegisterUseCase Vue (~2h)
+  - **Agent:** `Frontend UseCase (Vue)`
+  - **Prompt:** "Use cases injetando IAuthRepository."
+
+- [ ] `interface:repository` AuthHttpRepository Vue (~2h)
+  - **Agent:** `Frontend Repository (Vue)`
+  - **Prompt:** "HTTP para /auth/login e /auth/register."
+
+- [ ] `interface:page` LoginView Vue (~2h)
+  - **Agent:** `Frontend Page (Vue)`
+  - **Prompt:** "Tela de login injetando LoginUseCase."
+
+- [ ] `interface:form-web` RegisterView Vue (~2h)
+  - **Agent:** `Frontend Form (Vue)`
+  - **Prompt:** "Formulário de registro; exibe erros de Result."
+
+- [ ] `interface:mobile-entity` AuthUser entity Flutter (~1h)
+  - **Agent:** `Mobile Entity (Flutter)`
+  - **Prompt:** "Entidade AuthUser Dart pura."
+
+- [ ] `interface:mobile-usecase` LoginUseCase Flutter (~2h)
+  - **Agent:** `Mobile UseCase (Flutter)`
+  - **Prompt:** "LoginUseCase injetando IAuthRepository."
+
+- [ ] `interface:mobile-repository` AuthRepositoryImpl Flutter (~2h)
+  - **Agent:** `Mobile Repository (Flutter)`
+  - **Prompt:** "Dio para /auth/login."
+
+- [ ] `interface:mobile` LoginPage Flutter (~2h)
+  - **Agent:** `Mobile Screen (Flutter)`
+  - **Prompt:** "Tela de login com Riverpod."
 
 - [ ] `test:unit` + `test:coverage` User, VOs, LoginUseCase ≥95% (~2h)
-  - Skill: test-unit
+  - **Agent:** `Unit Tests (TypeScript)`
+  - **Prompt:** "Mock repository; fluxo feliz e erros."
 
 - [ ] `test:e2e` POST /auth/login (~2h)
-  - Skill: test-e2e
+  - **Agent:** `E2E Tests (TypeScript)`
+  - **Prompt:** "Supertest POST /auth/login."
 ```
 
 ### Etapa 3.2 — openspec-apply-change
@@ -335,37 +473,48 @@ loja-nova/
 
 > Implemente a mudança "ep-001-auth".
 
-O apply executa **task a task** na sequência inside-out:
+O apply executa **task a task**, acionando o **Agent** de cada linha na sequência inside-out:
 
 ```
-Implementando ep-001-auth (11 tasks)
+Implementando ep-001-auth (18 tasks)
 
-Task 1/11: domain:vo PasswordVO
-  → skill core-value-object
+Task 1/18: domain:vo PasswordVO
+  → Agent: Core Value Object
   → Criado: packages/shared-core/src/vo/password.vo.ts
   ✓ Task completa
 
-Task 2/11: domain:entity User
-  → skill core-entity
+Task 2/18: domain:entity User
+  → Agent: Core Entity
   → Criado: packages/auth/core/src/entity/user.entity.ts
   ✓ Task completa
 
-[... continua até task 8/11 ...]
+[... continua até task 7/18 — Backend Controller ...]
 
-Task 9/11: interface:mobile LoginPage Flutter
-  → skills mobile-entity-flutter → mobile-screen-flutter
-  → Criado: mobile-flutter/.../login_page.dart
+Task 8/18: interface:entity AuthUser Vue
+  → Agent: Frontend Entity (Vue)
   ✓ Task completa
 
-Task 10/11: test:unit + test:coverage
-  → skill test-unit
+Task 9/18: interface:usecase LoginUseCase Vue
+  → Agent: Frontend UseCase (Vue)
   ✓ Task completa
 
-Task 11/11: test:e2e POST /auth/login
-  → skill test-e2e
+[... tasks 10–12: Frontend Repository, Page, Form ...]
+
+Task 13/18: interface:mobile-entity AuthUser Flutter
+  → Agent: Mobile Entity (Flutter)
   ✓ Task completa
 
-Progresso: 11/11 tasks completas
+[... tasks 14–16: Mobile UseCase, Repository, Screen ...]
+
+Task 17/18: test:unit + test:coverage
+  → Agent: Unit Tests (TypeScript)
+  ✓ Task completa
+
+Task 18/18: test:e2e POST /auth/login
+  → Agent: E2E Tests (TypeScript)
+  ✓ Task completa
+
+Progresso: 18/18 tasks completas
 Pronto para arquivar. Use openspec-archive-change.
 ```
 
@@ -377,7 +526,7 @@ Pronto para arquivar. Use openspec-archive-change.
 
 ```
 ✓ ep-001-auth arquivado
-  - 11/11 tasks completadas
+  - 18/18 tasks completadas
   - BCs cobertos: Auth (backend + frontend Vue + mobile Flutter)
   - Duração estimada: ~17h
 ```
@@ -390,14 +539,13 @@ O pattern do EP-001 se repete para o BC Customers:
 
 ```
 1. openspec-propose "ep-002-customers"
-   → tasks.md com: Name/Email/CPF VOs, Customer entity, CustomerRepository,
-     CreateCustomerUseCase, GetCustomerByIdQuery, CustomerController,
-     frontend-entity/usecase/repository/page/form (Vue),
-     mobile-entity/usecase/repository/screen/form (Flutter),
-     test:unit, test:coverage, test:e2e
+   → tasks.md com: VOs, Customer entity, CreateCustomerUseCase, CustomerController,
+     Frontend Entity/UseCase/Repository/Page/Form (Vue),
+     Mobile Entity/UseCase/Repository/Screen/Form (Flutter),
+     Unit Tests, E2E Tests — cada task com **Agent** + **Prompt**
 
 2. openspec-apply-change "ep-002-customers"
-   → chama skills na sequência inside-out
+   → aciona cada Agent na sequência inside-out
 
 3. openspec-archive-change "ep-002-customers"
 ```
@@ -466,7 +614,7 @@ O tasks.md terá ~16 tasks cobrindo backend completo + listagem de pedidos no Vu
 ```
 ❌ Errado: criar uma mudança openspec para corrigir um bug urgente em produção
 
-✓ Certo: hotfixes urgentes → skills diretos (core-entity, backend-controller, etc.)
+✓ Certo: hotfixes urgentes → agents diretos (`Core Entity`, `Backend Controller`, etc.)
          Registrar como débito técnico para documentação posterior
 ```
 
@@ -476,7 +624,7 @@ O tasks.md terá ~16 tasks cobrindo backend completo + listagem de pedidos no Vu
 ❌ Errado: implementar todos os BCs e só então configurar Docker + CI/CD
            → sem feedback de build/deploy desde o início
 
-✓ Certo: incluir config-docker e config-cicd na mudança bootstrap-loja-nova
+✓ Certo: incluir `Config Docker (TypeScript)` e `Config CI/CD (TypeScript)` na mudança bootstrap-loja-nova
          (conforme config-project-fullstack e [Hub Full-Stack](./02-fullstack-project-setup.md))
 ```
 
@@ -485,21 +633,21 @@ O tasks.md terá ~16 tasks cobrindo backend completo + listagem de pedidos no Vu
 ```
 ❌ Errado: frontend-page-vue chamando HttpClient diretamente, sem entity/usecase/repository
 
-✓ Certo: frontend-entity-vue → frontend-usecase-vue → frontend-repository-vue → frontend-page-vue
-         (mesmo padrão Clean Architecture do backend)
+✓ Certo: Frontend Entity (Vue) → Frontend UseCase (Vue) → Frontend Repository (Vue) → Frontend Page (Vue)
+         (mesmo padrão Clean Architecture do backend; uma task por camada, cada uma com seu Agent)
 ```
 
 ---
 
 ## Resumo do Ciclo
 
-| Fase | O que acontece | Skills |
+| Fase | O que acontece | Agents |
 |------|----------------|--------|
-| Análise | Discovery + modelagem DDD + migração + planejamento | `req-*` |
-| Setup | Bootstrap + Docker + CI/CD + shared kernel | `openspec-*` + `config-project-*` + `config-docker` + `config-cicd` + `config-shared-core` |
-| Por BC | Propose → Apply (inside-out) → Archive | `openspec-*` + `core-*` + `backend-*` + `frontend-*` + `mobile-*` + `test-unit-*` + `test-e2e-*` |
+| Análise | Discovery + modelagem DDD + migração + planejamento | Requirement Discovery, DDD Modeling, Migration Strategy, Agile Planning |
+| Setup | Bootstrap + shell + Docker + CI/CD + shared kernel | openspec-* + Config Project (*) + Config Shared Web (*) + Config Docker + Config CI/CD + Config Shared Core |
+| Por BC | Propose → Apply (inside-out) → Archive | openspec-* + Core * + Backend * + Frontend * + Mobile * + Unit Tests + E2E Tests |
 
-**Regra de ouro**: uma mudança OpenSpec por Bounded Context/épico, cobrindo **todas as camadas daquele BC** (backend + frontend + mobile). O `openspec-apply-change` chama os skills certos na sequência correta.
+**Regra de ouro**: uma mudança OpenSpec por Bounded Context/épico, cobrindo **todas as camadas daquele BC** (backend + frontend + mobile). O `tasks.md` deve listar **Agent** + **Prompt** por task (copiado do `backlog.md`). O `openspec-apply-change` aciona cada Agent na sequência correta.
 
 ---
 
