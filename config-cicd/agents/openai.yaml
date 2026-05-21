@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config CI/CD (TypeScript)'
+  short_description: 'GitHub Actions para lint, testes, build Docker e deploy em NestJS + Next.js'
+  default_prompt: 'Crie workflows GitHub Actions para monorepo TurboRepo com NestJS e Next.js. Gere .github/workflows/ci.yml (lint + test + build em PRs, com postgres service para testes de integracao) e .github/workflows/cd.yml (build Docker + push para registry + deploy em push para main). Perguntar ao usuario o registry de destino (GHCR recomendado) e o ambiente de deploy (Fly.io, Railway, ECS ou apenas build/push). Consultar references/cicd-pattern.md para os templates completos.'
