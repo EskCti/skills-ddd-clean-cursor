@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Shared Web (Vue)'
+  short_description: 'Shell admin Vue 3 com Tailwind — sidebar, topbar, rodapé e rotas'
+  default_prompt: 'Configure o shell web admin Vue 3 com Tailwind CSS v4: sidebar colapsável, topbar com menu do usuário, rodapé, dashboard vazio e rotas de referência. Execute init-shared-web-vue.mjs em apps/web-vue, configure @tailwindcss/vite no vite.config.ts e mescle shell.routes.ts no router. Consultar SKILL.md e references/integrate-shell.md.'

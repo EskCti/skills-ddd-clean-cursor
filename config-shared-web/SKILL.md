@@ -1,7 +1,7 @@
 ---
 name: config-shared-web
 stack: typescript
-description: 'Inicializar e padronizar a camada web compartilhada para apps admin em Next.js com scaffold base agnostico de biblioteca de componentes, grupos de rotas `app/(private)` e `app/(public)`, estrutura `src/shared` (incluindo i18n e form validator), modulo `src/modules/examples` e adapter de UI selecionavel (default: Shadcn). Usar quando o pedido envolver bootstrap/rebootstrap do shell web, criacao de layout dashboard reutilizavel e setup inicial de componentes/paginas de referencia.'
+description: 'Inicializar e padronizar a camada web compartilhada para apps admin em Next.js com Tailwind CSS v4, scaffold base agnostico de biblioteca de componentes, grupos de rotas `app/(private)` e `app/(public)`, estrutura `src/shared` (incluindo i18n e form validator), modulo `src/modules/examples` e adapter de UI selecionavel (default: Shadcn). Usar quando o pedido envolver bootstrap/rebootstrap do shell web, criacao de layout dashboard reutilizavel e setup inicial de componentes/paginas de referencia.'
 ---
 
 # Config Shared Web
@@ -10,7 +10,7 @@ description: 'Inicializar e padronizar a camada web compartilhada para apps admi
 
 Executa bootstrap deterministico do shell web compartilhado no frontend (`apps/web` por default) em duas camadas:
 
-- camada base (`templates/base`): estrutura do projeto, rotas, modulo examples, `src/shared` (context/hook/template), internacionalizacao e validador de formularios;
+- camada base (`templates/base`): **Tailwind CSS v4**, estrutura do projeto, rotas, modulo examples, `src/shared` (context/hook/template), internacionalizacao e validador de formularios;
 - camada de biblioteca de UI (`templates/ui-libraries/<library>`): dependencias, setup da biblioteca e componentes basicos.
 
 Adapter default: `shadcn`.
@@ -122,7 +122,8 @@ node .agents/skills/config-shared-web/scripts/init-shared-web.mjs --ui-library s
 - Sidebar desktop colapsavel (somente icones no estado colapsado).
 - Em mobile, navegacao lateral exibida somente via drawer.
 - Logo no sidebar com icone + texto (texto oculto quando colapsado).
-- Item de logout como placeholder para evolucao futura.
+- Topbar com toggle, notificacoes e dropdown de usuario.
+- **Rodape** global com copyright.
 - Dashboard privado inicial renderiza `EmptyDashboardState` com ilustracao SVG.
 - `EmptyDashboardState` deve aceitar `moduleName?: string`; sem prop, manter "Dashboard Vazio"; com prop, mostrar "Dashboard <moduleName>" com destaque visual no nome.
 - `SidebarMenu` padroniza menu de navegacao com item principal opcional, grupos por secao e suporte a menu colapsado com tooltip.
