@@ -326,29 +326,25 @@ Gerar os seguintes documentos em `<docsPath>/modeling/<project-name>/`:
 ### Pipeline completo
 
 ```
-Sistema fonte            req-discovery         req-ddd-modeling          req-agile-planning       implementação
-(qualquer linguagem) →   (leitura) →           (modelagem DDD) →        (planejamento ágil) →    skills TS/KT/CS
-                         requirements.md       ddd-strategic-model.md   backlog.md
-                         ddd-analysis.md       ddd-tactical-model.md    epics-summary.md
+Sistema fonte            req-discovery         req-ddd-modeling          req-migration-strategy   req-agile-planning       implementação
+(qualquer linguagem) →   (leitura) →           (modelagem DDD) →        [opcional]         →    (planejamento) →         config-project-fullstack
+                         requirements.md       ddd-strategic-model.md   migration-strategy.md  backlog.md               + openspec-* + config-docker/cicd
+                         ddd-analysis.md       ddd-tactical-model.md  acl-design.md          epics-summary.md         + core-* / frontend-* / mobile-*
                                                ddd-operational-notes.md sprint-plan.md
 ```
 
 > O `req-ddd-modeling` pode ser usado **diretamente** sem `req-discovery` — basta fornecer uma descrição do domínio.
 
-### Antes (fontes):
-
-- **`req-discovery`** → fornece `requirements.md` + `ddd-analysis.md`
-- **Descrição livre** → o usuário descreve o domínio textualmente
-
 ### Depois (consumidores):
 
-- **`req-agile-planning`** → usa o modelo DDD para gerar épicos (1 por BC), stories e tasks
-- **`openspec-propose`** → proposta de change para um BC específico
-- **`config-new-module[-kt|-cs]`** → scaffold do módulo de um BC
+- **`req-migration-strategy`** → se o sistema for legado em produção
+- **`req-agile-planning`** → usa o modelo DDD para gerar épicos (1 por BC), stories e tasks (EP-000 com docker/cicd)
+- **`config-project-fullstack`** → orquestra bootstrap completo
+- **`openspec-propose`** → proposta de change para bootstrap ou BC específico
 
 Ofereça essas opções ao finalizar:
 
-> "Modelagem DDD concluída!\n> Próximos passos:\n> 1. Gerar planejamento ágil com épicos por BC (`req-agile-planning`)\n> 2. Implementar um BC diretamente (`config-new-module[-kt|-cs]`)\n> 3. Aprofundar um BC específico (`openspec-explore`)"
+> "Modelagem DDD concluída!\n> Próximos passos:\n> 1. [Se legado] Estratégia de migração (`req-migration-strategy`)\n> 2. Gerar backlog (`req-agile-planning`) — EP-000 inclui docker + cicd\n> 3. Bootstrap full-stack (`config-project-fullstack` + OpenSpec)\n> 4. Implementar BC (`openspec-propose \"bc-<nome>\"`)"
 
 ---
 
