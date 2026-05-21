@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Mobile UseCase (Flutter)'
+  short_description: 'Caso de uso Flutter em Dart puro com UseCase<Type, Params> + Result<T>'
+  default_prompt: 'Crie o caso de uso Flutter para a operação indicada. Use abstract UseCase<Type, Params> com Future<Result<Type>> como retorno, receba o repository no construtor via injeção de dependência, encapsule parâmetros em <Nome>Params e nunca lance exceções (retorne Failure). Consultar references/flutter-usecase-pattern.md.'

@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Mobile Repository (Flutter)'
+  short_description: 'Repositório Flutter: interface domínio + impl Dio + datasource + Model'
+  default_prompt: 'Crie o repositório Flutter para o BC indicado: (1) abstract class IRepository com métodos Future<Result<T>>, (2) RemoteDataSource com Dio, (3) RepositoryImpl que captura DioException e retorna Failure, (4) Model com json_serializable. Consultar references/flutter-repository-pattern.md.'

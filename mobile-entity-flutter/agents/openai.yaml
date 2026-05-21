@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Mobile Entity (Flutter)'
+  short_description: 'Entidade de domínio Flutter com sealed Result<T>/Failure'
+  default_prompt: 'Crie a entidade de domínio Flutter para a entidade indicada. Use Dart puro (sem Flutter/Riverpod), construtor privado + factory create() retornando Result<Entity, Failure>, sealed class Failure com variantes específicas do BC, e implementação de == e hashCode. Consultar references/flutter-entity-pattern.md.'

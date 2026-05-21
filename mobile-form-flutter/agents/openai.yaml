@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Mobile Form (Flutter)'
+  short_description: 'Formulário Flutter com Form + TextFormField + Riverpod'
+  default_prompt: 'Crie o formulário Flutter para a entidade indicada usando ConsumerStatefulWidget, Form com GlobalKey<FormState>, TextFormField com validators inline, TextEditingController por campo e submissão via Riverpod notifier com feedback de loading/sucesso/erro via ScaffoldMessenger. Consultar references/flutter-form-pattern.md.'
