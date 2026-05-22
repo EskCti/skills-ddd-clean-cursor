@@ -39,9 +39,9 @@ Equivalente ao `config-prisma` do stack TypeScript e `config-jpa-kt` do stack Ko
 
 ## Arquivos críticos
 
-- `src/Project.Infrastructure/Persistence/Contexts/AppDbContext.cs`
-- `src/Project.Backend/appsettings.json`
-- `src/Project.Infrastructure/Persistence/Configurations/*.Configuration.cs`
+- `apps/backend/Project.Infrastructure/Persistence/Contexts/AppDbContext.cs`
+- `apps/backend/Project.Backend/appsettings.json`
+- `apps/backend/Project.Infrastructure/Persistence/Configurations/*.Configuration.cs`
 - `docker-compose.yml`
 - `.env` / `.env.example`
 
@@ -50,19 +50,19 @@ Equivalente ao `config-prisma` do stack TypeScript e `config-jpa-kt` do stack Ko
 Gerar migration (no root):
 
 ```bash
-dotnet ef migrations add <MigrationName> --project src/Project.Infrastructure --startup-project src/Project.Backend --output-dir Persistence/Migrations
+dotnet ef migrations add <MigrationName> --project apps/backend/Project.Infrastructure --startup-project apps/backend/Project.Backend --output-dir Persistence/Migrations
 ```
 
 Aplicar no banco local:
 
 ```bash
-dotnet ef database update --project src/Project.Infrastructure --startup-project src/Project.Backend
+dotnet ef database update --project apps/backend/Project.Infrastructure --startup-project apps/backend/Project.Backend
 ```
 
 Remover última migration:
 
 ```bash
-dotnet ef migrations remove --project src/Project.Infrastructure --startup-project src/Project.Backend
+dotnet ef migrations remove --project apps/backend/Project.Infrastructure --startup-project apps/backend/Project.Backend
 ```
 
 ## Resources

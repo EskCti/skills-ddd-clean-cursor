@@ -1,24 +1,24 @@
 # New Module Contract (C#)
 
-## Estrutura Gerada no `src/`
+## Estrutura gerada em `apps/backend/`
 
 Para um novo módulo `<ModuleName>`:
 
-- `src/Project.<ModuleName>/Project.<ModuleName>.csproj`
-  - Referências: `Project.Shared.Kernel`
-- `src/Project.<ModuleName>/Domain/Entities/<ModuleName>.cs`
-- `src/Project.<ModuleName>/Domain/Repositories/I<ModuleName>Repository.cs`
-- `src/Project.<ModuleName>/Application/UseCases/` (Pasta vazia ou placeholder)
-- `src/Project.<ModuleName>/Application/DTOs/` (Pasta vazia ou placeholder)
+- `apps/backend/Project.<ModuleName>/Project.<ModuleName>.csproj`
+  - Referências: `Project.Shared.Kernel` (ou `Project.Core` conforme BC)
+- `apps/backend/Project.<ModuleName>/Domain/Entities/<ModuleName>.cs`
+- `apps/backend/Project.<ModuleName>/Domain/Repositories/I<ModuleName>Repository.cs`
+- `apps/backend/Project.<ModuleName>/Application/UseCases/`
+- `apps/backend/Project.<ModuleName>/Application/DTOs/`
 
-## Integração com a Solução
+## Integração com a solução
 
-- [ ] Executar `dotnet sln add src/Project.<ModuleName>/Project.<ModuleName>.csproj`.
-- [ ] Adicionar referência no Projeto de Backend: `dotnet add src/Project.Backend/Project.Backend.csproj reference src/Project.<ModuleName>/Project.<ModuleName>.csproj`.
-- [ ] Registrar serviços do módulo no `Program.cs` ou via extensão `IServiceCollection`.
+- [ ] `dotnet sln add apps/backend/Project.<ModuleName>/Project.<ModuleName>.csproj`
+- [ ] `dotnet add apps/backend/Project.Backend/Project.Backend.csproj reference apps/backend/Project.<ModuleName>/Project.<ModuleName>.csproj`
+- [ ] Registrar serviços no `Program.cs` ou extensão `IServiceCollection`
 
-## Convenções de Código
+## Convenções
 
-- Namespace: `Project.<ModuleName>.<Layer>` (ex: `Project.Ordering.Domain.Entities`).
-- Nomenclatura PascalCase em arquivos e classes.
-- Contrato do `csproj` deve seguir a versão do .NET do root.
+- Namespace: `Project.<ModuleName>.<Layer>`
+- PascalCase em arquivos e classes
+- `.csproj` alinhado ao `net8.0` da solução raiz

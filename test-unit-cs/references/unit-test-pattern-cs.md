@@ -10,7 +10,7 @@
 ## Paths
 
 ```
-tests/ProjectName.UnitTests/
+apps/backend/tests/ProjectName.UnitTests/
 ├── Domain/
 │   ├── Entities/CustomerTests.cs
 │   └── ValueObjects/EmailTests.cs
@@ -54,7 +54,7 @@ tests/ProjectName.UnitTests/
 ## Executar com coverage
 
 ```bash
-dotnet test tests/ProjectName.UnitTests \
+dotnet test apps/backend/tests/ProjectName.UnitTests/ProjectName.UnitTests.csproj \
   --collect:"XPlat Code Coverage" \
   --results-directory ./coverage
 

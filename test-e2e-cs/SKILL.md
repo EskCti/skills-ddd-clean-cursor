@@ -20,8 +20,8 @@ Testes E2E de API em `tests/<Project>.IntegrationTests/` usando `WebApplicationF
 ## Workflow
 
 1. Identificar endpoints e payload da story.
-2. Criar `*E2ETests.cs` em `tests/ProjectName.IntegrationTests/Api/`.
-3. `dotnet test tests/ProjectName.IntegrationTests`.
+2. Criar `*E2ETests.cs` em `apps/backend/tests/ProjectName.IntegrationTests/Api/`.
+3. `dotnet test apps/backend/tests/ProjectName.IntegrationTests/ProjectName.IntegrationTests.csproj`.
 4. CI executa após unit tests.
 
 ## References

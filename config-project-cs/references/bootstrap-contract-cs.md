@@ -2,121 +2,60 @@
 
 ## Goal
 
-Padronizar o bootstrap de uma solução .NET (C#) com Clean Architecture para:
+Padronizar o bootstrap de uma solução .NET (C#) com Clean Architecture em **monorepo full-stack**:
 
-- `src/*.Backend` (ASP.NET Core API)
-- `src/*.Core` (Domínio e Aplicação — sem dependências de infra/web)
-- `src/*.Infrastructure` (Persistência, EF Core, Dapper)
-- `src/*.Shared.Kernel` (Abstrações transversais de domínio)
+- `apps/backend/<Project>.Backend` (ASP.NET Core API — ou `<Project>.Api`)
+- `apps/backend/<Project>.Core`
+- `apps/backend/<Project>.Infrastructure`
+- `apps/backend/<Project>.Shared.Kernel`
+- `apps/backend/tests/<Project>.UnitTests` e `<Project>.IntegrationTests`
+
+`<Project>.sln` permanece na **raiz** do repositório.
+
+Alinhado a `skills.config.json` (`backendAppPath: apps/backend`) e ao **Config Project Full-Stack** (mesmo padrão de `apps/backend-kt` no Kotlin).
 
 ## Steps Applied
 
-1. Inicializar solução (`dotnet new sln`).
-2. Criar projetos:
-   - `src/*.Backend` (Template: `webapi`)
-   - `src/*.Core` (Template: `classlib`)
-   - `src/*.Infrastructure` (Template: `classlib`)
-   - `src/*.Shared.Kernel` (Template: `classlib`)
-3. Configurar referências:
-   - `Backend` -> `Infrastructure`, `Core`
-   - `Infrastructure` -> `Core`
-   - `Core` -> `Shared.Kernel`
-4. Configurar `.csproj` global:
-   - `<Nullable>enable</Nullable>`
-   - `<ImplicitUsings>enable</ImplicitUsings>`
-   - `<TargetFramework>net8.0</TargetFramework>`
-5. Setup de `Program.cs` no Backend:
-   - Configuração de Dependency Injection (DI).
-   - Middleware de Exception Handling.
-   - Setup de Swagger/OpenAPI.
-   - Configuração de CORS para `http://localhost:3000`.
-6. Configurar `.gitignore` para o ecossistema .NET.
-7. Criar `.env` e `.env.example` com:
-   - `ConnectionStrings__DefaultConnection=Host=localhost;Database=appdb;Username=postgres;Password=postgres`
-   - `Jwt__Secret=change-me-to-a-very-long-secret-key`
-   - `PORT=5000`
-8. Criar `docker-compose.yml` com Postgres.
-9. Criar projetos de teste:
-   - `tests/*.UnitTests` — xUnit + Moq + Coverlet (referência `test-unit-cs`)
-   - `tests/*.IntegrationTests` — `WebApplicationFactory<Program>` (referência `test-e2e-cs`)
-10. Expor `public partial class Program { }` no Backend para integration tests.
-11. Validar: `dotnet build` && `dotnet test`.
-
-## `.gitignore` esperado
-
-```
-[Aa]bin/
-[Aa]obj/
-bin/
-obj/
-*.user
-*.userosscache
-*.sln.doccache
-.vs/
-.vscode/
-.env
-!.env.example
-```
+1. Inicializar solução (`dotnet new sln` ou template `ProjectName.sln`).
+2. Criar projetos sob `apps/backend/`:
+   - `*.Backend` (Template: `webapi`)
+   - `*.Core`, `*.Infrastructure`, `*.Shared.Kernel` (Template: `classlib`)
+3. Criar testes em `apps/backend/tests/`.
+4. Configurar referências:
+   - `Backend` → `Infrastructure`, `Core`
+   - `Infrastructure` → `Core`
+   - `Core` → `Shared.Kernel`
+5. Configurar `.csproj` global (`net8.0`, nullable, implicit usings).
+6. Setup de `Program.cs` no Backend (Swagger, CORS, DI).
+7. `.gitignore`, `.env.example`, `docker-compose.yml` na raiz.
+8. Expor `public partial class Program { }` no Backend para integration tests.
+9. Validar: `dotnet build` && `dotnet test`.
 
 ## Dependência entre projetos
 
-- `src/*.Backend/Project.Backend.csproj`:
+Projetos irmãos em `apps/backend/` — referências relativas `..\Project.Core\`:
+
+- `apps/backend/Project.Backend/Project.Backend.csproj`:
   ```xml
   <ItemGroup>
     <ProjectReference Include="..\Project.Infrastructure\Project.Infrastructure.csproj" />
     <ProjectReference Include="..\Project.Core\Project.Core.csproj" />
   </ItemGroup>
   ```
-- `src/*.Infrastructure/Project.Infrastructure.csproj`:
+- `apps/backend/tests/Project.IntegrationTests/`:
   ```xml
-  <ItemGroup>
-    <ProjectReference Include="..\Project.Core\Project.Core.csproj" />
-  </ItemGroup>
-  ```
-- `src/*.Core/Project.Core.csproj`:
-  ```xml
-  <ItemGroup>
-    <ProjectReference Include="..\Project.Shared.Kernel\Project.Shared.Kernel.csproj" />
-  </ItemGroup>
+  <ProjectReference Include="..\..\Project.Backend\Project.Backend.csproj" />
   ```
 
-## Program.cs mínimo
+## Script
 
-```csharp
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-// CORS
-builder.Services.AddCors(options => {
-    options.AddDefaultPolicy(policy => {
-        policy.WithOrigins("http://localhost:3000")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
-    });
-});
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline
-if (app.Environment.IsDevelopment()) {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseCors();
-app.UseAuthorization();
-app.MapControllers();
-
-app.Run();
+```bash
+node config-project-cs/scripts/project-init-cs.mjs --project-name=RetailOps --backend-path=apps/backend
 ```
 
 ## Notes
 
-- O setup é idempotente: pula etapas já atendidas.
-- Projetos usam as versões LTS mais recentes do .NET (net8.0).
-- Módulos adicionais seguem o padrão `src/Project.<ModuleName>`.
+- Setup idempotente: pula arquivos existentes.
+- Frontends e mobile ficam em `apps/web-*`, `apps/mobile-*` — não em `src/`.
+- Módulos por BC futuros: `apps/backend/Project.<ModuleName>/` ou projetos adicionais na mesma solução (ver `config-new-module-cs`).
+- Override de pasta: `--backend-path=apps/api` se o time padronizar outro nome (mantendo sob `apps/`).

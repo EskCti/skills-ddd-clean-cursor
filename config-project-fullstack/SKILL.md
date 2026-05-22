@@ -42,8 +42,8 @@ Escolha o agent conforme a combinação:
 | NestJS (TS) | Vue 3 | `Config Project (Vue)` → `Config Shared Web (Vue)` | "Bootstrap monorepo NestJS + Vue 3 + Tailwind. Depois: Config Shared Web (Vue) para shell admin." |
 | Spring Boot (KT) | Angular | `Config Project (Kotlin)` + `Config Project (Angular)` → `Config Shared Web (Angular)` | Backend primeiro; depois frontend + shell. |
 | Spring Boot (KT) | Vue 3 | `Config Project (Kotlin)` + `Config Project (Vue)` → `Config Shared Web (Vue)` | Backend primeiro; depois frontend + shell. |
-| ASP.NET Core (CS) | Angular | `Config Project (C#)` + `Config Project (Angular)` → `Config Shared Web (Angular)` | Backend primeiro; depois frontend + shell. |
-| ASP.NET Core (CS) | Vue 3 | `Config Project (C#)` + `Config Project (Vue)` → `Config Shared Web (Vue)` | Backend primeiro; depois frontend + shell. |
+| ASP.NET Core (CS) | Angular | `Config Project (C#)` + `Config Project (Angular)` → `Config Shared Web (Angular)` | Backend em `apps/backend/` primeiro; depois `apps/web-angular` + shell. |
+| ASP.NET Core (CS) | Vue 3 | `Config Project (C#)` + `Config Project (Vue)` → `Config Shared Web (Vue)` | Backend em `apps/backend/` primeiro; depois `apps/web-vue` + shell. |
 
 > **OpenSpec aqui**: Se usar OpenSpec, criar a mudança ANTES do bootstrap:
 > ```

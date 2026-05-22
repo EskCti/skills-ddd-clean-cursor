@@ -25,11 +25,11 @@ project-root/
 
 ## Workflow
 
-1. Verificar se `ProjectName.sln` e `src/ProjectName.Backend/` existem.
-2. Criar `src/ProjectName.Backend/Dockerfile` com estágio `builder` (dotnet publish) e `runner` (aspnet runtime).
+1. Verificar se `ProjectName.sln` e `apps/backend/ProjectName.Backend/` existem.
+2. Criar `apps/backend/ProjectName.Backend/Dockerfile` com estágio `builder` (dotnet publish) e `runner` (aspnet runtime).
 3. Criar `.dockerignore` cobrindo `bin/`, `obj/`, `.env*`.
 4. Criar `docker-compose.prod.yml` orquestrando backend e postgres.
-5. Validar: `docker build -f src/ProjectName.Backend/Dockerfile .`
+5. Validar: `docker build -f apps/backend/ProjectName.Backend/Dockerfile .`
 
 ## References
 

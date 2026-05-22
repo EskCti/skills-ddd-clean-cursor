@@ -1,4 +1,4 @@
 interface:
   display_name: 'Config Docker (C#)'
   short_description: 'Dockerfile multi-stage para ASP.NET Core com runtime alpine'
-  default_prompt: 'Crie Dockerfile multi-stage para producao em backend C# com ASP.NET Core .NET 8+. Use mcr.microsoft.com/dotnet/sdk:8.0-alpine como builder (dotnet publish -c Release) e mcr.microsoft.com/dotnet/aspnet:8.0-alpine como runner. Gere src/ProjectName.Backend/Dockerfile, .dockerignore e docker-compose.prod.yml com postgres. Substituir ProjectName pelo nome real do projeto. Consultar references/docker-pattern-cs.md para os templates completos.'
+  default_prompt: 'Crie Dockerfile multi-stage para producao em backend C# com ASP.NET Core .NET 8+. Contexto na raiz do repo; projetos em apps/backend/. Gere apps/backend/ProjectName.Backend/Dockerfile, .dockerignore e docker-compose.prod.yml com postgres. Consultar references/docker-pattern-cs.md.'
