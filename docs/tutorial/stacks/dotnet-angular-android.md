@@ -45,12 +45,15 @@ dotnet restore && dotnet build && dotnet test
 ```
 LojaDDD/
 ├── LojaDDD.sln
-├── src/LojaDDD.Backend/
-├── src/LojaDDD.Core/
-├── tests/LojaDDD.UnitTests/        # Unit Tests (C#)
-├── tests/LojaDDD.IntegrationTests/ # E2E Tests (C#)
-├── apps/web-angular/               # após Config Project (Angular)
-└── mobile-android/                 # após Config Project (Android)
+├── apps/
+│   ├── backend/
+│   │   ├── LojaDDD.Backend/
+│   │   ├── LojaDDD.Core/
+│   │   └── tests/
+│   │       ├── LojaDDD.UnitTests/
+│   │       └── LojaDDD.IntegrationTests/
+│   ├── web-angular/                # Config Project (Angular)
+│   └── mobile-android/             # Config Project (Android)
 ```
 
 Detalhes: [Backend incremental](./backend-incremental.md) (Passo 0–1).

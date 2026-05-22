@@ -1,4 +1,4 @@
 interface:
   display_name: 'E2E Tests (C#)'
   short_description: 'Testes E2E API com WebApplicationFactory e IntegrationTests'
-  default_prompt: 'Crie testes E2E em tests/ProjectName.IntegrationTests usando WebApplicationFactory<Program>. Cobrir POST criar e GET buscar para o endpoint indicado. Consultar references/e2e-test-pattern-cs.md.'
+  default_prompt: 'Crie testes E2E em apps/backend/tests/ProjectName.IntegrationTests usando WebApplicationFactory<Program>. Cobrir POST criar e GET buscar para o endpoint indicado. Consultar references/e2e-test-pattern-cs.md.'
