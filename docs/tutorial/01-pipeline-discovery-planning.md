@@ -1,17 +1,24 @@
 # Tutorial 01 — Pipeline de Requisitos e Planejamento
 
-Agents usados: `req-discovery` → `req-ddd-modeling` → `req-migration-strategy` → `req-agile-planning`
+Agents usados: `req-discovery` → `req-ddd-modeling` → `req-migration-strategy` → **`delivery-profile`** → `req-agile-planning`
 
-**Cenário**: Sistema legado PHP/Laravel (`loja-php`) com clientes, produtos e pedidos. A análise `req-*` é **agnóstica de stack** — a combinação backend + frontend + mobile é escolhida depois no [Hub Full-Stack](./02-fullstack-project-setup.md).
+**Cenário**: Sistema legado PHP (`loja-php`) com clientes, produtos e pedidos. A análise de **domínio** é agnóstica de linguagem, mas o pipeline exige **inventário de entrega** (`delivery-inventory.md` → `delivery-profile.md`) antes do backlog — senão o planejamento vira só API/backend. A stack (ex.: C# + Vue + Android) é fixada no perfil de entrega; ver [Hub Full-Stack](./02-fullstack-project-setup.md).
 
 ### Após o backlog — qual caminho?
 
 | Caminho | Stack exemplo | Tutorial de implementação |
 |---------|---------------|---------------------------|
-| **Incremental** (Strangler Fig) | ASP.NET Core (C#) | [backend-incremental](./stacks/backend-incremental.md) |
-| **Full-stack legado** | NestJS + Vue + Flutter | [nestjs-vue-flutter](./stacks/nestjs-vue-flutter.md) ou [Tutorial 04](./04-ciclo-completo-openspec.md) |
+| **Incremental** (Strangler Fig) | ASP.NET Core (C#) só API | [backend-incremental](./stacks/backend-incremental.md) — `delivery-profile.md` com Web/Mobile = Nenhum |
+| **Full-stack C# + Vue + Android** | RetailOps / loja-php | [dotnet-cs-vue-android](./stacks/dotnet-cs-vue-android.md) + [Tutorial 04](./04-ciclo-completo-openspec.md) |
+| **Full-stack TS** | NestJS + Vue + Flutter | [nestjs-vue-flutter](./stacks/nestjs-vue-flutter.md) ou [Tutorial 04](./04-ciclo-completo-openspec.md) |
 
-> **Neste tutorial 01**, os exemplos de `req-agile-planning` usam sufixo **`-cs`** (caminho incremental C#). Se escolher NestJS, as mesmas tasks aparecem **sem sufixo** — ver [Tutorial 04](./04-ciclo-completo-openspec.md).
+> **Causa raiz de backlog incompleto**: análise só de domínio/API, sem `delivery-inventory.md` + `delivery-profile.md` antes do `req-agile-planning`. O pipeline abaixo corrige isso.
+
+### Leitura recomendada antes de começar
+
+- [README — DDD vs CA](./README.md#ddd-backend-vs-clean-architecture-webmobile)
+- [README — Como usar agents no Cursor](./README.md#como-usar-agents-no-cursor)
+- [README — Checklist antes do código](./README.md#checklist-antes-do-código)
 
 ---
 
@@ -21,7 +28,9 @@ Agents usados: `req-discovery` → `req-ddd-modeling` → `req-migration-strateg
 
 ### Como acionar o agent
 
-No Cursor, abra o agente **"Requirement Discovery"** ou use o skill diretamente:
+**Agent**: **Requirement Discovery** (`req-discovery`)
+
+No Cursor, selecione o agent pelo `display_name` acima ou cite `@req-discovery`:
 
 > Analise o sistema legado em `/home/projetos/loja-php` e extraia os requisitos funcionais, regras de negócio e mapeamento DDD para reimplementação em DDD/Clean Architecture (stack a definir no planejamento).
 
@@ -52,9 +61,11 @@ app/Services/          → Domain Services ou Use Cases
 
 ```
 docs/discovery/loja-php/
-├── requirements.md      ← requisitos funcionais e não-funcionais
-├── ddd-analysis.md      ← bounded contexts, entities, VOs, use cases
-└── domain-model.md      ← mapeamento técnico detalhado
+├── requirements.md         ← requisitos funcionais e não-funcionais
+├── ddd-analysis.md           ← bounded contexts, entities, VOs, use cases
+├── delivery-inventory.md     ← superfícies web/mobile/API por área (obrigatório se houver UI)
+├── screens.md                ← rotas/telas (quando aplicável)
+└── domain-model.md           ← mapeamento técnico detalhado
 ```
 
 ### Exemplo de saída — ddd-analysis.md (trecho)
@@ -87,11 +98,13 @@ docs/discovery/loja-php/
 
 ## Etapa 2 — req-ddd-modeling: Aprofundar a Modelagem DDD
 
-**Objetivo**: Aplicar o Roadmap DDD (Estratégico → Tático → Operacional) sobre os requisitos levantados.
+**Objetivo**: Aplicar o Roadmap DDD (Estratégico → Tático → Operacional) sobre os requisitos levantados — **domínio no backend** + **apresentação** web/mobile por BC.
+
+**Agent**: **DDD Modeling** (`req-ddd-modeling`)
 
 ### Como acionar
 
-> Aplique o Roadmap DDD sobre os requisitos em `docs/discovery/loja-php/requirements.md` e `ddd-analysis.md`. Classifique os subdomínios, construa o context map com relações tipadas e documente a linguagem ubíqua.
+> Aplique o Roadmap DDD sobre `docs/discovery/loja-php/requirements.md`, `ddd-analysis.md` e `delivery-inventory.md`. No `ddd-tactical-model.md`, inclua **Superfícies de entrega** e seções **Apresentação — Web admin** / **Apresentação — Mobile** quando aplicável (ver `req-ddd-modeling/references/client-presentation-model.md`).
 
 ### O que o agent faz
 
@@ -132,18 +145,32 @@ docs/discovery/loja-php/
 └─────────────────────────────────────────────────────────┘
 ```
 
-**Fase Tática** — para cada BC, identifica VOs, Entities, Aggregates, Domain Events:
+**Fase Tática** — para cada BC: domínio (backend) + superfícies + **modelo de apresentação** (web/mobile):
 
 ```markdown
-## BC: Orders (Pedidos)
+## BC: Identity & Access
 
-Value Objects: Money, Quantity, OrderStatus
-Entities: Order (root), OrderItem
-Aggregates: Order → [OrderItem]
-Domain Services: DiscountPolicy, ShippingCalculator
-Domain Events: OrderPlaced, OrderCancelled, PaymentConfirmed
-Repository: IOrderRepository
+### Domínio (backend)
+Value Objects: Email, PermissionCode
+Entities: User (root), PermissionGrant
+Repository: IUserRepository
+Use cases (API): AuthenticateUser, AssignPermissions
+
+### Superfícies de entrega
+| API | Web admin | Mobile |
+| Sim | Sim       | Sim    |
+
+### Apresentação — Web admin
+| Rota | Ação | API |
+| /login | login | POST /api/auth/login |
+| /users/permissions | editar permissões | GET/PUT …/permissions |
+
+### Apresentação — Mobile
+| Tela | Ação | API |
+| ProfileScreen | ver perfil | GET /api/me |
 ```
+
+> Detalhe: `req-ddd-modeling/references/client-presentation-model.md`. Sem apresentação, o backlog tende a vir só com `interface:page`.
 
 **Fase Operacional** — recomenda topologia:
 
@@ -154,7 +181,7 @@ Repository: IOrderRepository
 ```
 docs/modeling/loja-php/
 ├── ddd-strategic-model.md   ← subdomínios, BCs, context map, linguagem ubíqua
-├── ddd-tactical-model.md    ← VOs, entities, aggregates, events por BC
+├── ddd-tactical-model.md    ← domínio + superfícies + Apresentação Web/Mobile por BC
 └── ddd-operational-notes.md ← topologia recomendada, sequência de implementação
 ```
 
@@ -162,11 +189,13 @@ docs/modeling/loja-php/
 
 ## Etapa 3 — req-migration-strategy: Plano de Migração do Legado
 
-**Objetivo**: Definir como migrar o PHP legado para o novo sistema C# sem downtime.
+**Objetivo**: Definir como migrar o legado em produção sem Big Bang (opcional se não for legado).
+
+**Agent**: **Migration Strategy** (`req-migration-strategy`)
 
 ### Como acionar
 
-> Defina a estratégia de migração do sistema PHP em `docs/discovery/loja-php/` para DDD/Clean Architecture em C#. O sistema tem 500 usuários ativos em produção.
+> Defina a estratégia de migração do PHP em `docs/discovery/loja-php/` para DDD/Clean Architecture (stack fixada depois no `delivery-profile.md`). Ex.: Strangler Fig, 500 usuários ativos.
 
 ### O que o agent faz
 
@@ -189,7 +218,7 @@ docs/modeling/loja-php/
 **Sequência de migração**:
 
 ```
-Fase 0: Bootstrap novo projeto C# + ACL setup           (1 sprint)
+Fase 0: Bootstrap novo projeto + ACL setup            (1 sprint)
 Fase 1: BC Auth → migrar autenticação                   (1 sprint)
 Fase 2: BC Customers → menor acoplamento                (2 sprints)
 Fase 3: BC Catalog → produtos e categorias              (2 sprints)
@@ -200,7 +229,7 @@ Desligamento do legado                                   (após Fase 4)
 **ACL desenhada** para o BC Orders (lê pedidos do legado durante transição):
 
 ```
-Legado PHP            ACL (C#)                Novo Domínio
+Legado PHP            ACL (novo backend)      Novo Domínio
 ─────────────         ──────────────────      ─────────────
 pedidos (MySQL)  →    LegacyOrderAdapter  →   Order Entity
 { cd_pedido,          LegacyOrderMapper       { id, items,
@@ -218,13 +247,37 @@ docs/migration/loja-php/
 
 ---
 
-## Etapa 4 — req-agile-planning: Gerar o Backlog
+## Etapa 3.5 — Perfil de entrega (antes do backlog)
 
-**Objetivo**: Transformar o modelo DDD em épicos, stories e tasks técnicas. **Exemplo abaixo: stack C# (`-cs`)** — caminho incremental. Para NestJS + Vue + Flutter, veja [Tutorial 04](./04-ciclo-completo-openspec.md).
+**Objetivo**: Fixar stack e **quais BCs terão web e mobile**, para o backlog não virar “só backend”.
+
+**Agent**: **Agile Planning** (Fase 0 do skill) ou prompt manual com template em `req-agile-planning/references/delivery-profile.md`.
 
 ### Como acionar
 
-> Organize os requisitos de `docs/modeling/loja-php/ddd-strategic-model.md` e `ddd-tactical-model.md` em um backlog ágil. Stack escolhida: C#. Prioridade: Auth primeiro, depois Customers, depois Orders.
+> Com base em `delivery-inventory.md` e no MVP, crie `docs/planning/loja-php/delivery-profile.md`. **RetailOps (este repo)**: ASP.NET Core + Vue 3 + Android. **Walkthrough TS (Tutorial 04)**: NestJS + Vue + Flutter. Tabela **API | Web admin | Mobile** por BC.
+
+### Artefato
+
+```
+docs/planning/loja-php/delivery-profile.md
+```
+
+Ver template: `req-agile-planning/references/delivery-profile.md`.
+
+---
+
+## Etapa 4 — req-agile-planning: Gerar o Backlog full-stack
+
+**Objetivo**: Transformar o modelo DDD em épicos, stories e tasks **por camada** (backend + web + mobile conforme `delivery-profile.md`).
+
+**Agent**: **Agile Planning** (`req-agile-planning`)
+
+### Como acionar
+
+> Leia `delivery-profile.md` e `ddd-tactical-model.md` (Apresentação Web/Mobile). Gere `backlog.md` com stack **do perfil** (não agnóstico). Para **cada US** com Web=Sim: subseção **Telas e fluxos (web)** + tasks `Frontend Entity` → … → `Frontend Page`. Para Mobile=Sim: **Telas e fluxos (mobile)** + `Mobile Entity` → … → `Mobile Screen`. EP-000 full-stack. Validar [checklist do README](./README.md#checklist-antes-do-código).
+
+> **Não** use backlog “agnóstico”, US sem **Telas e fluxos**, nem só `Backend Controller` + `Frontend Page`.
 
 ### O que o agent faz
 
@@ -250,6 +303,13 @@ Para cada story, gera tasks **inside-out** com **Agent** (`display_name`) e **Pr
 **Critérios de Aceitação:**
 - Dado nome válido e CPF válido, quando cadastrar, então cliente criado com id
 - Dado CPF já cadastrado, quando cadastrar, então retornar erro "CPF já existe"
+- Dado atendente em `/customers/new`, quando salvar, então lista atualizada
+
+### Telas e fluxos (web)
+
+| Rota | Persona | Ação | API |
+| `/customers` | atendente | listar | GET /api/customers |
+| `/customers/new` | atendente | cadastrar | POST /api/customers |
 
 **Tasks:**
 - [ ] `domain:vo` Criar VO Email (~1h)
@@ -285,6 +345,8 @@ Para cada story, gera tasks **inside-out** com **Agent** (`display_name`) e **Pr
 - [ ] `interface:controller` Criar CustomerController (~2h)
   - **Agent:** `Backend Controller (C#)`
   - **Prompt:** "POST /api/customers e GET /api/customers/{id}."
+- [ ] `interface:entity` … `interface:repository` … `interface:page` … *(se Web=Sim no delivery-profile)*
+  - Ver bloco completo no template de `req-agile-planning` (EP-001 no backlog RetailOps é o exemplo corrigido).
 - [ ] `test:unit` Testes de Customer, CPF, Email (~2h)
   - **Agent:** `Unit Tests (C#)`
   - **Prompt:** "Mock repository; fluxo feliz e CPF duplicado."
@@ -300,8 +362,9 @@ Para cada story, gera tasks **inside-out** com **Agent** (`display_name`) e **Pr
 
 ```
 docs/planning/loja-php/
-├── backlog.md        ← épicos + stories + tasks com Agent + Prompt
-└── epics-summary.md  ← visão executiva com estimativas
+├── delivery-profile.md  ← stack + API/Web/Mobile por BC (ANTES do backlog)
+├── backlog.md           ← épicos + stories + tasks com Agent + Prompt (full-stack)
+└── epics-summary.md     ← visão executiva com estimativas
 ```
 
 ---
@@ -309,12 +372,13 @@ docs/planning/loja-php/
 ## Resumo do Pipeline
 
 ```
-req-discovery        req-ddd-modeling     req-migration-strategy  req-agile-planning
-(análise PHP)   →    (subdomínios,    →   (Strangler Fig,    →    (backlog com
-requirements.md      context map,         sequência,              tasks -cs)
-ddd-analysis.md      linguagem ubíqua)    ACL design)
-domain-model.md      ddd-strategic-model  migration-strategy.md   backlog.md
-                     ddd-tactical-model   acl-design.md           epics-summary.md
+req-discovery           req-ddd-modeling        req-migration-strategy   delivery-profile      req-agile-planning
+(análise legado)   →    (BCs, tático)     →   (Strangler, ACL)    →   (stack+superfícies) → (backlog full-stack)
+requirements.md         ddd-strategic-model     migration-strategy.md    delivery-profile.md   backlog.md
+delivery-inventory.md   ddd-tactical-model      acl-design.md                                  epics-summary.md
+ddd-analysis.md         (+ superfícies/BC)
+screens.md
+domain-model.md
 ```
 
 > Próximo passo: [Tutorial 02 — Hub Full-Stack](./02-fullstack-project-setup.md) → escolher combinação em [`stacks/`](./stacks/README.md)

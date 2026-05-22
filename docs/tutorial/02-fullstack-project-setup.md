@@ -4,15 +4,17 @@
 
 > **Regra**: Nenhum setup full-stack começa “no escuro”. O `backlog.md` (épicos, BCs, tasks por camada) vem do pipeline `req-*`. O agent **`Config Project Full-Stack`** traduz a combinação escolhida na sequência exata de agents. Cada task usa **Agent** (`display_name`) + **Prompt**.
 
+> **Antes de abrir este tutorial**: confira o [Checklist antes do código](./README.md#checklist-antes-do-código) no README. **DDD** = backend (`req-ddd-modeling`); **CA** = web/mobile (tasks `Frontend *` / `Mobile *`). Ver [DDD vs CA](./README.md#ddd-backend-vs-clean-architecture-webmobile).
+
 ---
 
 ## Fluxo comum (todas as combinações)
 
 ```
-Tutorial 01 — req-discovery → req-ddd-modeling → req-migration-strategy → req-agile-planning
+Tutorial 01 — req-discovery → req-ddd-modeling → req-migration-strategy → delivery-profile.md → req-agile-planning
                                     │
                                     ▼
-                           backlog.md + epics-summary.md
+                           delivery-profile.md + backlog.md + epics-summary.md
                                     │
                                     ▼
               Config Project Full-Stack  ← informar backend + frontend + mobile
@@ -52,6 +54,7 @@ O agent responde com: agents de bootstrap, sufixo de skills (`-kt`, `-cs` ou nen
 | **NestJS** | **Next.js** | **Flutter** | SSR/SEO, time full TS, tipos compartilhados | [nestjs-next-flutter](./stacks/nestjs-next-flutter.md) |
 | **Spring Boot** | **Vue 3** | **Flutter** | Ecossistema JVM + UI Vue | [spring-vue-flutter](./stacks/spring-vue-flutter.md) |
 | **ASP.NET Core** | **Angular** | **Android** | .NET enterprise + nativo Android | [dotnet-angular-android](./stacks/dotnet-angular-android.md) |
+| **ASP.NET Core** | **Vue 3** | **Android** | Legado PHP → .NET + PrimeVue + Compose (RetailOps) | [dotnet-cs-vue-android](./stacks/dotnet-cs-vue-android.md) |
 | **Qualquer** | — | — | Strangler Fig, só backend / migração incremental | [backend-incremental](./stacks/backend-incremental.md) |
 
 Matriz completa e justificativas: [`config-project-fullstack/references/fullstack-stack-matrix.md`](../../config-project-fullstack/references/fullstack-stack-matrix.md)
@@ -80,7 +83,7 @@ Independente da combinação, o **req-agile-planning** deve gerar tasks semelhan
 | Fase | Agents (display_name) | OpenSpec (opcional) |
 |------|------------------------|---------------------|
 | Bootstrap | Config Project (*), Config Shared Web (*), Config Docker, Config CI/CD, Config Shared Core | `openspec-propose "bootstrap-<nome>"` |
-| BC full-stack | Core *, Backend *, Frontend *, Mobile *, Unit Tests, E2E Tests | `openspec-propose "ep-XXX-<bc>"` |
+| BC full-stack | Core *, Backend *, Frontend Entity→UseCase→Repository→Page→Form, Mobile Entity→…→Screen, testes API + test:unit-web/mobile | `openspec-propose "ep-XXX-<bc>"` — ver checklist `req-agile-planning` |
 | Feature web (isolada) | Frontend Entity → UseCase → Repository → Page → Form | `openspec-propose "feat-<nome>-<fw>"` |
 | Feature mobile (isolada) | Mobile Entity → UseCase → Repository → Screen → Form | `openspec-propose "feat-<nome>-<mobile>"` |
 | Auth backend | Config Auth Core Basic, Config Auth Backend Basic | `openspec-propose "feat-auth"` |

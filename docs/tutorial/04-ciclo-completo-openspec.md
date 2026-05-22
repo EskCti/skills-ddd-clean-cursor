@@ -1,10 +1,16 @@
 # Tutorial 04 — Ciclo Completo com OpenSpec: do Legado ao Full-Stack
 
-Agents usados: `req-discovery` → `req-ddd-modeling` → `req-migration-strategy` → `req-agile-planning` → `config-project-fullstack` → `openspec-propose` → `openspec-apply-change` → `openspec-archive-change`
+Agents usados: `req-discovery` → `req-ddd-modeling` → `req-migration-strategy` → **`delivery-profile`** → `req-agile-planning` → `config-project-fullstack` → `openspec-propose` → `openspec-apply-change` → `openspec-archive-change`
 
-**Cenário**: Sistema legado PHP/Laravel com módulos de Auth, Clientes e Pedidos será migrado para **NestJS** (backend) + **Vue 3 + PrimeVue** (frontend) + **Flutter** (mobile), usando OpenSpec para rastrear cada mudança.
+**Cenário (walkthrough deste doc)**: legado PHP/Laravel → **NestJS** + **Vue 3 + PrimeVue** + **Flutter**, com OpenSpec.
+
+**Este monorepo (RetailOps)**: mesma análise (`loja-php`), stack de implementação **ASP.NET Core + Vue 3 + Android** — siga [dotnet-cs-vue-android](./stacks/dotnet-cs-vue-android.md) para agents de código; use **este tutorial** só para comandos OpenSpec (`propose` / `apply` / `archive`).
 
 > **Formato de tasks**: em `backlog.md` e `tasks.md`, use sempre **Agent** (`display_name` do `agents/openai.yaml`) + **Prompt** — nunca pasta de skill (`core-entity`, `frontend-entity-vue`). Ver `req-agile-planning`.
+>
+> **Checklist CA (web/mobile)**: cada épico com UI deve ter tasks separadas para `interface:entity` → `interface:usecase` → `interface:repository` → `interface:page` — **não** apenas `Frontend Page (Vue)`. `openspec-propose` expande o template; `openspec-apply-change` valida antes de marcar `[x]`.
+>
+> **Stack C# + Vue + Android** (este monorepo): [dotnet-cs-vue-android](./stacks/dotnet-cs-vue-android.md).
 
 ## Como usar este tutorial
 
@@ -26,11 +32,13 @@ Agents usados: `req-discovery` → `req-ddd-modeling` → `req-migration-strateg
 │                    CICLO COMPLETO COM OPENSPEC                           │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
-│  FASE 1 — ANÁLISE (agnóstico de linguagem)                              │
+│  FASE 1 — ANÁLISE (detalhe no Tutorial 01)                              │
 │                                                                          │
 │  Legado PHP  →  req-discovery  →  req-ddd-modeling  →  req-migration   │
-│                                                              strategy    │
-│                                   backlog.md ←── req-agile-planning     │
+│                     delivery-inventory   (+ Apresentação Web/Mobile)    │
+│                                          →  delivery-profile.md         │
+│                                          →  req-agile-planning          │
+│                                              backlog.md (+ Telas/fluxos)│
 │                                                                          │
 │  FASE 2 — SETUP DO PROJETO (com Docker + CI/CD no bootstrap)            │
 │                                                                          │
@@ -65,72 +73,62 @@ Agents usados: `req-discovery` → `req-ddd-modeling` → `req-migration-strateg
 
 ## Fase 1 — Análise do Legado
 
-> Se já concluiu o [Tutorial 01 — Análise](./01-pipeline-discovery-planning.md), pule para a [Fase 2](#fase-2--setup-do-projeto).
+> Se já concluiu o [Tutorial 01](./01-pipeline-discovery-planning.md) (incluindo `delivery-profile.md`, backlog com **Telas e fluxos** e [checklist](./README.md#checklist-antes-do-código)), pule para a [Fase 2](#fase-2--setup-do-projeto).
 
 ### Etapa 1.1 — req-discovery
 
-**Agent**: `req-discovery`
+**Agent**: **Requirement Discovery** (`req-discovery`)
 
-> Analise o sistema legado PHP/Laravel em `/projetos/loja-php`. Identifique os Bounded Contexts, entidades de domínio, regras de negócio e mapeamento para DDD/Clean Architecture. A nova implementação será em TypeScript (NestJS) com frontend Vue + PrimeVue e mobile Flutter.
+> Analise o sistema legado PHP/Laravel em `/projetos/loja-php`. Identifique Bounded Contexts, regras de negócio e mapeamento DDD/Clean Architecture. Documente **inventário de entrega** (painéis web, apps mobile, só API) em `delivery-inventory.md`. Stack alvo deste walkthrough: NestJS + Vue 3 + Flutter.
 
 **Saída** (em `docs/discovery/loja-php/`):
 
 ```
 requirements.md
-├── RF-001: Usuário pode criar conta com nome, email, senha
-├── RF-002: Usuário faz login com email e senha (JWT)
-├── RF-010: Sistema mantém cadastro de clientes (Customer)
-├── RF-020: Sistema gerencia pedidos (Order com itens, status, total)
+delivery-inventory.md    ← API | Web | Mobile por área do legado
 ddd-analysis.md
-├── BC-001: Auth (Usuários)
-├── BC-002: Customers (Clientes)
-└── BC-003: Orders (Pedidos)
+├── BC-001: Auth
+├── BC-002: Customers
+└── BC-003: Orders
 ```
 
 ### Etapa 1.2 — req-ddd-modeling
 
-**Agent**: `req-ddd-modeling`
+**Agent**: **DDD Modeling** (`req-ddd-modeling`)
 
-> Aplique o Roadmap DDD sobre a análise em `docs/discovery/loja-php/ddd-analysis.md`. Gere o modelo estratégico (subdomínios, context map) e tático (entities, VOs, events) para os 3 BCs encontrados.
+> Aplique o Roadmap DDD sobre `docs/discovery/loja-php/`. No `ddd-tactical-model.md`, por BC: domínio (backend) + **Superfícies de entrega** + seções **Apresentação — Web admin** / **Apresentação — Mobile** quando Sim (template em `req-ddd-modeling/references/client-presentation-model.md`).
 
 **Saída** (em `docs/modeling/loja-php/`):
 
 ```
 ddd-strategic-model.md
-├── Core Domain: Orders (diferencial competitivo)
-├── Supporting: Customers
-└── Generic: Auth
 ddd-tactical-model.md
-├── BC Auth: User entity, Email VO, Password VO (hash)
-├── BC Customers: Customer entity, Name/Email/CPF VOs
-└── BC Orders: Order aggregate, OrderItem, Money VO, OrderStatus VO
+├── BC Auth: domínio + Apresentação Web (login, permissões) + Mobile (perfil) se aplicável
+├── BC Customers: …
+└── BC Orders: …
 ```
 
 ### Etapa 1.3 — req-migration-strategy
 
-**Agent**: `req-migration-strategy`
+**Agent**: **Migration Strategy** (`req-migration-strategy`)
 
-> Defina a estratégia de migração do legado PHP para NestJS + Vue + Flutter. Usar o modelo tático em `docs/modeling/loja-php/ddd-tactical-model.md` como base.
+> Estratégia de migração do legado PHP para **NestJS + Vue + Flutter**. Base: `docs/modeling/loja-php/ddd-tactical-model.md`.
 
-**Saída**: `docs/migration/loja-php/migration-strategy.md`
+**Saída**: `docs/migration/loja-php/migration-strategy.md` (Strangler Fig, sequência de BCs, ACL).
 
-```markdown
-## Estratégia: Strangler Fig
+### Etapa 1.4 — delivery-profile (obrigatório)
 
-### Sequência por Bounded Context
-1. BC Auth (Generic) → migrar primeiro para desbloquear outros BCs
-2. BC Customers (Supporting) → após Auth
-3. BC Orders (Core) → último, maior complexidade
+**Agent**: **Agile Planning** (Fase 0) ou prompt manual — ver [Tutorial 01 § 3.5](./01-pipeline-discovery-planning.md#etapa-35--perfil-de-entrega-antes-do-backlog)
 
-### Anti-Corruption Layer (ACL)
-- Adapter entre API legada PHP e novo backend NestJS durante coexistência
-```
+> Com base em `delivery-inventory.md` e no MVP (Auth, Customers, Orders), crie `docs/planning/loja-php/delivery-profile.md`: stack **NestJS + Vue 3 + PrimeVue + Flutter**; tabela **API | Web admin | Mobile** por BC.
 
-### Etapa 1.4 — req-agile-planning
+**Saída**: `docs/planning/loja-php/delivery-profile.md`
 
-**Agent**: `req-agile-planning`
+### Etapa 1.5 — req-agile-planning
 
-> Crie o backlog baseado no modelo tático em `docs/modeling/loja-php/` e na estratégia de migração. Stack: NestJS (TS) + Vue 3 + Flutter. Incluir tasks de frontend Vue e mobile Flutter para cada Bounded Context.
+**Agent**: **Agile Planning** (`req-agile-planning`)
+
+> Gere `backlog.md` lendo `delivery-profile.md` e `ddd-tactical-model.md` (Apresentação). Stack fixa: **NestJS + Vue + Flutter**. Em **cada US** com web/mobile: subseções **Telas e fluxos (web)** / **(mobile)** + tasks inside-out (entity → usecase → repository → page; mobile-entity → …). **Proibir** “Template full-stack” em uma linha.
 
 **Saída**: `docs/planning/loja-php/backlog.md` (trecho)
 
@@ -389,7 +387,7 @@ loja-nova/
 
 **Agent**: `openspec-propose`
 
-> Crie a mudança "ep-001-auth" com todas as tasks do EP-001 do backlog: VO Email, VO Password (bcrypt), entidade User, LoginUseCase, RegisterUseCase, AuthController (JWT), LoginView Vue, LoginPage Flutter, test:unit e test:e2e.
+> Crie a mudança "ep-001-auth" copiando **todas** as tasks expandidas do EP-001 em `docs/planning/loja-php/backlog.md` (backend C# + bloco Vue entity/usecase/repository/page + bloco Android + test:unit/e2e API + test:unit-web/mobile). Não omitir camadas de frontend.
 
 **tasks.md gerado** (em `openspec/changes/ep-001-auth/tasks.md`):
 
@@ -473,7 +471,9 @@ loja-nova/
 
 > Implemente a mudança "ep-001-auth".
 
-O apply executa **task a task**, acionando o **Agent** de cada linha na sequência inside-out:
+O apply **valida o checklist** de camadas (passo 6 do skill) e executa **task a task**, acionando o **Agent** + skill correspondente na sequência inside-out:
+
+> Se `tasks.md` tiver seção **§12 Frontend CA** / **§14 Tests** pendentes, continuar até lá antes de `openspec-archive-change`. MVP (`interface:page` com fetch na store) não substitui entity/usecase/repository.
 
 ```
 Implementando ep-001-auth (18 tasks)
@@ -643,7 +643,7 @@ O tasks.md terá ~16 tasks cobrindo backend completo + listagem de pedidos no Vu
 
 | Fase | O que acontece | Agents |
 |------|----------------|--------|
-| Análise | Discovery + modelagem DDD + migração + planejamento | Requirement Discovery, DDD Modeling, Migration Strategy, Agile Planning |
+| Análise | Discovery + DDD + migração + delivery-profile + backlog | Requirement Discovery, DDD Modeling, Migration Strategy, Agile Planning (+ `delivery-profile.md`) |
 | Setup | Bootstrap + shell + Docker + CI/CD + shared kernel | openspec-* + Config Project (*) + Config Shared Web (*) + Config Docker + Config CI/CD + Config Shared Core |
 | Por BC | Propose → Apply (inside-out) → Archive | openspec-* + Core * + Backend * + Frontend * + Mobile * + Unit Tests + E2E Tests |
 
