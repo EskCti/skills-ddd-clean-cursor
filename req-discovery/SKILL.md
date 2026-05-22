@@ -12,6 +12,8 @@ Analisar um sistema existente (**qualquer linguagem ou arquitetura**) e extrair 
 
 **Fluxo**: o sistema fonte pode ser PHP/MVC, Go, Python, Java, monolito — qualquer coisa. A saída é **sempre** estruturada em Bounded Contexts, Entities, Value Objects e camadas Clean Architecture, pronta para ser implementada com os skills deste repositório (TypeScript, Kotlin ou C#). Consultar `references/ddd-clean-mapping.md` para o mapa completo.
 
+**Full-stack na análise**: além do domínio/API, documentar **quais superfícies o legado expõe** (painel web, app mobile, só API) em `delivery-inventory.md` — isso alimenta `req-ddd-modeling` (seções **Apresentação — Web/Mobile** por BC), depois `delivery-profile.md` e `req-agile-planning` (subseções **Telas e fluxos** por US).
+
 ---
 
 ## Entrada
@@ -191,9 +193,20 @@ Para cada funcionalidade identificada, classificar por camada:
 └─────────────────────────────────────────────────┘
 ```
 
+### Fase 3.5 — Inventário de entrega (superfícies UI/mobile)
+
+**Obrigatório** quando o legado tiver painel web, telas PHP renderizadas ou app mobile — mesmo que a stack alvo ainda não esteja definida.
+
+1. Listar **módulos/telas web** (menu, rotas `.php`, SPA) agrupados por área de negócio.
+2. Listar **apps mobile** ou “campo/PDV” se existirem no legado ou no roadmap.
+3. Marcar o que é **somente API** (integrações, cron, relatórios export).
+4. Gerar `delivery-inventory.md` (template abaixo) — será copiado/resumido em `planning/<projeto>/delivery-profile.md` no `req-agile-planning`.
+
+Se a análise for **só codebase** sem UI óbvia: inferir telas a partir de `sistema/paginas/`, `views/`, rotas `web.php`, menus no layout.
+
 ### Fase 4 — Documentação
 
-Gerar os artefatos de saída no diretório configurado.
+Gerar os artefatos de saída no diretório configurado (incluindo `delivery-inventory.md` quando houver UI/mobile).
 
 ---
 
@@ -209,6 +222,7 @@ Os artefatos são salvos no diretório **do projeto consumidor** (não do reposi
 │           ├── requirements.md          ← requisitos funcionais/não-funcionais (obrigatório)
 │           ├── ddd-analysis.md          ← bounded contexts, entities, VOs, camadas (obrigatório)
 │           ├── screens.md               ← mapeamento de telas (se via browser)
+│           ├── delivery-inventory.md    ← superfícies web/mobile/API por área (obrigatório se houver UI)
 │           └── domain-model.md          ← modelo de domínio detalhado (se via código)
 ```
 
@@ -319,6 +333,41 @@ Tela A → Ação → Tela B → Confirmação → Tela C
 - <funcionalidade sem teste>
 - <endpoint sem documentação>
 - <comportamento ambíguo>
+```
+
+### `delivery-inventory.md` (obrigatório se legado tiver UI web e/ou mobile)
+
+```markdown
+# Inventário de entrega — <Nome do Sistema>
+
+**Fonte**: discovery <data>
+**Legado**: <URL ou path>
+
+## Resumo
+
+| Superfície | Presente no legado? | Observação |
+|------------|-------------------|------------|
+| Painel web admin | Sim/Não | ex.: PHP `sistema/` |
+| App mobile / PDV campo | Sim/Não | |
+| API/integrações only | Sim/Não | |
+
+## Telas web por área de negócio
+
+| Área (≈ BC futuro) | Telas / rotas principais | CRUD? | Relatórios? |
+|--------------------|--------------------------|-------|-------------|
+| Auth | login, usuários, permissões | | |
+| Vendas | PDV, abertura caixa | | |
+
+## Mobile (se aplicável)
+
+| Fluxo | Telas | Paridade MVP? |
+|-------|-------|---------------|
+| Perfil | login, home | Sim/Não |
+
+## Próximo passo
+
+→ `req-ddd-modeling` deve espelhar colunas **API | Web | Mobile** por BC.
+→ `req-agile-planning` cria `planning/<projeto>/delivery-profile.md` antes do `backlog.md`.
 ```
 
 ### `screens.md` (quando análise via browser)
@@ -496,12 +545,13 @@ Use diagramas ASCII extensivamente durante a análise:
 ### Pipeline completo
 
 ```
-Sistema fonte            req-discovery       req-ddd-modeling          req-migration-strategy   req-agile-planning       implementação
-(qualquer linguagem) →   (leitura) →         (modelagem DDD) →        [opcional]         →    (planejamento) →         config-project-fullstack
-                         requirements.md     ddd-strategic-model.md   migration-strategy.md  backlog.md               + openspec-propose/apply-change
-                         ddd-analysis.md     ddd-tactical-model.md  acl-design.md          epics-summary.md         + config-docker + config-cicd
-                         domain-model.md     ddd-operational-notes.md sprint-plan.md           + core-* / frontend-* / mobile-*
+Sistema fonte            req-discovery       req-ddd-modeling          req-migration-strategy   delivery-profile.md      req-agile-planning
+(qualquer linguagem) →   (leitura) →         (modelagem DDD) →        [opcional]         →   (stack+superfícies) →   (backlog full-stack)
+                         requirements.md     ddd-strategic-model.md   migration-strategy.md  planning/*/              backlog.md
+                         delivery-inventory  ddd-tactical-model.md    acl-design.md          delivery-profile.md      + openspec-propose/apply
+                         ddd-analysis.md     (+ superfícies/BC)                                epics-summary.md         + core/frontend/mobile/*
                          screens.md
+                         domain-model.md
 ```
 
 > O sistema fonte é apenas **lido**. A saída é **sempre** DDD/Clean Architecture. A implementação usa os skills deste repositório (TS, KT, CS + frontend/mobile).
@@ -529,7 +579,7 @@ Consultar `references/ddd-clean-mapping.md`.
 
 Ofereça essas opções ao finalizar:
 
-> "Análise concluída! Próximos passos:
+> "Análise concluída! Artefatos: requirements.md, ddd-analysis.md, delivery-inventory.md (se houver UI). Próximos passos:
 > 1. Aprofundar modelagem DDD (`req-ddd-modeling`)
 > 2. [Se legado] Definir estratégia de migração (`req-migration-strategy`)
 > 3. Gerar backlog com docker/cicd no bootstrap (`req-agile-planning`)

@@ -244,10 +244,9 @@ Gerar em `<docsPath>/migration/<project-name>/`:
 ### Pipeline completo (com migração)
 
 ```
-req-discovery → req-ddd-modeling → req-migration-strategy → req-agile-planning → implementação
-requirements.md  ddd-strategic-model  migration-strategy.md   backlog.md           config-project-fullstack
-ddd-analysis.md  ddd-tactical-model   acl-design.md           (EP-000: docker+cicd) + openspec-apply-change
-                                                                                      + core-* / frontend-* / mobile-*
+req-discovery → req-ddd-modeling → req-migration-strategy → delivery-profile.md → req-agile-planning → implementação
+delivery-inventory.md  ddd-tactical-model   acl-design.md           (stack+Web/Mobile/BC)  backlog.md (full-stack)
+requirements.md      ddd-strategic-model  migration-strategy.md                          + openspec-apply-change
 ```
 
 ### Próximos passos após migration strategy
@@ -261,7 +260,7 @@ ddd-analysis.md  ddd-tactical-model   acl-design.md           (EP-000: docker+ci
 
 Ao finalizar, oferecer:
 
-> "Estratégia de migração definida!\n> Próximos passos:\n> 1. Gerar backlog por fase de migração (`req-agile-planning`)\n> 2. Bootstrap do projeto novo com docker/cicd (`config-project-fullstack`)\n> 3. Migrar BC de menor risco primeiro (`openspec-propose \"ep-001-<bc>\"`)"
+> "Estratégia de migração definida!\n> Próximos passos:\n> 1. Criar `delivery-profile.md` (stack C#/Vue/Android + colunas API/Web/Mobile por BC)\n> 2. Gerar backlog full-stack por fase (`req-agile-planning`)\n> 3. Bootstrap (`config-project-fullstack`)\n> 4. Migrar BC (`openspec-propose \"ep-001-<bc>\"`)"
 
 ---
 
