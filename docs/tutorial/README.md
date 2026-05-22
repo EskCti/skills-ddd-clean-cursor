@@ -2,6 +2,82 @@
 
 Guias práticos do levantamento de requisitos à entrega em produção — **sempre começando pela análise**, depois **full-stack por combinação** de backend + frontend + mobile.
 
+**Público**: desenvolvedor **pleno** aprendendo a sequência de agents no Cursor. Leia primeiro [Trilha mínima](#trilha-mínima-pleno-1–2-dias) e [Checklist antes do código](#checklist-antes-do-código).
+
+---
+
+## DDD (backend) vs Clean Architecture (web/mobile)
+
+| Camada | O quê modelar | Skills de análise | Skills de implementação |
+|--------|---------------|-------------------|-------------------------|
+| **Backend** | Domínio canônico: BCs, aggregates, VOs, use cases, API | `req-discovery`, `req-ddd-modeling` | `Core *`, `Backend *`, `test-unit-*`, `test-e2e-*` |
+| **Web admin** | Telas, rotas, guards; entidades/use cases **finos** que chamam HTTP | Seções **Apresentação — Web** no `ddd-tactical-model.md` + **Telas e fluxos (web)** na US | `Frontend Entity/UseCase/Repository/Page/Form` |
+| **Mobile** | Screens, navegação; mesmo padrão CA no cliente | **Apresentação — Mobile** + **Telas e fluxos (mobile)** | `Mobile Entity/UseCase/Repository/Screen/Form` |
+
+> **Regra**: não duplicar DDD tático no Vue/Android. O `req-ddd-modeling` documenta **apresentação** para planejar; a regra de negócio pesada fica no backend.
+
+---
+
+## Como usar agents no Cursor
+
+| Passo | O que fazer |
+|-------|-------------|
+| 1 | No chat, escolha o **agent pelo `display_name`** (coluna abaixo) ou cite o skill (`@req-discovery`). |
+| 2 | Cole o **prompt** sugerido no tutorial ou adapte com caminhos do seu projeto (`docs/discovery/<projeto>/`). |
+| 3 | Confira a **saída** no diretório indicado antes do próximo agent. |
+| 4 | Na implementação, use o **Agent** + **Prompt** de cada task do `backlog.md` (não o nome da pasta `core-entity`). |
+| 5 | Com OpenSpec: `/opsx:propose` ou skill `openspec-propose` → depois `/opsx:apply` (`openspec-apply-change`). |
+
+**Onde achar o `display_name`**: `.agents/skills/<skill>/agents/openai.yaml` → campo `display_name`.
+
+### Pipeline de análise — agents e artefatos
+
+| Ordem | Skill | Agent (`display_name`) | Entrada | Saída principal |
+|-------|--------|------------------------|---------|-----------------|
+| 1 | `req-discovery` | **Requirement Discovery** | URL ou pasta do legado | `requirements.md`, `ddd-analysis.md`, **`delivery-inventory.md`** |
+| 2 | `req-ddd-modeling` | **DDD Modeling** | discovery ou descrição livre | `ddd-strategic-model.md`, `ddd-tactical-model.md` (+ **Apresentação Web/Mobile** por BC) |
+| 3 | `req-migration-strategy` | **Migration Strategy** | discovery + modeling (se legado) | `migration-strategy.md`, `acl-design.md` |
+| 4 | *(manual/agent)* | **Agile Planning** (Fase 0) | `delivery-inventory` + tático | **`delivery-profile.md`** em `planning/<projeto>/` |
+| 5 | `req-agile-planning` | **Agile Planning** | modeling + **delivery-profile** | `backlog.md` (US com **Telas e fluxos** + tasks por camada) |
+
+### Implementação — ordem típica de agents
+
+| Camada | Exemplos de `display_name` (C# + Vue + Android) |
+|--------|--------------------------------------------------|
+| Bootstrap | `Config Project Full-Stack`, `Config Project (C#)`, `Config Shared Web (Vue)`, `Config Project (Android)` |
+| Backend | `Core Entity (C#)`, `Core Use Case (C#)`, `Backend Data (C#)`, `Backend Controller (C#)` |
+| Web | `Frontend Entity (Vue)` → `Frontend UseCase (Vue)` → `Frontend Repository (Vue)` → `Frontend Page (Vue)` |
+| Mobile | `Mobile Entity (Android)` → … → `Mobile Screen (Android)` |
+| Testes | `Unit Tests (C#)`, `E2E Tests (C#)`; `test:unit-web` / `test:unit-mobile` no backlog |
+
+---
+
+## Checklist antes do código
+
+Marque **sim** em todos antes de abrir o [Tutorial 02](./02-fullstack-project-setup.md) ou rodar `config-project-fullstack`:
+
+- [ ] Existe `docs/discovery/<projeto>/delivery-inventory.md` (se o legado tinha web ou mobile).
+- [ ] Existe `docs/modeling/<projeto>/ddd-tactical-model.md` com **Superfícies de entrega** (API | Web | Mobile) em cada BC do MVP.
+- [ ] Nos BCs com Web/Mobile = Sim, há seções **Apresentação — Web admin** / **Apresentação — Mobile** (ver [client-presentation-model](../../req-ddd-modeling/references/client-presentation-model.md)).
+- [ ] Existe `docs/planning/<projeto>/delivery-profile.md` com **uma** stack fixa (não “agnóstico”).
+- [ ] Existe `docs/planning/<projeto>/backlog.md` com EP-000 (docker + cicd + shell web se aplicável).
+- [ ] Cada US com web no perfil tem **`### Telas e fluxos (web)`** e tasks `interface:entity` → … → `interface:page` (não só `Frontend Page`).
+- [ ] Cada US com mobile tem **`### Telas e fluxos (mobile)`** e bloco `interface:mobile-entity` → …
+- [ ] Tasks usam **Agent** + **Prompt** (não só nome de skill).
+- [ ] Você sabe qual tutorial `stacks/*` seguir (ex.: [dotnet-cs-vue-android](./stacks/dotnet-cs-vue-android.md) neste monorepo).
+
+---
+
+## Trilha mínima (pleno, 1–2 dias)
+
+1. [README](./README.md) (esta página) — DDD vs CA + checklist.
+2. [Tutorial 01](./01-pipeline-discovery-planning.md) — rodar agents 1→5 na ordem da tabela acima.
+3. Validar [checklist](#checklist-antes-do-código).
+4. [Tutorial 02](./02-fullstack-project-setup.md) → tutorial da stack ([dotnet-cs-vue-android](./stacks/dotnet-cs-vue-android.md) no RetailOps).
+5. Por épico: [Tutorial 04](./04-ciclo-completo-openspec.md) (comandos OpenSpec) ou agents diretos do backlog.
+
+> Referência longa de implementação: [nestjs-angular-flutter](./stacks/nestjs-angular-flutter.md) — use **depois** da sequência estar clara.
+
 ---
 
 ## Índice
@@ -10,7 +86,7 @@ Guias práticos do levantamento de requisitos à entrega em produção — **sem
 
 | # | Tutorial | Conteúdo |
 |---|----------|----------|
-| [01](./01-pipeline-discovery-planning.md) | Pipeline de Requisitos e Planejamento | `req-discovery` → `req-ddd-modeling` → `req-migration-strategy` → `req-agile-planning` → **`backlog.md`** |
+| [01](./01-pipeline-discovery-planning.md) | Pipeline de Requisitos e Planejamento | `req-discovery` → `req-ddd-modeling` → `req-migration-strategy` → **`delivery-profile.md`** → `req-agile-planning` → **`backlog.md`** |
 
 ### Fase 2 — Full-Stack (escolher combinação)
 
@@ -25,6 +101,7 @@ Guias práticos do levantamento de requisitos à entrega em produção — **sem
 | NestJS | Next.js | Flutter | [stacks/nestjs-next-flutter.md](./stacks/nestjs-next-flutter.md) |
 | Spring Boot | Vue 3 | Flutter | [stacks/spring-vue-flutter.md](./stacks/spring-vue-flutter.md) |
 | ASP.NET Core | Angular | Android | [stacks/dotnet-angular-android.md](./stacks/dotnet-angular-android.md) |
+| ASP.NET Core | Vue 3 | Android | [stacks/dotnet-cs-vue-android.md](./stacks/dotnet-cs-vue-android.md) |
 | Qualquer | — | — | [stacks/backend-incremental.md](./stacks/backend-incremental.md) |
 
 ### Fase 3 — Atalhos e integração
@@ -32,26 +109,28 @@ Guias práticos do levantamento de requisitos à entrega em produção — **sem
 | # | Tutorial | Conteúdo |
 |---|----------|----------|
 | [03](./03-implementacao-modulo.md) | Atalho: Backend incremental | Redireciona para [stacks/backend-incremental.md](./stacks/backend-incremental.md) |
-| [04](./04-ciclo-completo-openspec.md) | Ciclo OpenSpec (legado → NestJS+Vue+Flutter) | Narrativa integrada ou referência propose/apply/archive |
+| [04](./04-ciclo-completo-openspec.md) | Ciclo OpenSpec | Narrativa **NestJS + Vue + Flutter** + comandos propose/apply/archive; RetailOps → [dotnet-cs-vue-android](./stacks/dotnet-cs-vue-android.md) |
 
 ---
 
 ## Ordem recomendada
 
 ```
-01 Análise (req-*)  ──►  backlog.md
-       │
+01 Análise (req-* + delivery-profile)  ──►  delivery-profile.md + backlog.md
+       │         (validar checklist)
        ▼
 02 Hub Full-Stack  ──►  escolher combinação (stacks/*)
        │
        ├──► backend-incremental  (Strangler Fig / só API)
        │
        ▼
-Implementação por BC + testes
+Implementação por BC (inside-out) + testes
        │
        ▼
-04 OpenSpec  (referência ou narrativa legado — não duplica 01+02+stack)
+04 OpenSpec  (comandos — narrativa TS; RetailOps usa stack C#)
 ```
+
+> **Não pule** o [Tutorial 03](./03-implementacao-modulo.md) pensando que substitui o 02 — o 03 só redireciona para incremental; escolha stack no hub antes.
 
 > O tutorial [NestJS + Angular + Flutter](./stacks/nestjs-angular-flutter.md) é o **mais detalhado** (referência para BC, testes, frontend e mobile).
 
@@ -64,20 +143,27 @@ Implementação por BC + testes
 │                           PIPELINE COMPLETO                                     │
 ├─────────────────────────────────────────────────────────────────────────────────┤
 │                                                                                  │
-│  FASE 1 — DESCOBERTA E MODELAGEM (agnóstico)          → Tutorial 01             │
+│  FASE 1 — DESCOBERTA E PLANEJAMENTO                   → Tutorial 01             │
 │                                                                                  │
 │  Sistema Legado     req-discovery        req-ddd-modeling                       │
-│  (qualquer stack) ──(análise)──────────▶ (roadmap DDD)                         │
+│  (qualquer stack) ──(análise)──────────▶ (DDD backend + Apresentação UI)      │
 │                     requirements.md      ddd-strategic-model.md                 │
-│                     ddd-analysis.md      ddd-tactical-model.md                  │
+│                     delivery-inventory   ddd-tactical-model.md                  │
+│                     ddd-analysis.md      (+ superfícies API/Web/Mobile)         │
 │                         │                                                        │
 │                         ▼ (se legado)                                            │
 │                   req-migration-strategy                                         │
 │                   migration-strategy.md                                          │
 │                         │                                                        │
 │                         ▼                                                        │
+│                   delivery-profile.md   (stack fixa + tabela por BC)            │
+│                         │                                                        │
+│                         ▼                                                        │
 │                   req-agile-planning                                             │
-│                   backlog.md  ◄── input para config-project-fullstack           │
+│                   backlog.md (+ Telas e fluxos por US)                          │
+│                         │                                                        │
+│                         ▼                                                        │
+│              [Checklist antes do código] ──► Tutorial 02                        │
 │                                                                                  │
 ├─────────────────────────────────────────────────────────────────────────────────┤
 │                                                                                  │
@@ -133,9 +219,8 @@ Implementação por BC + testes
 ### Fluxo combinado (recomendado para times)
 
 ```
-req-discovery → req-ddd-modeling → req-agile-planning
-                                         │
-                                    backlog.md
+req-discovery → req-ddd-modeling → [req-migration-strategy]
+       → delivery-profile.md → req-agile-planning → backlog.md
                                          │
                           config-project-fullstack → tutorial stacks/*
                                          │

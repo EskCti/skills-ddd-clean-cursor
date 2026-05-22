@@ -67,11 +67,20 @@ Implement tasks from an OpenSpec change.
    - Remaining tasks overview
    - Dynamic instruction from CLI
 
-6. **Implement tasks (loop until done or blocked)**
+6. **Validate task coverage (before and during apply)**
+
+   Read `req-agile-planning` checklist (“BC com web e/ou mobile”). Para a change atual:
+
+   - Se existir `apps/web-vue` ou `apps/web-angular` e houver tasks de auth/UI, verificar se `tasks.md` inclui `interface:entity`, `interface:usecase`, `interface:repository` **antes** de `interface:page` (tasks pendentes ou seção dedicada tipo “§12 Frontend CA”).
+   - Se existir `apps/mobile-android` ou Flutter e houver feature mobile, verificar `interface:mobile-entity` → `interface:mobile-usecase` → `interface:mobile-repository` → `interface:mobile`.
+   - Se faltar camada: **pausar**, listar tasks ausentes, sugerir atualizar `backlog.md` + `tasks.md` (ou rodar `openspec-propose` de reconciliação) — **não** marcar `[x]` em `interface:page`/`interface:mobile` com `fetch` direto na store como substituto de CA.
+
+7. **Implement tasks (loop until done or blocked)**
 
    For each pending task:
    - Show which task is being worked on
-   - Read the **Agent** field from the task (display_name from `agents/openai.yaml`) and invoke that agent with the task **Prompt**
+   - Read the **Agent** field from the task (display_name from `agents/openai.yaml`) and invoke that agent with the task **Prompt**; para `interface:page` / `interface:mobile`, incluir no prompt o conteúdo da US em `backlog.md` (**Telas e fluxos (web/mobile)**) e `ddd-tactical-model.md` (Apresentação)
+   - Read the matching skill under `.agents/skills/` when the Agent maps to a known skill (ex. `Frontend Entity (Vue)` → `frontend-entity-vue`)
    - Make the code changes required
    - Keep changes minimal and focused
    - Mark task complete in the tasks file: `- [ ]` → `- [x]`
@@ -83,7 +92,7 @@ Implement tasks from an OpenSpec change.
    - Error or blocker encountered → report and wait for guidance
    - User interrupts
 
-7. **On completion or pause, show status**
+8. **On completion or pause, show status**
 
    Display:
    - Tasks completed this session
@@ -148,6 +157,8 @@ What would you like to do?
 - Always read context files before starting (from the apply instructions output)
 - Each task in `tasks.md` must list **Agent** (display_name) + **Prompt** — never skill folder names (`core-entity`, `frontend-entity-vue`)
 - Invoke the Agent named in each task; do not implement without matching the backlog format from `req-agile-planning`
+- Do not treat `Frontend Page (Vue)` / `Mobile Screen (Android)` as full-stack completion unless entity, usecase, and repository tasks are done (or explicitly marked MVP with follow-up section pending)
+- When a task Prompt says “sem fetch na view/store”, enforce that — repository + use case must exist
 - If task is ambiguous, pause and ask before implementing
 - If implementation reveals issues, pause and suggest artifact updates
 - Keep code changes minimal and scoped to each task

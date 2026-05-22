@@ -225,8 +225,44 @@ Para cada BC, produzir:
 │ Repository Ports:                              │
 │   • IOrderRepository (save, findById, findAll)  │
 │                                                │
+│ Superfícies de entrega (para req-agile-planning):│
+│   • API REST: Sim — endpoints expostos         │
+│   • Web admin: Sim/Não — telas (ver delivery-inventory) │
+│   • Mobile: Sim/Não — fluxos app               │
+│                                                │
+│ Apresentação — Web (se Web = Sim):             │
+│   • Rotas/telas, guards, menu                  │
+│   • Entidades + use cases de UI (cliente)      │
+│                                                │
+│ Apresentação — Mobile (se Mobile = Sim):       │
+│   • Telas, navegação, estado de tela           │
+│   • Entidades + use cases de UI (cliente)      │
+│                                                │
 └──────────────────────────────────────────────┘
 ```
+
+> **Obrigatório** em cada BC do `ddd-tactical-model.md`:
+> 1. Bloco **Superfícies de entrega** (API | Web admin | Mobile) — copiar de `delivery-inventory.md` quando existir.
+> 2. Se **Web admin = Sim**: seção **Apresentação — Web admin** (template em `references/client-presentation-model.md`).
+> 3. Se **Mobile = Sim**: seção **Apresentação — Mobile** (mesmo reference).
+>
+> O domínio canônico (VOs, entities, aggregates) continua no backend; as seções de apresentação **não** substituem o modelo tático — guiam `req-agile-planning` e os agents `frontend-*` / `mobile-*`.
+
+### Fase 2.1 — Modelo de apresentação (cliente)
+
+Quando o BC tiver Web e/ou Mobile = **Sim**, documentar **antes** do backlog:
+
+| Elemento | O que descrever | Não fazer |
+|----------|-----------------|-----------|
+| Telas / rotas | URL ou nome de screen, persona, ação | Repetir regras de negócio do aggregate |
+| API consumida | Verbos e paths que a UI chama | Redesenhar contrato sem alinhar ao use case backend |
+| Guards / menu | Auth, permissões, itens de navegação | — |
+| Entidades UI | Campos que a tela precisa (DTO espelho) | Tabelas de banco ou entidades EF |
+| Use cases UI | Login, listar, salvar — orquestram repository HTTP | Lógica de desconto/estoque no Vue |
+
+**Ordem de leitura**: `delivery-inventory.md` → superfícies no BC → detalhar apresentação → `delivery-profile.md` → `backlog.md` com subseções **Telas e fluxos** por US.
+
+Consultar templates completos: `references/client-presentation-model.md`.
 
 ---
 
@@ -298,7 +334,20 @@ Gerar os seguintes documentos em `<docsPath>/modeling/<project-name>/`:
 # Modelo Tático — <Nome do Projeto>
 
 ## <Bounded Context 1>
-(VOs, Entities, Aggregates, Domain Services, Domain Events, Repositories)
+
+### Domínio (backend)
+(VOs, Entities, Aggregates, Domain Services, Domain Events, Repository ports)
+
+### Superfícies de entrega
+| API REST | Web admin | Mobile |
+|----------|-----------|--------|
+| Sim      | Sim       | Não    |
+
+### Apresentação — Web admin
+(se Web = Sim: tabelas de telas/rotas, navegação, entidades UI, use cases UI — ver references/client-presentation-model.md)
+
+### Apresentação — Mobile
+(se Mobile = Sim: idem para app)
 
 ## <Bounded Context 2>
 (...)
@@ -326,11 +375,11 @@ Gerar os seguintes documentos em `<docsPath>/modeling/<project-name>/`:
 ### Pipeline completo
 
 ```
-Sistema fonte            req-discovery         req-ddd-modeling          req-migration-strategy   req-agile-planning       implementação
-(qualquer linguagem) →   (leitura) →           (modelagem DDD) →        [opcional]         →    (planejamento) →         config-project-fullstack
-                         requirements.md       ddd-strategic-model.md   migration-strategy.md  backlog.md               + openspec-* + config-docker/cicd
-                         ddd-analysis.md       ddd-tactical-model.md  acl-design.md          epics-summary.md         + core-* / frontend-* / mobile-*
-                                               ddd-operational-notes.md sprint-plan.md
+Sistema fonte            req-discovery         req-ddd-modeling          req-migration-strategy   delivery-profile.md      req-agile-planning
+(qualquer linguagem) →   (leitura) →           (modelagem DDD) →        [opcional]         →   (stack+superfícies) →    (backlog full-stack)
+                         requirements.md       ddd-strategic-model.md   migration-strategy.md  planning/*/              backlog.md
+                         delivery-inventory.md ddd-tactical-model.md    acl-design.md          delivery-profile.md      + frontend/mobile tasks
+                         ddd-analysis.md       (+ superfícies/BC)                                epics-summary.md
 ```
 
 > O `req-ddd-modeling` pode ser usado **diretamente** sem `req-discovery` — basta fornecer uma descrição do domínio.
@@ -344,7 +393,7 @@ Sistema fonte            req-discovery         req-ddd-modeling          req-mig
 
 Ofereça essas opções ao finalizar:
 
-> "Modelagem DDD concluída!\n> Próximos passos:\n> 1. [Se legado] Estratégia de migração (`req-migration-strategy`)\n> 2. Gerar backlog (`req-agile-planning`) — EP-000 inclui docker + cicd\n> 3. Bootstrap full-stack (`config-project-fullstack` + OpenSpec)\n> 4. Implementar BC (`openspec-propose \"bc-<nome>\"`)"
+> "Modelagem DDD concluída!\n> Próximos passos:\n> 1. [Se legado] Estratégia de migração (`req-migration-strategy`)\n> 2. Definir perfil de entrega (`delivery-profile.md`) — stack + API/Web/Mobile por BC\n> 3. Gerar backlog (`req-agile-planning`) — cada US com web/mobile: subseções **Telas e fluxos** + tasks inside-out (não só API)\n> 4. Bootstrap (`config-project-fullstack` + OpenSpec)\n> 5. Implementar BC (`openspec-propose \"ep-XXX-<bc>\"`)"
 
 ---
 
@@ -356,11 +405,15 @@ Ofereça essas opções ao finalizar:
 - **Documente a linguagem ubíqua** — termos devem ser acordados, não assumidos
 - **Domain Events são opcionais** — só incluir quando há reações cross-context claras
 - **Não misture camadas** — Entities no Domain, Use Cases na Application, never vice-versa
+- **Inclua superfícies de entrega por BC** — sem coluna Web/Mobile o backlog ficará incompleto
+- **Inclua modelo de apresentação** quando Web ou Mobile = Sim — sem rotas/telas/use cases UI o `req-agile-planning` gera só `interface:page`
+- **Não duplique o aggregate no cliente** — entidades UI são projeção/DTO; regras de negócio ficam no backend
 
 ## References
 
 - Consultar `references/ddd-strategic-patterns.md` para padrões estratégicos detalhados.
 - Consultar `references/ddd-tactical-patterns.md` para padrões táticos detalhados.
+- Consultar `references/client-presentation-model.md` para templates web/mobile por BC.
 
 ## Global Standards
 

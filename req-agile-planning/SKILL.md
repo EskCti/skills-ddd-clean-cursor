@@ -11,9 +11,9 @@ Transformar requisitos (documentados ou descritos) em um backlog ágil estrutura
 **Fluxo completo (recomendado)**:
 
 ```
-req-discovery → req-ddd-modeling → [req-migration-strategy] → req-agile-planning
-       ↓
-  backlog.md (EP-000 bootstrap inclui docker + cicd)
+req-discovery → req-ddd-modeling → [req-migration-strategy] → delivery-profile.md → req-agile-planning
+       ↓                              ↑ stack + superfícies por BC (obrigatório full-stack)
+  backlog.md (EP-000 bootstrap inclui docker + cicd + web + mobile)
        ↓
 openspec-propose "bootstrap-<nome>" → openspec-apply-change
   (config-project-fullstack orquestra: config-project-* + config-docker + config-cicd + config-shared-core)
@@ -46,16 +46,36 @@ Se nenhuma fonte for fornecida, pergunte:
 
 ## Workflow
 
+### Fase 0 — Perfil de entrega full-stack (OBRIGATÓRIA)
+
+**Antes** de escrever épicos ou tasks, definir **como** o sistema será entregue (não só o domínio).
+
+1. **Se `delivery-profile.md` não existir** em `<docsPath>/planning/<projeto>/`:
+   - Perguntar ao usuário (ou inferir do pedido) a **matriz de stack**:
+     - Backend: NestJS | Spring Boot | **ASP.NET Core**
+     - Web: Nenhum | Next.js | Angular | **Vue 3**
+     - Mobile: Nenhum | Flutter | **Android**
+   - Ler `screens.md` e `requirements.md` do discovery — listar telas web e apps mobile do legado.
+   - Ler `ddd-tactical-model.md` — para cada BC do MVP, marcar colunas **API | Web admin | Mobile** e validar seções **Apresentação — Web/Mobile** (ver `references/delivery-profile.md` e `req-ddd-modeling/references/client-presentation-model.md`).
+   - **Criar** `<docsPath>/planning/<projeto>/delivery-profile.md`.
+
+2. **Se já existir** `delivery-profile.md`: validar que cobre todos os BCs do release planejado; atualizar se faltar superfície.
+
+3. **Regra**: backlog com web ou mobile no perfil **não pode** ser “só backend”. EP-000 e cada US devem refletir o perfil.
+
+> Erro típico (RetailOps EP-001): stack no cabeçalho do backlog (`C# + Vue + Android`) mas US sem tasks `Frontend Entity/UseCase/Repository` — causado por pular Fase 0 ou ignorar coluna Web/Mobile do perfil.
+
 ### Fase 1 — Compreensão
 
 1. **Ler/receber os requisitos** da fonte fornecida
-2. **Ler saída do `req-ddd-modeling`** se existir — `ddd-strategic-model.md` (subdomínios, BCs, context map) e `ddd-tactical-model.md` (entities, VOs, events por BC) são a fonte mais rica
+2. **Ler saída do `req-ddd-modeling`** se existir — `ddd-strategic-model.md` (subdomínios, BCs, context map) e `ddd-tactical-model.md` (domínio por BC **+** seções **Apresentação — Web admin** / **Apresentação — Mobile** quando existirem) são a fonte mais rica
 3. **Senão, ler `ddd-analysis.md`** se existir — os Bounded Contexts já mapeados viram Épicos diretamente
 4. **Identificar domínios/módulos** — agrupar funcionalidades relacionadas (se nenhum modelo DDD existir, inferir Bounded Contexts dos requisitos)
 4. **Mapear dependências** — quais funcionalidades dependem de outras
 5. **Identificar MVP** — perguntar ao usuário o que é prioridade
+6. **Ler `delivery-profile.md`** — para cada BC no MVP, anotar se a US exige bloco Web e/ou Mobile
 
-Se os requisitos vierem do `req-discovery`, ler também `screens.md` e `domain-model.md` se existirem.
+Se os requisitos vierem do `req-discovery`, ler também `screens.md`, `delivery-inventory.md` e `domain-model.md` se existirem.
 
 ### Fase 2 — Estruturação em Épicos (= Bounded Contexts)
 
@@ -132,6 +152,22 @@ Regras para Stories:
 - Estimativa de complexidade: 1, 2, 3, 5, 8, 13 (Fibonacci)
 - Prioridade: Must / Should / Could / Won't (MoSCoW)
 
+**Processo full-stack (caminho 1 + 3 — análise + backlog):**
+
+Quando `delivery-profile.md` marcar **Web admin = Sim** para o BC da story:
+
+- Incluir subseção **`### Telas e fluxos (web)`** com tabela ou lista: rota/tela, persona, ação, endpoints API, guards/menu (copiar de `ddd-tactical-model.md` → Apresentação — Web).
+- Critérios de aceitação devem cobrir **pelo menos uma tela** da subseção (navegação, erro, permissão).
+
+Quando **Mobile = Sim**:
+
+- Incluir **`### Telas e fluxos (mobile)`** (screens, navegação, endpoints).
+- Critérios de aceitação para fluxo mobile quando aplicável.
+
+Se o `ddd-tactical-model.md` **não** tiver apresentação e o perfil exigir web/mobile: **parar** e pedir completar modelagem (`req-ddd-modeling`) ou preencher a subseção manualmente na US — **não** gerar só tasks `interface:page`.
+
+> As subseções **Telas e fluxos** complementam as tasks `interface:entity` → … — não substituem a cadeia inside-out no cliente.
+
 ### Fase 4 — Decomposição em Tasks (por camada DDD)
 
 Para cada Story, criar Tasks técnicas **tipadas por camada arquitetural**, seguindo a ordem de dentro para fora da Clean Architecture:
@@ -172,6 +208,20 @@ Ordem de implementação (inside-out):
 ```
 
 > **OpenSpec**: para features que envolvem múltiplas camadas (backend + frontend + mobile), recomenda-se usar `openspec-propose` antes de iniciar a implementação. O `tasks.md` deve copiar o formato do backlog (**Agent** + **Prompt** por task). O `openspec-apply-change` aciona cada **Agent** listado na ordem inside-out.
+
+### Checklist obrigatório — BC com web e/ou mobile
+
+Antes de considerar o backlog (ou `tasks.md`) pronto para `openspec-apply-change`, validar:
+
+1. **Backend** (se aplicável): `domain:vo` → `domain:entity` → `domain:service` → `app:usecase` → `infra:persistence` → `interface:controller`
+2. **Vue/Angular** (se aplicável): **todas** as tasks `interface:entity` → `interface:usecase` → `interface:repository` → `interface:page` → `interface:form-web` (nunca só `interface:page`)
+3. **Android/Flutter** (se aplicável): **todas** as tasks `interface:mobile-entity` → `interface:mobile-usecase` → `interface:mobile-repository` → `interface:mobile` (e `interface:mobile-form` se houver formulário)
+4. **Proibido**: uma linha genérica “Template full-stack” ou “Aplicar template” sem expandir em tasks numeradas
+5. **Testes**: `test:unit` + `test:e2e` do **backend** da stack; mais `test:unit-web` / `test:unit-mobile` quando houver UI nativa (ver tabela abaixo)
+6. Cada task: prefixo de camada + **Agent** (`display_name`) + **Prompt** específico (classe, endpoint, comportamento)
+7. Cada US com web/mobile no perfil: subseções **Telas e fluxos (web)** e/ou **(mobile)** preenchidas e alinhadas às tasks `interface:*` / `interface:mobile-*`
+
+> Um agente `Frontend Page (Vue)` **não** substitui entity/usecase/repository — ele só implementa a camada de apresentação. A subseção **Telas e fluxos** define *o quê* implementar; as tasks definem *como* (CA no cliente).
 
 Formato de task — **inclui o agent Cursor a acionar e o prompt sugerido**:
 
@@ -242,6 +292,10 @@ Se a stack **não foi escolhida ainda**, mostrar as 3 opções:
 | `test:unit` | `Unit Tests (TypeScript)` | `Unit Tests (Kotlin)` | `Unit Tests (C#)` |
 | `test:coverage` | `Unit Tests (TypeScript)` | `Unit Tests (Kotlin)` | `Unit Tests (C#)` |
 | `test:e2e` | `E2E Tests (TypeScript)` | `E2E Tests (Kotlin)` | `E2E Tests (C#)` |
+| `test:unit-web` | `Frontend UseCase (Vue)` ou `Frontend UseCase (Angular)` | — | — |
+| `test:unit-mobile` | `Mobile UseCase (Flutter)` | `Mobile UseCase (Android)` | — |
+
+> **`test:unit-web` / `test:unit-mobile`**: não há skill `Unit Tests (Vue)` separado; use o agent do **use case** da stack com prompt explícito para Vitest/JUnit e mocks de repository. E2E de UI (Playwright) permanece em `test:e2e` apenas na stack TypeScript (`E2E Tests (TypeScript)`).
 
 Regras para Tasks:
 
@@ -314,12 +368,17 @@ Se o `requirements.md` veio do skill `req-discovery`, use o mesmo `<nome-do-sist
 ```
 docs/discovery/meu-erp/requirements.md   ← requisitos
 docs/discovery/meu-erp/ddd-analysis.md   ← análise DDD (bounded contexts, entities, VOs)
+docs/planning/meu-erp/delivery-profile.md ← stack + superfícies API/Web/Mobile por BC (antes do backlog)
 docs/planning/meu-erp/backlog.md          ← saída (épicos + stories + tasks por camada)
 ```
 
 ---
 
 ## Artefatos de Saída
+
+### `delivery-profile.md` (obrigatório em full-stack — antes do backlog)
+
+Ver template em `references/delivery-profile.md`. Sem este arquivo, **não** gerar `backlog.md` com tasks web/mobile incompletas.
 
 ### `backlog.md` (obrigatório — documento unificado)
 
@@ -330,7 +389,8 @@ docs/planning/meu-erp/backlog.md          ← saída (épicos + stories + tasks 
 **Análise DDD**: <ddd-analysis.md ou inferido>
 **Data**: <data>
 **Total**: <N> épicos (<B> bounded contexts + <T> técnicos), <M> stories, <P> tasks
-**Stack**: agnóstico (escolha TS, KT ou CS na implementação)
+**Perfil de entrega**: `<docsPath>/planning/<projeto>/delivery-profile.md`
+**Stack**: <Backend> · <Web ou "Nenhum"> · <Mobile ou "Nenhum"> — **fixa** (não "agnóstico")
 
 ## Roadmap
 
@@ -411,6 +471,34 @@ docs/planning/meu-erp/backlog.md          ← saída (épicos + stories + tasks 
 
 - [ ] Dado <contexto>, quando <ação>, então <resultado>
 - [ ] Dado <contexto>, quando <ação>, então <resultado>
+- [ ] (se web) Dado usuário em `<rota>`, quando <ação na UI>, então <resultado visível>
+- [ ] (se mobile) Dado app em `<Screen>`, quando <ação>, então <resultado>
+
+### Telas e fluxos (web)
+
+> Obrigatório quando `delivery-profile` / `ddd-tactical-model` tiver **Web admin = Sim** para este BC. Omitir se Web = Não.
+
+| Rota / tela | Persona | Ação | API | Form? |
+|-------------|---------|------|-----|-------|
+| `/<exemplo>` | <persona> | <ação> | `GET/POST …` | Sim/Não |
+
+**Navegação**: <menu, guards, redirect login>
+
+**Entidades / use cases UI** (alimentam tasks `interface:entity` … `interface:form-web`):
+
+- `<EntidadeUI>` → `<UseCaseUI>` via `<IRepository>`
+
+### Telas e fluxos (mobile)
+
+> Obrigatório quando **Mobile = Sim**. Omitir se Mobile = Não.
+
+| Tela | Persona | Ação | API | Form? |
+|------|---------|------|-----|-------|
+| `<Screen>` | <persona> | <ação> | `…` | Sim/Não |
+
+**Navegação**: <tabs, deep links>
+
+**Entidades / use cases UI**: <lista breve>
 
 **Tasks (inside-out)**:
 
@@ -542,7 +630,7 @@ Durante a criação do backlog, interaja ativamente:
 
 ### Antes (fontes):
 
-- **`req-ddd-modeling`** → fornece `ddd-strategic-model.md` + `ddd-tactical-model.md` (fonte mais rica, com subdomínios, BCs, context map e padrões táticos)
+- **`req-ddd-modeling`** → fornece `ddd-strategic-model.md` + `ddd-tactical-model.md` (domínio + **apresentação web/mobile por BC** — ver `req-ddd-modeling/references/client-presentation-model.md`)
 - **`req-discovery`** → fornece `requirements.md` como entrada principal
 - **`openspec-explore`** → investigação prévia do problema
 

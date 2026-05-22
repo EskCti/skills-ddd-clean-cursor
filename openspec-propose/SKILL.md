@@ -106,10 +106,24 @@ After completing all artifacts, summarize:
 - The schema defines what each artifact should contain - follow it
 - Read dependency artifacts for context before creating new ones
 - Use `template` as the structure for your output file - fill in its sections
-- For `tasks.md`: copy tasks from `backlog.md` when available — each task must include prefix, **Agent** (display_name from `agents/openai.yaml`), and **Prompt** (format from `req-agile-planning`)
+- For `tasks.md`: read `delivery-profile.md`, `backlog.md`, and `modeling/<projeto>/ddd-tactical-model.md` (seções **Apresentação — Web/Mobile** + subseções **Telas e fluxos** das US) — each task must include prefix, **Agent**, and **Prompt**. Omit web/mobile tasks only when delivery-profile marks that surface as **Nenhum**
+- **Expandir template full-stack**: se o backlog tiver “Template full-stack” ou só `interface:page` sem entity/usecase/repository, **expandir** usando o template em `docs/planning/*/backlog.md` (seção “Template — Tasks full-stack”) e o checklist em `req-agile-planning` — **nunca** copiar uma única task genérica para web/mobile
+- **Ordem no `tasks.md`**: backend inside-out primeiro; depois bloco Vue (`interface:entity` → … → `interface:form-web`); depois bloco mobile (`interface:mobile-entity` → …); por último `test:unit`/`test:e2e` (API) e `test:unit-web`/`test:unit-mobile` se existirem no backlog
+- Se a change já foi aplicada parcialmente (MVP), adicionar seção nova (ex. “§12 Frontend CA”) com tasks `[ ]` em vez de reescrever o histórico `[x]` do backend
 - **IMPORTANT**: `context` and `rules` are constraints for YOU, not content for the file
   - Do NOT copy `<context>`, `<rules>`, `<project_context>` blocks into the artifact
   - These guide what you write, but should never appear in the output
+
+**Guardrails — validação de `tasks.md` antes de finalizar**
+
+Executar mentalmente o checklist de `req-agile-planning` (“BC com web e/ou mobile”). Se faltar camada, **inserir tasks** antes de marcar propose como concluído.
+
+| Erro comum | Correção |
+|------------|----------|
+| Só `Frontend Page (Vue)` no auth | Adicionar `Frontend Entity`, `Frontend UseCase`, `Frontend Repository` antes da page; prompts devem citar rotas da US (**Telas e fluxos**) |
+| Backlog sem **Telas e fluxos (web/mobile)** | Completar US no backlog ou `ddd-tactical-model` antes de propor |
+| “Template full-stack” em uma linha | Expandir 8–12 tasks mobile + 5–7 tasks web |
+| Só `Unit Tests (C#)` no épico full-stack | Adicionar `test:unit-web` e/ou `test:unit-mobile` quando houver apps web-vue / mobile-android |
 
 **Guardrails**
 

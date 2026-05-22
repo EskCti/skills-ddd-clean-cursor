@@ -14,9 +14,9 @@ Este conteúdo foi reorganizado por **combinação de stack**. O guia de backend
 
 ## Fluxo recomendado
 
-1. [Tutorial 01 — Análise](./01-pipeline-discovery-planning.md) → `backlog.md`
-2. [Tutorial 02 — Hub Full-Stack](./02-fullstack-project-setup.md) → confirmar que incremental é o caminho
-3. [Backend incremental](./stacks/backend-incremental.md) → implementar BC
-4. Depois: escolher combinação web/mobile no hub e implementar features de UI
+1. [Tutorial 01 — Análise](./01-pipeline-discovery-planning.md) → `delivery-profile.md` + `backlog.md` (Web/Mobile = **Nenhum** no perfil)
+2. [Checklist](./README.md#checklist-antes-do-código) — validar antes de codar
+3. [Backend incremental](./stacks/backend-incremental.md) → implementar BC (só API)
+4. Depois: [Tutorial 02 — Hub](./02-fullstack-project-setup.md) + stack web/mobile para UI
 
-> Para projeto **novo** com backend + frontend + mobile desde o início, use o [Hub Full-Stack](./02-fullstack-project-setup.md) em vez deste atalho.
+> **Não substitui o Tutorial 02** para projeto full-stack desde o início — use o [Hub Full-Stack](./02-fullstack-project-setup.md) e escolha a combinação na matriz.
