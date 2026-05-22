@@ -4,8 +4,8 @@
 
 - Contrato base: `Project.Shared.Kernel/Application/IUseCase.cs`
 - Use cases (exemplos):
-  - `src/Project.Core/Application/UseCases/Product/CreateProductUseCase.cs`
-  - `src/Project.Core/Application/UseCases/Auth/LoginUseCase.cs`
+  - `apps/backend/Project.Core/Application/UseCases/Product/CreateProductUseCase.cs`
+  - `apps/backend/Project.Core/Application/UseCases/Auth/LoginUseCase.cs`
 
 ## Estrutura esperada
 

@@ -44,7 +44,7 @@ jobs:
         run: dotnet build --no-restore -c Release
 
       - name: Unit tests with coverage
-        run: dotnet test tests/ProjectName.UnitTests --no-build -c Release --collect:"XPlat Code Coverage" --results-directory ./coverage
+        run: dotnet test apps/backend/tests/ProjectName.UnitTests/ProjectName.UnitTests.csproj --no-build -c Release --collect:"XPlat Code Coverage" --results-directory ./coverage
 
       - name: Coverage gate (domain + application ≥95%)
         run: |
@@ -56,7 +56,7 @@ jobs:
           awk "BEGIN { exit !($PCT >= 95) }" <<< "$PCT" || (echo "FAIL: coverage below 95%" && exit 1)
 
       - name: Integration tests
-        run: dotnet test tests/ProjectName.IntegrationTests --no-build -c Release --logger trx
+        run: dotnet test apps/backend/tests/ProjectName.IntegrationTests/ProjectName.IntegrationTests.csproj --no-build -c Release --logger trx
         env:
           ConnectionStrings__DefaultConnection: Host=localhost;Database=test_db;Username=test;Password=test
 
@@ -103,7 +103,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: src/ProjectName.Backend/Dockerfile
+          file: apps/backend/ProjectName.Backend/Dockerfile
           push: true
           tags: ${{ env.IMAGE }}:${{ github.sha }},${{ env.IMAGE }}:latest
 

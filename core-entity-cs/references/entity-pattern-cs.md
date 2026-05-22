@@ -2,7 +2,7 @@
 
 ## Paths
 
-- `src/Project.Core/Domain/Entities/*.cs`
+- `apps/backend/Project.Core/Domain/Entities/*.cs`
 
 ## Estrutura esperada
 

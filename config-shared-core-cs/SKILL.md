@@ -12,7 +12,7 @@ Manter a base tecnológica do domínio (Shared Kernel) em C#, garantindo que as 
 
 ## Localização
 
-- `src/ProjectName.Shared.Kernel/`
+- `apps/backend/ProjectName.Shared.Kernel/` (ou caminho de `backendAppPath` em `skills.config.json`)
 
 ## Workflow
 

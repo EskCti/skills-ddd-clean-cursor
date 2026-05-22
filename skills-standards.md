@@ -232,11 +232,11 @@ C# files do not use dot-separated type suffixes in filenames. The type is expres
 
 ### Quick Examples (C#)
 
-- Backend controller: `src/Project.Backend/Controllers/CustomerController.cs`
-- Core entity: `src/Project.Core/Domain/Entities/Customer.cs`
-- Core VO: `src/Project.Core/Domain/ValueObjects/CustomerName.cs`
-- Core use case: `src/Project.Core/Application/UseCases/CreateCustomerUseCase.cs`
-- Core repository: `src/Project.Core/Domain/Repositories/ICustomerRepository.cs`
+- Backend controller: `apps/backend/Project.Backend/Controllers/CustomerController.cs`
+- Core entity: `apps/backend/Project.Core/Domain/Entities/Customer.cs`
+- Core VO: `apps/backend/Project.Core/Domain/ValueObjects/CustomerName.cs`
+- Core use case: `apps/backend/Project.Core/Application/UseCases/CreateCustomerUseCase.cs`
+- Core repository: `apps/backend/Project.Core/Domain/Repositories/ICustomerRepository.cs`
 
 ## 9. DDD / Clean Architecture Standards
 

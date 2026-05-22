@@ -1,28 +1,26 @@
 # Docker Pattern (C# — ASP.NET Core .NET 8+)
 
-## src/ProjectName.Backend/Dockerfile
+## apps/backend/ProjectName.Backend/Dockerfile
+
+Contexto de build: **raiz do repositório** (onde está o `.sln`).
 
 ```dockerfile
-# Stage 1: Builder — SDK completo para compilação e publish
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS builder
 WORKDIR /app
 
-# Restaurar dependências (cache de camada)
-COPY *.sln ./
-COPY src/ProjectName.Backend/ProjectName.Backend.csproj ./src/ProjectName.Backend/
-COPY src/ProjectName.Core/ProjectName.Core.csproj ./src/ProjectName.Core/
-COPY src/ProjectName.Infrastructure/ProjectName.Infrastructure.csproj ./src/ProjectName.Infrastructure/
-COPY src/ProjectName.Shared.Kernel/ProjectName.Shared.Kernel.csproj ./src/ProjectName.Shared.Kernel/
+COPY ProjectName.sln ./
+COPY apps/backend/ProjectName.Backend/ProjectName.Backend.csproj ./apps/backend/ProjectName.Backend/
+COPY apps/backend/ProjectName.Core/ProjectName.Core.csproj ./apps/backend/ProjectName.Core/
+COPY apps/backend/ProjectName.Infrastructure/ProjectName.Infrastructure.csproj ./apps/backend/ProjectName.Infrastructure/
+COPY apps/backend/ProjectName.Shared.Kernel/ProjectName.Shared.Kernel.csproj ./apps/backend/ProjectName.Shared.Kernel/
 RUN dotnet restore
 
-# Build e publish
 COPY . .
-RUN dotnet publish src/ProjectName.Backend/ProjectName.Backend.csproj \
+RUN dotnet publish apps/backend/ProjectName.Backend/ProjectName.Backend.csproj \
     -c Release \
     -o /app/publish \
     --no-restore
 
-# Stage 2: Runner — apenas ASP.NET runtime (sem SDK)
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS runner
 WORKDIR /app
 
@@ -39,7 +37,6 @@ ENTRYPOINT ["dotnet", "ProjectName.Backend.dll"]
 ## docker-compose.prod.yml
 
 ```yaml
-version: '3.8'
 services:
   postgres:
     image: postgres:16-alpine
@@ -53,7 +50,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: src/ProjectName.Backend/Dockerfile
+      dockerfile: apps/backend/ProjectName.Backend/Dockerfile
     ports:
       - "8080:8080"
     environment:
@@ -77,14 +74,14 @@ volumes:
 *.log
 .git
 **/TestResults
+apps/web-vue/node_modules
+apps/mobile-android/.gradle
+apps/mobile-android/build
 ```
 
 ## Checklist
 
-- [ ] Todos os `.csproj` copiados antes do restore (cache de camadas)
-- [ ] `.dockerignore` criado na raiz
-- [ ] `ASPNETCORE_URLS=http://+:8080` configurado
-- [ ] Variáveis sensíveis via `.env`
-- [ ] `docker build` testado localmente
-- [ ] Imagem final < 200MB (aspnet alpine + binários .NET)
-- [ ] Considerar `--self-contained` para imagem sem runtime externo
+- [ ] Todos os `.csproj` em `apps/backend/` copiados antes do restore
+- [ ] `.dockerignore` na raiz
+- [ ] `ASPNETCORE_URLS=http://+:8080`
+- [ ] `docker build -f apps/backend/ProjectName.Backend/Dockerfile .`

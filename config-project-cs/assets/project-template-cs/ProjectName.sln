@@ -3,17 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectName.Backend", "src\ProjectName.Backend\ProjectName.Backend.csproj", "{00000000-0000-0000-0000-000000000001}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectName.Backend", "apps\backend\ProjectName.Backend\ProjectName.Backend.csproj", "{00000000-0000-0000-0000-000000000001}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectName.Core", "src\ProjectName.Core\ProjectName.Core.csproj", "{00000000-0000-0000-0000-000000000002}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectName.Core", "apps\backend\ProjectName.Core\ProjectName.Core.csproj", "{00000000-0000-0000-0000-000000000002}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectName.Infrastructure", "src\ProjectName.Infrastructure\ProjectName.Infrastructure.csproj", "{00000000-0000-0000-0000-000000000003}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectName.Infrastructure", "apps\backend\ProjectName.Infrastructure\ProjectName.Infrastructure.csproj", "{00000000-0000-0000-0000-000000000003}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectName.Shared.Kernel", "src\ProjectName.Shared.Kernel\ProjectName.Shared.Kernel.csproj", "{00000000-0000-0000-0000-000000000004}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectName.Shared.Kernel", "apps\backend\ProjectName.Shared.Kernel\ProjectName.Shared.Kernel.csproj", "{00000000-0000-0000-0000-000000000004}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectName.UnitTests", "tests\ProjectName.UnitTests\ProjectName.UnitTests.csproj", "{00000000-0000-0000-0000-000000000005}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectName.UnitTests", "apps\backend\tests\ProjectName.UnitTests\ProjectName.UnitTests.csproj", "{00000000-0000-0000-0000-000000000005}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectName.IntegrationTests", "tests\ProjectName.IntegrationTests\ProjectName.IntegrationTests.csproj", "{00000000-0000-0000-0000-000000000006}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectName.IntegrationTests", "apps\backend\tests\ProjectName.IntegrationTests\ProjectName.IntegrationTests.csproj", "{00000000-0000-0000-0000-000000000006}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,20 +1,15 @@
-# Project Template (C#)
+# config-project-cs — assets
 
-This folder contains the base solution and project files for a new .NET Clean Architecture project:
+Template de solução .NET 8 com Clean Architecture em **apps/backend/**.
 
-- `ProjectName.sln`
-- `src/ProjectName.Backend/ProjectName.Backend.csproj` + `Program.cs`
-- `src/ProjectName.Core/ProjectName.Core.csproj`
-- `src/ProjectName.Infrastructure/ProjectName.Infrastructure.csproj`
-- `src/ProjectName.Shared.Kernel/ProjectName.Shared.Kernel.csproj`
-- `tests/ProjectName.UnitTests/` — xUnit + Moq + Coverlet (≥95% domain+application)
-- `tests/ProjectName.IntegrationTests/` — `WebApplicationFactory<Program>` (E2E API)
+## Conteúdo
 
-The `project-init-cs.mjs` script copies these templates, replaces `ProjectName` with the actual project name, and runs `dotnet restore`.
+- `ProjectName.sln` (raiz do template)
+- `apps/backend/ProjectName.Backend/` + `Program.cs`
+- `apps/backend/ProjectName.Core/`
+- `apps/backend/ProjectName.Infrastructure/`
+- `apps/backend/ProjectName.Shared.Kernel/`
+- `apps/backend/tests/ProjectName.UnitTests/`
+- `apps/backend/tests/ProjectName.IntegrationTests/` — `WebApplicationFactory<Program>`
 
-After bootstrap, run:
-
-```bash
-dotnet test
-dotnet test --collect:"XPlat Code Coverage"   # Coverlet → gate ≥95% no CI
-```
+Gerado por `scripts/project-init-cs.mjs` com substituição de `ProjectName` e opcional `--backend-path`.

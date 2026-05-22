@@ -59,7 +59,7 @@ public partial class Program { }
 ## CI
 
 ```bash
-dotnet test tests/ProjectName.IntegrationTests
+dotnet test apps/backend/tests/ProjectName.IntegrationTests/ProjectName.IntegrationTests.csproj
 ```
 
 ## Checklist
