@@ -1,0 +1,362 @@
+# Template Padronizado para Tasks OpenSpec
+# Versão: 1.0.0
+# Data: 2026-05-23
+# Propósito: Padronizar a estrutura de tasks no OpenSpec para melhor consistência e integração com skills
+
+# ============================================================================
+# ESTRUTURA BASE DE UMA TASK
+# ============================================================================
+
+task_template:
+  # ID único da task (obrigatório)
+  id: "interface:controller"
+  
+  # Prefixo da task (obrigatório)
+  # Formatos aceitos:
+  # - domain:vo       # Value Object de domínio
+  # - domain:entity   # Entidade de domínio
+  # - domain:service  # Serviço de domínio
+  # - app:usecase     # Caso de uso de aplicação
+  # - app:dto         # Data Transfer Object
+  # - app:query       # Query CQRS
+  # - infra:persistence # Implementação de persistência
+  # - interface:controller # Controller HTTP
+  # - interface:entity     # Entidade frontend
+  # - interface:usecase    # Caso de uso frontend
+  # - interface:repository # Repositório frontend
+  # - interface:page       # Página frontend
+  # - interface:form-web   # Formulário frontend
+  # - interface:mobile-entity # Entidade mobile
+  # - interface:mobile-usecase # Caso de uso mobile
+  # - interface:mobile-repository # Repositório mobile
+  # - interface:mobile          # Tela mobile
+  # - test:unit                 # Testes unitários
+  # - test:e2e                  # Testes end-to-end
+  prefix: "interface:controller"
+  
+  # Descrição da task (obrigatório)
+  # Formato: Verbo + objeto + contexto
+  # Exemplo: "Criar controller para gestão de clientes"
+  description: "Criar PlatformCompaniesController"
+  
+  # Estimativa de tempo (opcional)
+  # Formato: ~Xh (onde X é número de horas)
+  # Exemplo: "~2h"
+  estimate: "~2h"
+  
+  # Agent correspondente (obrigatório)
+  # Deve corresponder exatamente ao nome do skill
+  # Formato: `Nome do Agent (Stack)`
+  # Exemplo: `Backend Controller (C#)`
+  agent: "Backend Controller (C#)"
+  
+  # Prompt para o Agent (obrigatório)
+  # Deve ser específico, direcionado e incluir todos os requisitos
+  # Formato: "Descrição detalhada + requisitos + especificações"
+  prompt: "CRUD /api/platform/companies; contratos nested; authorize SAS level."
+  
+  # Specs relacionadas (opcional)
+  # Lista de identificadores de especificação
+  # Exemplo: ["platform-company-management", "tenant-contracts"]
+  specs: ["platform-company-management", "tenant-contracts"]
+  
+  # Dependências (opcional)
+  # Lista de IDs de tasks que devem ser completadas antes desta
+  # Exemplo: ["app:usecase", "infra:persistence"]
+  dependencies: ["app:usecase", "infra:persistence"]
+  
+  # Notas adicionais (opcional)
+  # Informações contextuais ou instruções especiais
+  notes: ""
+
+# ============================================================================
+# TEMPLATES POR CAMADA ARQUITETURAL
+# ============================================================================
+
+templates_by_layer:
+  
+  # --------------------------------------------------------------------------
+  # CAMADA DE DOMÍNIO
+  # --------------------------------------------------------------------------
+  domain:
+    
+    # Value Object
+    value_object:
+      prefix: "domain:vo"
+      agent: "Core Value Object (C#)"
+      prompt_template: "Crie {vo_name}VO com Create() retornando Result<T> e validações: {validations}."
+    
+    # Entidade
+    entity:
+      prefix: "domain:entity"
+      agent: "Core Entity (C#)"
+      prompt_template: "Crie {entity_name} com {properties}. Aggregate root. Regras: {business_rules}."
+    
+    # Serviço de Domínio
+    domain_service:
+      prefix: "domain:service"
+      agent: "Core Domain Service (C#)"
+      prompt_template: "{service_name}Service implementando políticas: {policies}. Integra {entities}."
+
+  # --------------------------------------------------------------------------
+  # CAMADA DE APLICAÇÃO
+  # --------------------------------------------------------------------------
+  application:
+    
+    # Caso de Uso
+    usecase:
+      prefix: "app:usecase"
+      agent: "Core Use Case (C#)"
+      prompt_template: "{usecase_name}UseCase: {description}. Input: {input}. Output: {output}. Regras: {rules}."
+    
+    # DTO
+    dto:
+      prefix: "app:dto"
+      agent: "Core DTO (C#)"
+      prompt_template: "DTOs {dto_names} para {context}. Campos: {fields}. Validações: {validations}."
+    
+    # Query CQRS
+    query:
+      prefix: "app:query"
+      agent: "Core Query CQRS (C#)"
+      prompt_template: "{query_name}Query + {row_name}Row; filtros {filters}; projeção {projection}."
+
+  # --------------------------------------------------------------------------
+  # CAMADA DE INFRAESTRUTURA
+  # --------------------------------------------------------------------------
+  infrastructure:
+    
+    # Persistência
+    persistence:
+      prefix: "infra:persistence"
+      agent: "Backend Data (C#)"
+      prompt_template: "Implemente I{entity_name}Repository com EF Core. Mapeamentos: {mappings}."
+    
+    # Controller
+    controller:
+      prefix: "interface:controller"
+      agent: "Backend Controller (C#)"
+      prompt_template: "CRUD /api/{module}/{resource}; {scope}; {policies}. Endpoints: {endpoints}."
+
+  # --------------------------------------------------------------------------
+  # CAMADA DE APRESENTAÇÃO - WEB
+  # --------------------------------------------------------------------------
+  presentation_web:
+    
+    # Entidade Frontend
+    entity:
+      prefix: "interface:entity"
+      agent: "Frontend Entity (Vue)"
+      prompt_template: "Entidade {entity_name} TypeScript pura com Result<T>; validações {validations}."
+    
+    # Caso de Uso Frontend
+    usecase:
+      prefix: "interface:usecase"
+      agent: "Frontend UseCase (Vue)"
+      prompt_template: "{usecase_name}UseCase com Promise<Result<T>>; orquestra {operations}."
+    
+    # Repositório Frontend
+    repository:
+      prefix: "interface:repository"
+      agent: "Frontend Repository (Vue)"
+      prompt_template: "I{entity_name}Repository → /api/{module}/{resource}; map DTO→entity."
+    
+    # Página Frontend
+    page:
+      prefix: "interface:page"
+      agent: "Frontend Page (Vue)"
+      prompt_template: "Página {route} PrimeVue DataTable, filtros {filters}, paginação."
+    
+    # Formulário Frontend
+    form:
+      prefix: "interface:form-web"
+      agent: "Frontend Form (Vue)"
+      prompt_template: "Form {form_name} vee-validate + PrimeVue; campos {fields}; validações {validations}."
+
+  # --------------------------------------------------------------------------
+  # CAMADA DE APRESENTAÇÃO - MOBILE
+  # --------------------------------------------------------------------------
+  presentation_mobile:
+    
+    # Entidade Mobile
+    entity:
+      prefix: "interface:mobile-entity"
+      agent: "Mobile Entity (Android)"
+      prompt_template: "data class {entity_name} Kotlin puro + sealed Result; espelha {api_endpoint}."
+    
+    # Caso de Uso Mobile
+    usecase:
+      prefix: "interface:mobile-usecase"
+      agent: "Mobile UseCase (Android)"
+      prompt_template: "{usecase_name}UseCase suspend consumindo {api_endpoint}; lógica {logic}."
+    
+    # Repositório Mobile
+    repository:
+      prefix: "interface:mobile-repository"
+      agent: "Mobile Repository (Android)"
+      prompt_template: "I{entity_name}Repository + Retrofit; Bearer interceptor; map DTO→{entity_name}."
+    
+    # Tela Mobile
+    screen:
+      prefix: "interface:mobile"
+      agent: "Mobile Screen (Android)"
+      prompt_template: "{screen_name}Screen Compose + ViewModel StateFlow; funcionalidades {features}."
+
+  # --------------------------------------------------------------------------
+  # CAMADA DE TESTES
+  # --------------------------------------------------------------------------
+  testing:
+    
+    # Testes Unitários
+    unit:
+      prefix: "test:unit"
+      agent: "Unit Tests (C#)"
+      prompt_template: "xUnit + Moq: {test_scenarios}. Coverlet ≥95% {modules}."
+    
+    # Testes E2E
+    e2e:
+      prefix: "test:e2e"
+      agent: "E2E Tests (C#)"
+      prompt_template: "WebApplicationFactory: {test_scenarios}. Status codes: {status_codes}."
+
+# ============================================================================
+# REGRAS DE VALIDAÇÃO
+# ============================================================================
+
+validation_rules:
+  
+  # Regras de nomenclatura
+  naming:
+    - "prefix deve seguir o formato: camada:tipo (ex: interface:controller)"
+    - "agent deve incluir stack entre parênteses (ex: Backend Controller (C#))"
+    - "description deve começar com verbo no infinitivo"
+  
+  # Regras de conteúdo
+  content:
+    - "prompt deve ser específico e incluir todos os requisitos"
+    - "specs deve listar identificadores de especificação relevantes"
+    - "dependencies deve listar apenas tasks realmente necessárias"
+  
+  # Regras de ordem (Clean Architecture)
+  order:
+    - "domain:vo e domain:entity devem vir antes de app:usecase"
+    - "app:usecase deve vir antes de interface:controller"
+    - "interface:entity deve vir antes de interface:usecase"
+    - "interface:usecase deve vir antes de interface:repository"
+    - "interface:repository deve vir antes de interface:page"
+    - "test:unit e test:e2e devem vir no final"
+
+# ============================================================================
+# EXEMPLOS PRÁTICOS
+# ============================================================================
+
+examples:
+  
+  # Exemplo 1: Controller Backend C#
+  - id: "interface:controller"
+    prefix: "interface:controller"
+    description: "Criar PlatformCompaniesController"
+    estimate: "~2h"
+    agent: "Backend Controller (C#)"
+    prompt: "CRUD /api/platform/companies; contratos nested; authorize SAS level."
+    specs: ["platform-company-management", "tenant-contracts"]
+    dependencies: ["app:usecase", "infra:persistence"]
+  
+  # Exemplo 2: Entidade Frontend Vue
+  - id: "interface:entity"
+    prefix: "interface:entity"
+    description: "Criar entidade Customer Vue"
+    estimate: "~1h"
+    agent: "Frontend Entity (Vue)"
+    prompt: "Entidade Customer TypeScript pura com Result<T>; validações CPF."
+    specs: ["customer-management"]
+    dependencies: []
+  
+  # Exemplo 3: Caso de Uso de Domínio C#
+  - id: "app:usecase"
+    prefix: "app:usecase"
+    description: "Criar RegisterTrialCompanyUseCase"
+    estimate: "~3h"
+    agent: "Core Use Case (C#)"
+    prompt: "RegisterTrialCompanyUseCase: cria Company + admin User; valida email único; define trial_expires_at."
+    specs: ["trial-registration", "multi-tenancy"]
+    dependencies: ["domain:entity", "domain:vo"]
+
+# ============================================================================
+# CHECKLIST DE VALIDAÇÃO
+# ============================================================================
+
+checklist:
+  
+  # Antes de criar uma task
+  before_creation:
+    - "Verificar se o prefixo segue o padrão camada:tipo"
+    - "Confirmar que o agent corresponde a um skill existente"
+    - "Garantir que o prompt inclui todos os requisitos necessários"
+    - "Validar dependências com tasks anteriores"
+  
+  # Após criar uma task
+  after_creation:
+    - "Verificar formatação Markdown correta"
+    - "Confirmar que specs estão listadas corretamente"
+    - "Validar estimativa de tempo realista"
+    - "Garantir que a task segue a ordem Clean Architecture"
+
+# ============================================================================
+# USO COM SKILLS OPENSPEC
+# ============================================================================
+
+integration_with_openspec:
+  
+  # No openspec-propose
+  propose_integration:
+    - "Usar templates para garantir consistência entre tasks"
+    - "Validar ordem das tasks usando validation_rules.order"
+    - "Incluir dependências apropriadas entre tasks"
+  
+  # No openspec-apply-change
+  apply_integration:
+    - "Validar se todas as dependências estão completas"
+    - "Usar agent para acionar skill correspondente"
+    - "Seguir prompt exatamente como especificado"
+  
+  # Validação automática
+  automated_validation:
+    - "Verificar se interface:entity → interface:usecase → interface:repository existem antes de interface:page"
+    - "Validar se domain:entity existe antes de app:usecase"
+    - "Garantir que test:unit/test:e2e estão no final"
+
+# ============================================================================
+# ATUALIZAÇÃO DE DOCUMENTAÇÃO
+# ============================================================================
+
+documentation_updates:
+  
+  # Tutorial 04 - Ciclo Completo OpenSpec
+  tutorial_04_updates:
+    - "Adicionar seção sobre uso de templates padronizados"
+    - "Incluir exemplos específicos da stack C# + Vue + Android"
+    - "Referenciar este template na seção de criação de tasks"
+  
+  # Skills Standards
+  skills_standards_updates:
+    - "Atualizar padrões de nomenclatura para tasks"
+    - "Incluir referência a este template"
+    - "Documentar integração com validation_rules"
+
+# ============================================================================
+# VERSÕES E MANUTENÇÃO
+# ============================================================================
+
+versioning:
+  current_version: "1.0.0"
+  last_updated: "2026-05-23"
+  maintainer: "OpenSpec Skills Team"
+  
+  changelog:
+    - "1.0.0 (2026-05-23): Template inicial com estrutura completa"
+  
+  future_enhancements:
+    - "Suporte a validação automática de dependências"
+    - "Integração com dashboard de progresso"
+    - "Templates específicos por tipo de feature"
