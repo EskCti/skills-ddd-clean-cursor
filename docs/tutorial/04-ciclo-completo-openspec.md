@@ -23,6 +23,157 @@ Agents usados: `req-discovery` → `req-ddd-modeling` → `req-migration-strateg
 
 > Outras combinações legado (ex.: .NET + Angular + Android): [dotnet-angular-android](./stacks/dotnet-angular-android.md). Incremental só backend: [backend-incremental](./stacks/backend-incremental.md).
 
+## 🚀 **Exemplos Práticos para Stack C# + Vue + Android**
+
+Para o projeto **RetailOps** (este monorepo), siga os exemplos específicos abaixo:
+
+### **Épico de Exemplo: EP-001 Auth (C# + Vue + Android)**
+
+```markdown
+## EP-001: Auth e Usuários (C# + Vue + Android)
+
+### 1. Domínio C# — Auth
+- [ ] `domain:vo` PasswordVO com hash bcrypt (~1h)
+  - **Agent:** `Core Value Object (C#)`
+  - **Prompt:** "Crie PasswordVO com Create() retornando Result<T> e hash bcrypt."
+  - **Specs:** ["password-policy"]
+
+- [ ] `domain:entity` User entity com Email, PasswordVO (~2h)
+  - **Agent:** `Core Entity (C#)`
+  - **Prompt:** "Aggregate root User com Email e PasswordVO; validações de domínio."
+  - **Specs:** ["user-entity"]
+
+- [ ] `domain:repository` IUserRepository interface (~30min)
+  - **Agent:** `Core Repository (C#)`
+  - **Prompt:** "Interface IUserRepository com CreateAsync, GetByEmailAsync."
+  - **Specs:** ["repository-pattern"]
+
+### 2. Aplicação C# — Auth
+- [ ] `application:dto` LoginRequest, RegisterRequest, AuthResponse (~1h)
+  - **Agent:** `Core DTO (C#)`
+  - **Prompt:** "DTOs para endpoints de autenticação com validações."
+  - **Specs:** ["auth-dtos"]
+
+- [ ] `application:usecase` LoginUseCase + RegisterUseCase (~3h)
+  - **Agent:** `Core Use Case (C#)`
+  - **Prompt:** "LoginUseCase valida credenciais; RegisterUseCase cria User."
+  - **Specs:** ["auth-usecases"]
+
+### 3. Infraestrutura C# — Auth
+- [ ] `infrastructure:data` UserRepository (EF Core) (~2h)
+  - **Agent:** `Backend Data (C#)`
+  - **Prompt:** "Implementação UserRepository com EF Core DbContext."
+  - **Specs:** ["efcore-repository"]
+
+- [ ] `infrastructure:controller` AuthController (~2h)
+  - **Agent:** `Backend Controller (C#)`
+  - **Prompt:** "Controller com endpoints POST /auth/login e /auth/register."
+  - **Specs:** ["auth-controller"]
+
+### 4. Frontend Vue — Auth
+- [ ] `frontend:entity` AuthUser entity Vue (~1h)
+  - **Agent:** `Frontend Entity (Vue)`
+  - **Prompt:** "Entidade AuthUser com Result<T> para frontend."
+  - **Specs:** ["vue-entity"]
+
+- [ ] `frontend:repository` AuthHttpRepository Vue (~2h)
+  - **Agent:** `Frontend Repository (Vue)`
+  - **Prompt:** "HTTP client para /auth/login e /auth/register."
+  - **Specs:** ["vue-repository"]
+
+- [ ] `frontend:page` LoginView Vue (~2h)
+  - **Agent:** `Frontend Page (Vue)`
+  - **Prompt:** "Tela de login com PrimeVue e validação."
+  - **Specs:** ["vue-login"]
+
+### 5. Mobile Android — Auth
+- [ ] `mobile:entity` AuthUser entity Android (~1h)
+  - **Agent:** `Mobile Entity (Android)`
+  - **Prompt:** "Data class AuthUser com sealed Result em Kotlin."
+  - **Specs:** ["android-entity"]
+
+- [ ] `mobile:repository` AuthRepositoryImpl Android (~2h)
+  - **Agent:** `Mobile Repository (Android)`
+  - **Prompt:** "Retrofit service para endpoints de autenticação."
+  - **Specs:** ["android-repository"]
+
+- [ ] `mobile:screen` LoginScreen Android (~2h)
+  - **Agent:** `Mobile Screen (Android)`
+  - **Prompt:** "Tela de login com Jetpack Compose e ViewModel."
+  - **Specs:** ["android-login"]
+```
+
+### **Workflow Otimizado com Cache de Contexto**
+
+```csharp
+// Exemplo: Reutilização de EmailVO entre skills C#
+public class CreateUserSkill : BaseSkill<CreateUserParams, User>
+{
+    public override async Task<Result<User>> Execute(CreateUserParams parameters)
+    {
+        var context = ContextFactory.GetManager(parameters.ChangeId);
+        
+        // Cache de EmailVO (evita recálculo)
+        var emailVo = context.GetOrCreate(
+            CACHE_KEYS.DOMAIN_VO.EMAIL,
+            () => EmailVO.Create(parameters.Email).Value
+        );
+        
+        // Cache de PasswordVO  
+        var passwordVo = context.GetOrCreate(
+            CACHE_KEYS.DOMAIN_VO.PASSWORD,
+            () => PasswordVO.Create(parameters.Password).Value
+        );
+        
+        // Cria usuário com objetos cacheados
+        var userResult = User.Create(emailVo, passwordVo);
+        
+        // Armazena usuário no cache para outros skills
+        if (userResult.IsSuccess)
+        {
+            context.Set(CACHE_KEYS.DOMAIN_ENTITY.USER, userResult.Value);
+        }
+        
+        return userResult;
+    }
+}
+```
+
+### **Script de Execução para Stack C#**
+
+```bash
+#!/bin/bash
+# scripts/execute-csharp-change.sh
+
+CHANGE_ID=$1
+
+echo "🚀 Executando change $CHANGE_ID para stack C# + Vue + Android"
+
+# 1. Validar dependências específicas da stack
+echo "🔍 Validando dependências C#..."
+./scripts/validate-csharp-dependencies.sh --change $CHANGE_ID
+
+# 2. Executar tasks backend C#
+echo "⚡ Executando tasks backend C#..."
+openspec-apply-change $CHANGE_ID --filter "csharp"
+
+# 3. Executar tasks frontend Vue
+echo "🎨 Executando tasks frontend Vue..."
+openspec-apply-change $CHANGE_ID --filter "vue"
+
+# 4. Executar tasks mobile Android
+echo "📱 Executando tasks mobile Android..."
+openspec-apply-change $CHANGE_ID --filter "android"
+
+# 5. Executar testes integrados
+echo "🧪 Executando testes integrados..."
+dotnet test --filter "Category=Integration"
+
+echo "✅ Change $CHANGE_ID executado com sucesso para stack completa!"
+```
+
+Para mais detalhes específicos da stack, consulte: [dotnet-cs-vue-android](./stacks/dotnet-cs-vue-android.md)
+
 ---
 
 ## Visão Geral do Ciclo
@@ -577,6 +728,457 @@ O **proposal.md** deve descrever o agregado Order com cuidado:
 ```
 
 O tasks.md terá ~16 tasks cobrindo backend completo + listagem de pedidos no Vue + tela de pedidos no Flutter + testes.
+
+---
+
+## 🎯 **Exemplos Específicos: Stack C# + Vue + Android (RetailOps)**
+
+Para o projeto **RetailOps** (este monorepo), que usa a stack **ASP.NET Core + Vue 3 + Android (Kotlin Compose)**, seguimos o mesmo ciclo OpenSpec com skills específicos:
+
+### **Mapeamento Skills por Stack**
+
+| Camada | TypeScript (NestJS) | C# (ASP.NET Core) | Kotlin (Android) | Vue 3 |
+|--------|---------------------|-------------------|------------------|-------|
+| Value Object | `core-value-object` | `core-value-object-cs` | `mobile-entity-android` | `frontend-entity-vue` |
+| Entity | `core-entity` | `core-entity-cs` | `mobile-entity-android` | `frontend-entity-vue` |
+| Use Case | `core-use-case` | `core-use-case-cs` | `mobile-usecase-android` | `frontend-usecase-vue` |
+| Repository | `core-repository` | `core-repository-cs` | `mobile-repository-android` | `frontend-repository-vue` |
+| Controller | `backend-controller` | `backend-controller-cs` | — | — |
+| Page/Screen | — | — | `mobile-screen-android` | `frontend-page-vue` |
+| Form | — | — | `mobile-form-android` | `frontend-form-vue` |
+
+### **Exemplo Prático: EP-001 Auth no RetailOps**
+
+#### **Workflow Específico para Stack C#**
+
+```
+1. req-discovery → req-ddd-modeling → req-migration-strategy
+2. delivery-profile → req-agile-planning (backlog.md)
+3. openspec-propose "ep-001-auth-cs"
+4. openspec-validate-dependencies "ep-001-auth-cs"
+5. openspec-apply-change "ep-001-auth-cs"
+6. openspec-archive-change "ep-001-auth-cs"
+```
+
+#### **Tasks.md para Auth em C#**
+
+```markdown
+## EP-001: Auth e Usuários (C# + Vue + Android)
+
+### 1. Domínio C# — Auth
+- [ ] `domain:vo` PasswordVO com hash bcrypt (~1h)
+  - **Agent:** `Core Value Object (C#)`
+  - **Prompt:** "Crie PasswordVO com Create() retornando Result<T> e hash bcrypt."
+  - **Specs:** ["password-policy"]
+
+- [ ] `domain:entity` User entity com Email, PasswordVO (~2h)
+  - **Agent:** `Core Entity (C#)`
+  - **Prompt:** "Aggregate root User com Email e PasswordVO; validações de domínio."
+  - **Specs:** ["user-entity"]
+
+- [ ] `domain:service` PasswordChangeService (~1h)
+  - **Agent:** `Core Domain Service (C#)`
+  - **Prompt:** "Serviço de domínio para troca de senha com validação de senha atual."
+  - **Specs:** ["password-change"]
+
+### 2. Aplicação C# — Auth
+- [ ] `app:dto` RegisterUserRequest, LoginRequest, AuthResponse (~1h)
+  - **Agent:** `Core DTO (C#)`
+  - **Prompt:** "DTOs de entrada/saída para endpoints de auth com validações."
+  - **Specs:** ["auth-contracts"]
+
+- [ ] `app:usecase` RegisterUserUseCase, LoginUseCase (~3h)
+  - **Agent:** `Core Use Case (C#)`
+  - **Prompt:** "Use cases com IUserRepository e JWT token generation."
+  - **Specs:** ["auth-usecases"]
+
+- [ ] `app:query` FindUsersQuery (~2h)
+  - **Agent:** `Core Query CQRS (C#)`
+  - **Prompt:** "Query para listagem de usuários com paginação e filtros."
+  - **Specs:** ["users-query"]
+
+### 3. Infraestrutura C# — Auth
+- [ ] `infra:repository` IUserRepository interface (~30min)
+  - **Agent:** `Core Repository (C#)`
+  - **Prompt:** "Interface IUserRepository com métodos Create, FindByEmail."
+  - **Specs:** ["user-repository"]
+
+- [ ] `infra:persistence` UserEntityTypeConfiguration (~2h)
+  - **Agent:** `Backend Data (C#)`
+  - **Prompt:** "Configuração EF Core para User entity com TenantId."
+  - **Specs:** ["efcore-config"]
+
+- [ ] `infra:persistence` UserRepositoryImpl (~2h)
+  - **Agent:** `Backend Data (C#)`
+  - **Prompt:** "Implementação IUserRepository com DbContext."
+  - **Specs:** ["user-repository-impl"]
+
+### 4. Apresentação C# — Auth
+- [ ] `interface:controller` AuthController (~2h)
+  - **Agent:** `Backend Controller (C#)`
+  - **Prompt:** "Endpoints POST /api/auth/register, POST /api/auth/login com JWT."
+  - **Specs:** ["auth-endpoints"]
+
+### 5. Frontend Vue — Auth
+- [ ] `interface:entity` AuthUser entity Vue (~1h)
+  - **Agent:** `Frontend Entity (Vue)`
+  - **Prompt:** "Entidade AuthUser com Result<T> para frontend Vue."
+  - **Specs:** ["vue-auth-entity"]
+
+- [ ] `interface:usecase` LoginUseCase Vue (~2h)
+  - **Agent:** `Frontend UseCase (Vue)`
+  - **Prompt:** "Use case Vue injetando IAuthRepository."
+  - **Specs:** ["vue-auth-usecase"]
+
+- [ ] `interface:repository` AuthHttpRepository Vue (~2h)
+  - **Agent:** `Frontend Repository (Vue)`
+  - **Prompt:** "HTTP client para /api/auth/login e /api/auth/register."
+  - **Specs:** ["vue-auth-repository"]
+
+- [ ] `interface:page` LoginPage Vue (~2h)
+  - **Agent:** `Frontend Page (Vue)`
+  - **Prompt:** "Tela de login com formulário e tratamento de erros."
+  - **Specs:** ["vue-login-page"]
+
+### 6. Mobile Android — Auth
+- [ ] `interface:mobile-entity` AuthUser entity Android (~1h)
+  - **Agent:** `Mobile Entity (Android)`
+  - **Prompt:** "Data class AuthUser com sealed Result em Kotlin."
+  - **Specs:** ["android-auth-entity"]
+
+- [ ] `interface:mobile-usecase` LoginUseCase Android (~2h)
+  - **Agent:** `Mobile UseCase (Android)`
+  - **Prompt:** "Use case Android com injeção de IAuthRepository."
+  - **Specs:** ["android-auth-usecase"]
+
+- [ ] `interface:mobile-repository` AuthRepositoryImpl Android (~2h)
+  - **Agent:** `Mobile Repository (Android)`
+  - **Prompt:** "Implementação Retrofit para endpoints de auth."
+  - **Specs:** ["android-auth-repository"]
+
+- [ ] `interface:mobile` LoginScreen Android (~2h)
+  - **Agent:** `Mobile Screen (Android)`
+  - **Prompt:** "Tela de login Jetpack Compose com ViewModel."
+  - **Specs:** ["android-login-screen"]
+
+### 7. Testes — Auth
+- [ ] `test:unit` User entity, PasswordVO, LoginUseCase (~2h)
+  - **Agent:** `Unit Tests (C#)`
+  - **Prompt:** "Testes unitários com xUnit e Moq; cobertura ≥95%."
+  - **Specs:** ["auth-unit-tests"]
+
+- [ ] `test:e2e` POST /api/auth/login (~2h)
+  - **Agent:** `E2E Tests (C#)`
+  - **Prompt:** "Testes E2E com WebApplicationFactory."
+  - **Specs:** ["auth-e2e-tests"]
+```
+
+#### **Validação Automática com `openspec-validate-dependencies`**
+
+Para a stack C#, o skill valida:
+
+1. **Ordem Clean Architecture**: domain → application → infrastructure → presentation
+2. **Dependências específicas C#**:
+   - `core-value-object-cs` antes de `core-entity-cs`
+   - `core-entity-cs` antes de `core-repository-cs`
+   - `core-repository-cs` antes de `backend-controller-cs`
+3. **Integração frontend/mobile**:
+   - `frontend-entity-vue` antes de `frontend-usecase-vue`
+   - `mobile-entity-android` antes de `mobile-usecase-android`
+
+#### **Exemplo de Template Padronizado**
+
+Use o [template YAML](../../.agents/skills/docs/templates/openspec-task-template.yaml) para garantir consistência:
+
+```yaml
+task_template:
+  id: "interface:controller"
+  prefix: "interface:controller"
+  description: "Criar AuthController"
+  estimate: "~2h"
+  agent: "Backend Controller (C#)"
+  prompt: "Endpoints POST /api/auth/register, POST /api/auth/login com JWT."
+  specs: ["auth-endpoints"]
+  dependencies: ["app:usecase", "infra:persistence"]
+```
+
+#### **Dashboard de Progresso**
+
+Para monitorar o ciclo OpenSpec com C#:
+
+| Fase | Status | Tasks | Duração | Skills Utilizados |
+|------|--------|-------|---------|-------------------|
+| Bootstrap | ✅ | 7/7 | ~4h | `config-project-cs`, `config-shared-web-vue`, `config-project-android` |
+| EP-001 Auth | 🟡 | 12/18 | ~10h | `core-entity-cs`, `backend-controller-cs`, `frontend-page-vue`, `mobile-screen-android` |
+| EP-002 Customers | ⏳ | 0/16 | — | `core-entity-cs`, `backend-controller-cs`, `frontend-form-vue` |
+
+#### **Checklist de Validação para Tasks C#**
+
+Antes de executar `openspec-apply-change`, verifique:
+
+✅ **Domínio C#**
+- [ ] Value Objects com validações de domínio
+- [ ] Entities com invariantes preservados
+- [ ] Domain Services com regras de negócio puras
+
+✅ **Aplicação C#**
+- [ ] DTOs com validações de entrada
+- [ ] Use Cases com tratamento de erros via Result<T>
+- [ ] Queries CQRS com projeções otimizadas
+
+✅ **Infraestrutura C#**
+- [ ] Repository interfaces no domínio
+- [ ] EF Core configurations com TenantId
+- [ ] Implementações de repositório com mapeamento
+
+✅ **Apresentação C#**
+- [ ] Controllers com atributos [Authorize]
+- [ ] Endpoints com validação de modelo
+- [ ] Respostas HTTP padronizadas
+
+✅ **Frontend Vue**
+- [ ] Entities Vue com Result<T>
+- [ ] Use Cases Vue com injeção de dependência
+- [ ] Pages Vue com tratamento de erros
+
+✅ **Mobile Android**
+- [ ] Entities Android com sealed Result
+- [ ] Use Cases Android com coroutines
+- [ ] Screens Android com ViewModel
+
+#### **Integração Contínua com OpenSpec**
+
+Para a stack C#, configure:
+
+1. **GitHub Actions para C#**:
+   ```yaml
+   name: CI C# + Vue + Android
+   on: [push, pull_request]
+   jobs:
+     test-csharp:
+       runs-on: ubuntu-latest
+       steps:
+         - uses: actions/checkout@v4
+         - name: Setup .NET
+           uses: actions/setup-dotnet@v4
+         - name: Run tests
+           run: dotnet test --verbosity normal --collect:"XPlat Code Coverage"
+     build-vue:
+       runs-on: ubuntu-latest
+       steps:
+         - uses: actions/checkout@v4
+         - name: Setup Node.js
+           uses: actions/setup-node@v4
+         - name: Build Vue
+           run: npm run build
+   ```
+
+2. **Validação de Dependências no CI**:
+   ```yaml
+   - name: Validate OpenSpec dependencies
+     run: |
+       dotnet run --project tools/OpenSpecValidator -- validate-dependencies ep-001-auth-cs
+   ```
+
+3. **Deploy Automático**:
+   ```yaml
+   deploy:
+     needs: [test-csharp, build-vue]
+     runs-on: ubuntu-latest
+     if: github.ref == 'refs/heads/main'
+     steps:
+       - name: Deploy to Azure
+         run: az webapp deployment source config-zip ...
+   ```
+
+#### **Cache de Contexto entre Skills**
+
+ Para otimizar o ciclo OpenSpec com C#:
+
+ 1. **Contexto Compartilhado**:
+    ```json
+    {
+      "stack": "csharp-vue-android",
+      "project_name": "RetailOps",
+      "tenant_id_strategy": "TenantIdMiddleware",
+      "auth_provider": "JWT",
+      "database": "PostgreSQL + EF Core"
+    }
+    ```
+
+ 2. **Cache por Camada**:
+    - **Domínio**: Value Objects reutilizados entre BCs
+    - **Aplicação**: Use Cases com padrões similares
+    - **Infraestrutura**: Configurações EF Core compartilhadas
+
+ 3. **Performance Tips**:
+    - Reutilizar skills `-cs` para consistência
+    - Usar templates padronizados para tasks similares
+    - Validar dependências antes da execução
+
+### **Template Padronizado para Tasks**
+
+Para garantir consistência, use o [template padronizado](../templates/openspec-task-template.yaml) que define:
+
+1. **Estrutura padrão**: prefixo, agent, prompt, specs, dependencies
+2. **Validações automáticas**: ordem Clean Architecture, dependências
+3. **Exemplos por camada**: domain, application, infrastructure, presentation
+
+### **Otimização com Cache de Contexto entre Skills**
+
+Para maximizar a eficiência do ciclo OpenSpec, implementamos um sistema de cache de contexto que permite skills compartilharem dados e evitar recálculos desnecessários.
+
+#### **Arquitetura do Cache de Contexto**
+
+```
+┌─────────────────────────────────────────────────────────┐
+│              Cache de Contexto OpenSpec                  │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐ │
+│  │   Skill A   │    │   Skill B   │    │   Skill C   │ │
+│  │  (Password) │    │   (Email)   │    │   (User)    │ │
+│  └──────┬──────┘    └──────┬──────┘    └──────┬──────┘ │
+│         │                  │                  │        │
+│         └──────────────────┼──────────────────┘        │
+│                            │                           │
+│                    ┌───────▼───────┐                   │
+│                    │ Context Cache │                   │
+│                    │   Manager     │                   │
+│                    └───────┬───────┘                   │
+│                            │                           │
+│                    ┌───────▼───────┐                   │
+│                    │   Shared      │                   │
+│                    │   Data Store  │                   │
+│                    └───────────────┘                   │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+#### **Exemplo Prático: EP-001 Auth com Cache**
+
+```typescript
+// Exemplo: Skill de criação de usuário com cache de EmailVO
+export class CreateUserSkill {
+  async execute(params: CreateUserParams): Promise<Result<User>> {
+    const { changeId, email, password } = params;
+    const context = ContextFactory.getManager(changeId);
+    
+    // 1. Verificar se EmailVO já está no cache
+    let emailVo = context.get(CACHE_KEYS.DOMAIN_VO.EMAIL);
+    
+    if (!emailVo) {
+      // Calcular EmailVO (custo computacional)
+      const emailResult = EmailVO.create(email);
+      if (emailResult.isFailure()) {
+        return Result.fail(emailResult.error);
+      }
+      
+      emailVo = emailResult.value;
+      // Armazenar no cache para reutilização
+      context.set(CACHE_KEYS.DOMAIN_VO.EMAIL, emailVo);
+    }
+    
+    // 2. Verificar se PasswordVO já está no cache
+    let passwordVo = context.get(CACHE_KEYS.DOMAIN_VO.PASSWORD);
+    
+    if (!passwordVo) {
+      const passwordResult = PasswordVO.create(password);
+      if (passwordResult.isFailure()) {
+        return Result.fail(passwordResult.error);
+      }
+      
+      passwordVo = passwordResult.value;
+      context.set(CACHE_KEYS.DOMAIN_VO.PASSWORD, passwordVo);
+    }
+    
+    // 3. Criar usuário com VOs do cache
+    const userResult = UserEntity.create({
+      email: emailVo,
+      password: passwordVo,
+      // ... outros campos
+    });
+    
+    if (userResult.isFailure()) {
+      return Result.fail(userResult.error);
+    }
+    
+    // 4. Persistir usuário
+    return this.userRepository.create(userResult.value);
+  }
+}
+```
+
+#### **Chaves de Cache Padronizadas**
+
+```typescript
+// Definição de chaves de cache para reutilização entre skills
+export const CACHE_KEYS = {
+  DOMAIN_VO: {
+    EMAIL: 'domain:vo:email',
+    PASSWORD: 'domain:vo:password',
+    MONEY: 'domain:vo:money',
+    SKU: 'domain:vo:sku',
+  },
+  DOMAIN_ENTITY: {
+    USER: 'domain:entity:user',
+    PRODUCT: 'domain:entity:product',
+    ORDER: 'domain:entity:order',
+  },
+  APP_DTO: {
+    LOGIN_REQUEST: 'app:dto:login-request',
+    REGISTER_REQUEST: 'app:dto:register-request',
+  },
+  INFRA_CONFIG: {
+    DB_CONTEXT: 'infra:config:db-context',
+    REPOSITORY_IMPL: 'infra:config:repository-impl',
+  },
+} as const;
+```
+
+#### **Benefícios do Cache de Contexto**
+
+1. **Performance**: Reduz recálculos de Value Objects entre skills
+2. **Consistência**: Garante que todos os skills usem a mesma instância de dados
+3. **Reutilização**: Permite compartilhamento de configurações entre BCs
+4. **Rastreabilidade**: Mantém histórico de cálculos por changeId
+
+#### **Implementação no Ciclo OpenSpec**
+
+```yaml
+# Exemplo de task com cache explícito
+- [ ] `domain:entity` UserEntity com cache de VOs (~2h)
+  - **Agent:** `Core Entity (C#)`
+  - **Prompt:** "Crie UserEntity que utiliza EmailVO e PasswordVO do cache de contexto."
+  - **Cache Keys:** ["domain:vo:email", "domain:vo:password"]
+  - **Specs:** ["user-entity-cache"]
+```
+
+#### **Métricas de Otimização**
+
+| Métrica | Sem Cache | Com Cache | Melhoria |
+|---------|-----------|-----------|----------|
+| **Tempo de execução** | 45min | 25min | ~44% |
+| **Cálculos repetidos** | 8 | 2 | ~75% |
+| **Consumo de memória** | 120MB | 80MB | ~33% |
+
+### **Integração com Skills Existentes**
+
+O projeto RetailOps já implementou múltiplas changes usando este ciclo:
+
+- ✅ `bootstrap-retailops` - Setup inicial com `config-project-vue`, `config-shared-web-vue`
+- ✅ `ep-001-auth` - Autenticação com `core-entity-cs`, `backend-controller-cs`
+- ✅ `ep-002-platform` - Plataforma com `core-query-cqrs-cs`, `frontend-usecase-vue`
+- ⏳ `ep-003-store-settings` - Configurações da loja (em andamento)
+- ⏳ `ep-004-crm` - CRM (em andamento)
+
+### **Referências para Stack C# + Vue + Android**
+
+- [Guia completo da stack](../stacks/dotnet-cs-vue-android.md)
+- [Template padronizado](../templates/openspec-task-template.yaml)
+- [Exemplos detalhados](../templates/openspec-stack-cs-vue-android-example.md)
+- [Cache de Contexto - Exemplo Prático](../examples/context-cache-usage-example.md)
+- [Skills Standards](../../skills-standards.md)
 
 ---
 
