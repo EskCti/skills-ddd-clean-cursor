@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Value Object (Java)'
+  short_description: 'Value Objects Java imutáveis com Result'
+  default_prompt: 'Crie Value Object <Nome> em packages/<bc>/domain/valueobject/. Factory create() → Result, validação de invariantes, sem Spring.'

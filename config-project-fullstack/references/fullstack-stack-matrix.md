@@ -7,7 +7,8 @@
 | Enterprise TS + PrimeNG | NestJS | Angular | Flutter | Tipagem forte, iOS+Android | [nestjs-angular-flutter](../../docs/tutorial/stacks/nestjs-angular-flutter.md) |
 | Legado PHP → TS (referência) | NestJS | Vue+PrimeVue | Flutter | Produtividade UI | [nestjs-vue-flutter](../../docs/tutorial/stacks/nestjs-vue-flutter.md) |
 | Startup tech (time JS/TS) | NestJS | Next.js | Flutter | Tipos compartilhados, SSR | [nestjs-next-flutter](../../docs/tutorial/stacks/nestjs-next-flutter.md) |
-| Enterprise Java / JVM | Spring Boot | Vue+PrimeVue | Flutter | Spring + Vue | [spring-vue-flutter](../../docs/tutorial/stacks/spring-vue-flutter.md) |
+| Enterprise Java / JVM (Kotlin) | Spring Boot | Vue+PrimeVue | Flutter | Spring + Vue | [spring-vue-flutter](../../docs/tutorial/stacks/spring-vue-flutter.md) |
+| Enterprise Java / JVM (Java) | Spring Boot (Java) | Vue+PrimeVue | Flutter | Domínio puro + Spring na infra | [java-vue-flutter](../../docs/tutorial/stacks/java-vue-flutter.md) |
 | Enterprise .NET / Azure | ASP.NET Core | Angular | Android | LINQ, Android nativo | [dotnet-angular-android](../../docs/tutorial/stacks/dotnet-angular-android.md) |
 | Performance / sistemas críticos | Axum (Rust) | Angular | Flutter | Backend async, memória segura, API `:4000` | [rust-vue-flutter](../../docs/tutorial/stacks/rust-vue-flutter.md) *(seção Variante Angular)* |
 | Performance + UI Vue | Axum (Rust) | Vue+PrimeVue | Flutter | Rust backend + produtividade Vue | [rust-vue-flutter](../../docs/tutorial/stacks/rust-vue-flutter.md) |
@@ -76,6 +77,39 @@ Fase 4 — Mobile Flutter
   mobile-entity-flutter → mobile-usecase-flutter → mobile-repository-flutter
   mobile-screen-flutter → mobile-form-flutter
 ```
+
+### Stack 2B: Spring Boot (Java) + Vue + Flutter
+
+**Tutorial**: [java-vue-flutter.md](../../docs/tutorial/stacks/java-vue-flutter.md)
+
+```
+Fase 1 — Setup (inclui Docker + CI/CD)
+  config-project-java → config-jpa-java → config-project-vue → config-shared-web-vue
+  → config-project-flutter → config-docker-java → config-cicd-java
+  config-shared-core-java
+
+Fase 2 — Domínio (por BC) — sufixo -java
+  config-new-module-java               → packages/<bc>/ + apps/backend-java/modules/<bc>/
+  core-value-object-java → core-entity-java → core-repository-java
+  core-dto-java → core-use-case-java → core-query-cqrs-java
+  backend-data-java → backend-controller-java
+  unit-tests-java → e2e-tests-java
+
+Fase 3 — Frontend Vue
+  frontend-entity-vue → frontend-usecase-vue → frontend-repository-vue
+  frontend-page-vue → frontend-form-vue
+  Proxy Vite: /api → http://localhost:4000
+
+Fase 4 — Mobile Flutter
+  mobile-entity-flutter → mobile-usecase-flutter → mobile-repository-flutter
+  mobile-screen-flutter → mobile-form-flutter
+```
+
+**Layout Java (obrigatório)**: `config-shared-core-java/references/java-namespace-layout.md`
+
+- ✅ `com.example.customers.domain.entity.Customer` (packages/)
+- ✅ `com.example.modules.customers.infrastructure.persistence.CustomerJpaEntity` (Spring)
+- ❌ Spring annotations em `packages/<bc>/`
 
 ### Stack 3: ASP.NET Core (CS) + Angular + Android
 

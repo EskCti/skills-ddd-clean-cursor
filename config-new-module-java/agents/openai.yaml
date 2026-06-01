@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config New Module (Java)'
+  short_description: 'Scaffold BC Java — domain + Spring infra'
+  default_prompt: 'Crie um Bounded Context Java em packages/<bc>/ (pure Java) e apps/backend-java/modules/<bc>/ (Spring). Siga java-namespace-layout.md — Customer no domínio, CustomerJpaEntity na infra.'

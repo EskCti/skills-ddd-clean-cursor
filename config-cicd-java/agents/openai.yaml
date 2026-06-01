@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config CI/CD (Java)'
+  short_description: 'GitHub Actions CI for Gradle + JaCoCo'
+  default_prompt: 'Configure GitHub Actions CI para Java 21 Gradle: build, test, JaCoCo coverage ≥95% em packages/<bc>/ domain+application.'

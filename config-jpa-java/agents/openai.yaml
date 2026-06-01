@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config JPA (Java)'
+  short_description: 'Flyway + JPA + Postgres setup for Spring Boot'
+  default_prompt: 'Configure JPA/Spring Data + Flyway no backend Java. Datasource via env, ddl-auto validate, migrations em db/migration. JpaEntity separada do domínio.'

@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Repository (Java)'
+  short_description: 'Repository ports Java em domain/repository'
+  default_prompt: 'Crie interface <Entity>Repository em packages/<bc>/domain/repository/. Retorna Result, sem Spring. Adapter JPA fica na infra.'

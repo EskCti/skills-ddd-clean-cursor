@@ -36,12 +36,12 @@ Tutorial 01 — req-discovery → req-ddd-modeling → req-migration-strategy �
 
 > Tenho o backlog em `docs/planning/<projeto>/backlog.md` gerado pelo req-agile-planning.
 > Quero criar o projeto `<nome>` com:
-> - Backend: [ NestJS | Spring Boot | ASP.NET Core | Axum (Rust) ]
+> - Backend: [ NestJS | Spring Boot (Kotlin) | Spring Boot (Java) | ASP.NET Core | Axum (Rust) ]
 > - Frontend: [ Next.js | Angular | Vue 3 | Nenhum ]
 > - Mobile: [ Flutter | Android | Nenhum ]
 > Docker e CI/CD no bootstrap. Usar OpenSpec para rastrear mudanças.
 
-O agent responde com: agents de bootstrap, sufixo de skills (`-kt`, `-cs`, `-rs` ou nenhum), ordem de EP-000 e link lógico para o tutorial da combinação abaixo.
+O agent responde com: agents de bootstrap, sufixo de skills (`-kt`, `-java`, `-cs`, `-rs` ou nenhum), ordem de EP-000 e link lógico para o tutorial da combinação abaixo.
 
 ---
 
@@ -52,7 +52,8 @@ O agent responde com: agents de bootstrap, sufixo de skills (`-kt`, `-cs`, `-rs`
 | **NestJS** | **Angular** | **Flutter** | Enterprise TS, Tailwind + PrimeNG (widgets), iOS+Android | [nestjs-angular-flutter](./stacks/nestjs-angular-flutter.md) |
 | **NestJS** | **Vue 3** | **Flutter** | Produtividade UI (Tailwind + PrimeVue), legado PHP→TS | [nestjs-vue-flutter](./stacks/nestjs-vue-flutter.md) |
 | **NestJS** | **Next.js** | **Flutter** | SSR/SEO, time full TS, tipos compartilhados | [nestjs-next-flutter](./stacks/nestjs-next-flutter.md) |
-| **Spring Boot** | **Vue 3** | **Flutter** | Ecossistema JVM + UI Vue | [spring-vue-flutter](./stacks/spring-vue-flutter.md) |
+| **Spring Boot (Kotlin)** | **Vue 3** | **Flutter** | Ecossistema JVM + UI Vue | [spring-vue-flutter](./stacks/spring-vue-flutter.md) |
+| **Spring Boot (Java)** | **Vue 3** | **Flutter** | Domínio puro Java + Spring na infra | [java-vue-flutter](./stacks/java-vue-flutter.md) |
 | **ASP.NET Core** | **Angular** | **Android** | .NET enterprise + nativo Android | [dotnet-angular-android](./stacks/dotnet-angular-android.md) |
 | **ASP.NET Core** | **Vue 3** | **Android** | Legado PHP → .NET + PrimeVue + Compose (RetailOps) | [dotnet-cs-vue-android](./stacks/dotnet-cs-vue-android.md) |
 | **Axum (Rust)** | **Angular** | **Flutter** | Performance, memória segura, API `:4000` | [rust-vue-flutter](./stacks/rust-vue-flutter.md) *(seção Variante Angular)* |
@@ -71,12 +72,12 @@ Independente da combinação, o **req-agile-planning** deve gerar tasks semelhan
 ## EP-000: [TECH] Bootstrap do Projeto
 
 - [ ] `infra:fullstack` → **Agent:** `Config Project Full-Stack`
-- [ ] `infra:setup`     → **Agent:** `Config Project` / `(Angular)` / `(Vue)` / `(Kotlin)` / `(C#)` / `(Rust)`
+- [ ] `infra:setup`     → **Agent:** `Config Project` / `(Angular)` / `(Vue)` / `(Kotlin)` / `(Java)` / `(C#)` / `(Rust)`
 - [ ] `infra:shell-web` → **Agent:** `Config Shared Web` / `(Angular)` / `(Vue)`
-- [ ] `infra:docker`    → **Agent:** `Config Docker (TypeScript|Kotlin|C#|Rust)`
-- [ ] `infra:cicd`      → **Agent:** `Config CI/CD (TypeScript|Kotlin|C#|Rust)`
-- [ ] `domain:shared`   → **Agent:** `Config Shared Core` / `(Kotlin)` / `(C#)` / `(Rust)`
-- [ ] `infra:migration` → **Agent:** `Config Prisma` / `Config JPA (Kotlin)` / `Config EF Core (C#)` / `Config SQLx (Rust)` *(Rust)*
+- [ ] `infra:docker`    → **Agent:** `Config Docker (TypeScript|Kotlin|Java|C#|Rust)`
+- [ ] `infra:cicd`      → **Agent:** `Config CI/CD (TypeScript|Kotlin|Java|C#|Rust)`
+- [ ] `domain:shared`   → **Agent:** `Config Shared Core` / `(Kotlin)` / `(Java)` / `(C#)` / `(Rust)`
+- [ ] `infra:migration` → **Agent:** `Config Prisma` / `Config JPA (Kotlin)` / `Config JPA (Java)` / `Config EF Core (C#)` / `Config SQLx (Rust)` *(Rust)*
 ```
 
 ---

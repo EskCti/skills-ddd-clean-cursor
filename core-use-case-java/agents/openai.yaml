@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Use Case (Java)'
+  short_description: 'Use cases Java — UseCase interface'
+  default_prompt: 'Implemente <Verb><Entity>UseCase em packages/<bc>/application/usecase/. Orquestra domínio, retorna Result, injeta Repository port.'

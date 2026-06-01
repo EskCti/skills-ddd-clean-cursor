@@ -145,6 +145,28 @@ Layout obrigatório: `config-shared-core-rs/references/rust-namespace-layout.md`
 
 **Tutorial full-stack (Rust + Vue + Flutter):** [docs/tutorial/stacks/rust-vue-flutter.md](docs/tutorial/stacks/rust-vue-flutter.md)
 
+### Skills Java (sufixo `-java`) — backend Spring Boot
+
+Layout obrigatório: `config-shared-core-java/references/java-namespace-layout.md` — domínio puro em `packages/<bc>/`, Spring em `apps/backend-java/modules/<bc>/`.
+
+**Bootstrap e infra:**
+- `config-project-java`: Gradle multi-module (shared + backend-java), docker-compose dev
+- `config-shared-core-java`: kernel (Result, Entity, UseCase)
+- `config-new-module-java`: scaffold BC em `packages/<bc>/` + módulo Spring
+- `config-jpa-java`: migrations Flyway + JPA
+- `config-docker-java` / `config-cicd-java`: produção e CI (JaCoCo ≥95%)
+
+**Domínio e aplicação:**
+- `core-entity-java` / `core-value-object-java` / `core-domain-service-java` / `core-repository-java`
+- `core-dto-java` / `core-use-case-java` / `core-query-cqrs-java`
+
+**Infra e interface:**
+- `backend-data-java`: adapters JPA + `*JpaEntity` separado do domínio
+- `backend-controller-java`: `@RestController` Spring
+- `test-unit-java` / `test-e2e-java`: JUnit 5 + MockMvc
+
+**Tutorial full-stack (Java + Vue + Flutter):** [docs/tutorial/stacks/java-vue-flutter.md](docs/tutorial/stacks/java-vue-flutter.md)
+
 ### Skills Frontend Angular (sufixo `-angular`) — Clean Architecture completa
 
 Skills para projetos Angular 17+ standalone + NestJS com **todas as camadas DDD**:

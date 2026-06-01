@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Project (Java)'
+  short_description: 'Bootstrap Gradle multi-module Spring Boot 3 + JPA'
+  default_prompt: 'Inicialize um workspace Java 21 com Gradle multi-module, Spring Boot 3, packages/shared e apps/backend-java. Siga java-namespace-layout.md — domínio puro em packages/, Spring em apps/backend-java.'

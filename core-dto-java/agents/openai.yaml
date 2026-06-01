@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core DTO (Java)'
+  short_description: 'Application DTOs Java — Input/Output records'
+  default_prompt: 'Crie DTOs em packages/<bc>/application/dto/. Records com sufixo Input/Output, sem regra de domínio.'

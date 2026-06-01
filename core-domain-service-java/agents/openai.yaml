@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Domain Service (Java)'
+  short_description: 'Domain services Java — regras puras'
+  default_prompt: 'Crie domain service em packages/<bc>/domain/service/. Lógica pura entre entidades/VOs, Result, sem Spring.'

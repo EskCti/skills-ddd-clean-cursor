@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Query CQRS (Java)'
+  short_description: 'Read-only queries Java na application'
+  default_prompt: 'Crie query read-only em packages/<bc>/application/usecase/. UseCase retorna DTO, sem mutar aggregate.'

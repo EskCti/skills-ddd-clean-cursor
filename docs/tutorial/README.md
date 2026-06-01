@@ -99,7 +99,8 @@ Marque **sim** em todos antes de abrir o [Tutorial 02](./02-fullstack-project-se
 | NestJS | Angular | Flutter | [stacks/nestjs-angular-flutter.md](./stacks/nestjs-angular-flutter.md) |
 | NestJS | Vue 3 | Flutter | [stacks/nestjs-vue-flutter.md](./stacks/nestjs-vue-flutter.md) |
 | NestJS | Next.js | Flutter | [stacks/nestjs-next-flutter.md](./stacks/nestjs-next-flutter.md) |
-| Spring Boot | Vue 3 | Flutter | [stacks/spring-vue-flutter.md](./stacks/spring-vue-flutter.md) |
+| Spring Boot (Kotlin) | Vue 3 | Flutter | [stacks/spring-vue-flutter.md](./stacks/spring-vue-flutter.md) |
+| Spring Boot (Java) | Vue 3 | Flutter | [stacks/java-vue-flutter.md](./stacks/java-vue-flutter.md) |
 | Axum (Rust) | Vue 3 | Flutter | [stacks/rust-vue-flutter.md](./stacks/rust-vue-flutter.md) |
 | ASP.NET Core | Angular | Android | [stacks/dotnet-angular-android.md](./stacks/dotnet-angular-android.md) |
 | ASP.NET Core | Vue 3 | Android | [stacks/dotnet-cs-vue-android.md](./stacks/dotnet-cs-vue-android.md) |
@@ -261,6 +262,6 @@ Ver matriz completa: [`config-project-fullstack/references/fullstack-stack-matri
 
 | Camada | Opções | Sufixo skills |
 |--------|--------|---------------|
-| Backend | NestJS, Spring Boot, ASP.NET Core, Axum (Rust) | —, `-kt`, `-cs`, `-rs` |
+| Backend | NestJS, Spring Boot (Kotlin/Java), ASP.NET Core, Axum (Rust) | —, `-kt`, `-java`, `-cs`, `-rs` |
 | Frontend | Next.js, Angular, Vue | skills específicos por framework |
 | Mobile | Flutter, Android Compose | `-flutter`, `-android` |

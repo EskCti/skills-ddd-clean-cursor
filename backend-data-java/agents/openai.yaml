@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Backend Data (Java)'
+  short_description: 'JPA adapters — JpaEntity + RepositoryAdapter'
+  default_prompt: 'Implemente persistência JPA: CustomerJpaEntity + CustomerRepositoryAdapter em modules/<bc>/infrastructure/persistence/. Mapeamento explícito DB↔domínio.'
