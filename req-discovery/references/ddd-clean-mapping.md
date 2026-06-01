@@ -128,6 +128,7 @@ Use sempre **Agent** (`display_name` do `agents/openai.yaml`) — nunca pasta de
 | **TypeScript** | sem sufixo | NestJS + Prisma + Next.js/Angular/Vue |
 | **Kotlin** | `-kt` | Spring Boot + JPA |
 | **C#** | `-cs` | ASP.NET Core + EF Core |
+| **Rust** | `-rs` | Axum + sqlx + Cargo workspace (modules por camada) |
 | **Angular** | `-angular` | Angular 17+ + Tailwind + PrimeNG (widgets) |
 | **Vue** | `-vue` | Vue 3 + Tailwind + PrimeVue |
 | **Flutter** | `-flutter` | Flutter + Riverpod |

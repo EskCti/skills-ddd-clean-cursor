@@ -21,7 +21,7 @@ openspec-propose "bootstrap-<nome>" → openspec-apply-change
 Por BC/épico: openspec-propose → openspec-apply-change → openspec-archive-change
 ```
 
-**Fluxo**: o sistema fonte pode ter sido analisado em qualquer linguagem (PHP, Go, Python, etc. via `req-discovery`). As tasks do backlog sempre referenciam os **skills deste repositório**. Na implementação, o usuário escolhe **TypeScript** (sem sufixo), **Kotlin** (sufixo `-kt`) ou **C#** (sufixo `-cs`). Consultar `req-discovery/references/ddd-clean-mapping.md`.
+**Fluxo**: o sistema fonte pode ter sido analisado em qualquer linguagem (PHP, Go, Python, etc. via `req-discovery`). As tasks do backlog sempre referenciam os **skills deste repositório**. Na implementação, o usuário escolhe **TypeScript** (sem sufixo), **Kotlin** (sufixo `-kt`), **C#** (sufixo `-cs`) ou **Rust** (sufixo `-rs`). Consultar `req-discovery/references/ddd-clean-mapping.md`.
 
 ---
 
@@ -119,13 +119,13 @@ Regras para Épicos:
 **Épico técnico de bootstrap** (EP-000) deve sempre existir e incluir **Docker + CI/CD no setup** (não deixar para o final):
 
 - Orquestração → `config-project-fullstack` (quando backend + frontend e/ou mobile)
-- Backend → `config-project` / `config-project-kt` / `config-project-cs`
+- Backend → `config-project` / `config-project-kt` / `config-project-cs` / `config-project-rs`
 - Frontend → `config-project-angular` / `config-project-vue` (se aplicável)
 - Mobile → `config-project-flutter` / `config-project-android` (se aplicável)
-- Docker produção → `config-docker` / `config-docker-kt` / `config-docker-cs`
-- CI/CD → `config-cicd` / `config-cicd-kt` / `config-cicd-cs`
-- Shared kernel → `config-shared-core` / `config-shared-core-kt` / `config-shared-core-cs`
-- Banco → `config-prisma` / `config-jpa-kt` / `config-efcore-cs`
+- Docker produção → `config-docker` / `config-docker-kt` / `config-docker-cs` / `config-docker-rs`
+- CI/CD → `config-cicd` / `config-cicd-kt` / `config-cicd-cs` / `config-cicd-rs`
+- Shared kernel → `config-shared-core` / `config-shared-core-kt` / `config-shared-core-cs` / `config-shared-core-rs`
+- Banco → `config-prisma` / `config-jpa-kt` / `config-efcore-cs` / `config-sqlx-rs`
 
 > Com OpenSpec: agrupar EP-000 na mudança `bootstrap-<nome>` via `openspec-propose` → `openspec-apply-change`.
 
@@ -259,22 +259,22 @@ Se a stack **não foi escolhida ainda**, mostrar as 3 opções:
 
 ### Mapeamento: Prefixo de Task → Agent Cursor
 
-| Prefixo | Agent TS | Agent KT | Agent CS |
-| ---------------------- | ----------------------- | -------------------------------- | ----------------------- |
-| `domain:vo` | `Core Value Object` | `Core Value Object (Kotlin)` | `Core Value Object (C#)` |
-| `domain:entity` | `Core Entity` | `Core Entity (Kotlin)` | `Core Entity (C#)` |
-| `domain:service` | `Core Domain Service` | `Core Domain Service (Kotlin)` | `Core Domain Service (C#)` |
-| `domain:repository` | `Core Repository` | `Core Repository (Kotlin)` | `Core Repository (C#)` |
-| `app:dto` | `Core DTO` | `Core DTO (Kotlin)` | `Core DTO (C#)` |
-| `app:usecase` | `Core Use Case` | `Core Use Case (Kotlin)` | `Core Use Case (C#)` |
-| `app:query` | `Core Query CQRS` | `Core Query CQRS (Kotlin)` | `Core Query CQRS (C#)` |
-| `infra:persistence` | `Backend Prisma Data` | `Backend Data (Kotlin)` | `Backend Data (C#)` |
-| `infra:migration` | `Config Prisma` | `Config JPA (Kotlin)` | `Config EF Core (C#)` |
-| `infra:setup` | `Config Project` | `Config Project (Kotlin)` | `Config Project (C#)` |
-| `infra:shell-web` | `Config Shared Web` / `(Angular)` / `(Vue)` | — | — |
-| `domain:shared` | `Config Shared Core` | `Config Shared Core (Kotlin)` | `Config Shared Core (C#)` |
-| `infra:auth` | `Config Auth Core Basic` | `Config Auth Core Basic (Kotlin)` | `Config Auth Core (C#)` |
-| `interface:controller` | `Backend Controller` | `Backend Controller (Kotlin)` | `Backend Controller (C#)` |
+| Prefixo | Agent TS | Agent KT | Agent CS | Agent RS |
+| ---------------------- | ----------------------- | -------------------------------- | ----------------------- | ----------------------- |
+| `domain:vo` | `Core Value Object` | `Core Value Object (Kotlin)` | `Core Value Object (C#)` | `Core Value Object (Rust)` |
+| `domain:entity` | `Core Entity` | `Core Entity (Kotlin)` | `Core Entity (C#)` | `Core Entity (Rust)` |
+| `domain:service` | `Core Domain Service` | `Core Domain Service (Kotlin)` | `Core Domain Service (C#)` | — |
+| `domain:repository` | `Core Repository` | `Core Repository (Kotlin)` | `Core Repository (C#)` | `Core Repository (Rust)` |
+| `app:dto` | `Core DTO` | `Core DTO (Kotlin)` | `Core DTO (C#)` | `Core DTO (Rust)` |
+| `app:usecase` | `Core Use Case` | `Core Use Case (Kotlin)` | `Core Use Case (C#)` | `Core Use Case (Rust)` |
+| `app:query` | `Core Query CQRS` | `Core Query CQRS (Kotlin)` | `Core Query CQRS (C#)` | `Core Query CQRS (Rust)` |
+| `infra:persistence` | `Backend Prisma Data` | `Backend Data (Kotlin)` | `Backend Data (C#)` | `Backend Data (Rust)` |
+| `infra:migration` | `Config Prisma` | `Config JPA (Kotlin)` | `Config EF Core (C#)` | `Config SQLx (Rust)` |
+| `infra:setup` | `Config Project` | `Config Project (Kotlin)` | `Config Project (C#)` | `Config Project (Rust)` |
+| `infra:shell-web` | `Config Shared Web` / `(Angular)` / `(Vue)` | — | — | — |
+| `domain:shared` | `Config Shared Core` | `Config Shared Core (Kotlin)` | `Config Shared Core (C#)` | `Config Shared Core (Rust)` |
+| `infra:auth` | `Config Auth Core Basic` | `Config Auth Core Basic (Kotlin)` | `Config Auth Core (C#)` | — |
+| `interface:controller` | `Backend Controller` | `Backend Controller (Kotlin)` | `Backend Controller (C#)` | `Backend Controller (Rust)` |
 | `interface:form` | `Frontend Form Schema` | — | — |
 | `interface:entity` | `Frontend Entity (Angular)` ou `Frontend Entity (Vue)` | — | — |
 | `interface:usecase` | `Frontend UseCase (Angular)` ou `Frontend UseCase (Vue)` | — | — |
@@ -286,14 +286,14 @@ Se a stack **não foi escolhida ainda**, mostrar as 3 opções:
 | `interface:mobile-repository` | `Mobile Repository (Flutter)` ou `Mobile Repository (Android)` | — | — |
 | `interface:mobile` | `Mobile Screen (Flutter)` ou `Mobile Screen (Android)` | — | — |
 | `interface:mobile-form` | `Mobile Form (Flutter)` ou `Mobile Form (Android)` | — | — |
-| `infra:docker` | `Config Docker (TypeScript)` | `Config Docker (Kotlin)` | `Config Docker (C#)` |
-| `infra:cicd` | `Config CI/CD (TypeScript)` | `Config CI/CD (Kotlin)` | `Config CI/CD (C#)` |
-| `infra:fullstack` | `Config Project Full-Stack` | `Config Project Full-Stack` | `Config Project Full-Stack` |
-| `test:unit` | `Unit Tests (TypeScript)` | `Unit Tests (Kotlin)` | `Unit Tests (C#)` |
-| `test:coverage` | `Unit Tests (TypeScript)` | `Unit Tests (Kotlin)` | `Unit Tests (C#)` |
-| `test:e2e` | `E2E Tests (TypeScript)` | `E2E Tests (Kotlin)` | `E2E Tests (C#)` |
-| `test:unit-web` | `Frontend UseCase (Vue)` ou `Frontend UseCase (Angular)` | — | — |
-| `test:unit-mobile` | `Mobile UseCase (Flutter)` | `Mobile UseCase (Android)` | — |
+| `infra:docker` | `Config Docker (TypeScript)` | `Config Docker (Kotlin)` | `Config Docker (C#)` | `Config Docker (Rust)` |
+| `infra:cicd` | `Config CI/CD (TypeScript)` | `Config CI/CD (Kotlin)` | `Config CI/CD (C#)` | `Config CI/CD (Rust)` |
+| `infra:fullstack` | `Config Project Full-Stack` | `Config Project Full-Stack` | `Config Project Full-Stack` | `Config Project Full-Stack` |
+| `test:unit` | `Unit Tests (TypeScript)` | `Unit Tests (Kotlin)` | `Unit Tests (C#)` | `Unit Tests (Rust)` |
+| `test:coverage` | `Unit Tests (TypeScript)` | `Unit Tests (Kotlin)` | `Unit Tests (C#)` | `Unit Tests (Rust)` |
+| `test:e2e` | `E2E Tests (TypeScript)` | `E2E Tests (Kotlin)` | `E2E Tests (C#)` | `E2E Tests (Rust)` |
+| `test:unit-web` | `Frontend UseCase (Vue)` ou `Frontend UseCase (Angular)` | — | — | — |
+| `test:unit-mobile` | `Mobile UseCase (Flutter)` | `Mobile UseCase (Android)` | — | — |
 
 > **`test:unit-web` / `test:unit-mobile`**: não há skill `Unit Tests (Vue)` separado; use o agent do **use case** da stack com prompt explícito para Vitest/JUnit e mocks de repository. E2E de UI (Playwright) permanece em `test:e2e` apenas na stack TypeScript (`E2E Tests (TypeScript)`).
 
@@ -308,7 +308,7 @@ Regras para Tasks:
 - O prompt deve incluir: nome da classe, VOs/dependências envolvidas, comportamento esperado
 - Deve ser atribuível a uma pessoa
 
-> **Nota**: o sistema fonte analisado pode ser qualquer linguagem (PHP, Go, Python, etc.). As tasks sempre referenciam os skills deste repositório (TS, KT ou CS) porque o objetivo é **reimplementar** usando DDD/Clean Architecture.
+> **Nota**: o sistema fonte analisado pode ser qualquer linguagem (PHP, Go, Python, etc.). As tasks sempre referenciam os skills deste repositório (TS, KT, CS ou RS) porque o objetivo é **reimplementar** usando DDD/Clean Architecture. Em Rust, seguir `config-shared-core-rs/references/rust-namespace-layout.md` — **sem** módulos redundantes (`domain::customer::Customer`).
 
 ### Fase 5 — Priorização e Roadmap
 
