@@ -135,7 +135,7 @@ Layout obrigatório: `config-shared-core-rs/references/rust-namespace-layout.md`
 - `config-docker-rs` / `config-cicd-rs`: produção e CI (clippy, test, coverage ≥95%)
 
 **Domínio e aplicação:**
-- `core-entity-rs` / `core-value-object-rs` / `core-repository-rs` (ports)
+- `core-entity-rs` / `core-value-object-rs` / `core-domain-service-rs` / `core-repository-rs` (ports)
 - `core-dto-rs` / `core-use-case-rs` / `core-query-cqrs-rs`
 
 **Infra e interface:**
