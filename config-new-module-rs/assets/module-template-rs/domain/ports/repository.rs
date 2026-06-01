@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use shared_kernel::{EntityId, Result};
 
-use crate::domain::__Entity__;
+use crate::modules::__BC__::domain::__Entity__;
 
 #[async_trait]
 pub trait __Entity__Repository: Send + Sync {

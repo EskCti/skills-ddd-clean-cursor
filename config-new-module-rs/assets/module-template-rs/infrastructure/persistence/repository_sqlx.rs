@@ -2,8 +2,8 @@ use async_trait::async_trait;
 use shared_kernel::{EntityId, Result};
 use sqlx::PgPool;
 
-use crate::domain::__Entity__;
-use crate::domain::ports::__Entity__Repository;
+use crate::modules::__BC__::domain::__Entity__;
+use crate::modules::__BC__::domain::ports::__Entity__Repository;
 
 pub struct __Entity__RepositorySqlx {
     pool: PgPool,

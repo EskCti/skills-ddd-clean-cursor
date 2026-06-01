@@ -26,6 +26,8 @@ modules/customers/
 ├── domain/
 │   ├── mod.rs             # pub use entity::Customer; pub mod ports; pub mod value_objects;
 │   ├── entity.rs          # struct Customer
+│   ├── services/          # domain services (Policy, Calculator) — core-domain-service-rs
+│   │   └── mod.rs
 │   ├── ports/
 │   │   ├── mod.rs
 │   │   └── repository.rs  # trait CustomerRepository

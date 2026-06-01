@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use shared_kernel::{Result, UseCase};
 
 use super::dto::{Create__Entity__Input, __Entity__Output};
-use crate::domain::ports::__Entity__Repository;
+use crate::modules::__BC__::domain::ports::__Entity__Repository;
 
 pub struct Create__Entity__ {
     repository: Arc<dyn __Entity__Repository>,
