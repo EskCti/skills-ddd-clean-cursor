@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Repository (Rust)'
+  short_description: 'Ports de repositório (traits) Rust'
+  default_prompt: 'Crie o trait <Entity>Repository em modules/<bc>/domain/ports/repository.rs. Implementação concreta somente em infrastructure com sufixo Sqlx.'

@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Domain Service (Rust)'
+  short_description: 'Serviços de domínio Rust — regras puras em domain/services'
+  default_prompt: 'Crie um domain service em modules/<bc>/domain/services/ — regra pura entre entidades/VOs, sem Axum/sqlx. Nomeie por intenção (Policy, Calculator). Retorne shared_kernel::Result quando aplicável.'

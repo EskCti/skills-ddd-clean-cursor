@@ -9,6 +9,8 @@
 | Startup tech (time JS/TS) | NestJS | Next.js | Flutter | Tipos compartilhados, SSR | [nestjs-next-flutter](../../docs/tutorial/stacks/nestjs-next-flutter.md) |
 | Enterprise Java / JVM | Spring Boot | Vue+PrimeVue | Flutter | Spring + Vue | [spring-vue-flutter](../../docs/tutorial/stacks/spring-vue-flutter.md) |
 | Enterprise .NET / Azure | ASP.NET Core | Angular | Android | LINQ, Android nativo | [dotnet-angular-android](../../docs/tutorial/stacks/dotnet-angular-android.md) |
+| Performance / sistemas críticos | Axum (Rust) | Angular | Flutter | Backend async, memória segura, API `:4000` | [rust-vue-flutter](../../docs/tutorial/stacks/rust-vue-flutter.md) *(seção Variante Angular)* |
+| Performance + UI Vue | Axum (Rust) | Vue+PrimeVue | Flutter | Rust backend + produtividade Vue | [rust-vue-flutter](../../docs/tutorial/stacks/rust-vue-flutter.md) |
 | Migração incremental | Qualquer | — | — | Strangler Fig | [backend-incremental](../../docs/tutorial/stacks/backend-incremental.md) |
 
 ---
@@ -97,6 +99,69 @@ Fase 4 — Mobile Android
   mobile-screen-android → mobile-form-android
 ```
 
+### Stack 4: Axum (Rust) + Angular + Flutter
+
+**Tutorial**: [rust-vue-flutter.md](../../docs/tutorial/stacks/rust-vue-flutter.md) — seção **Variante Angular** para agents frontend Angular.
+
+```
+Fase 1 — Setup (inclui Docker + CI/CD)
+  openspec-propose "bootstrap-<projeto>"  (se usando openspec)
+  openspec-apply-change "bootstrap-<projeto>"
+  ├── config-project-rs              → Cargo workspace (shared-kernel + api Axum), docker-compose Postgres
+  ├── config-sqlx-rs                 → migrations sqlx (se não incluídas no bootstrap)
+  ├── config-project-angular         → apps/web-angular (monorepo ou sibling)
+  ├── config-shared-web-angular      → shell Tailwind
+  ├── config-project-flutter         → app Flutter → API http://localhost:4000
+  ├── config-docker-rs               → Dockerfile multi-stage Rust
+  ├── config-cicd-rs                 → GitHub Actions (clippy, test, coverage ≥95%)
+  └── config-shared-core-rs          → crates/shared-kernel (Entity, VO, Result, UseCase)
+
+Fase 2 — Domínio (por BC) — sufixo -rs
+  config-new-module-rs               → scaffold modules/<bc>/ (domain/application/infrastructure/interfaces)
+  core-value-object-rs → core-entity-rs → core-repository-rs
+  core-dto-rs → core-use-case-rs → core-query-cqrs-rs
+  backend-data-rs → backend-controller-rs
+  unit-tests-rs → e2e-tests-rs
+
+Fase 3 — Frontend Angular (por feature)
+  frontend-entity-angular → frontend-usecase-angular → frontend-repository-angular
+  frontend-page-angular → frontend-form-angular
+  Proxy Angular: /api → http://localhost:4000
+
+Fase 4 — Mobile Flutter
+  mobile-entity-flutter → mobile-usecase-flutter → mobile-repository-flutter
+  mobile-screen-flutter → mobile-form-flutter
+
+Fase 5 — Auth
+  (skills auth -rs em roadmap — usar config-auth-* como referência ou implementação manual)
+```
+
+**Layout Rust (obrigatório)**: `config-shared-core-rs/references/rust-namespace-layout.md`
+
+- ✅ `modules::customers::domain::Customer`
+- ❌ `domain::customer::Customer`
+
+### Stack 5: Axum (Rust) + Vue + Flutter
+
+**Tutorial**: [rust-vue-flutter.md](../../docs/tutorial/stacks/rust-vue-flutter.md)
+
+```
+Fase 1 — Setup
+  config-project-rs → config-sqlx-rs → config-project-vue → config-shared-web-vue
+  → config-project-flutter → config-docker-rs → config-cicd-rs → config-shared-core-rs
+
+Fase 2 — Domínio (por BC) — sufixo -rs
+  (igual Stack 4)
+
+Fase 3 — Frontend Vue
+  frontend-entity-vue → frontend-usecase-vue → frontend-repository-vue
+  frontend-page-vue → frontend-form-vue
+  Proxy Vite: /api → http://localhost:4000
+
+Fase 4 — Mobile Flutter
+  (igual Stack 4)
+```
+
 ---
 
 ## Quando usar OpenSpec
@@ -112,12 +177,14 @@ Fase 4 — Mobile Android
 
 ---
 
-## Estrutura de repositório recomendada (monorepo)
+## Estrutura de repositório recomendada
+
+### Monorepo TypeScript (NestJS + Next/Angular/Vue)
 
 ```
 <projeto>/
 ├── apps/
-│   ├── backend/              # NestJS | Spring Boot | ASP.NET Core
+│   ├── backend/              # NestJS
 │   ├── web/                  # Next.js
 │   ├── web-angular/          # Angular 17+
 │   ├── web-vue/              # Vue 3 + PrimeVue
@@ -126,25 +193,44 @@ Fase 4 — Mobile Android
 ├── packages/
 │   └── <bc>/                 # Shared domain modules (TS monorepo)
 ├── openspec/
-│   └── changes/              # OpenSpec changes (proposal, design, tasks)
+│   └── changes/
 ├── docs/
-│   ├── discovery/            # req-discovery outputs
-│   ├── modeling/             # req-ddd-modeling outputs
-│   └── planning/             # req-agile-planning outputs
-├── .github/
-│   └── workflows/            # CI/CD pipelines
-├── docker-compose.yml        # Serviços locais (Postgres, Redis, etc.)
+├── .github/workflows/
+├── docker-compose.yml
 └── .env.example
 ```
+
+### Multi-stack (Spring / .NET / Rust + frontend separado)
+
+```
+<projeto>/
+├── Cargo.toml                # Rust: [workspace] na raiz (ou apps/backend-rust/)
+├── crates/
+│   ├── shared-kernel/
+│   └── api/                  # Axum binary + modules/<bc>/
+├── migrations/               # sqlx (Rust)
+├── src/                      # Spring Boot ou ASP.NET (KT/CS)
+├── apps/
+│   ├── web-angular/
+│   ├── web-vue/
+│   ├── mobile-flutter/
+│   └── mobile-android/
+├── openspec/
+├── docs/
+├── docker-compose.yml
+└── .env.example
+```
+
+> **Rust**: API default `BIND_ADDR=0.0.0.0:4000`. Frontend e mobile consomem `http://localhost:4000`.
 
 ---
 
 ## Checklist de projeto completo
 
 - [ ] Bootstrap (config-project) executado para backend + frontend + mobile
-- [ ] config-docker + config-cicd executados no bootstrap
-- [ ] config-shared-core executado
-- [ ] Config Prisma / JPA / EF Core configurado
-- [ ] Pelo menos um BC implementado inside-out
-- [ ] Auth configurada (se necessário)
+- [ ] config-docker + config-cicd executados no bootstrap (sufixo `-rs` se Rust)
+- [ ] config-shared-core executado (`config-shared-core-rs` se Rust)
+- [ ] Config Prisma / JPA / EF Core / **SQLx** configurado
+- [ ] Pelo menos um BC implementado inside-out (`config-new-module-rs` se Rust)
+- [ ] Auth configurada (se necessário; Rust: manual ou roadmap)
 - [ ] Primeira mudança OpenSpec criada (openspec-propose "bootstrap-<nome>")

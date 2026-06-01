@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core DTO (Rust)'
+  short_description: 'DTOs Input/Output Rust'
+  default_prompt: 'Crie Create<Entity>Input e <Entity>Output em modules/<bc>/application/dto.rs com serde.'

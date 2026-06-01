@@ -1,4 +1,4 @@
 interface:
   display_name: 'Config Project Full-Stack'
   short_description: 'Orquestrar criação de projeto completo: backend + frontend + mobile + OpenSpec'
-  default_prompt: 'Vamos criar um projeto full-stack completo. Primeiro defina: (1) backend — NestJS/Spring Boot/ASP.NET Core, (2) frontend — Next.js/Angular/Vue (Tailwind CSS em todos), (3) mobile — Flutter/Android/ambos/nenhum, (4) autenticação — básica/RBAC/nenhuma, (5) usar OpenSpec para rastrear mudanças? Após a decisão, siga o workflow do SKILL.md para orquestrar os agents em sequência, sempre indicando o agent correto e o prompt sugerido para cada etapa.'
+  default_prompt: 'Vamos criar um projeto full-stack completo. Primeiro defina: (1) backend — NestJS/Spring Boot/ASP.NET Core/Axum (Rust), (2) frontend — Next.js/Angular/Vue (Tailwind CSS em todos), (3) mobile — Flutter/Android/ambos/nenhum, (4) autenticação — básica/RBAC/nenhuma, (5) usar OpenSpec para rastrear mudanças? Após a decisão, siga o workflow do SKILL.md para orquestrar os agents em sequência, sempre indicando o agent correto e o prompt sugerido para cada etapa. Se Rust: Cargo workspace, API :4000, sufixo -rs, rust-namespace-layout.md.'

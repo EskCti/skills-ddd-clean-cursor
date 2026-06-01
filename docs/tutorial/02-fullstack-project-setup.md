@@ -36,12 +36,12 @@ Tutorial 01 — req-discovery → req-ddd-modeling → req-migration-strategy �
 
 > Tenho o backlog em `docs/planning/<projeto>/backlog.md` gerado pelo req-agile-planning.
 > Quero criar o projeto `<nome>` com:
-> - Backend: [ NestJS | Spring Boot | ASP.NET Core ]
+> - Backend: [ NestJS | Spring Boot | ASP.NET Core | Axum (Rust) ]
 > - Frontend: [ Next.js | Angular | Vue 3 | Nenhum ]
 > - Mobile: [ Flutter | Android | Nenhum ]
 > Docker e CI/CD no bootstrap. Usar OpenSpec para rastrear mudanças.
 
-O agent responde com: agents de bootstrap, sufixo de skills (`-kt`, `-cs` ou nenhum), ordem de EP-000 e link lógico para o tutorial da combinação abaixo.
+O agent responde com: agents de bootstrap, sufixo de skills (`-kt`, `-cs`, `-rs` ou nenhum), ordem de EP-000 e link lógico para o tutorial da combinação abaixo.
 
 ---
 
@@ -55,6 +55,8 @@ O agent responde com: agents de bootstrap, sufixo de skills (`-kt`, `-cs` ou nen
 | **Spring Boot** | **Vue 3** | **Flutter** | Ecossistema JVM + UI Vue | [spring-vue-flutter](./stacks/spring-vue-flutter.md) |
 | **ASP.NET Core** | **Angular** | **Android** | .NET enterprise + nativo Android | [dotnet-angular-android](./stacks/dotnet-angular-android.md) |
 | **ASP.NET Core** | **Vue 3** | **Android** | Legado PHP → .NET + PrimeVue + Compose (RetailOps) | [dotnet-cs-vue-android](./stacks/dotnet-cs-vue-android.md) |
+| **Axum (Rust)** | **Angular** | **Flutter** | Performance, memória segura, API `:4000` | [rust-vue-flutter](./stacks/rust-vue-flutter.md) *(seção Variante Angular)* |
+| **Axum (Rust)** | **Vue 3** | **Flutter** | Rust backend + UI Vue produtiva | [rust-vue-flutter](./stacks/rust-vue-flutter.md) |
 | **Qualquer** | — | — | Strangler Fig, só backend / migração incremental | [backend-incremental](./stacks/backend-incremental.md) |
 
 Matriz completa e justificativas: [`config-project-fullstack/references/fullstack-stack-matrix.md`](../../config-project-fullstack/references/fullstack-stack-matrix.md)
@@ -69,11 +71,12 @@ Independente da combinação, o **req-agile-planning** deve gerar tasks semelhan
 ## EP-000: [TECH] Bootstrap do Projeto
 
 - [ ] `infra:fullstack` → **Agent:** `Config Project Full-Stack`
-- [ ] `infra:setup`     → **Agent:** `Config Project` / `(Angular)` / `(Vue)` / `(Kotlin)` / `(C#)`
+- [ ] `infra:setup`     → **Agent:** `Config Project` / `(Angular)` / `(Vue)` / `(Kotlin)` / `(C#)` / `(Rust)`
 - [ ] `infra:shell-web` → **Agent:** `Config Shared Web` / `(Angular)` / `(Vue)`
-- [ ] `infra:docker`    → **Agent:** `Config Docker (TypeScript|Kotlin|C#)`
-- [ ] `infra:cicd`      → **Agent:** `Config CI/CD (TypeScript|Kotlin|C#)`
-- [ ] `domain:shared`   → **Agent:** `Config Shared Core` / `(Kotlin)` / `(C#)`
+- [ ] `infra:docker`    → **Agent:** `Config Docker (TypeScript|Kotlin|C#|Rust)`
+- [ ] `infra:cicd`      → **Agent:** `Config CI/CD (TypeScript|Kotlin|C#|Rust)`
+- [ ] `domain:shared`   → **Agent:** `Config Shared Core` / `(Kotlin)` / `(C#)` / `(Rust)`
+- [ ] `infra:migration` → **Agent:** `Config Prisma` / `Config JPA (Kotlin)` / `Config EF Core (C#)` / `Config SQLx (Rust)` *(Rust)*
 ```
 
 ---

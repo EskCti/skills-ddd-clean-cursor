@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Docker (Rust)'
+  short_description: 'Docker multi-stage Rust Axum'
+  default_prompt: 'Crie Dockerfile multi-stage para cargo build -p api e docker-compose.prod.yml com Postgres.'

@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Entity (Rust)'
+  short_description: 'Entidades de domínio Rust'
+  default_prompt: 'Crie a entidade <Nome> em modules/<bc>/domain/entity.rs. Re-export em domain::<Nome>. Aggregate root com create() → Result e métodos de domínio.'

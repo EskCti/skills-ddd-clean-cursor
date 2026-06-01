@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Value Object (Rust)'
+  short_description: 'Value Objects Rust com Result'
+  default_prompt: 'Crie o VO <Nome> em modules/<bc>/domain/value_objects/<snake>.rs. Exporte como domain::<Nome> — sem submódulo redundante <nome>::<Nome>.'

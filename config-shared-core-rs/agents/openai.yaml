@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Shared Core (Rust)'
+  short_description: 'Shared Kernel Rust — Entity, VO, Result, UseCase'
+  default_prompt: 'Configure ou estenda o shared-kernel Rust (crates/shared-kernel) com Entity, ValueObject, Result e UseCase. Siga rust-namespace-layout.md — sem módulos redundantes.'

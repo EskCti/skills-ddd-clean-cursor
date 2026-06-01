@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Use Case (Rust)'
+  short_description: 'Use cases Rust async'
+  default_prompt: 'Crie Create<Entity> em modules/<bc>/application/ implementando UseCase<Input, Output>. Injete Arc<dyn <Entity>Repository>.'

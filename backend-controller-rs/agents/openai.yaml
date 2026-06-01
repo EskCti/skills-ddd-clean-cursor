@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Backend Controller (Rust)'
+  short_description: 'Handlers e rotas Axum'
+  default_prompt: 'Crie rotas POST/GET /api/<bc> em modules/<bc>/interfaces/http/ delegando a Create<Entity> e Find<Entity>ById. Handlers thin.'

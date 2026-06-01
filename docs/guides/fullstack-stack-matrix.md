@@ -1,8 +1,10 @@
 # Matriz Completa de Stacks Full-Stack
 
-**Versão**: 1.0.0  
-**Última atualização**: 2026-05-23  
+**Versão**: 1.1.0  
+**Última atualização**: 2026-05-21  
 **Status**: ✅ **COMPLETO**
+
+> **Matriz canônica (orquestrador)**: [`config-project-fullstack/references/fullstack-stack-matrix.md`](../../config-project-fullstack/references/fullstack-stack-matrix.md) — inclui **Rust (Axum)** e tutorial [`rust-vue-flutter.md`](../tutorial/stacks/rust-vue-flutter.md).
 
 ---
 
@@ -14,7 +16,7 @@ Esta matriz documenta todas as combinações possíveis de stacks suportadas pel
 
 | Categoria | Opções | Skills Correspondentes |
 |-----------|--------|------------------------|
-| **Backend** | C# (ASP.NET Core), TypeScript (NestJS), Kotlin (Spring Boot) | `config-project-cs`, `config-project`, `config-project-kt` |
+| **Backend** | C# (ASP.NET Core), TypeScript (NestJS), Kotlin (Spring Boot), **Rust (Axum)** | `config-project-cs`, `config-project`, `config-project-kt`, **`config-project-rs`** |
 | **Frontend Web** | Next.js, Angular + PrimeNG, Vue + PrimeVue | `config-shared-web`, `config-shared-web-angular`, `config-shared-web-vue` |
 | **Mobile** | Android (Kotlin + Compose), Flutter (Dart) | `config-project-android`, `config-project-flutter` |
 
@@ -64,6 +66,17 @@ Esta matriz documenta todas as combinações possíveis de stacks suportadas pel
 | **Next.js** | Flutter | ⚠️ Parcial | `config-project-kt` + `config-project` + `config-project-flutter` | (Necessário adapter) |
 | **Next.js** | Nenhum | ⚠️ Parcial | `config-project-kt` + `config-project` | (Necessário adapter) |
 
+### **4. Backend Rust (Axum + sqlx)**
+
+| Frontend | Mobile | Status | Skills Recomendadas | Exemplo de Projeto |
+|----------|--------|--------|---------------------|-------------------|
+| **Vue + PrimeVue** | Flutter | ✅ Suportado | `config-project-rs` + `config-project-vue` + `config-project-flutter` | API performance + UI Vue |
+| **Angular + PrimeNG** | Flutter | ✅ Suportado | `config-project-rs` + `config-project-angular` + `config-project-flutter` | Sistemas críticos |
+| **Vue + PrimeVue** | Nenhum | ✅ Suportado | `config-project-rs` + `config-project-vue` | API-only + admin |
+| **Nenhum** | Flutter | ✅ Suportado | `config-project-rs` + `config-project-flutter` | Backend Rust + app mobile |
+
+> API default `:4000`. Layout: `config-shared-core-rs/references/rust-namespace-layout.md`. Tutorial: [`rust-vue-flutter.md`](../tutorial/stacks/rust-vue-flutter.md).
+
 ---
 
 ## 🔧 **Skills por Camada e Stack**
@@ -75,6 +88,7 @@ Esta matriz documenta todas as combinações possíveis de stacks suportadas pel
 | **C#** | `core-value-object-cs` | `core-entity-cs` | `core-domain-service-cs` | `core-repository-cs` |
 | **TypeScript** | `core-value-object` | `core-entity` | `core-domain-service` | `core-repository` |
 | **Kotlin** | `core-value-object-kt` | `core-entity-kt` | `core-domain-service-kt` | `core-repository-kt` |
+| **Rust** | `core-value-object-rs` | `core-entity-rs` | `core-domain-service-rs` | `core-repository-rs` |
 
 ### **Aplicação (Application)**
 
@@ -83,6 +97,7 @@ Esta matriz documenta todas as combinações possíveis de stacks suportadas pel
 | **C#** | `core-dto-cs` | `core-use-case-cs` | `core-query-cqrs-cs` |
 | **TypeScript** | `core-dto` | `core-use-case` | `core-query-cqrs` |
 | **Kotlin** | `core-dto-kt` | `core-use-case-kt` | `core-query-cqrs-kt` |
+| **Rust** | `core-dto-rs` | `core-use-case-rs` | `core-query-cqrs-rs` |
 
 ### **Infraestrutura (Infrastructure)**
 
@@ -91,6 +106,7 @@ Esta matriz documenta todas as combinações possíveis de stacks suportadas pel
 | **C#** | `backend-data-cs` | `config-efcore-cs` | `config-docker-cs` | `config-cicd-cs` |
 | **TypeScript** | `backend-prisma-data` | `config-prisma` | `config-docker` | `config-cicd` |
 | **Kotlin** | `backend-data-kt` | `config-jpa-kt` | `config-docker-kt` | `config-cicd-kt` |
+| **Rust** | `backend-data-rs` | `config-sqlx-rs` | `config-docker-rs` | `config-cicd-rs` |
 
 ### **Apresentação (Presentation)**
 
@@ -99,6 +115,7 @@ Esta matriz documenta todas as combinações possíveis de stacks suportadas pel
 | **C#** | `backend-controller-cs` | `frontend-entity-angular` ou `frontend-entity-vue` | `frontend-usecase-angular` ou `frontend-usecase-vue` | `frontend-repository-angular` ou `frontend-repository-vue` |
 | **TypeScript** | `backend-controller` | `frontend-entity-angular` ou `frontend-entity-vue` | `frontend-usecase-angular` ou `frontend-usecase-vue` | `frontend-repository-angular` ou `frontend-repository-vue` |
 | **Kotlin** | `backend-controller-kt` | `frontend-entity-angular` ou `frontend-entity-vue` | `frontend-usecase-angular` ou `frontend-usecase-vue` | `frontend-repository-angular` ou `frontend-repository-vue` |
+| **Rust** | `backend-controller-rs` | `frontend-entity-angular` ou `frontend-entity-vue` | `frontend-usecase-angular` ou `frontend-usecase-vue` | `frontend-repository-angular` ou `frontend-repository-vue` |
 
 ### **Mobile**
 
@@ -114,6 +131,7 @@ Esta matriz documenta todas as combinações possíveis de stacks suportadas pel
 | **C#** | `test-unit-cs` | `test-e2e-cs` | `test-unit-web` (TypeScript) | `test-unit-mobile` (Kotlin) |
 | **TypeScript** | `test-unit` | `test-e2e` | `test-unit-web` | `test-unit-mobile` (Kotlin) |
 | **Kotlin** | `test-unit-kt` | `test-e2e-kt` | `test-unit-web` (TypeScript) | `test-unit-mobile` |
+| **Rust** | `test-unit-rs` | `test-e2e-rs` | `test-unit-web` (TypeScript) | `test-unit-mobile` |
 
 ---
 
@@ -165,6 +183,35 @@ Esta matriz documenta todas as combinações possíveis de stacks suportadas pel
 9. `config-docker` - Docker para TypeScript
 10. `config-cicd` - CI/CD para TypeScript
 ```
+
+### **Combinação 4: Rust + Vue + Flutter**
+```markdown
+# Workflow: Rust (Axum) + Vue + Flutter
+
+## Fase 1: Bootstrap
+1. `config-project-rs` - Workspace Cargo (shared-kernel + api)
+2. `config-sqlx-rs` - Migrations Postgres
+3. `config-project-vue` - Frontend Vue
+4. `config-project-flutter` - Mobile Flutter
+
+## Fase 2: Shared Core
+5. `config-shared-core-rs` - Kernel Rust
+6. `config-shared-web-vue` - Shell Vue
+
+## Fase 3: Implementação por BC
+7. `config-new-module-rs` → `core-value-object-rs` → `core-entity-rs` → `core-domain-service-rs`
+8. `core-repository-rs` → `core-use-case-rs` → `backend-data-rs` → `backend-controller-rs`
+9. `frontend-entity-vue` → `frontend-usecase-vue` → `frontend-page-vue`
+10. `mobile-entity-flutter` → `mobile-usecase-flutter` → `mobile-screen-flutter`
+
+## Fase 4: Deploy
+11. `config-docker-rs` - Docker multi-stage
+12. `config-cicd-rs` - CI (clippy, test, coverage ≥95%)
+```
+
+> Detalhes: [`docs/tutorial/stacks/rust-vue-flutter.md`](../tutorial/stacks/rust-vue-flutter.md) · tasks OpenSpec: [`openspec-rust-task-examples.md`](../templates/openspec-rust-task-examples.md)
+
+---
 
 ### **Combinação 3: Kotlin + Vue + Ambos Mobile**
 ```markdown
@@ -420,6 +467,7 @@ install_tools() {
 ✅ **C# + Vue + Android/Flutter** - Suporte completo  
 ✅ **TypeScript + Next.js + Android/Flutter** - Suporte completo  
 ✅ **Kotlin + Angular/Vue + Android/Flutter** - Suporte completo  
+✅ **Rust (Axum) + Vue/Angular + Flutter** - Suporte completo  
 ⚠️ **Combinações com Next.js + C#/Kotlin** - Suporte parcial (necessário adapter)
 
 ### **Próximos Passos**
