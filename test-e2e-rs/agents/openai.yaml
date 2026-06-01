@@ -1,0 +1,4 @@
+interface:
+  display_name: 'E2E Tests (Rust)'
+  short_description: 'Testes integração HTTP Rust'
+  default_prompt: 'Crie teste E2E POST /customers → GET /customers/{id} em tests/integration/ com api Axum e Postgres.'

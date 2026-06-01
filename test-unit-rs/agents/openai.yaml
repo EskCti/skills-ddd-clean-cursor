@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Unit Tests (Rust)'
+  short_description: 'Testes unitários Rust domain+app'
+  default_prompt: 'Crie testes unitários para VOs, entity e use case do BC <nome>. Mock do trait Repository. Meta ≥95% domain+application.'

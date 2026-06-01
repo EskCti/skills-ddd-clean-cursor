@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config CI/CD (Rust)'
+  short_description: 'GitHub Actions Rust clippy/test/coverage'
+  default_prompt: 'Crie CI GitHub Actions: fmt, clippy, cargo test, coverage ≥95% domain+application nos módulos BC.'
