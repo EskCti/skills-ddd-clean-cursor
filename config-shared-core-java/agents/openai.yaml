@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Shared Core (Java)'
+  short_description: 'Shared kernel Java — Result, Entity, UseCase'
+  default_prompt: 'Mantenha packages/shared com Entity, Result, DomainError e UseCase em pure Java (sem Spring). Siga java-namespace-layout.md.'
