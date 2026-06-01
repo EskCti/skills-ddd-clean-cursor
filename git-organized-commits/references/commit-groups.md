@@ -14,8 +14,11 @@ Referência para o agent **Organized Git Commits**. Ajuste paths conforme o `git
 | `config-project/` E2E, `config-new-module*/` | feat | config | `feat(config): scaffold E2E automático no bootstrap NestJS` |
 | `config-project-cs/` | feat | config | `feat(config): template C# com UnitTests e IntegrationTests` |
 | `config-project-rs/` `config-shared-core-rs/` `config-new-module-rs/` `config-sqlx-rs/` | feat | config | `feat(config): bootstrap Rust Axum modular por BC` |
+| `config-project-java/` `config-shared-core-java/` `config-new-module-java/` `config-jpa-java/` | feat | config | `feat(config): bootstrap Java Spring Boot modular por BC` |
 | `core-*-rs/` `core-domain-service-rs/` `backend-*-rs/` | feat | core/backend | `feat(rust): skills domain/application/infra Axum` |
+| `core-*-java/` `core-domain-service-java/` `backend-*-java/` | feat | core/backend | `feat(java): skills domain/application/infra Spring Boot` |
 | `config-docker-rs/` `config-cicd-rs/` `test-*-rs/` | feat | config/test | `feat(rust): docker, CI/CD e testes Rust` |
+| `config-docker-java/` `config-cicd-java/` `test-*-java/` | feat | config/test | `feat(java): docker, CI/CD e testes Java` |
 | `test-unit*/` `test-e2e*/` + jest/gradle thresholds | feat | test | `feat(test): skills de testes unitários e E2E para TS, Kotlin e C#` |
 | `frontend-*-angular/` `frontend-*-vue/` | feat | frontend | `feat(frontend): skills Clean Architecture para Angular e Vue` |
 | `mobile-*-flutter/` `mobile-*-android/` | feat | mobile | `feat(mobile): skills Clean Architecture para Flutter e Android` |
