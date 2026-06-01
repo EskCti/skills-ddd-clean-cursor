@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Docker (Java)'
+  short_description: 'Multi-stage Dockerfile for Spring Boot Java'
+  default_prompt: 'Crie Dockerfile multi-stage para apps/backend-java (Gradle bootJar + JRE 21). Inclua docker-compose.prod.yml e .dockerignore.'

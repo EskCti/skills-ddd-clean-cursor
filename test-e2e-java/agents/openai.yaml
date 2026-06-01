@@ -1,0 +1,4 @@
+interface:
+  display_name: 'E2E Tests (Java)'
+  short_description: 'MockMvc / @SpringBootTest integration'
+  default_prompt: 'Escreva testes E2E com @SpringBootTest + MockMvc. Fluxo HTTP completo POST→GET, Postgres de teste.'

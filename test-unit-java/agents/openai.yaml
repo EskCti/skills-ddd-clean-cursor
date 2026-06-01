@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Unit Tests (Java)'
+  short_description: 'JUnit 5 + JaCoCo unit tests'
+  default_prompt: 'Escreva testes unitários JUnit 5 para domain/application em packages/<bc>/. Mock repository ports, meta ≥95% coverage.'
