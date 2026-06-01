@@ -1,7 +1,7 @@
 ---
 name: config-project-fullstack
 stack: agnostic
-description: Orquestrar a criação de um projeto full-stack completo com backend (NestJS/Spring Boot/ASP.NET Core), frontend (Next.js/Angular/Vue com Tailwind CSS) e mobile opcional (Flutter/Android). Integrar OpenSpec para gerenciamento de mudanças ao longo do ciclo. Usar quando o pedido envolver criar um projeto do zero com múltiplas camadas, ou quando o usuário não sabe por onde começar.
+description: Orquestrar a criação de um projeto full-stack completo com backend (NestJS/Spring Boot/ASP.NET Core/Axum Rust), frontend (Next.js/Angular/Vue com Tailwind CSS) e mobile opcional (Flutter/Android). Integrar OpenSpec para gerenciamento de mudanças ao longo do ciclo. Usar quando o pedido envolver criar um projeto do zero com múltiplas camadas, ou quando o usuário não sabe por onde começar.
 ---
 
 # Config Project Full-Stack
@@ -20,7 +20,7 @@ Antes de iniciar, coletar as seguintes decisões:
 
 ```
 1. Nome do projeto: <kebab-case>
-2. Backend: [ ] NestJS (TypeScript)  [ ] Spring Boot (Kotlin)  [ ] ASP.NET Core (C#)
+2. Backend: [ ] NestJS (TypeScript)  [ ] Spring Boot (Kotlin)  [ ] ASP.NET Core (C#)  [ ] Axum (Rust)
 3. Frontend: [ ] Next.js (+ Tailwind/Shadcn)  [ ] Angular (+ Tailwind)  [ ] Vue 3 (+ Tailwind)  [ ] Nenhum
 4. Mobile:   [ ] Flutter  [ ] Android (Kotlin + Compose)  [ ] Ambos  [ ] Nenhum
 5. Autenticação: [ ] Básica (JWT)  [ ] Completa (RBAC)  [ ] Nenhuma por agora
@@ -44,6 +44,11 @@ Escolha o agent conforme a combinação:
 | Spring Boot (KT) | Vue 3 | `Config Project (Kotlin)` + `Config Project (Vue)` → `Config Shared Web (Vue)` | Backend primeiro; depois frontend + shell. |
 | ASP.NET Core (CS) | Angular | `Config Project (C#)` + `Config Project (Angular)` → `Config Shared Web (Angular)` | Backend primeiro; depois frontend + shell. |
 | ASP.NET Core (CS) | Vue 3 | `Config Project (C#)` + `Config Project (Vue)` → `Config Shared Web (Vue)` | Backend primeiro; depois frontend + shell. |
+| Axum (Rust) | Angular | `Config Project (Rust)` + `Config Project (Angular)` → `Config Shared Web (Angular)` | Cargo workspace na raiz ou `apps/backend/`; API em `:4000`; depois frontend + shell. |
+| Axum (Rust) | Vue 3 | `Config Project (Rust)` + `Config Project (Vue)` → `Config Shared Web (Vue)` | Idem; proxy Vite `/api` → `http://localhost:4000`. |
+| Axum (Rust) | Nenhum | `Config Project (Rust)` | API-only; mobile opcional apontando para `:4000`. |
+
+> **Rust**: backend é workspace Cargo (`shared-kernel` + `api` Axum), **não** monorepo Turbo. Layout modular por BC: `config-shared-core-rs/references/rust-namespace-layout.md` — camadas `domain` / `application` / `infrastructure` / `interfaces`, sem `domain::customer::Customer`.
 
 > **OpenSpec aqui**: Se usar OpenSpec, criar a mudança ANTES do bootstrap:
 > ```
@@ -81,6 +86,9 @@ Após o bootstrap de backend + frontend (+ mobile, se houver), configure **produ
 | TypeScript | `config-docker` | `config-cicd` |
 | Kotlin | `config-docker-kt` | `config-cicd-kt` |
 | C# | `config-docker-cs` | `config-cicd-cs` |
+| Rust | `config-docker-rs` | `config-cicd-rs` |
+
+> **Rust (bootstrap completo)**: após `Config Project (Rust)`, incluir `Config SQLx (Rust)` se migrations ainda não existirem, `Config Docker (Rust)` e `Config CI/CD (Rust)` (clippy, test, coverage ≥95% domain+application).
 
 > **OpenSpec aqui**: incluir `config-docker` e `config-cicd` na mudança `bootstrap-<nome>`:
 > ```
@@ -100,6 +108,7 @@ Após o bootstrap, configurar o kernel compartilhado de domínio:
 | TypeScript | `Config Shared Core` | "Crie o shared kernel com Entity, ValueObject, Result, IUseCase base." |
 | Kotlin | `Config Shared Core (Kotlin)` | "Crie o shared kernel Kotlin com Entity, VO, Result, UseCase, Repository interfaces." |
 | C# | `Config Shared Core (C#)` | "Crie o shared kernel C# com Entity, ValueObject, Result<T>, IUseCase, IRepository." |
+| Rust | `Config Shared Core (Rust)` | "Estenda crates/shared-kernel com Entity, ValueObject, Result, UseCase. Siga rust-namespace-layout.md — sem dependências Axum/sqlx no kernel." |
 
 > **OpenSpec aqui**: Para cada Bounded Context novo, use `openspec-propose` antes de criar o módulo:
 > ```
@@ -115,17 +124,19 @@ Após o bootstrap, configurar o kernel compartilhado de domínio:
 Para cada BC identificado no backlog, seguir esta ordem:
 
 ```
-1. domain:vo          → core-value-object[-kt|-cs]
-2. domain:entity      → core-entity[-kt|-cs]
-3. domain:service     → core-domain-service[-kt|-cs]   (se necessário)
-4. domain:repository  → core-repository[-kt|-cs]
-5. app:dto            → core-dto[-kt|-cs]
-6. app:usecase        → core-use-case[-kt|-cs]
-7. app:query          → core-query-cqrs[-kt|-cs]
-8. infra:persistence  → backend-data[-kt|-cs]
-9. infra:migration    → config-prisma | config-jpa-kt | config-efcore-cs
-10. interface:controller → backend-controller[-kt|-cs]
+1. domain:vo          → core-value-object[-kt|-cs|-rs]
+2. domain:entity      → core-entity[-kt|-cs|-rs]
+3. domain:service     → core-domain-service[-kt|-cs]   (Rust: lógica em domain/ ou aguardar core-domain-service-rs)
+4. domain:repository  → core-repository[-kt|-cs|-rs]
+5. app:dto            → core-dto[-kt|-cs|-rs]
+6. app:usecase        → core-use-case[-kt|-cs|-rs]
+7. app:query          → core-query-cqrs[-kt|-cs|-rs]
+8. infra:persistence  → backend-data[-kt|-cs|-rs] | backend-prisma-data (TS)
+9. infra:migration    → config-prisma | config-jpa-kt | config-efcore-cs | config-sqlx-rs
+10. interface:controller → backend-controller[-kt|-cs|-rs]
 ```
+
+> **Rust — novo BC**: antes das tasks acima, `Config New Module (Rust)` scaffold em `crates/api/src/modules/<bc>/`.
 
 ### 3A — Frontend Web (por página/feature)
 
@@ -169,6 +180,9 @@ Após a API estar pronta:
 | TypeScript | `Config Auth Core Basic` → `Config Auth Backend Basic` → `Config Auth Web Basic` | `Config Auth Core Full` |
 | Kotlin | `Config Auth Core Basic (Kotlin)` → `Config Auth Backend Basic (Kotlin)` | `Config Auth Core Full (Kotlin)` |
 | C# | `Config Auth Core (C#)` → `Config Auth Backend Basic (C#)` | `Config Auth Core Full (C#)` |
+| Rust | — (skills auth `-rs` em roadmap) | — |
+
+> **Rust + auth**: implementar manualmente ou reutilizar padrões de `config-auth-*` como referência até existirem skills `-rs` dedicados.
 
 ---
 
@@ -176,7 +190,7 @@ Após a API estar pronta:
 
 | Momento | Mudança sugerida | Agents envolvidos no apply |
 |---------|-----------------|---------------------------|
-| Bootstrap do projeto | `bootstrap-<nome>` | Config Project (*), Config Shared Web (*), Config Docker, Config CI/CD, Config Shared Core |
+| Bootstrap do projeto | `bootstrap-<nome>` | Config Project (*), Config Shared Web (*), Config Docker, Config CI/CD, Config Shared Core, Config SQLx (Rust se `-rs`) |
 | Novo Bounded Context | `bc-<nome>` ou `ep-XXX-<bc>` | Core *, Backend *, Frontend *, Mobile *, Unit Tests, E2E Tests |
 | Feature frontend | `feat-<nome>-<framework>` | Frontend Entity → UseCase → Repository → Page → Form |
 | Feature mobile | `feat-<nome>-<mobile>` | Mobile Entity → UseCase → Repository → Screen → Form |
@@ -197,7 +211,7 @@ Após a API estar pronta:
 6. Config Auth (se necessário)
 ```
 
-Tutoriais: [docs/tutorial/02-fullstack-project-setup.md](../docs/tutorial/02-fullstack-project-setup.md) · [docs/tutorial/stacks/](../docs/tutorial/stacks/)
+Tutoriais: [docs/tutorial/02-fullstack-project-setup.md](../docs/tutorial/02-fullstack-project-setup.md) · [docs/tutorial/stacks/](../docs/tutorial/stacks/) · [Rust + Vue + Flutter](../docs/tutorial/stacks/rust-vue-flutter.md)
 
 ---
 
