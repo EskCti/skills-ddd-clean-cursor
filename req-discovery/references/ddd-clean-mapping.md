@@ -20,40 +20,40 @@ Sistema fonte     req-discovery     req-ddd-modeling       req-migration-strateg
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
 │                           INTERFACE (API/UI)                            │
-│  backend-controller[-kt|-cs|-rs]                                        │
+│  backend-controller[-kt|-cs|-rs|-java]                                        │
 │  frontend-entity/usecase/repository/page/form[-angular|-vue]             │
 │  mobile-entity/usecase/repository/screen/form[-flutter|-android]         │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                          APPLICATION                                    │
-│  core-use-case[-kt|-cs|-rs] · core-dto[-kt|-cs|-rs] · core-query-cqrs[-kt|-cs|-rs] │
+│  core-use-case[-kt|-cs|-rs|-java] · core-dto[-kt|-cs|-rs|-java] · core-query-cqrs[-kt|-cs|-rs|-java] │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                            DOMAIN                                       │
-│  core-entity[-kt|-cs|-rs] · core-value-object[-kt|-cs|-rs]               │
-│  core-domain-service[-kt|-cs|-rs] · core-repository[-kt|-cs|-rs]        │
+│  core-entity[-kt|-cs|-rs|-java] · core-value-object[-kt|-cs|-rs|-java]               │
+│  core-domain-service[-kt|-cs|-rs|-java] · core-repository[-kt|-cs|-rs|-java]        │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                         INFRASTRUCTURE                                  │
-│  backend-prisma-data / backend-data-kt / backend-data-cs / backend-data-rs │
-│  config-prisma / config-jpa-kt / config-efcore-cs / config-sqlx-rs     │
-│  config-docker[-kt|-cs|-rs] · config-cicd[-kt|-cs|-rs]                  │
+│  backend-prisma-data / backend-data-kt / backend-data-cs / backend-data-rs / backend-data-java │
+│  config-prisma / config-jpa-kt / config-jpa-java / config-efcore-cs / config-sqlx-rs     │
+│  config-docker[-kt|-cs|-rs|-java] · config-cicd[-kt|-cs|-rs|-java]                  │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Conceitos DDD → Skills (backend)
 
-| Conceito DDD | Skill TS | Skill KT | Skill CS | Skill RS |
-|-------------|----------|----------|----------|----------|
-| **Bounded Context** | `config-new-module` | `config-new-module-kt` | `config-new-module-cs` | `config-new-module-rs` |
-| **Entity / Aggregate** | `core-entity` | `core-entity-kt` | `core-entity-cs` | `core-entity-rs` |
-| **Value Object** | `core-value-object` | `core-value-object-kt` | `core-value-object-cs` | `core-value-object-rs` |
-| **Domain Service** | `core-domain-service` | `core-domain-service-kt` | `core-domain-service-cs` | `core-domain-service-rs` |
-| **Repository (port)** | `core-repository` | `core-repository-kt` | `core-repository-cs` | `core-repository-rs` |
-| **Use Case** | `core-use-case` | `core-use-case-kt` | `core-use-case-cs` | `core-use-case-rs` |
-| **DTO** | `core-dto` | `core-dto-kt` | `core-dto-cs` | `core-dto-rs` |
-| **Query (CQRS)** | `core-query-cqrs` | `core-query-cqrs-kt` | `core-query-cqrs-cs` | `core-query-cqrs-rs` |
-| **Repository (adapter)** | `backend-prisma-data` | `backend-data-kt` | `backend-data-cs` | `backend-data-rs` |
-| **Controller** | `backend-controller` | `backend-controller-kt` | `backend-controller-cs` | `backend-controller-rs` |
-| **Bootstrap full-stack** | `config-project-fullstack` | (orquestrador agnóstico) | — | — |
-| **Docker / CI/CD** | `config-docker` / `config-cicd` | `config-docker-kt` / `config-cicd-kt` | `config-docker-cs` / `config-cicd-cs` | `config-docker-rs` / `config-cicd-rs` |
+| Conceito DDD | Skill TS | Skill KT | Skill CS | Skill RS | Skill Java |
+|-------------|----------|----------|----------|----------|------------|
+| **Bounded Context** | `config-new-module` | `config-new-module-kt` | `config-new-module-cs` | `config-new-module-rs` | `config-new-module-java` |
+| **Entity / Aggregate** | `core-entity` | `core-entity-kt` | `core-entity-cs` | `core-entity-rs` | `core-entity-java` |
+| **Value Object** | `core-value-object` | `core-value-object-kt` | `core-value-object-cs` | `core-value-object-rs` | `core-value-object-java` |
+| **Domain Service** | `core-domain-service` | `core-domain-service-kt` | `core-domain-service-cs` | `core-domain-service-rs` | `core-domain-service-java` |
+| **Repository (port)** | `core-repository` | `core-repository-kt` | `core-repository-cs` | `core-repository-rs` | `core-repository-java` |
+| **Use Case** | `core-use-case` | `core-use-case-kt` | `core-use-case-cs` | `core-use-case-rs` | `core-use-case-java` |
+| **DTO** | `core-dto` | `core-dto-kt` | `core-dto-cs` | `core-dto-rs` | `core-dto-java` |
+| **Query (CQRS)** | `core-query-cqrs` | `core-query-cqrs-kt` | `core-query-cqrs-cs` | `core-query-cqrs-rs` | `core-query-cqrs-java` |
+| **Repository (adapter)** | `backend-prisma-data` | `backend-data-kt` | `backend-data-cs` | `backend-data-rs` | `backend-data-java` |
+| **Controller** | `backend-controller` | `backend-controller-kt` | `backend-controller-cs` | `backend-controller-rs` | `backend-controller-java` |
+| **Bootstrap full-stack** | `config-project-fullstack` | (orquestrador agnóstico) | — | — | — |
+| **Docker / CI/CD** | `config-docker` / `config-cicd` | `config-docker-kt` / `config-cicd-kt` | `config-docker-cs` / `config-cicd-cs` | `config-docker-rs` / `config-cicd-rs` | `config-docker-java` / `config-cicd-java` |
 
 ## Frontend e Mobile (Clean Architecture completa)
 
@@ -86,10 +86,10 @@ Sistema fonte     req-discovery     req-ddd-modeling       req-migration-strateg
 
 ## Mapeamento de testes (Agent)
 
-| Task | Agent TS | Agent KT | Agent CS | Agent RS |
-|------|----------|----------|----------|----------|
-| `test:unit` / `test:coverage` | `Unit Tests (TypeScript)` | `Unit Tests (Kotlin)` | `Unit Tests (C#)` | `Unit Tests (Rust)` |
-| `test:e2e` | `E2E Tests (TypeScript)` | `E2E Tests (Kotlin)` | `E2E Tests (C#)` | `E2E Tests (Rust)` |
+| Task | Agent TS | Agent KT | Agent CS | Agent RS | Agent Java |
+|------|----------|----------|----------|----------|------------|
+| `test:unit` / `test:coverage` | `Unit Tests (TypeScript)` | `Unit Tests (Kotlin)` | `Unit Tests (C#)` | `Unit Tests (Rust)` | `Unit Tests (Java)` |
+| `test:e2e` | `E2E Tests (TypeScript)` | `E2E Tests (Kotlin)` | `E2E Tests (C#)` | `E2E Tests (Rust)` | `E2E Tests (Java)` |
 
 ## Notação de Task
 
@@ -125,7 +125,7 @@ Use sempre **Agent** (`display_name` do `agents/openai.yaml`) — nunca pasta de
 | Por BC | `ep-XXX-<bc>` ou `bc-<nome>` | Core *, Backend *, Frontend *, Mobile *, Unit Tests, E2E Tests |
 | Por feature UI | `feat-<nome>-<framework>` | Frontend Entity → Page/Form ou Mobile * |
 
-> Exemplos de tasks OpenSpec por stack: `docs/templates/openspec-csharp-task-examples.md`, `docs/templates/openspec-rust-task-examples.md`.
+> Exemplos de tasks OpenSpec por stack: `docs/templates/openspec-csharp-task-examples.md`, `docs/templates/openspec-rust-task-examples.md`, `docs/templates/openspec-java-task-examples.md`.
 
 ## Escolha da Stack
 
@@ -135,6 +135,7 @@ Use sempre **Agent** (`display_name` do `agents/openai.yaml`) — nunca pasta de
 | **Kotlin** | `-kt` | Spring Boot + JPA |
 | **C#** | `-cs` | ASP.NET Core + EF Core |
 | **Rust** | `-rs` | Axum + sqlx + Cargo workspace (modules por camada) |
+| **Java** | `-java` | Spring Boot + JPA + Gradle (domain em `packages/`, Spring em `apps/backend-java`) |
 | **Angular** | `-angular` | Angular 17+ + Tailwind + PrimeNG (widgets) |
 | **Vue** | `-vue` | Vue 3 + Tailwind + PrimeVue |
 | **Flutter** | `-flutter` | Flutter + Riverpod |
@@ -148,4 +149,4 @@ Use sempre **Agent** (`display_name` do `agents/openai.yaml`) — nunca pasta de
 | Prefixo de rota (`/auth/*`, `/orders/*`) | Bounded context |
 | Módulo/package/namespace separado | Bounded context explícito |
 
-Cada Bounded Context → 1 Épico (`req-agile-planning`) → 1 mudança OpenSpec → 1 módulo (`config-new-module[-rs]`).
+Cada Bounded Context → 1 Épico (`req-agile-planning`) → 1 mudança OpenSpec → 1 módulo (`config-new-module[-rs|-java]`).
