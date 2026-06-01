@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Query CQRS (Rust)'
+  short_description: 'Queries de leitura Rust'
+  default_prompt: 'Crie Find<Entity>ById em modules/<bc>/application/ retornando <Entity>Output via repositório.'
