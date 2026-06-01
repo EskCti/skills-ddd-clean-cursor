@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config SQLx (Rust)'
+  short_description: 'Migrations e pool sqlx Postgres'
+  default_prompt: 'Configure sqlx migrations para o BC <nome>. Tabelas em migrations/; records de infra separados do domínio.'

@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config New Module (Rust)'
+  short_description: 'Scaffold Bounded Context modular em Rust'
+  default_prompt: 'Crie o módulo BC <nome> em crates/api/src/modules/ com camadas domain/application/infrastructure/interfaces. Entity na camada domain (ex. domain::Customer), sem submódulo customer::Customer.'

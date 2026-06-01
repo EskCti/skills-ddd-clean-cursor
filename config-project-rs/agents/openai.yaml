@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Project (Rust)'
+  short_description: 'Bootstrap workspace Rust Axum + sqlx + modular BCs'
+  default_prompt: 'Inicialize um workspace Rust com Axum, sqlx, shared-kernel e modules/ por Bounded Context. Siga rust-namespace-layout.md — camadas domain/application/infrastructure/interfaces sem nomes redundantes.'
