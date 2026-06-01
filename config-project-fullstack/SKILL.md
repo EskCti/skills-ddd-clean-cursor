@@ -126,7 +126,7 @@ Para cada BC identificado no backlog, seguir esta ordem:
 ```
 1. domain:vo          → core-value-object[-kt|-cs|-rs]
 2. domain:entity      → core-entity[-kt|-cs|-rs]
-3. domain:service     → core-domain-service[-kt|-cs]   (Rust: lógica em domain/ ou aguardar core-domain-service-rs)
+3. domain:service     → core-domain-service[-kt|-cs|-rs]   (se necessário)
 4. domain:repository  → core-repository[-kt|-cs|-rs]
 5. app:dto            → core-dto[-kt|-cs|-rs]
 6. app:usecase        → core-use-case[-kt|-cs|-rs]

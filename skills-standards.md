@@ -312,7 +312,7 @@ Infrastructure       →  backend-prisma-data (TS) / backend-data-kt (KT) / back
 | -------------- | ------------------- | ---------------------- | ------------------------ | ------------------------ | ------------------------ |
 | Domain         | Entity              | `core-entity`          | `core-entity-kt`         | `core-entity-cs`         | `core-entity-rs`         |
 | Domain         | Value Object        | `core-value-object`    | `core-value-object-kt`   | `core-value-object-cs`   | `core-value-object-rs`   |
-| Domain         | Domain Service      | `core-domain-service`  | `core-domain-service-kt` | `core-domain-service-cs` | —                        |
+| Domain         | Domain Service      | `core-domain-service`  | `core-domain-service-kt` | `core-domain-service-cs` | `core-domain-service-rs` |
 | Domain         | Repository port     | `core-repository`      | `core-repository-kt`     | `core-repository-cs`     | `core-repository-rs`     |
 | Application    | Use Case            | `core-use-case`        | `core-use-case-kt`       | `core-use-case-cs`       | `core-use-case-rs`       |
 | Application    | DTO                 | `core-dto`             | `core-dto-kt`            | `core-dto-cs`            | `core-dto-rs`            |
@@ -391,7 +391,7 @@ When implementing a feature, follow this order:
 
 | Scope | Target | Enforced in CI |
 |-------|--------|----------------|
-| **Domain + Application** (por BC/módulo) | **≥95% lines** | Sim — `config-cicd[-kt\|-cs]` falha o build se abaixo |
+| **Domain + Application** (por BC/módulo) | **≥95% lines** | Sim — `config-cicd[-kt\|-cs\|-rs]` falha o build se abaixo |
 | Infrastructure (adapters, controllers) | ≥80% lines | Recomendado |
 | Frontend / Mobile (presentation) | ≥70% lines | Recomendado |
 | E2E | Fluxos críticos cobertos | Obrigatório para MVP |
@@ -403,6 +403,7 @@ When implementing a feature, follow this order:
 - **TypeScript**: Jest + `--coverage` + `coverageThreshold` em `jest.config` ou validação no CI
 - **Kotlin**: JaCoCo report + gate no Gradle (`min 0.95` para packages `*.domain.*` e `*.application.*`)
 - **C#**: Coverlet + `--collect:"XPlat Code Coverage"` + threshold no CI
+- **Rust**: `cargo llvm-cov` + gate no CI (`config-cicd-rs`) para packages domain+application
 
 > Este repositório de skills **não executa testes** — os templates gerados (`config-shared-core`, `config-auth-*`) incluem exemplos com `jest --coverage`. A meta de 95% é aplicada nos **projetos gerados** via `config-cicd` e tasks `test:coverage` do backlog.
 

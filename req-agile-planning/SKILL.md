@@ -263,7 +263,7 @@ Se a stack **não foi escolhida ainda**, mostrar as 3 opções:
 | ---------------------- | ----------------------- | -------------------------------- | ----------------------- | ----------------------- |
 | `domain:vo` | `Core Value Object` | `Core Value Object (Kotlin)` | `Core Value Object (C#)` | `Core Value Object (Rust)` |
 | `domain:entity` | `Core Entity` | `Core Entity (Kotlin)` | `Core Entity (C#)` | `Core Entity (Rust)` |
-| `domain:service` | `Core Domain Service` | `Core Domain Service (Kotlin)` | `Core Domain Service (C#)` | — |
+| `domain:service` | `Core Domain Service` | `Core Domain Service (Kotlin)` | `Core Domain Service (C#)` | `Core Domain Service (Rust)` |
 | `domain:repository` | `Core Repository` | `Core Repository (Kotlin)` | `Core Repository (C#)` | `Core Repository (Rust)` |
 | `app:dto` | `Core DTO` | `Core DTO (Kotlin)` | `Core DTO (C#)` | `Core DTO (Rust)` |
 | `app:usecase` | `Core Use Case` | `Core Use Case (Kotlin)` | `Core Use Case (C#)` | `Core Use Case (Rust)` |
