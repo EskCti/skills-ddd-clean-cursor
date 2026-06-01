@@ -13,6 +13,9 @@ Referência para o agent **Organized Git Commits**. Ajuste paths conforme o `git
 | `config-project-angular/` `config-project-vue/` `config-project-flutter/` `config-project-android/` | feat | config | `feat(config): bootstrap Angular, Vue, Flutter e Android` |
 | `config-project/` E2E, `config-new-module*/` | feat | config | `feat(config): scaffold E2E automático no bootstrap NestJS` |
 | `config-project-cs/` | feat | config | `feat(config): template C# com UnitTests e IntegrationTests` |
+| `config-project-rs/` `config-shared-core-rs/` `config-new-module-rs/` `config-sqlx-rs/` | feat | config | `feat(config): bootstrap Rust Axum modular por BC` |
+| `core-*-rs/` `backend-*-rs/` | feat | core/backend | `feat(rust): skills domain/application/infra Axum` |
+| `config-docker-rs/` `config-cicd-rs/` `test-*-rs/` | feat | config/test | `feat(rust): docker, CI/CD e testes Rust` |
 | `test-unit*/` `test-e2e*/` + jest/gradle thresholds | feat | test | `feat(test): skills de testes unitários e E2E para TS, Kotlin e C#` |
 | `frontend-*-angular/` `frontend-*-vue/` | feat | frontend | `feat(frontend): skills Clean Architecture para Angular e Vue` |
 | `mobile-*-flutter/` `mobile-*-android/` | feat | mobile | `feat(mobile): skills Clean Architecture para Flutter e Android` |
