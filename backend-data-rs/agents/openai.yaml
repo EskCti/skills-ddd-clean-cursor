@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Backend Data (Rust)'
+  short_description: 'Persistência sqlx Rust'
+  default_prompt: 'Implemente <Entity>RepositorySqlx em modules/<bc>/infrastructure/persistence/ para o trait domain::ports::<Entity>Repository. Use CustomerRecord separado do domínio.'
