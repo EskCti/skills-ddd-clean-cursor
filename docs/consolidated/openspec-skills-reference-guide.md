@@ -25,6 +25,7 @@
 | **OpenSpec C# Task Examples** | Exemplos práticos específicos para stack C# | [templates/openspec-csharp-task-examples.md](file:///home/eskokado/projetos/eskcti/saas/ecommerce_cs/.agents/skills/docs/templates/openspec-csharp-task-examples.md) | ✅ |
 | **OpenSpec TypeScript Task Examples** | Exemplos práticos específicos para stack TypeScript | [templates/openspec-typescript-task-examples.md](file:///home/eskokado/projetos/eskcti/saas/ecommerce_cs/.agents/skills/docs/templates/openspec-typescript-task-examples.md) | ✅ |
 | **OpenSpec Kotlin Task Examples** | Exemplos práticos específicos para stack Kotlin | [templates/openspec-kotlin-task-examples.md](file:///home/eskokado/projetos/eskcti/saas/ecommerce_cs/.agents/skills/docs/templates/openspec-kotlin-task-examples.md) | ✅ |
+| **OpenSpec Rust Task Examples** | Exemplos práticos para stack Rust (Axum + Vue + Flutter) | [templates/openspec-rust-task-examples.md](../templates/openspec-rust-task-examples.md) | ✅ |
 
 ### **3. Templates Padronizados**
 | Documento | Descrição | Localização | Status |

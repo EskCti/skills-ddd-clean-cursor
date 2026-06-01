@@ -185,6 +185,7 @@ openspec-propose "bc-customers"
 Config New Module (Rust)
 Core Value Object (Rust)   → Email, Cpf em domain/value_objects/
 Core Entity (Rust)         → Customer em domain/entity.rs
+Core Domain Service (Rust) → CpfUniquenessPolicy em domain/services/ (se necessário)
 Core Repository (Rust)     → trait CustomerRepository em domain/ports/
 Core DTO (Rust)            → CreateCustomerInput, CustomerOutput
 Core Use Case (Rust)       → CreateCustomer
@@ -206,6 +207,10 @@ E2E Tests (Rust)           → POST → GET integração HTTP
 - [ ] `domain:entity` Criar entidade Customer (~2h)
   - **Agent:** `Core Entity (Rust)`
   - **Prompt:** "Crie Customer em modules/customers/domain/entity.rs. Aggregate root com create() → Result e métodos de domínio."
+
+- [ ] `domain:service` CpfUniquenessPolicy (~1h)
+  - **Agent:** `Core Domain Service (Rust)`
+  - **Prompt:** "Crie CpfUniquenessPolicy em domain/services/ — regra pura, sem I/O. Retorne Result."
 
 - [ ] `domain:repository` Port CustomerRepository (~1h)
   - **Agent:** `Core Repository (Rust)`
