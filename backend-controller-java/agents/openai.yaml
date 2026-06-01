@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Backend Controller (Java)'
+  short_description: 'Spring @RestController — thin HTTP layer'
+  default_prompt: 'Crie @RestController em modules/<bc>/interfaces/web/. Delega use case, mapeia Result → ResponseEntity, sem regra de domínio.'

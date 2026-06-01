@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Entity (Java)'
+  short_description: 'Entidades de domínio Java'
+  default_prompt: 'Crie a entidade <Nome> em packages/<bc>/domain/entity/. Aggregate root com create() → Result e métodos de domínio. Sem sufixo Entity.'
