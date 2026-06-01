@@ -106,13 +106,13 @@ When editing any skill (`*/SKILL.md`):
 | Category        | Prefix                     | Purpose                                                          | Stack                        |
 | --------------- | -------------------------- | ---------------------------------------------------------------- | ---------------------------- |
 | Orquestrador    | `config-project-fullstack` | **Ponto de entrada** para projetos completos — define agents em sequência e integra OpenSpec | Agnostic |
-| Config          | `config-*`                 | Bootstrap/scaffolding de projeto, módulo ou infra                | TS, KT, CS, Angular, Vue, Flutter, Android |
-| Core       | `core-*`     | Padrões de domínio e aplicação (entity, VO, use case)            | TS, KT or CS                 |
-| Backend    | `backend-*`  | Camada de infraestrutura/interface do backend                    | TS, KT or CS                 |
+| Config          | `config-*`                 | Bootstrap/scaffolding de projeto, módulo ou infra                | TS, KT, CS, RS, Angular, Vue, Flutter, Android |
+| Core       | `core-*`     | Padrões de domínio e aplicação (entity, VO, use case)            | TS, KT, CS or RS                 |
+| Backend    | `backend-*`  | Camada de infraestrutura/interface do backend                    | TS, KT, CS or RS                 |
 | Frontend   | `frontend-*` | Camada de interface web (Tailwind + Next.js/Angular/Vue) | TS, Angular, Vue             |
 | Mobile     | `mobile-*`   | Telas e formulários mobile (Flutter, Android Compose)            | Flutter, Android (Kotlin)    |
 | Requisitos | `req-*`      | Discovery, modelagem DDD, migração e planejamento                | Agnostic                     |
-| Qualidade  | `test-*`     | Testes unitários (≥95% domain/app) e E2E (fluxos críticos)       | TS, KT, CS                   |
+| Qualidade  | `test-*`     | Testes unitários (≥95% domain/app) e E2E (fluxos críticos)       | TS, KT, CS, RS                   |
 | OpenSpec   | `openspec-*` | Fluxo de proposta/exploração/implementação                       | Agnostic                     |
 | Workflow   | `git-*`      | Automação de fluxo de trabalho (commits organizados, etc.)       | Agnostic                     |
 
@@ -123,6 +123,7 @@ When editing any skill (`*/SKILL.md`):
 | TypeScript        | (none)      | NestJS + Prisma + Next.js/React   | Templates + scripts                                 |
 | Kotlin            | `-kt`       | Spring Boot + JPA + Gradle        | Templates + scripts                                 |
 | C#                | `-cs`       | ASP.NET Core + EF Core            | Templates + scripts                                 |
+| **Rust**          | `-rs`       | Axum + sqlx + Cargo workspace     | Templates + scripts                                 |
 | Angular           | `-angular`  | Angular 17+ standalone + Tailwind + PrimeNG (widgets) | Templates                      |
 | Vue               | `-vue`      | Vue 3 + Tailwind + PrimeVue + Pinia | Templates                                        |
 | Flutter           | `-flutter`  | Flutter + Riverpod + Dio          | Templates                                           |
@@ -238,38 +239,94 @@ C# files do not use dot-separated type suffixes in filenames. The type is expres
 - Core use case: `src/Project.Core/Application/UseCases/CreateCustomerUseCase.cs`
 - Core repository: `src/Project.Core/Domain/Repositories/ICustomerRepository.cs`
 
-## 9. DDD / Clean Architecture Standards
+## 9. Rust Stack Standards
+
+### Naming Pattern
+
+- **Bounded Context folder**: kebab-case — `modules/customers/`
+- **Rust module**: snake_case — `mod customers;`
+- **Types**: PascalCase — `Customer`, `Email`, `CreateCustomer`
+- **Files**: snake_case — `entity.rs`, `repository_sqlx.rs`, `create_customer.rs`
+- **Skill directories**: kebab-case com sufixo `-rs`
+
+### Namespace layout (obrigatório)
+
+Consultar `config-shared-core-rs/references/rust-namespace-layout.md`.
+
+| Evitar | Usar |
+|--------|------|
+| `customers::domain::customer::Customer` | `customers::domain::Customer` |
+| `domain::cliente::Cliente` | `customers::domain::Customer` |
+| `CustomerEntity` no domínio | `Customer` (domínio) + `CustomerRecord` (infra) |
+
+Camadas por BC: `domain` → `application` → `infrastructure` → `interfaces::http`.
+
+### Recommended paths
+
+| Layer | Path |
+|-------|------|
+| Entity | `crates/api/src/modules/<bc>/domain/entity.rs` |
+| VO | `.../domain/value_objects/email.rs` |
+| Port | `.../domain/ports/repository.rs` |
+| Use case | `.../application/create_customer.rs` |
+| DTO | `.../application/dto.rs` |
+| Adapter | `.../infrastructure/persistence/repository_sqlx.rs` |
+| HTTP | `.../interfaces/http/handlers.rs` |
+| Shared kernel | `crates/shared-kernel/src/` |
+
+### Structural conventions
+
+- Workspace Cargo: `shared-kernel` + `api` binary crate.
+- HTTP: Axum; DB: sqlx + Postgres; async: Tokio.
+- Ports as `async_trait` traits in `domain::ports`.
+- Adapters named `*RepositorySqlx`, `*Sqlx` — never same name as port struct and domain entity.
+- `shared_kernel::Result<T>` for domain/application errors.
+- Code identifiers in **English**; Portuguese only in UX/docs.
+
+### Quick examples
+
+- Domain entity: `crate::modules::customers::domain::Customer`
+- VO: `crate::modules::customers::domain::Email`
+- Port: `crate::modules::customers::domain::ports::CustomerRepository`
+- Use case: `crate::modules::customers::application::CreateCustomer`
+- Adapter: `crate::modules::customers::infrastructure::persistence::CustomerRepositorySqlx`
+- Handler: `crate::modules::customers::interfaces::http::create_customer`
+
+## 10. DDD / Clean Architecture Standards
 
 ### Layer Model
 
 All skills follow the same Clean Architecture layer model:
 
 ```
-Interface (API/UI)   →  backend-controller[-kt|-cs], frontend-form-schema
-Application          →  core-use-case[-kt|-cs], core-dto[-kt|-cs], core-query-cqrs[-kt|-cs]
-Domain               →  core-entity[-kt|-cs], core-value-object[-kt|-cs], core-domain-service[-kt|-cs], core-repository[-kt|-cs]
-Infrastructure       →  backend-prisma-data (TS) / backend-data-kt (KT) / backend-data-cs (CS)
-                        config-prisma (TS) / config-jpa-kt (KT) / config-efcore-cs (CS)
+Interface (API/UI)   →  backend-controller[-kt|-cs|-rs], frontend-form-schema
+Application          →  core-use-case[-kt|-cs|-rs], core-dto[-kt|-cs|-rs], core-query-cqrs[-kt|-cs|-rs]
+Domain               →  core-entity[-kt|-cs|-rs], core-value-object[-kt|-cs|-rs], core-domain-service[-kt|-cs|-rs], core-repository[-kt|-cs|-rs]
+Infrastructure       →  backend-prisma-data (TS) / backend-data-kt (KT) / backend-data-cs (CS) / backend-data-rs (RS)
+                        config-prisma (TS) / config-jpa-kt (KT) / config-efcore-cs (CS) / config-sqlx-rs (RS)
 ```
 
 ### Implementation by Stack
 
-| Layer          | Concept             | Skill TS               | Skill KT                 | Skill CS                 |
-| -------------- | ------------------- | ---------------------- | ------------------------ | ------------------------ |
-| Domain         | Entity              | `core-entity`          | `core-entity-kt`         | `core-entity-cs`         |
-| Domain         | Value Object        | `core-value-object`    | `core-value-object-kt`   | `core-value-object-cs`   |
-| Domain         | Domain Service      | `core-domain-service`  | `core-domain-service-kt` | `core-domain-service-cs` |
-| Domain         | Repository port     | `core-repository`      | `core-repository-kt`     | `core-repository-cs`     |
-| Application    | Use Case            | `core-use-case`        | `core-use-case-kt`       | `core-use-case-cs`       |
-| Application    | DTO                 | `core-dto`             | `core-dto-kt`            | `core-dto-cs`            |
-| Application    | Query CQRS          | `core-query-cqrs`      | `core-query-cqrs-kt`     | `core-query-cqrs-cs`     |
-| Infrastructure | Persistence adapter | `backend-prisma-data`  | `backend-data-kt`        | `backend-data-cs`        |
-| Infrastructure | Migration           | `config-prisma`        | `config-jpa-kt`          | `config-efcore-cs`       |
-| Infrastructure | Docker (produção)   | `config-docker`        | `config-docker-kt`       | `config-docker-cs`       |
-| Infrastructure | CI/CD               | `config-cicd`          | `config-cicd-kt`         | `config-cicd-cs`         |
-| Interface      | Controller          | `backend-controller`   | `backend-controller-kt`  | `backend-controller-cs`  |
-| Quality        | Unit tests          | `test-unit`            | `test-unit-kt`           | `test-unit-cs`           |
-| Quality        | E2E tests           | `test-e2e`             | `test-e2e-kt`            | `test-e2e-cs`            |
+| Layer          | Concept             | Skill TS               | Skill KT                 | Skill CS                 | Skill RS                 |
+| -------------- | ------------------- | ---------------------- | ------------------------ | ------------------------ | ------------------------ |
+| Domain         | Entity              | `core-entity`          | `core-entity-kt`         | `core-entity-cs`         | `core-entity-rs`         |
+| Domain         | Value Object        | `core-value-object`    | `core-value-object-kt`   | `core-value-object-cs`   | `core-value-object-rs`   |
+| Domain         | Domain Service      | `core-domain-service`  | `core-domain-service-kt` | `core-domain-service-cs` | —                        |
+| Domain         | Repository port     | `core-repository`      | `core-repository-kt`     | `core-repository-cs`     | `core-repository-rs`     |
+| Application    | Use Case            | `core-use-case`        | `core-use-case-kt`       | `core-use-case-cs`       | `core-use-case-rs`       |
+| Application    | DTO                 | `core-dto`             | `core-dto-kt`            | `core-dto-cs`            | `core-dto-rs`            |
+| Application    | Query CQRS          | `core-query-cqrs`      | `core-query-cqrs-kt`     | `core-query-cqrs-cs`     | `core-query-cqrs-rs`     |
+| Infrastructure | Persistence adapter | `backend-prisma-data`  | `backend-data-kt`        | `backend-data-cs`        | `backend-data-rs`        |
+| Infrastructure | Migration           | `config-prisma`        | `config-jpa-kt`          | `config-efcore-cs`       | `config-sqlx-rs`         |
+| Infrastructure | Docker (produção)   | `config-docker`        | `config-docker-kt`       | `config-docker-cs`       | `config-docker-rs`       |
+| Infrastructure | CI/CD               | `config-cicd`          | `config-cicd-kt`         | `config-cicd-cs`         | `config-cicd-rs`         |
+| Interface      | Controller          | `backend-controller`   | `backend-controller-kt`  | `backend-controller-cs`  | `backend-controller-rs`  |
+| Quality        | Unit tests          | `test-unit`            | `test-unit-kt`           | `test-unit-cs`           | `test-unit-rs`           |
+| Quality        | E2E tests           | `test-e2e`             | `test-e2e-kt`            | `test-e2e-cs`            | `test-e2e-rs`            |
+| Bootstrap      | Project             | `config-project`       | `config-project-kt`      | `config-project-cs`      | `config-project-rs`      |
+| Bootstrap      | Shared kernel       | `config-shared-core`   | `config-shared-core-kt`  | `config-shared-core-cs`  | `config-shared-core-rs`  |
+| Bootstrap      | New module          | `config-new-module`    | `config-new-module-kt`   | `config-new-module-cs`   | `config-new-module-rs`   |
 | Interface      | Form (Next.js)      | `frontend-form-schema` | —                        | —                        |
 | Frontend       | Projeto full-stack  | `config-project` (Next.js) | `config-project-angular` | `config-project-vue`  |
 | Frontend       | **Domínio** (Entity + Result) | — | `frontend-entity-angular` | `frontend-entity-vue` |
@@ -291,7 +348,7 @@ Infrastructure       →  backend-prisma-data (TS) / backend-data-kt (KT) / back
 >
 > **Padrão Result**: TypeScript usa `Result<T, E>` com `ok()/err()`. Dart/Flutter usa `sealed class Result<T>` (Success/Failure). Android/Kotlin usa `kotlin.Result<T>` com `sealed class Failure`.
 
-> The `req-discovery` skill reads systems in any language/architecture. The agile planning and implementation always use the skills above (TS, KT or CS).
+> The `req-discovery` skill reads systems in any language/architecture. The agile planning and implementation always use the skills above (TS, KT, CS or RS).
 
 ### DDD Concept → Skill Mapping
 
@@ -304,7 +361,7 @@ Infrastructure       →  backend-prisma-data (TS) / backend-data-kt (KT) / back
 | Domain Service       | `core-domain-service`                                         |
 | Repository (port)    | `core-repository`                                             |
 | Controller           | `backend-controller`                                          |
-| Repository (adapter) | `backend-prisma-data` / `backend-data-kt` / `backend-data-cs` |
+| Repository (adapter) | `backend-prisma-data` / `backend-data-kt` / `backend-data-cs` / `backend-data-rs` |
 | Use Case             | `core-use-case`                                               |
 | DTO                  | `core-dto`                                                    |
 | Query (CQRS)         | `core-query-cqrs`                                             |
