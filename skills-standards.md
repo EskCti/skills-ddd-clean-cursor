@@ -121,7 +121,8 @@ When editing any skill (`*/SKILL.md`):
 | Stack             | Suffix      | Framework                         | Automação                                           |
 | ----------------- | ----------- | --------------------------------- | --------------------------------------------------- |
 | TypeScript        | (none)      | NestJS + Prisma + Next.js/React   | Templates + scripts                                 |
-| Kotlin            | `-kt`       | Spring Boot + JPA + Gradle        | Templates + scripts                                 |
+| Kotlin            | `-kt`       | Spring Boot + JPA + Gradle (Kotlin) | Templates + scripts                                 |
+| Java              | `-java`     | Spring Boot + JPA + Gradle (Java)   | Templates + scripts                                 |
 | C#                | `-cs`       | ASP.NET Core + EF Core            | Templates + scripts                                 |
 | **Rust**          | `-rs`       | Axum + sqlx + Cargo workspace     | Templates + scripts                                 |
 | Angular           | `-angular`  | Angular 17+ standalone + Tailwind + PrimeNG (widgets) | Templates                      |
@@ -132,7 +133,7 @@ When editing any skill (`*/SKILL.md`):
 
 ### Source vs Target
 
-The `req-discovery` skill can **read** systems in any language (PHP, Go, Python, Java, Ruby, etc.). The output is always structured in DDD/Clean Architecture, and the tasks in the agile planning always reference implementation skills from this repository (TypeScript, Kotlin or C#).
+The `req-discovery` skill can **read** systems in any language (PHP, Go, Python, Java, Ruby, etc.). The output is always structured in DDD/Clean Architecture, and the tasks in the agile planning always reference implementation skills from this repository (TypeScript, Kotlin, C#, Rust or Java).
 
 ## 6. Quick Examples (TypeScript)
 
@@ -292,41 +293,95 @@ Camadas por BC: `domain` → `application` → `infrastructure` → `interfaces:
 - Adapter: `crate::modules::customers::infrastructure::persistence::CustomerRepositorySqlx`
 - Handler: `crate::modules::customers::interfaces::http::create_customer`
 
-## 10. DDD / Clean Architecture Standards
+## 10. Java Stack Standards
+
+### Naming Pattern
+
+- **Bounded Context folder**: kebab-case — `packages/customers/`
+- **Java package**: lowercase dot-separated — `com.example.customers.domain.entity`
+- **Types**: PascalCase — `Customer`, `Email`, `CreateCustomerUseCase`
+- **Skill directories**: kebab-case com sufixo `-java`
+
+### Namespace layout (obrigatório)
+
+Consultar `config-shared-core-java/references/java-namespace-layout.md`.
+
+| Evitar | Usar |
+|--------|------|
+| `customers.domain.entity.customer.CustomerEntity` | `customers.domain.entity.Customer` |
+| `domain.cliente.Cliente` | `customers.domain.entity.Customer` |
+| Spring em `packages/<bc>/` | Spring **somente** em `apps/backend-java/modules/<bc>/` |
+| `CustomerEntity` no domínio | `Customer` (domínio) + `CustomerJpaEntity` (infra) |
+
+Camadas: `packages/<bc>/` (domain + application, pure Java) → `apps/backend-java/modules/<bc>/` (infrastructure + interfaces, Spring).
+
+### Recommended paths
+
+| Layer | Path |
+|-------|------|
+| Entity | `packages/<bc>/src/main/java/.../domain/entity/Customer.java` |
+| VO | `.../domain/valueobject/Email.java` |
+| Port | `.../domain/repository/CustomerRepository.java` |
+| Use case | `.../application/usecase/CreateCustomerUseCase.java` |
+| DTO | `.../application/dto/CreateCustomerInput.java` |
+| JPA adapter | `apps/backend-java/.../modules/<bc>/infrastructure/persistence/` |
+| Controller | `.../interfaces/web/CustomerController.java` |
+| Shared kernel | `packages/shared/` |
+
+### Structural conventions
+
+- Gradle multi-module: `packages/shared` + `packages/<bc>` + `apps/backend-java`.
+- Spring Boot 3 + JPA + Flyway; Postgres via docker-compose.
+- Domain/application **sem** anotações Spring (`@Entity`, `@Service` proibidos em `packages/<bc>/`).
+- Ports as interfaces in `domain.repository`; adapters `*RepositoryAdapter` + `*JpaEntity` na infra.
+- `com.example.shared.Result<T>` for domain/application errors.
+- Code identifiers in **English**; Portuguese only in UX/docs.
+- Default API port: **4000**.
+
+### Quick examples
+
+- Domain entity: `com.example.customers.domain.entity.Customer`
+- VO: `com.example.customers.domain.valueobject.Email`
+- Port: `com.example.customers.domain.repository.CustomerRepository`
+- Use case: `com.example.customers.application.usecase.CreateCustomerUseCase`
+- JPA entity: `com.example.modules.customers.infrastructure.persistence.CustomerJpaEntity`
+- Controller: `com.example.modules.customers.interfaces.web.CustomerController`
+
+## 11. DDD / Clean Architecture Standards
 
 ### Layer Model
 
 All skills follow the same Clean Architecture layer model:
 
 ```
-Interface (API/UI)   →  backend-controller[-kt|-cs|-rs], frontend-form-schema
-Application          →  core-use-case[-kt|-cs|-rs], core-dto[-kt|-cs|-rs], core-query-cqrs[-kt|-cs|-rs]
-Domain               →  core-entity[-kt|-cs|-rs], core-value-object[-kt|-cs|-rs], core-domain-service[-kt|-cs|-rs], core-repository[-kt|-cs|-rs]
-Infrastructure       →  backend-prisma-data (TS) / backend-data-kt (KT) / backend-data-cs (CS) / backend-data-rs (RS)
-                        config-prisma (TS) / config-jpa-kt (KT) / config-efcore-cs (CS) / config-sqlx-rs (RS)
+Interface (API/UI)   →  backend-controller[-kt|-cs|-rs|-java], frontend-form-schema
+Application          →  core-use-case[-kt|-cs|-rs|-java], core-dto[-kt|-cs|-rs|-java], core-query-cqrs[-kt|-cs|-rs|-java]
+Domain               →  core-entity[-kt|-cs|-rs|-java], core-value-object[-kt|-cs|-rs|-java], core-domain-service[-kt|-cs|-rs|-java], core-repository[-kt|-cs|-rs|-java]
+Infrastructure       →  backend-prisma-data (TS) / backend-data-kt (KT) / backend-data-cs (CS) / backend-data-rs (RS) / backend-data-java (Java)
+                        config-prisma (TS) / config-jpa-kt|config-jpa-java (KT/Java) / config-efcore-cs (CS) / config-sqlx-rs (RS)
 ```
 
 ### Implementation by Stack
 
-| Layer          | Concept             | Skill TS               | Skill KT                 | Skill CS                 | Skill RS                 |
-| -------------- | ------------------- | ---------------------- | ------------------------ | ------------------------ | ------------------------ |
-| Domain         | Entity              | `core-entity`          | `core-entity-kt`         | `core-entity-cs`         | `core-entity-rs`         |
-| Domain         | Value Object        | `core-value-object`    | `core-value-object-kt`   | `core-value-object-cs`   | `core-value-object-rs`   |
-| Domain         | Domain Service      | `core-domain-service`  | `core-domain-service-kt` | `core-domain-service-cs` | `core-domain-service-rs` |
-| Domain         | Repository port     | `core-repository`      | `core-repository-kt`     | `core-repository-cs`     | `core-repository-rs`     |
-| Application    | Use Case            | `core-use-case`        | `core-use-case-kt`       | `core-use-case-cs`       | `core-use-case-rs`       |
-| Application    | DTO                 | `core-dto`             | `core-dto-kt`            | `core-dto-cs`            | `core-dto-rs`            |
-| Application    | Query CQRS          | `core-query-cqrs`      | `core-query-cqrs-kt`     | `core-query-cqrs-cs`     | `core-query-cqrs-rs`     |
-| Infrastructure | Persistence adapter | `backend-prisma-data`  | `backend-data-kt`        | `backend-data-cs`        | `backend-data-rs`        |
-| Infrastructure | Migration           | `config-prisma`        | `config-jpa-kt`          | `config-efcore-cs`       | `config-sqlx-rs`         |
-| Infrastructure | Docker (produção)   | `config-docker`        | `config-docker-kt`       | `config-docker-cs`       | `config-docker-rs`       |
-| Infrastructure | CI/CD               | `config-cicd`          | `config-cicd-kt`         | `config-cicd-cs`         | `config-cicd-rs`         |
-| Interface      | Controller          | `backend-controller`   | `backend-controller-kt`  | `backend-controller-cs`  | `backend-controller-rs`  |
-| Quality        | Unit tests          | `test-unit`            | `test-unit-kt`           | `test-unit-cs`           | `test-unit-rs`           |
-| Quality        | E2E tests           | `test-e2e`             | `test-e2e-kt`            | `test-e2e-cs`            | `test-e2e-rs`            |
-| Bootstrap      | Project             | `config-project`       | `config-project-kt`      | `config-project-cs`      | `config-project-rs`      |
-| Bootstrap      | Shared kernel       | `config-shared-core`   | `config-shared-core-kt`  | `config-shared-core-cs`  | `config-shared-core-rs`  |
-| Bootstrap      | New module          | `config-new-module`    | `config-new-module-kt`   | `config-new-module-cs`   | `config-new-module-rs`   |
+| Layer          | Concept             | Skill TS               | Skill KT                 | Skill CS                 | Skill RS                 | Skill Java               |
+| -------------- | ------------------- | ---------------------- | ------------------------ | ------------------------ | ------------------------ | ------------------------ |
+| Domain         | Entity              | `core-entity`          | `core-entity-kt`         | `core-entity-cs`         | `core-entity-rs`         | `core-entity-java`       |
+| Domain         | Value Object        | `core-value-object`    | `core-value-object-kt`   | `core-value-object-cs`   | `core-value-object-rs`   | `core-value-object-java` |
+| Domain         | Domain Service      | `core-domain-service`  | `core-domain-service-kt` | `core-domain-service-cs` | `core-domain-service-rs` | `core-domain-service-java` |
+| Domain         | Repository port     | `core-repository`      | `core-repository-kt`     | `core-repository-cs`     | `core-repository-rs`     | `core-repository-java`   |
+| Application    | Use Case            | `core-use-case`        | `core-use-case-kt`       | `core-use-case-cs`       | `core-use-case-rs`       | `core-use-case-java`     |
+| Application    | DTO                 | `core-dto`             | `core-dto-kt`            | `core-dto-cs`            | `core-dto-rs`            | `core-dto-java`          |
+| Application    | Query CQRS          | `core-query-cqrs`      | `core-query-cqrs-kt`     | `core-query-cqrs-cs`     | `core-query-cqrs-rs`     | `core-query-cqrs-java`   |
+| Infrastructure | Persistence adapter | `backend-prisma-data`  | `backend-data-kt`        | `backend-data-cs`        | `backend-data-rs`        | `backend-data-java`      |
+| Infrastructure | Migration           | `config-prisma`        | `config-jpa-kt`          | `config-efcore-cs`       | `config-sqlx-rs`         | `config-jpa-java`        |
+| Infrastructure | Docker (produção)   | `config-docker`        | `config-docker-kt`       | `config-docker-cs`       | `config-docker-rs`       | `config-docker-java`     |
+| Infrastructure | CI/CD               | `config-cicd`          | `config-cicd-kt`         | `config-cicd-cs`         | `config-cicd-rs`         | `config-cicd-java`       |
+| Interface      | Controller          | `backend-controller` | `backend-controller-kt`  | `backend-controller-cs`  | `backend-controller-rs`  | `backend-controller-java` |
+| Quality        | Unit tests          | `test-unit`            | `test-unit-kt`           | `test-unit-cs`           | `test-unit-rs`           | `test-unit-java`         |
+| Quality        | E2E tests           | `test-e2e`             | `test-e2e-kt`            | `test-e2e-cs`            | `test-e2e-rs`            | `test-e2e-java`           |
+| Bootstrap      | Project             | `config-project`       | `config-project-kt`      | `config-project-cs`      | `config-project-rs`      | `config-project-java`    |
+| Bootstrap      | Shared kernel       | `config-shared-core`   | `config-shared-core-kt`  | `config-shared-core-cs`  | `config-shared-core-rs`  | `config-shared-core-java` |
+| Bootstrap      | New module          | `config-new-module`    | `config-new-module-kt`   | `config-new-module-cs`   | `config-new-module-rs`   | `config-new-module-java` |
 | Interface      | Form (Next.js)      | `frontend-form-schema` | —                        | —                        |
 | Frontend       | Projeto full-stack  | `config-project` (Next.js) | `config-project-angular` | `config-project-vue`  |
 | Frontend       | **Domínio** (Entity + Result) | — | `frontend-entity-angular` | `frontend-entity-vue` |
@@ -391,7 +446,7 @@ When implementing a feature, follow this order:
 
 | Scope | Target | Enforced in CI |
 |-------|--------|----------------|
-| **Domain + Application** (por BC/módulo) | **≥95% lines** | Sim — `config-cicd[-kt\|-cs\|-rs]` falha o build se abaixo |
+| **Domain + Application** (por BC/módulo) | **≥95% lines** | Sim — `config-cicd[-kt\|-cs\|-rs\|-java]` falha o build se abaixo |
 | Infrastructure (adapters, controllers) | ≥80% lines | Recomendado |
 | Frontend / Mobile (presentation) | ≥70% lines | Recomendado |
 | E2E | Fluxos críticos cobertos | Obrigatório para MVP |
@@ -404,6 +459,7 @@ When implementing a feature, follow this order:
 - **Kotlin**: JaCoCo report + gate no Gradle (`min 0.95` para packages `*.domain.*` e `*.application.*`)
 - **C#**: Coverlet + `--collect:"XPlat Code Coverage"` + threshold no CI
 - **Rust**: `cargo llvm-cov` + gate no CI (`config-cicd-rs`) para packages domain+application
+- **Java**: JaCoCo + gate no Gradle (`config-cicd-java`) para packages `*.domain.*` e `*.application.*`
 
 > Este repositório de skills **não executa testes** — os templates gerados (`config-shared-core`, `config-auth-*`) incluem exemplos com `jest --coverage`. A meta de 95% é aplicada nos **projetos gerados** via `config-cicd` e tasks `test:coverage` do backlog.
 
