@@ -244,6 +244,44 @@ cargo test --test integration
 
 ---
 
+## Fechamento de épico (Definition of Done — Rust)
+
+**Antes** de `openspec-archive-change` ou merge do PR:
+
+| # | Ação | Comando / Agent |
+|---|------|-----------------|
+| 1 | Testes unitários | `cargo test --workspace` — `Unit Tests (Rust)` |
+| 2 | Cobertura ≥95% domain+app | `cargo llvm-cov` — task `test:coverage` |
+| 3 | E2E do BC | `cargo test --test integration` — `E2E Tests (Rust)` |
+| 4 | Qualidade estática | `cargo fmt --check` + `cargo clippy -D warnings` |
+| 5 | **Vazamento de memória** | `bash config-cicd-rs/scripts/check-memory-rs.sh` |
+| 6 | CI remoto verde | `Config CI/CD (Rust)` — PR no GitHub |
+
+```bash
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace
+cargo llvm-cov --workspace --summary-only
+cargo test -p api --test integration
+bash config-cicd-rs/scripts/check-memory-rs.sh
+```
+
+Detalhes: [`config-cicd-rs/references/memory-leak-check-rs.md`](../../../config-cicd-rs/references/memory-leak-check-rs.md)
+
+**Tasks no backlog (final do épico):**
+
+```markdown
+- [ ] `quality:ci-verify` Pipeline CI verde (~30min)
+  - **Agent:** `Config CI/CD (Rust)`
+  - **Prompt:** "Validar workflow CI: fmt, clippy, test, coverage ≥95%. Corrigir até PR verde."
+
+- [ ] `quality:memory-leak` Verificar vazamento de memória (~30min)
+  - **Agent:** `Config CI/CD (Rust)`
+  - **Prompt:** "Executar check-memory-rs.sh. Revisar tasks Tokio, pools sqlx, Arc. Falhar épico se LeakSanitizer reportar leak."
+```
+
+---
+
 ## Etapa 4 — Feature Vue (`feat-customer-vue`)
 
 Mesma ordem Clean Architecture do [NestJS + Vue + Flutter](./nestjs-vue-flutter.md#etapa-4--feature-vue-feat-customer-vue):
@@ -338,6 +376,7 @@ Skills `config-auth-*-rs` ainda não existem. Para JWT/RBAC:
 - [ ] Bootstrap: Config Project (Rust) + SQLx + Vue + Flutter + Docker + CI/CD + shared-core-rs
 - [ ] `cargo check` / `cargo test --workspace` verdes
 - [ ] BC Customers: Unit Tests ≥95% domain+application + E2E HTTP
+- [ ] **Fechamento de épico**: `check-memory-rs.sh` + CI verde (sem vazamento)
 - [ ] Frontend Entity → Form (Vue) consumindo API `:4000`
 - [ ] Mobile Entity → Screen (Flutter)
 - [ ] OpenSpec archive nas mudanças (`bootstrap-*`, `bc-*`, `feat-*`)

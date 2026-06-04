@@ -132,7 +132,7 @@ Layout obrigatório: `config-shared-core-rs/references/rust-namespace-layout.md`
 - `config-shared-core-rs`: kernel (Entity, ValueObject, Result, UseCase)
 - `config-new-module-rs`: scaffold BC em `crates/api/src/modules/<bc>/`
 - `config-sqlx-rs`: migrations Postgres (sqlx)
-- `config-docker-rs` / `config-cicd-rs`: produção e CI (clippy, test, coverage ≥95%)
+- `config-docker-rs` / `config-cicd-rs`: produção e CI (clippy, test, coverage ≥95%, **memory leak check** ao fechar épico)
 
 **Domínio e aplicação:**
 - `core-entity-rs` / `core-value-object-rs` / `core-domain-service-rs` / `core-repository-rs` (ports)

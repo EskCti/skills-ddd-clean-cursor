@@ -205,7 +205,11 @@ Ordem de implementação (inside-out):
 22. test:unit              → testes unitários (entity, VO, use case)
 23. test:coverage          → validar cobertura ≥95% em domain + application
 24. test:e2e               → teste de fluxo completo
+25. quality:ci-verify     → pipeline CI verde (PR) — todas as stacks backend
+26. quality:memory-leak   → **somente Rust**: vazamento de memória (LeakSanitizer/Valgrind)
 ```
+
+> **Fechamento de épico**: cada épico funcional deve terminar com as tasks 22–25 (e 26 se Rust). Não arquivar OpenSpec nem merge sem testes + coverage + E2E + CI verde.
 
 > **OpenSpec**: para features que envolvem múltiplas camadas (backend + frontend + mobile), recomenda-se usar `openspec-propose` antes de iniciar a implementação. O `tasks.md` deve copiar o formato do backlog (**Agent** + **Prompt** por task). O `openspec-apply-change` aciona cada **Agent** listado na ordem inside-out.
 
@@ -292,6 +296,8 @@ Se a stack **não foi escolhida ainda**, mostrar as 3 opções:
 | `test:unit` | `Unit Tests (TypeScript)` | `Unit Tests (Kotlin)` | `Unit Tests (C#)` | `Unit Tests (Rust)` | `Unit Tests (Java)` |
 | `test:coverage` | `Unit Tests (TypeScript)` | `Unit Tests (Kotlin)` | `Unit Tests (C#)` | `Unit Tests (Rust)` | `Unit Tests (Java)` |
 | `test:e2e` | `E2E Tests (TypeScript)` | `E2E Tests (Kotlin)` | `E2E Tests (C#)` | `E2E Tests (Rust)` | `E2E Tests (Java)` |
+| `quality:ci-verify` | `Config CI/CD (TypeScript)` | `Config CI/CD (Kotlin)` | `Config CI/CD (C#)` | `Config CI/CD (Rust)` | `Config CI/CD (Java)` |
+| `quality:memory-leak` | — | — | — | `Config CI/CD (Rust)` | — |
 | `test:unit-web` | `Frontend UseCase (Vue)` ou `Frontend UseCase (Angular)` | — | — | — | — |
 | `test:unit-mobile` | `Mobile UseCase (Flutter)` | `Mobile UseCase (Android)` | — | — | — |
 
@@ -566,8 +572,14 @@ Ver template em `references/delivery-profile.md`. Sem este arquivo, **não** ger
   - **Agent:** mesmo de test:unit
   - **Prompt:** "Execute testes com coverage. Ajuste até ≥95% lines em domain+application. CI usa scripts/check-coverage.mjs."
 - [ ] `test:e2e` Teste do fluxo completo (~2h)
-  - **Agent TS:** `E2E Tests (TypeScript)` | **KT:** `E2E Tests (Kotlin)` | **CS:** `E2E Tests (C#)`
-  - **Prompt:** "Crie E2E: API POST criar → GET buscar (Supertest/MockMvc/WebApplicationFactory). Se houver UI, Playwright para fluxo principal."
+  - **Agent TS:** `E2E Tests (TypeScript)` | **KT:** `E2E Tests (Kotlin)` | **CS:** `E2E Tests (C#)` | **RS:** `E2E Tests (Rust)` | **Java:** `E2E Tests (Java)`
+  - **Prompt:** "Crie E2E: API POST criar → GET buscar (Supertest/MockMvc/integration HTTP). Se houver UI, Playwright para fluxo principal."
+- [ ] `quality:ci-verify` Validar pipeline CI verde (~30min)
+  - **Agent:** `Config CI/CD` da stack
+  - **Prompt:** "Push/PR: fmt, lint/clippy, test, coverage ≥95% domain+application. Corrigir falhas antes de fechar o épico."
+- [ ] `quality:memory-leak` Verificar vazamento de memória (~30min) — **somente Rust**
+  - **Agent:** `Config CI/CD (Rust)`
+  - **Prompt:** "Rode bash config-cicd-rs/scripts/check-memory-rs.sh após test:e2e. Corrija Arc/tasks/pools. Confirme job memory-check no CI."
 
 ### US-002: <Título da Story>
 

@@ -95,7 +95,7 @@ Após o bootstrap de backend + frontend (+ mobile, se houver), configure **produ
 
 > **Java (bootstrap completo)**: após `Config Project (Java)`, incluir `Config JPA (Java)`, `Config Docker (Java)` e `Config CI/CD (Java)` (JaCoCo ≥95% domain+application).
 
-> **Rust (bootstrap completo)**: após `Config Project (Rust)`, incluir `Config SQLx (Rust)` se migrations ainda não existirem, `Config Docker (Rust)` e `Config CI/CD (Rust)` (clippy, test, coverage ≥95% domain+application).
+> **Rust (bootstrap completo)**: após `Config Project (Rust)`, incluir `Config SQLx (Rust)` se migrations ainda não existirem, `Config Docker (Rust)` e `Config CI/CD (Rust)` (clippy, test, coverage ≥95% domain+application). **Ao fechar cada épico**: `bash config-cicd-rs/scripts/check-memory-rs.sh` + CI verde — `memory-leak-check-rs.md`.
 
 > **OpenSpec aqui**: incluir `config-docker` e `config-cicd` na mudança `bootstrap-<nome>`:
 > ```
@@ -216,9 +216,10 @@ Após a API estar pronta:
 1. Tutorial 01 (req-*) → backlog.md
 2. Tutorial 02 Hub → escolher combinação (docs/tutorial/stacks/)
 3. config-project-fullstack → bootstrap + docker + cicd + shared-core
-4. Por BC: inside-out → test-unit-* → test-e2e-*
-5. Frontend/mobile por feature
-6. Config Auth (se necessário)
+4. Por BC: inside-out → test-unit-* → test:coverage → test:e2e-* → quality:ci-verify
+5. **Rust**: ao fechar cada épico → `quality:memory-leak` (`check-memory-rs.sh`)
+6. Frontend/mobile por feature
+7. Config Auth (se necessário)
 ```
 
 Tutoriais: [docs/tutorial/02-fullstack-project-setup.md](../docs/tutorial/02-fullstack-project-setup.md) · [docs/tutorial/stacks/](../docs/tutorial/stacks/) · [Rust + Vue + Flutter](../docs/tutorial/stacks/rust-vue-flutter.md) · [Java + Vue + Flutter](../docs/tutorial/stacks/java-vue-flutter.md)
