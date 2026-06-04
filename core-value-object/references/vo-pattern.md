@@ -10,7 +10,7 @@
 ## Core Principles
 
 - Imutabilidade: valor definido no construtor e sem setters.
-- Invariantes: validar no `tryCreate` e retornar `Result.fail` quando violado.
+- Invariantes: validar no `tryCreate`; acumular violações e retornar `Result.fail([...])` (lista) quando houver mais de uma regra.
 - Normalizacao: aplicar `trim`, `toLowerCase`, formatações ou defaults quando fizer sentido.
 - Erros: usar constantes estaticas com codigo legivel (ex.: `INVALID_EMAIL`).
 - API consistente: `create` -> chama `tryCreate`, `throwsIfFailed`, retorna `instance`.

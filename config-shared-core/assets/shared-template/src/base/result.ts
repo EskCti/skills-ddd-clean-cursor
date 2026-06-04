@@ -52,20 +52,20 @@ export class Result<T> {
     return this._instance!;
   }
 
-  get errors(): string[] | undefined {
-    const semErros = !this._errors || this._errors.length === 0;
-    if (semErros && this._instance === undefined) {
+  /** On failure: non-empty list. On success: empty list. */
+  get errors(): string[] {
+    if ((!this._errors || this._errors.length === 0) && this._instance === undefined) {
       return ['RESULT_UNDEFINED'];
     }
-    return this._errors;
+    return this._errors ?? [];
   }
 
   get isOk(): boolean {
-    return !this.errors;
+    return (this._errors === undefined || this._errors.length === 0) && this._instance !== undefined;
   }
 
   get isFailure(): boolean {
-    return !!this.errors;
+    return !this.isOk;
   }
 
   get withFail(): Result<any> {
