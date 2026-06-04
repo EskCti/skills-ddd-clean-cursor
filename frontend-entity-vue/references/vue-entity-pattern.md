@@ -3,12 +3,17 @@
 ## Result<T, E> base (src/shared/result.ts)
 
 ```typescript
+export type ValidationErrors = readonly string[]
+
 export type Ok<T> = { readonly ok: true; readonly data: T }
-export type Err<E> = { readonly ok: false; readonly error: E }
-export type Result<T, E = string> = Ok<T> | Err<E>
+export type Err = { readonly ok: false; readonly error: ValidationErrors }
+export type Result<T> = Ok<T> | Err
 
 export const ok = <T>(data: T): Ok<T> => ({ ok: true, data })
-export const err = <E>(error: E): Err<E> => ({ ok: false, error })
+export const err = (error: string | readonly string[]): Err => ({
+  ok: false,
+  error: typeof error === 'string' ? [error] : [...error],
+})
 
 export function isOk<T, E>(result: Result<T, E>): result is Ok<T> {
   return result.ok === true
@@ -49,14 +54,17 @@ export class CustomerEntity implements CustomerData {
     email: string
     cpf: string
   }): Result<CustomerEntity> {
+    const errors: string[] = []
     const name = params.name.trim()
-    if (name.length < 2) return err('Nome deve ter pelo menos 2 caracteres')
+    if (name.length < 2) errors.push('Nome deve ter pelo menos 2 caracteres')
 
     const email = params.email.trim().toLowerCase()
-    if (!email.includes('@') || !email.includes('.')) return err('Email inválido')
+    if (!email.includes('@') || !email.includes('.')) errors.push('Email inválido')
 
     const cpf = params.cpf.replace(/\D/g, '')
-    if (cpf.length !== 11) return err('CPF deve ter 11 dígitos')
+    if (cpf.length !== 11) errors.push('CPF deve ter 11 dígitos')
+
+    if (errors.length > 0) return err(errors)
 
     return ok(new CustomerEntity({ id: params.id, name, email, cpf, isActive: true }))
   }
@@ -71,5 +79,5 @@ export class CustomerEntity implements CustomerData {
 
 - [ ] `Result<T, E>` + `ok()` + `err()` em `src/shared/result.ts`
 - [ ] Construtor privado + `static create()` retornando `Result<Entity>`
-- [ ] Validações retornam `err('mensagem')` — nunca `throw`
+- [ ] Validações acumulam em `errors[]` e retornam `err(errors)` — nunca `throw`
 - [ ] Sem imports Vue/Pinia na entidade

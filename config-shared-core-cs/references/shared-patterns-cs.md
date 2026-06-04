@@ -7,8 +7,9 @@
 
 ## Results e Erros
 
-- `Result<T>`: Objeto imutável para retorno de sucesso/falha.
-- `Error.cs`: Objeto rico com `Code`, `Message` e `Type`.
+- `Result<T>`: sucesso/falha; falha sempre com `IReadOnlyList<string> Errors`.
+- `Result<T>.Combine(r1, r2, …)`: agrega erros de VOs na factory da entidade.
+- `Error.cs`: objeto rico com `Code`, `Message` e `Type` (quando usado fora de `Result.Errors`).
 
 ## Application Base
 

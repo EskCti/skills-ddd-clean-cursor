@@ -14,39 +14,51 @@ describe('StrongPassword', () => {
     expect(password.value).toBe('Secure123@');
   });
 
+  test('should accumulate all validation errors', () => {
+    const result = StrongPassword.tryCreate('a');
+
+    expect(result.isFailure).toBe(true);
+    expect(result.errors).toEqual([
+      'WEAK_PASSWORD_TOO_SHORT',
+      'WEAK_PASSWORD_NO_UPPERCASE',
+      'WEAK_PASSWORD_NO_DIGIT',
+      'WEAK_PASSWORD_NO_SPECIAL',
+    ]);
+  });
+
   test('should fail when password is too short', () => {
     const result = StrongPassword.tryCreate('Aa1!');
 
     expect(result.isFailure).toBe(true);
-    expect(result.errors).toContain('WEAK_PASSWORD');
+    expect(result.errors).toContain('WEAK_PASSWORD_TOO_SHORT');
   });
 
   test('should fail when password has no uppercase letter', () => {
     const result = StrongPassword.tryCreate('aa123456!');
 
     expect(result.isFailure).toBe(true);
-    expect(result.errors).toContain('WEAK_PASSWORD');
+    expect(result.errors).toContain('WEAK_PASSWORD_NO_UPPERCASE');
   });
 
   test('should fail when password has no lowercase letter', () => {
     const result = StrongPassword.tryCreate('AA123456!');
 
     expect(result.isFailure).toBe(true);
-    expect(result.errors).toContain('WEAK_PASSWORD');
+    expect(result.errors).toContain('WEAK_PASSWORD_NO_LOWERCASE');
   });
 
   test('should fail when password has no number', () => {
     const result = StrongPassword.tryCreate('AaBbCcDd!');
 
     expect(result.isFailure).toBe(true);
-    expect(result.errors).toContain('WEAK_PASSWORD');
+    expect(result.errors).toContain('WEAK_PASSWORD_NO_DIGIT');
   });
 
   test('should fail when password has no special character', () => {
     const result = StrongPassword.tryCreate('Aa123456');
 
     expect(result.isFailure).toBe(true);
-    expect(result.errors).toContain('WEAK_PASSWORD');
+    expect(result.errors).toContain('WEAK_PASSWORD_NO_SPECIAL');
   });
 
   test('should throw when create receives weak password', () => {

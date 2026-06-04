@@ -26,18 +26,19 @@ public class Product : Entity
     public static Result<Product> Create(string name, string description, decimal price, string currency = "USD")
     {
         var nameResult = ProductName.Create(name);
-        if (nameResult.IsFailure)
-            return Result<Product>.Failure(nameResult.Errors);
-
         var descriptionResult = ProductDescription.Create(description);
-        if (descriptionResult.IsFailure)
-            return Result<Product>.Failure(descriptionResult.Errors);
-
         var priceResult = Money.Create(price, currency);
-        if (priceResult.IsFailure)
-            return Result<Product>.Failure(priceResult.Errors);
 
-        return Result<Product>.Success(new Product(nameResult.Value, descriptionResult.Value, priceResult.Value));
+        var combined = Result<ProductName>.Combine(
+            nameResult,
+            descriptionResult,
+            priceResult);
+
+        if (combined.IsFailure)
+            return Result<Product>.Failure(combined.Errors);
+
+        var (validName, validDescription, validPrice) = combined.Value;
+        return Result<Product>.Success(new Product(validName, validDescription, validPrice));
     }
 
     public Result UpdatePrice(decimal newPrice, string currency = "USD")

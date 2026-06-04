@@ -8,7 +8,7 @@
 ## Core Principles
 
 - Imutabilidade: `val` apenas, sem setters.
-- Invariantes: validar no `tryCreate` e retornar `Result.failure` quando violado.
+- Invariantes: validar no `tryCreate`; usar **`DomainResult<T>`** com `errors: List<String>` (acumular todas as regras).
 - Normalização: aplicar `trim()`, `lowercase()`, formatações antes da construção.
 - Erros: mensagens descritivas como constantes.
 - API consistente: `create` -> chama `tryCreate` + `getOrThrow()`.
@@ -18,20 +18,21 @@
 ```kotlin
 package com.example.shared.domain.vo
 
+import com.example.shared.domain.result.DomainResult
+
 @JvmInline
 value class Name private constructor(val value: String) {
     companion object {
-        private const val INVALID_NAME = "Name must not be blank and must have at most 255 characters"
-
         fun create(value: String): Name =
             tryCreate(value).getOrThrow()
 
-        fun tryCreate(value: String): Result<Name> {
+        fun tryCreate(value: String): DomainResult<Name> {
+            val errors = mutableListOf<String>()
             val normalized = value.trim()
-            if (normalized.isBlank() || normalized.length > 255) {
-                return Result.failure(IllegalArgumentException(INVALID_NAME))
-            }
-            return Result.success(Name(normalized))
+            if (normalized.isBlank()) errors.add("Name must not be blank")
+            if (normalized.length > 255) errors.add("Name must have at most 255 characters")
+            if (errors.isNotEmpty()) return DomainResult.failure(errors)
+            return DomainResult.success(Name(normalized))
         }
     }
 }
@@ -42,6 +43,8 @@ value class Name private constructor(val value: String) {
 ```kotlin
 package com.example.shared.domain.vo
 
+import com.example.shared.domain.result.DomainResult
+
 data class Address private constructor(
     val street: String,
     val city: String,
@@ -51,7 +54,7 @@ data class Address private constructor(
         fun create(street: String, city: String, zipCode: String): Address =
             tryCreate(street, city, zipCode).getOrThrow()
 
-        fun tryCreate(street: String, city: String, zipCode: String): Result<Address> {
+        fun tryCreate(street: String, city: String, zipCode: String): DomainResult<Address> {
             val errors = mutableListOf<String>()
             val s = street.trim()
             val c = city.trim()
@@ -60,9 +63,9 @@ data class Address private constructor(
             if (c.isBlank()) errors.add("City must not be blank")
             if (z.isBlank()) errors.add("Zip code must not be blank")
             if (errors.isNotEmpty()) {
-                return Result.failure(IllegalArgumentException(errors.joinToString("; ")))
+                return DomainResult.failure(errors)
             }
-            return Result.success(Address(s, c, z))
+            return DomainResult.success(Address(s, c, z))
         }
     }
 }
@@ -78,7 +81,7 @@ data class Address private constructor(
 
 ## Test Pattern
 
-- Validar sucesso e falha (`isSuccess`, `isFailure`, `exceptionOrNull()`).
+- Validar sucesso e falha (`isSuccess`, `isFailure`, `errors` com todos os itens em falha múltipla).
 - Verificar normalização do valor armazenado.
 - Testar `create` lançando exceção quando inválido.
 - Cobrir getters derivados quando existirem.

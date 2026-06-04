@@ -1,7 +1,12 @@
 import { Result, ValueObject, ValueObjectConfig } from '../base';
 
 export class StrongPassword extends ValueObject<string, ValueObjectConfig> {
-  private static readonly WEAK_PASSWORD = 'WEAK_PASSWORD';
+  private static readonly WEAK_PASSWORD_TOO_SHORT = 'WEAK_PASSWORD_TOO_SHORT';
+  private static readonly WEAK_PASSWORD_NO_UPPERCASE = 'WEAK_PASSWORD_NO_UPPERCASE';
+  private static readonly WEAK_PASSWORD_NO_LOWERCASE = 'WEAK_PASSWORD_NO_LOWERCASE';
+  private static readonly WEAK_PASSWORD_NO_DIGIT = 'WEAK_PASSWORD_NO_DIGIT';
+  private static readonly WEAK_PASSWORD_NO_SPECIAL = 'WEAK_PASSWORD_NO_SPECIAL';
+
   private constructor(value: string, config?: ValueObjectConfig) {
     super(value, config);
   }
@@ -13,25 +18,28 @@ export class StrongPassword extends ValueObject<string, ValueObjectConfig> {
   }
 
   public static tryCreate(value: string, config?: ValueObjectConfig): Result<StrongPassword> {
-    try {
-      if (value.length < 8) {
-        throw new Error(StrongPassword.WEAK_PASSWORD);
-      }
-      if (!/[A-Z]/.test(value)) {
-        throw new Error(StrongPassword.WEAK_PASSWORD);
-      }
-      if (!/[a-z]/.test(value)) {
-        throw new Error(StrongPassword.WEAK_PASSWORD);
-      }
-      if (!/[0-9]/.test(value)) {
-        throw new Error(StrongPassword.WEAK_PASSWORD);
-      }
-      if (!/[^A-Za-z0-9]/.test(value)) {
-        throw new Error(StrongPassword.WEAK_PASSWORD);
-      }
-      return Result.ok(new StrongPassword(value, config));
-    } catch (error: any) {
-      return Result.fail(error.message);
+    const errors: string[] = [];
+
+    if (value.length < 8) {
+      errors.push(StrongPassword.WEAK_PASSWORD_TOO_SHORT);
     }
+    if (!/[A-Z]/.test(value)) {
+      errors.push(StrongPassword.WEAK_PASSWORD_NO_UPPERCASE);
+    }
+    if (!/[a-z]/.test(value)) {
+      errors.push(StrongPassword.WEAK_PASSWORD_NO_LOWERCASE);
+    }
+    if (!/[0-9]/.test(value)) {
+      errors.push(StrongPassword.WEAK_PASSWORD_NO_DIGIT);
+    }
+    if (!/[^A-Za-z0-9]/.test(value)) {
+      errors.push(StrongPassword.WEAK_PASSWORD_NO_SPECIAL);
+    }
+
+    if (errors.length > 0) {
+      return Result.fail(errors);
+    }
+
+    return Result.ok(new StrongPassword(value, config));
   }
 }

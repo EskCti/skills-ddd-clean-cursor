@@ -34,11 +34,24 @@ abstract class Entity<T : Entity<T>>(
 }
 ```
 
+## DomainResult.kt — contrato
+
+```kotlin
+package com.example.shared.domain.result
+
+data class DomainResult<out T>(val value: T?, val errors: List<String>) {
+    val isSuccess: Boolean get() = errors.isEmpty()
+    val isFailure: Boolean get() = errors.isNotEmpty()
+    // companion: success, failure(List), combine
+}
+```
+
 ## Id.kt — exemplo
 
 ```kotlin
 package com.example.shared.domain.vo
 
+import com.example.shared.domain.result.DomainResult
 import java.util.UUID
 
 @JvmInline
@@ -49,19 +62,19 @@ value class Id private constructor(val value: String) {
         fun create(value: String? = null): Id =
             tryCreate(value).getOrThrow()
 
-        fun tryCreate(value: String? = null): Result<Id> {
+        fun tryCreate(value: String? = null): DomainResult<Id> {
             val resolved = value?.trim()?.ifBlank { null } ?: UUID.randomUUID().toString()
             return try {
                 UUID.fromString(resolved)
-                Result.success(Id(resolved))
+                DomainResult.success(Id(resolved))
             } catch (e: IllegalArgumentException) {
-                Result.failure(IllegalArgumentException(INVALID_ID))
+                DomainResult.failure(INVALID_ID)
             }
         }
 
-        fun required(value: String): Result<Id> {
+        fun required(value: String): DomainResult<Id> {
             if (value.isBlank()) {
-                return Result.failure(IllegalArgumentException(INVALID_ID))
+                return DomainResult.failure(INVALID_ID)
             }
             return tryCreate(value)
         }
@@ -74,20 +87,21 @@ value class Id private constructor(val value: String) {
 ```kotlin
 package com.example.shared.domain.vo
 
+import com.example.shared.domain.result.DomainResult
+
 @JvmInline
 value class Name private constructor(val value: String) {
     companion object {
-        private const val INVALID_NAME = "Name must not be blank and must have at most 255 characters"
-
         fun create(value: String): Name =
             tryCreate(value).getOrThrow()
 
-        fun tryCreate(value: String): Result<Name> {
+        fun tryCreate(value: String): DomainResult<Name> {
+            val errors = mutableListOf<String>()
             val normalized = value.trim()
-            if (normalized.isBlank() || normalized.length > 255) {
-                return Result.failure(IllegalArgumentException(INVALID_NAME))
-            }
-            return Result.success(Name(normalized))
+            if (normalized.isBlank()) errors.add("Name must not be blank")
+            if (normalized.length > 255) errors.add("Name must have at most 255 characters")
+            if (errors.isNotEmpty()) return DomainResult.failure(errors)
+            return DomainResult.success(Name(normalized))
         }
     }
 }
@@ -98,6 +112,8 @@ value class Name private constructor(val value: String) {
 ```kotlin
 package com.example.shared.domain.vo
 
+import com.example.shared.domain.result.DomainResult
+
 @JvmInline
 value class Email private constructor(val value: String) {
     companion object {
@@ -107,12 +123,12 @@ value class Email private constructor(val value: String) {
         fun create(value: String): Email =
             tryCreate(value).getOrThrow()
 
-        fun tryCreate(value: String): Result<Email> {
+        fun tryCreate(value: String): DomainResult<Email> {
             val normalized = value.trim().lowercase()
             if (!EMAIL_REGEX.matches(normalized)) {
-                return Result.failure(IllegalArgumentException(INVALID_EMAIL))
+                return DomainResult.failure(INVALID_EMAIL)
             }
-            return Result.success(Email(normalized))
+            return DomainResult.success(Email(normalized))
         }
     }
 
@@ -126,6 +142,8 @@ value class Email private constructor(val value: String) {
 ```kotlin
 package com.example.shared.domain.vo
 
+import com.example.shared.domain.result.DomainResult
+
 @JvmInline
 value class HashPassword private constructor(val value: String) {
     companion object {
@@ -135,12 +153,12 @@ value class HashPassword private constructor(val value: String) {
         fun create(value: String): HashPassword =
             tryCreate(value).getOrThrow()
 
-        fun tryCreate(value: String): Result<HashPassword> {
+        fun tryCreate(value: String): DomainResult<HashPassword> {
             val trimmed = value.trim()
             if (!BCRYPT_REGEX.matches(trimmed)) {
-                return Result.failure(IllegalArgumentException(INVALID_HASH))
+                return DomainResult.failure(INVALID_HASH)
             }
-            return Result.success(HashPassword(trimmed))
+            return DomainResult.success(HashPassword(trimmed))
         }
     }
 }
@@ -151,8 +169,10 @@ value class HashPassword private constructor(val value: String) {
 ```kotlin
 package com.example.shared.application
 
+import com.example.shared.domain.result.DomainResult
+
 interface UseCase<IN, OUT> {
-    suspend fun execute(data: IN): Result<OUT>
+    suspend fun execute(data: IN): DomainResult<OUT>
 }
 ```
 
@@ -205,5 +225,5 @@ interface TransactionManager {
 
 - Módulo shared sem Spring, sem JPA, sem framework.
 - Dependência mínima: `kotlin-stdlib` + `junit`.
-- Todas as classes com `companion object` e `tryCreate` retornando `Result`.
+- Todas as classes com `companion object` e `tryCreate` retornando **`DomainResult`** (lista de erros em falha).
 - VOs simples como `@JvmInline value class`.

@@ -1,5 +1,6 @@
 package com.example.shared.domain.vo
 
+import com.example.shared.domain.result.DomainResult
 import java.text.Normalizer
 
 @JvmInline
@@ -11,12 +12,12 @@ value class DotSeparatedName private constructor(val value: String) {
         fun create(value: String): DotSeparatedName =
             tryCreate(value).getOrThrow()
 
-        fun tryCreate(value: String): Result<DotSeparatedName> {
+        fun tryCreate(value: String): DomainResult<DotSeparatedName> {
             val normalized = normalize(value)
             if (!PATTERN.matches(normalized)) {
-                return Result.failure(IllegalArgumentException(INVALID_DOT_SEPARATED_NAME))
+                return DomainResult.failure(INVALID_DOT_SEPARATED_NAME)
             }
-            return Result.success(DotSeparatedName(normalized))
+            return DomainResult.success(DotSeparatedName(normalized))
         }
 
         fun normalize(value: String): String =

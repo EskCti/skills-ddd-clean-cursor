@@ -75,6 +75,18 @@
   - **Agent:** `E2E Tests (Rust)`
   - **Prompt:** "tests/integration: POST /customers → GET /customers/{id}. Postgres via docker-compose."
 
+- [ ] `test:coverage` Validar ≥95% domain+application (~30min)
+  - **Agent:** `Unit Tests (Rust)`
+  - **Prompt:** "cargo llvm-cov --workspace --fail-under-lines 95 em domain+application."
+
+- [ ] `quality:ci-verify` Pipeline CI verde (~30min)
+  - **Agent:** `Config CI/CD (Rust)`
+  - **Prompt:** "PR com fmt, clippy, test e coverage gate verdes."
+
+- [ ] `quality:memory-leak` Verificar vazamento de memória (~30min)
+  - **Agent:** `Config CI/CD (Rust)`
+  - **Prompt:** "bash config-cicd-rs/scripts/check-memory-rs.sh após test:e2e. Corrigir leaks antes de archive."
+
 ### 6. Frontend Vue — Customers
 - [ ] `interface:entity` Customer Vue (~1h)
   - **Agent:** `Frontend Entity (Vue)`

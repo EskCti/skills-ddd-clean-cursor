@@ -33,7 +33,7 @@ const toast = useToast()
 const router = useRouter()
 const route = useRoute()
 const isEdit = ref(false)
-const serverError = ref<string | null>(null)
+const serverErrors = ref<string[]>([])
 
 onMounted(async () => {
   const id = route.params.id as string
@@ -46,7 +46,7 @@ onMounted(async () => {
 })
 
 const onSubmit = handleSubmit(async (values) => {
-  serverError.value = null
+  serverErrors.value = []
 
   // store.create() chama o UseCase → que valida domínio + chama repository
   const result = await store.create(values)
@@ -56,8 +56,10 @@ const onSubmit = handleSubmit(async (values) => {
     router.push('/customers')
   } else {
     // Erro de negócio (email duplicado, etc.) exibido no formulário
-    serverError.value = result.error
-    toast.add({ severity: 'error', summary: result.error, life: 3000 })
+    serverErrors.value = [...result.error]
+    result.error.forEach((msg) =>
+      toast.add({ severity: 'error', summary: msg, life: 3000 }),
+    )
   }
 })
 </script>
@@ -92,7 +94,9 @@ const onSubmit = handleSubmit(async (values) => {
       </div>
 
       <!-- Erro do servidor (UseCase/Repository) exibido no formulário -->
-      <small v-if="serverError" class="text-red-500">{{ serverError }}</small>
+      <ul v-if="serverErrors.length" class="text-red-500 text-sm list-disc pl-4">
+        <li v-for="(msg, i) in serverErrors" :key="i">{{ msg }}</li>
+      </ul>
 
       <div class="flex gap-2 justify-end">
         <Button label="Cancelar" severity="secondary" @click="router.push('/customers')" />
@@ -107,6 +111,6 @@ const onSubmit = handleSubmit(async (values) => {
 
 - [ ] Formulário chama `store.create()` — não usecase ou repository diretamente
 - [ ] `store.create()` retorna `Result<T>` que o formulário usa para exibir erros
-- [ ] `serverError` ref para erros de negócio do UseCase (email duplicado, etc.)
+- [ ] `serverErrors` ref (`string[]`) — lista completa no formulário e toasts por item
 - [ ] Validações de formato no schema Zod (cliente-side imediato)
 - [ ] Validações de negócio no UseCase (server-side via API)

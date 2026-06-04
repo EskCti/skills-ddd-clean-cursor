@@ -14,7 +14,7 @@ describe('Result', () => {
 
     expect(result.isOk).toBe(true);
     expect(result.instance).toBeNull();
-    expect(result.errors).toBeUndefined();
+    expect(result.errors).toEqual([]);
   });
 
   test('should create failed result from string', () => {
@@ -115,7 +115,7 @@ describe('Result', () => {
     const result = await Result.try(async () => {});
 
     expect(result.isOk).toBe(true);
-    expect(result.errors).toBeUndefined();
+    expect(result.errors).toEqual([]);
   });
 
   test('should execute try with failure', async () => {

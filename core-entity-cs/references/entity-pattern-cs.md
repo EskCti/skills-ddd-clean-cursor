@@ -10,33 +10,22 @@
 - Construtor privado/protegido.
 - Método estático `Create` retornando `Result<T>`.
 - Identificador `Id` (Guid).
-- Validação de invariantes no `Create`.
+- Validar invariantes no `Create` e **combinar erros de VOs** (`Result<T>.Combine`).
 
-## Exemplo em C#
+## Exemplo com lista de erros
 
 ```csharp
-public class Customer : Entity
+public static Result<Customer> Create(string name, string email)
 {
-    public string Name { get; private set; }
-    public string Email { get; private set; }
+    var nameResult = Name.Create(name);
+    var emailResult = Email.Create(email);
 
-    private Customer(string name, string email, Guid? id = null)
-    {
-        Id = id ?? Guid.NewGuid();
-        Name = name;
-        Email = email;
-    }
+    var combined = Result<Name>.Combine(nameResult, emailResult);
+    if (combined.IsFailure)
+        return Result<Customer>.Failure(combined.Errors);
 
-    public static Result<Customer> Create(string name, string email)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-            return Result.Failure<Customer>("Name is required");
-
-        if (!email.Contains("@"))
-            return Result.Failure<Customer>("Invalid email");
-
-        return Result.Success(new Customer(name, email));
-    }
+    return Result<Customer>.Success(
+        new Customer(combined.Value.Item1, combined.Value.Item2));
 }
 ```
 
@@ -44,6 +33,6 @@ public class Customer : Entity
 
 - [ ] Herda de `Entity` do Shared Kernel.
 - [ ] Construtor não é público.
-- [ ] Factory method `Create` contém as validações.
+- [ ] Factory `Create` agrega `Errors` de todos os VOs (não retorna no primeiro falho).
 - [ ] Propriedades têm `private set`.
-- [ ] Testes unitários cobrem cenários de erro de validação.
+- [ ] Testes cobrem `Create_MultipleValidationErrors_ShouldReturnAllErrors`.

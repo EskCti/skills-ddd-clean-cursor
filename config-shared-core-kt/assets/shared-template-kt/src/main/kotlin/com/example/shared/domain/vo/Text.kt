@@ -1,5 +1,7 @@
 package com.example.shared.domain.vo
 
+import com.example.shared.domain.result.DomainResult
+
 open class Text private constructor(val value: String) {
 
     companion object {
@@ -19,7 +21,7 @@ open class Text private constructor(val value: String) {
             text: String,
             minLength: Int = defaultMinLength,
             maxLength: Int = defaultMaxLength
-        ): Result<Text> = tryCreateInternal(text, minLength, maxLength) { v -> Text(v) }
+        ): DomainResult<Text> = tryCreateInternal(text, minLength, maxLength) { v -> Text(v) }
 
         internal fun <T> tryCreateInternal(
             text: String,
@@ -28,15 +30,13 @@ open class Text private constructor(val value: String) {
             tooShortMsg: String = TOO_SHORT,
             tooLongMsg: String = TOO_LONG,
             factory: (String) -> T
-        ): Result<T> {
+        ): DomainResult<T> {
+            val errors = mutableListOf<String>()
             val trimmed = text.trim()
-            if (trimmed.length < minLength) {
-                return Result.failure(IllegalArgumentException(tooShortMsg))
-            }
-            if (trimmed.length > maxLength) {
-                return Result.failure(IllegalArgumentException(tooLongMsg))
-            }
-            return Result.success(factory(trimmed))
+            if (trimmed.length < minLength) errors.add(tooShortMsg)
+            if (trimmed.length > maxLength) errors.add(tooLongMsg)
+            if (errors.isNotEmpty()) return DomainResult.failure(errors)
+            return DomainResult.success(factory(trimmed))
         }
     }
 

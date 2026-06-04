@@ -13,7 +13,7 @@
 2. Construtor `private/protected`.
 3. Método estático `Create(Type value)` retornando `Result<Xxx>`.
 4. Validação de invariantes no `Create`.
-5. Usar `Result.Failure` para erros e `Result.Success` para sucesso.
+5. Acumular regras violadas em `List<string>` e `Result.Failure(errors)`; nunca só a primeira mensagem quando houver várias.
 
 ## Exemplo mínimo (C#)
 

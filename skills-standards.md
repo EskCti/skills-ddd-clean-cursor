@@ -107,12 +107,12 @@ When editing any skill (`*/SKILL.md`):
 | --------------- | -------------------------- | ---------------------------------------------------------------- | ---------------------------- |
 | Orquestrador    | `config-project-fullstack` | **Ponto de entrada** para projetos completos — define agents em sequência e integra OpenSpec | Agnostic |
 | Config          | `config-*`                 | Bootstrap/scaffolding de projeto, módulo ou infra                | TS, KT, CS, RS, Angular, Vue, Flutter, Android |
-| Core       | `core-*`     | Padrões de domínio e aplicação (entity, VO, use case)            | TS, KT, CS or RS                 |
-| Backend    | `backend-*`  | Camada de infraestrutura/interface do backend                    | TS, KT, CS or RS                 |
+| Core       | `core-*`     | Padrões de domínio e aplicação (entity, VO, use case)            | TS, KT, CS, RS, Java             |
+| Backend    | `backend-*`  | Camada de infraestrutura/interface do backend                    | TS, KT, CS, RS, Java             |
 | Frontend   | `frontend-*` | Camada de interface web (Tailwind + Next.js/Angular/Vue) | TS, Angular, Vue             |
 | Mobile     | `mobile-*`   | Telas e formulários mobile (Flutter, Android Compose)            | Flutter, Android (Kotlin)    |
 | Requisitos | `req-*`      | Discovery, modelagem DDD, migração e planejamento                | Agnostic                     |
-| Qualidade  | `test-*`     | Testes unitários (≥95% domain/app) e E2E (fluxos críticos)       | TS, KT, CS, RS                   |
+| Qualidade  | `test-*`     | Testes unitários (≥95% domain/app) e E2E (fluxos críticos)       | TS, KT, CS, RS, Java             |
 | OpenSpec   | `openspec-*` | Fluxo de proposta/exploração/implementação                       | Agnostic                     |
 | Workflow   | `git-*`      | Automação de fluxo de trabalho (commits organizados, etc.)       | Agnostic                     |
 
@@ -134,6 +134,32 @@ When editing any skill (`*/SKILL.md`):
 ### Source vs Target
 
 The `req-discovery` skill can **read** systems in any language (PHP, Go, Python, Java, Ruby, etc.). The output is always structured in DDD/Clean Architecture, and the tasks in the agile planning always reference implementation skills from this repository (TypeScript, Kotlin, C#, Rust or Java).
+
+## 5.1 Result and validation errors (all stacks)
+
+**Contract**: domain and application layers use a `Result` type where **every failure exposes a list of errors** (never only the first message at the API boundary). Value Objects and Entities **accumulate** validation messages; **combine** merges lists from multiple `Result`s before returning.
+
+| Stack | Result type | Errors on failure | Combine |
+|-------|-------------|-------------------|---------|
+| TypeScript | `Result<T>` (`packages/shared`) | `errors: string[]` (non-empty) | `Result.combine([...])` |
+| Kotlin | `DomainResult<T>` (`domain.result`) | `errors: List<String>` | `DomainResult.combine(...)` or `flatMap { it.errors }` |
+| C# | `Result<T>` | `Errors: IReadOnlyList<string>` | `Result<T>.Combine(r1, r2, …)` |
+| Rust | `shared_kernel::Result<T>` | `Err(Vec<DomainError>)` | `combine2`, `combine_errors` |
+| Java | `Result<T>` | `getErrors(): List<DomainError>` | `Result.mergeErrors(...)` |
+| Angular / Vue (frontend) | `Result<T, E>` com `E = readonly string[]` | `error: string[]` em `Err` | acumular no `create()` + `err([...])` |
+| Flutter (mobile) | `Result<T>` / `Failure` | `messages: List<String>` | `Failure(messages)` |
+| Android (mobile) | `kotlin.Result` + `sealed Failure` | mapear para `List<String>` na UI | helper `toErrorMessages()` |
+
+Rules for skills `core-entity*` and `core-value-object*`:
+
+1. **VO**: collect all violated rules → `failure(list)` (do not stop at the first check).
+2. **Entity `tryCreate` / `Create`**: run all VO validations → **combine** errors → return single failed `Result` with full list.
+3. **API (backend controller)**: map the list to `400 Bad Request` with `{ errors: [...] }` (or equivalent).
+4. **Presentation (frontend + mobile)**: **sempre exibir a lista completa** de mensagens — lista/bullets no template, nunca só `errors[0]` ou `message` única quando a API/domínio devolveu várias.
+
+Success: `errors` is **empty** (`[]` / `emptyList()` / `Array.Empty`).
+
+> **Backend Kotlin** usa `DomainResult` no domínio. **Android mobile** mantém `kotlin.Result` no use case, mas a **tela** recebe `List<String>` e renderiza todos os itens.
 
 ## 6. Quick Examples (TypeScript)
 
@@ -284,6 +310,12 @@ Camadas por BC: `domain` → `application` → `infrastructure` → `interfaces:
 - `shared_kernel::Result<T>` for domain/application errors.
 - Code identifiers in **English**; Portuguese only in UX/docs.
 
+### Memory and epic closure (Rust only)
+
+- **Durante o BC**: evitar `Box::leak`, tasks Tokio sem await, pools recriados por request.
+- **Ao terminar cada épico**: rodar testes, coverage ≥95%, **e** `config-cicd-rs/scripts/check-memory-rs.sh` (ver `config-cicd-rs/references/memory-leak-check-rs.md`).
+- **CI**: job `memory-check` com LeakSanitizer (nightly) nos testes de integração — ver `config-cicd-rs/references/cicd-pattern-rs.md`.
+
 ### Quick examples
 
 - Domain entity: `crate::modules::customers::domain::Customer`
@@ -401,7 +433,7 @@ Infrastructure       →  backend-prisma-data (TS) / backend-data-kt (KT) / back
 
 > **Clean Architecture em todos os layers**: frontend e mobile seguem o mesmo modelo do backend — Domain (entity + Result) → Application (use case) → Infrastructure (repository + HTTP) → Presentation (component/screen).
 >
-> **Padrão Result**: TypeScript usa `Result<T, E>` com `ok()/err()`. Dart/Flutter usa `sealed class Result<T>` (Success/Failure). Android/Kotlin usa `kotlin.Result<T>` com `sealed class Failure`.
+> **Padrão Result**: backend TS/CS/RS/Java seguem §5.1 (lista de erros). Frontend Angular/Vue: `Err` com `error: string[]` e UI em lista. Flutter: `Failure(messages: List<String>)`. Android mobile: `kotlin.Result` + mapear falhas para `List<String>` na UI. Backend Kotlin: `DomainResult` (não `kotlin.Result` no domínio).
 
 > The `req-discovery` skill reads systems in any language/architecture. The agile planning and implementation always use the skills above (TS, KT, CS or RS).
 
@@ -463,6 +495,20 @@ When implementing a feature, follow this order:
 
 > Este repositório de skills **não executa testes** — os templates gerados (`config-shared-core`, `config-auth-*`) incluem exemplos com `jest --coverage`. A meta de 95% é aplicada nos **projetos gerados** via `config-cicd` e tasks `test:coverage` do backlog.
 
+### Epic Definition of Done (todas as stacks)
+
+Antes de considerar um **épico/BC concluído** (merge, archive OpenSpec, demo):
+
+| Passo | Todas as stacks backend | Extra **Rust** |
+|-------|-------------------------|----------------|
+| Testes unitários | `test:unit` verde | `cargo test --workspace` |
+| Cobertura | `test:coverage` ≥95% domain+application | `cargo llvm-cov` / gate CI |
+| E2E fluxo crítico | `test:e2e` verde | `cargo test --test integration` |
+| CI/CD | Pipeline CI verde (PR) | + job `memory-check` |
+| Vazamento de memória | — | `check-memory-rs.sh` ou LeakSanitizer no CI |
+
+Tasks no backlog: incluir bloco final por épico com `test:unit`, `test:coverage`, `test:e2e`, validação CI; em Rust acrescentar `quality:memory-leak`.
+
 ### Task Type Prefixes (for Agile Planning)
 
 Tasks in backlogs generated by `req-agile-planning` use these layer prefixes:
@@ -487,6 +533,7 @@ Tasks in backlogs generated by `req-agile-planning` use these layer prefixes:
 | `interface:mobile`     | Interface      | Tela mobile (Flutter/Android) |
 | `test:unit`            | Quality        | Unit tests                    |
 | `test:coverage`        | Quality        | Coverage gate (≥95% domain+app) |
+| `quality:memory-leak`  | Quality        | Rust: LeakSanitizer / Valgrind (`config-cicd-rs`) |
 | `test:e2e`             | Quality        | End-to-end tests              |
 
 ## 9. Documentation Output Standards

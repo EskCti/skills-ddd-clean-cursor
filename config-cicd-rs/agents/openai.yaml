@@ -1,4 +1,4 @@
 interface:
   display_name: 'Config CI/CD (Rust)'
-  short_description: 'GitHub Actions Rust clippy/test/coverage'
-  default_prompt: 'Crie CI GitHub Actions: fmt, clippy, cargo test, coverage ≥95% domain+application nos módulos BC.'
+  short_description: 'GitHub Actions Rust: clippy, test, coverage, memory leak'
+  default_prompt: 'Configure CI GitHub Actions para Rust: fmt, clippy, cargo test, coverage ≥95% domain+application. Inclua job memory-check (LeakSanitizer). Ao fechar épico, rodar scripts/check-memory-rs.sh. Ver config-cicd-rs/references/memory-leak-check-rs.md.'

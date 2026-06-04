@@ -2,51 +2,55 @@
 
 ## Result
 
+Failures use **`Err(Vec<DomainError>)`** — always a list. Success is `Ok(T)` with `errors()` returning an empty slice.
+
 ```rust
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Result<T, E = DomainError> {
+pub enum Result<T> {
     Ok(T),
-    Err(E),
+    Err(Vec<DomainError>),
 }
 
-impl<T, E: std::fmt::Display> Result<T, E> {
-    pub fn map<U, F: FnOnce(T) -> U>(self, f: F) -> Result<U, E> {
+impl<T> Result<T> {
+    pub fn ok(value: T) -> Self { Self::Ok(value) }
+    pub fn err(message: impl Into<String>) -> Self {
+        Self::Err(vec![DomainError::new(message)])
+    }
+    pub fn fail(errors: Vec<DomainError>) -> Self { Self::Err(errors) }
+    pub fn errors(&self) -> &[DomainError] {
         match self {
-            Result::Ok(v) => Result::Ok(f(v)),
-            Result::Err(e) => Result::Err(e),
+            Self::Ok(_) => &[],
+            Self::Err(e) => e.as_slice(),
         }
     }
 }
-```
 
-## Entity
-
-```rust
-pub trait Entity {
-    type Id: Clone + PartialEq + Eq + std::fmt::Debug;
-    fn id(&self) -> &Self::Id;
+pub fn combine2<T1, T2>(r1: Result<T1>, r2: Result<T2>) -> Result<(T1, T2)> {
+    let mut errors = Vec::new();
+    // ... extend from each Err, return Ok((v1, v2)) when empty
 }
 ```
 
-## ValueObject
+## Entity combine (example)
 
 ```rust
-pub trait ValueObject: Clone + PartialEq + Eq + std::fmt::Debug {}
+let name = CustomerName::try_new(raw_name)?;
+let email = Email::try_new(raw_email)?;
+// Prefer:
+let combined = combine2(name, email)?;
+// Or manual:
+let mut errors = Vec::new();
+if let Err(e) = name { errors.extend(e); }
+if let Err(e) = email { errors.extend(e); }
+if !errors.is_empty() { return Result::Err(errors); }
 ```
 
-## UseCase
+## DomainError
 
 ```rust
-#[async_trait::async_trait]
-pub trait UseCase<I, O> {
-    async fn execute(&self, input: I) -> Result<O>;
-}
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
+#[error("{0}")]
+pub struct DomainError(pub String);
 ```
 
-Import nos módulos de BC:
-
-```rust
-use shared_kernel::{Entity, Result, ValueObject, UseCase};
-```
-
-Nunca `shared_kernel::entity::entity::Entity`.
+Import: `use shared_kernel::{Entity, Result, ValueObject, UseCase, DomainError};`
