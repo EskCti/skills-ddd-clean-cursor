@@ -44,8 +44,12 @@ import { CustomerUseCases } from '../domain/customer.use-cases'
             CPF inválido
           </small>
         </div>
-        @if (serverError()) {
-          <small class="text-red-500">{{ serverError() }}</small>
+        @if (serverErrors().length > 0) {
+          <ul class="text-red-500 text-sm list-disc pl-4">
+            @for (msg of serverErrors(); track msg) {
+              <li>{{ msg }}</li>
+            }
+          </ul>
         }
         <div class="flex gap-2 justify-end">
           <p-button label="Cancelar" severity="secondary" (click)="cancel()" />
@@ -64,7 +68,7 @@ export class CustomerFormComponent {
 
   saving = signal(false)
   isEdit = signal(false)
-  serverError = signal<string | null>(null)
+  serverErrors = signal<string[]>([])
 
   form = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
@@ -75,7 +79,7 @@ export class CustomerFormComponent {
   async onSubmit() {
     if (this.form.invalid) return
     this.saving.set(true)
-    this.serverError.set(null)
+    this.serverErrors.set([])
     const { name, email, cpf } = this.form.value
 
     // Chama o UseCase (que valida domínio + chama repository)
@@ -88,7 +92,7 @@ export class CustomerFormComponent {
       this.router.navigate(['../'], { relativeTo: this.route })
     } else {
       // Erro de negócio (email duplicado, etc.) exibido no formulário
-      this.serverError.set(result.error)
+      this.serverErrors.set([...result.error])
     }
     this.saving.set(false)
   }
@@ -100,7 +104,7 @@ export class CustomerFormComponent {
 ## Checklist
 
 - [ ] Formulário injeta `CustomerUseCases` (não `CustomerService`/`CustomerHttpRepository`)
-- [ ] `result.ok` para sucesso, `result.error` para erros de negócio no servidor
-- [ ] `serverError` signal para exibir erros do UseCase/servidor no formulário
+- [ ] `result.ok` para sucesso, `result.error` (`string[]`) para erros de negócio
+- [ ] `serverErrors` signal — lista renderizada com `@for` (todas as mensagens)
 - [ ] Validações de UI no Reactive Form (Validators) para feedback imediato
 - [ ] Validações de domínio no UseCase (email único, regras de negócio)

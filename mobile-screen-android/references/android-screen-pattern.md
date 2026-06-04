@@ -13,15 +13,19 @@ class CustomerViewModel @Inject constructor(
     sealed class UiState {
         data object Loading : UiState()
         data class Success(val customers: List<Customer>) : UiState()
-        data class Error(val message: String) : UiState()
+        data class Error(val messages: List<String>) : UiState()
     }
 
     sealed class CreateState {
         data object Idle : CreateState()
         data object Loading : CreateState()
         data object Success : CreateState()
-        data class Error(val message: String) : CreateState()
+        data class Error(val messages: List<String>) : CreateState()
     }
+
+    /** Mapeia falha do use case / API para lista exibível na UI */
+    private fun Throwable.toErrorMessages(): List<String> =
+        message?.let { listOf(it) } ?: listOf("Erro desconhecido")
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
@@ -36,7 +40,7 @@ class CustomerViewModel @Inject constructor(
             _uiState.value = UiState.Loading
             getCustomers(NoParams)
                 .onSuccess { _uiState.value = UiState.Success(it) }
-                .onFailure { _uiState.value = UiState.Error(it.message ?: "Erro desconhecido") }
+                .onFailure { _uiState.value = UiState.Error(it.toErrorMessages()) }
         }
     }
 
@@ -48,7 +52,7 @@ class CustomerViewModel @Inject constructor(
                     _createState.value = CreateState.Success
                     loadCustomers() // atualiza a lista
                 }
-                .onFailure { _createState.value = CreateState.Error(it.message ?: "Erro") }
+                .onFailure { _createState.value = CreateState.Error(it.toErrorMessages()) }
         }
     }
 
@@ -81,7 +85,10 @@ fun CustomerListScreen(
 
                 is CustomerViewModel.UiState.Error ->
                     Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(s.message, color = MaterialTheme.colorScheme.error)
+                        s.messages.forEach { msg ->
+                            Text(msg, color = MaterialTheme.colorScheme.error)
+                            Spacer(Modifier.height(4.dp))
+                        }
                         Spacer(Modifier.height(8.dp))
                         Button(onClick = { viewModel.loadCustomers() }) { Text("Tentar novamente") }
                     }
@@ -119,5 +126,5 @@ Data (RepositoryImpl → Retrofit ApiService → DTO)
 - [ ] ViewModel injeta UseCase (não IRepository diretamente)
 - [ ] UseCase injetado via `@HiltViewModel @Inject constructor`
 - [ ] ViewModel expõe dois StateFlows: `uiState` e `createState`
-- [ ] `onSuccess / onFailure` de `kotlin.Result` para tratar retorno
+- [ ] `onSuccess / onFailure` de `kotlin.Result` — UI com `Error(messages: List<String>)` e **um `Text` por mensagem**
 - [ ] `loadCustomers()` pode ser chamado para refresh

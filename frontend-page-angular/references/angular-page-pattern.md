@@ -23,8 +23,12 @@ import type { CustomerEntity } from '../domain/customer.entity'
         <p-button label="Novo Cliente" icon="pi pi-plus" routerLink="new" />
       </div>
 
-      @if (error()) {
-        <p-message severity="error" [text]="error()!" styleClass="mb-4" />
+      @if (errors().length > 0) {
+        <div class="mb-4 flex flex-col gap-2">
+          @for (msg of errors(); track msg) {
+            <p-message severity="error" [text]="msg" />
+          }
+        </div>
       }
 
       <p-table [value]="customers()" [loading]="loading()" [paginator]="true" [rows]="10" stripedRows>
@@ -52,18 +56,18 @@ export class CustomerListComponent implements OnInit {
 
   customers = signal<CustomerEntity[]>([])
   loading = signal(false)
-  error = signal<string | null>(null)
+  errors = signal<string[]>([])
 
   ngOnInit() { this.loadCustomers() }
 
   async loadCustomers() {
     this.loading.set(true)
-    this.error.set(null)
+    this.errors.set([])
     const result = await this.useCases.getCustomers()
     if (result.ok) {
       this.customers.set(result.data)
     } else {
-      this.error.set(result.error)
+      this.errors.set([...result.error])
     }
     this.loading.set(false)
   }
@@ -86,6 +90,6 @@ Data (CustomerHttpRepository → HttpClient → API)
 
 - [ ] Componente injeta UseCase (`inject(CustomerUseCases)`)
 - [ ] UseCase, não `CustomerService` HTTP direto
-- [ ] `Result.ok` branch para sucesso, `Result.error` para falha
-- [ ] `error` signal para exibir erros na UI
+- [ ] `Result.ok` branch para sucesso, `result.error` (lista) para falha
+- [ ] `errors` signal (`string[]`) — template com `@for` exibindo **todas** as mensagens
 - [ ] `loading` signal para estado de carregamento

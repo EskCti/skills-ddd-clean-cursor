@@ -131,16 +131,16 @@ const createCustomer = new CreateCustomerUseCase(repository)
 export const useCustomerStore = defineStore('customer', () => {
   const customers = ref<CustomerEntity[]>([])
   const loading = ref(false)
-  const error = ref<string | null>(null)
+  const errors = ref<string[]>([])
 
   async function fetchAll() {
     loading.value = true
-    error.value = null
+    errors.value = []
     const result = await getCustomers.execute()
     if (result.ok) {
       customers.value = result.data
     } else {
-      error.value = result.error
+      errors.value = [...result.error]
     }
     loading.value = false
   }
@@ -153,7 +153,7 @@ export const useCustomerStore = defineStore('customer', () => {
     return result // retorna Result para o componente tratar
   }
 
-  return { customers, loading, error, fetchAll, create }
+  return { customers, loading, errors, fetchAll, create }
 })
 ```
 

@@ -21,8 +21,8 @@ final class CustomersLoaded extends CustomersState {
   const CustomersLoaded(this.customers);
 }
 final class CustomersError extends CustomersState {
-  final String message;
-  const CustomersError(this.message);
+  final List<String> messages;
+  const CustomersError(this.messages);
 }
 
 final customersNotifierProvider =
@@ -43,7 +43,7 @@ class CustomersNotifier extends AsyncNotifier<CustomersState> {
     final result = await _getCustomers(const NoParams());
     return result.when(
       success: (customers) => CustomersLoaded(customers),
-      failure: (msg, _) => CustomersError(msg),
+      failure: (messages, _) => CustomersError(messages),
     );
   }
 
@@ -87,11 +87,15 @@ class CustomerListPage extends ConsumerWidget {
         error: (e, _) => Center(child: Text('Erro: $e')),
         data: (state) => switch (state) {
           CustomersLoading() => const Center(child: CircularProgressIndicator()),
-          CustomersError(:final message) => Center(
+          CustomersError(:final messages) => Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(message, style: const TextStyle(color: Colors.red)),
+                for (final msg in messages)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text(msg, style: const TextStyle(color: Colors.red)),
+                  ),
                 ElevatedButton(
                   onPressed: () => ref.read(customersNotifierProvider.notifier).refresh(),
                   child: const Text('Tentar novamente'),

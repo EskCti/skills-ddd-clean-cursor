@@ -73,11 +73,13 @@ fun CustomerFormScreen(
             )
 
             if (createState is CustomerViewModel.CreateState.Error) {
-                Text(
-                    (createState as CustomerViewModel.CreateState.Error).message,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                )
+                (createState as CustomerViewModel.CreateState.Error).messages.forEach { msg ->
+                    Text(
+                        msg,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
             }
 
             Button(
@@ -102,5 +104,5 @@ fun CustomerFormScreen(
 - [ ] Formulário chama `viewModel.createCustomer(...)` — não o UseCase diretamente
 - [ ] ViewModel expõe `createState: StateFlow<CreateState>` (Idle/Loading/Success/Error)
 - [ ] `LaunchedEffect(createState)` para navegar no Success + `resetCreateState()`
-- [ ] Erros do UseCase (e.g., email duplicado) aparecem via `CreateState.Error.message`
+- [ ] Erros do UseCase aparecem via `CreateState.Error(messages)` — **um `Text` por item**
 - [ ] Validações de UI no formulário (formato) + validações de negócio no UseCase

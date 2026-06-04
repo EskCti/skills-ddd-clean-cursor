@@ -16,11 +16,11 @@ sealed class Result<T> {
 
   R when<R>({
     required R Function(T data) success,
-    required R Function(String message, Object? exception) failure,
+    required R Function(List<String> messages, Object? exception) failure,
   }) =>
       switch (this) {
         Success<T> s => success(s.data),
-        Failure<T> f => failure(f.message, f.exception),
+        Failure<T> f => failure(f.messages, f.exception),
       };
 }
 
@@ -30,9 +30,13 @@ final class Success<T> extends Result<T> {
 }
 
 final class Failure<T> extends Result<T> {
-  final String message;
+  final List<String> messages;
   final Object? exception;
-  const Failure(this.message, {this.exception});
+  const Failure(this.messages, {this.exception});
+
+  /// Atalho para falha com uma mensagem
+  factory Failure.single(String message, {Object? exception}) =>
+      Failure([message], exception: exception);
 }
 ```
 
@@ -88,17 +92,18 @@ class Customer extends Equatable {
     required String email,
     required String cpf,
   }) {
+    final messages = <String>[];
     if (name.trim().length < 2) {
-      return Failure('Nome inválido',
-          exception: CustomerInvalidData('name', 'Mínimo 2 caracteres'));
+      messages.add('Nome deve ter pelo menos 2 caracteres');
     }
     if (!email.contains('@') || !email.contains('.')) {
-      return Failure('Email inválido',
-          exception: CustomerInvalidData('email', 'Formato inválido'));
+      messages.add('Email inválido');
     }
     if (cpf.replaceAll(RegExp(r'\D'), '').length != 11) {
-      return Failure('CPF inválido',
-          exception: CustomerInvalidData('cpf', 'Deve ter 11 dígitos'));
+      messages.add('CPF deve ter 11 dígitos');
+    }
+    if (messages.isNotEmpty) {
+      return Failure(messages);
     }
     return Success(Customer._(
       id: id,
@@ -124,6 +129,7 @@ class Customer extends Equatable {
 - [ ] `Result<T>` sealed class criada em `lib/core/result/result.dart`
 - [ ] `<Bc>Failure` sealed class com variantes específicas
 - [ ] Entidade com construtor privado (`._`) e factory `create()`
-- [ ] Validações retornam `Failure` — nunca `throw`
+- [ ] Validações acumulam em `messages` e retornam `Failure(messages)` — nunca `throw`
+- [ ] Telas exibem **todas** as entradas de `messages` (lista/bullets)
 - [ ] `Equatable` para igualdade por valor
 - [ ] Sem dependências Flutter ou Riverpod na entidade

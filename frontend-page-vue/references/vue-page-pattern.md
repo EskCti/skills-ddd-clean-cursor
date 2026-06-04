@@ -29,8 +29,10 @@ const getSeverity = (isActive: boolean) => isActive ? 'success' : 'danger'
       <Button label="Novo Cliente" icon="pi pi-plus" @click="router.push('/customers/new')" />
     </div>
 
-    <!-- Erro do UseCase/Repository exibido na UI -->
-    <Message v-if="store.error" severity="error" :text="store.error" class="mb-4" />
+    <!-- Erros do UseCase/Repository — lista completa -->
+    <div v-if="store.errors.length" class="mb-4 flex flex-col gap-2">
+      <Message v-for="(msg, i) in store.errors" :key="i" severity="error" :text="msg" />
+    </div>
 
     <DataTable :value="store.customers" :loading="store.loading" paginator :rows="10" stripedRows>
       <Column field="name" header="Nome" sortable />
@@ -69,6 +71,6 @@ Data (CustomerHttpRepository → fetch → API)
 ## Checklist
 
 - [ ] View usa Pinia store (não importa use cases ou repository diretamente)
-- [ ] Store expõe `customers`, `loading` e `error`
-- [ ] `store.error` exibido na UI com `<Message>` PrimeVue
+- [ ] Store expõe `customers`, `loading` e `errors: string[]`
+- [ ] `store.errors` exibido com um `<Message>` **por item** (nunca só o primeiro)
 - [ ] Store chama UseCase (não fetch direto)

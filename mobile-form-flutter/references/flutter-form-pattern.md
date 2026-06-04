@@ -57,10 +57,12 @@ class _CustomerFormPageState extends ConsumerState<CustomerFormPage> {
           );
           context.pop();
         },
-        failure: (message, exception) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(message), backgroundColor: Colors.red),
-          );
+        failure: (messages, exception) {
+          for (final msg in messages) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(msg), backgroundColor: Colors.red),
+            );
+          }
         },
       );
     } finally {

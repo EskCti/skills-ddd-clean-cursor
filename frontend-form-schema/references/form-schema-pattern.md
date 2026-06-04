@@ -68,6 +68,7 @@
 - [ ] `resolver: v.resolver(schema)` aplicado.
 - [ ] `defaultValues` coerentes com schema e modo (create/update).
 - [ ] Mensagens de erro exibidas via `FormMessage`.
+- [ ] Erros da API (`{ errors: string[] }`) mapeados e exibidos como **lista** (não só o primeiro item).
 - [ ] Barrel `index.ts` atualizado quando novo schema é adicionado.
 
 ## Armadilhas comuns
