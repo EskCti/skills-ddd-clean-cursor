@@ -1,5 +1,7 @@
 package com.example.shared.domain.vo
 
+import com.example.shared.domain.result.DomainResult
+
 @JvmInline
 value class HashPassword private constructor(val value: String) {
     companion object {
@@ -9,12 +11,12 @@ value class HashPassword private constructor(val value: String) {
         fun create(value: String): HashPassword =
             tryCreate(value).getOrThrow()
 
-        fun tryCreate(value: String): Result<HashPassword> {
+        fun tryCreate(value: String): DomainResult<HashPassword> {
             val trimmed = value.trim()
             if (!BCRYPT_REGEX.matches(trimmed)) {
-                return Result.failure(IllegalArgumentException(INVALID_HASH))
+                return DomainResult.failure(INVALID_HASH)
             }
-            return Result.success(HashPassword(trimmed))
+            return DomainResult.success(HashPassword(trimmed))
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.shared.domain.vo
 
+import com.example.shared.domain.result.DomainResult
 import java.util.UUID
 
 @JvmInline
@@ -10,19 +11,19 @@ value class Id private constructor(val value: String) {
         fun create(value: String? = null): Id =
             tryCreate(value).getOrThrow()
 
-        fun tryCreate(value: String? = null): Result<Id> {
+        fun tryCreate(value: String? = null): DomainResult<Id> {
             val resolved = value?.trim()?.ifBlank { null } ?: UUID.randomUUID().toString()
             return try {
                 UUID.fromString(resolved)
-                Result.success(Id(resolved))
+                DomainResult.success(Id(resolved))
             } catch (e: IllegalArgumentException) {
-                Result.failure(IllegalArgumentException(INVALID_ID))
+                DomainResult.failure(INVALID_ID)
             }
         }
 
-        fun required(value: String): Result<Id> {
+        fun required(value: String): DomainResult<Id> {
             if (value.isBlank()) {
-                return Result.failure(IllegalArgumentException(INVALID_ID))
+                return DomainResult.failure(INVALID_ID)
             }
             return tryCreate(value)
         }

@@ -1,5 +1,7 @@
 package com.example.shared.domain.vo
 
+import com.example.shared.domain.result.DomainResult
+
 @JvmInline
 value class Name private constructor(val value: String) {
     companion object {
@@ -8,12 +10,13 @@ value class Name private constructor(val value: String) {
         fun create(value: String): Name =
             tryCreate(value).getOrThrow()
 
-        fun tryCreate(value: String): Result<Name> {
+        fun tryCreate(value: String): DomainResult<Name> {
+            val errors = mutableListOf<String>()
             val normalized = value.trim()
-            if (normalized.isBlank() || normalized.length > 255) {
-                return Result.failure(IllegalArgumentException(INVALID_NAME))
-            }
-            return Result.success(Name(normalized))
+            if (normalized.isBlank()) errors.add("Name must not be blank")
+            if (normalized.length > 255) errors.add("Name must have at most 255 characters")
+            if (errors.isNotEmpty()) return DomainResult.failure(errors)
+            return DomainResult.success(Name(normalized))
         }
     }
 }

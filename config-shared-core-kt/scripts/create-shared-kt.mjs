@@ -74,6 +74,7 @@ async function validateTemplate() {
   const required = [
     'build.gradle.kts',
     'src/main/kotlin/com/example/shared/domain/base/Entity.kt',
+    'src/main/kotlin/com/example/shared/domain/result/DomainResult.kt',
     'src/main/kotlin/com/example/shared/domain/vo/Id.kt',
     'src/main/kotlin/com/example/shared/domain/vo/Name.kt',
     'src/main/kotlin/com/example/shared/domain/vo/Email.kt',

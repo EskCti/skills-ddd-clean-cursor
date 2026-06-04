@@ -1,5 +1,7 @@
 package com.example.shared.domain.vo
 
+import com.example.shared.domain.result.DomainResult
+
 @JvmInline
 value class Email private constructor(val value: String) {
     companion object {
@@ -9,12 +11,13 @@ value class Email private constructor(val value: String) {
         fun create(value: String): Email =
             tryCreate(value).getOrThrow()
 
-        fun tryCreate(value: String): Result<Email> {
+        fun tryCreate(value: String): DomainResult<Email> {
+            val errors = mutableListOf<String>()
             val normalized = value.trim().lowercase()
-            if (!EMAIL_REGEX.matches(normalized)) {
-                return Result.failure(IllegalArgumentException(INVALID_EMAIL))
-            }
-            return Result.success(Email(normalized))
+            if (normalized.isBlank()) errors.add("Email must not be blank")
+            if (!EMAIL_REGEX.matches(normalized)) errors.add(INVALID_EMAIL)
+            if (errors.isNotEmpty()) return DomainResult.failure(errors)
+            return DomainResult.success(Email(normalized))
         }
     }
 

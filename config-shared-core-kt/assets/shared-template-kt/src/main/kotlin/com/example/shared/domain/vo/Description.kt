@@ -1,5 +1,7 @@
 package com.example.shared.domain.vo
 
+import com.example.shared.domain.result.DomainResult
+
 @JvmInline
 value class Description private constructor(val value: String) {
     companion object {
@@ -18,7 +20,7 @@ value class Description private constructor(val value: String) {
             text: String,
             minLength: Int = DEFAULT_MIN_LENGTH,
             maxLength: Int = DEFAULT_MAX_LENGTH
-        ): Result<Description> =
+        ): DomainResult<Description> =
             Text.tryCreateInternal(text, minLength, maxLength, TOO_SHORT, TOO_LONG) { v -> Description(v) }
     }
 }
