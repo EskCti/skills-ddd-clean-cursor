@@ -14,7 +14,7 @@ Entidade em `domain/entity.rs` como `pub struct Customer` — path `modules::cus
 
 - Ler `references/entity-pattern-rs.md` e `rust-namespace-layout.md`.
 - Implementar `shared_kernel::Entity`.
-- Factory `create` / `try_new` retornando `Result<Self>`.
+- Factory `try_new` retornando `Result<Self>` com `Err(Vec<DomainError>)`; combinar erros de todos os VOs.
 - Comportamento via métodos de domínio (`deactivate`, etc.).
 - **Proibido** `domain/customer/mod.rs` com `struct Customer` dentro de `mod customer`.
 

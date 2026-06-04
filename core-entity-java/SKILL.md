@@ -14,7 +14,7 @@ Entidade em `domain/entity/Customer.java` — path `com.example.customers.domain
 
 - Ler `references/entity-pattern-java.md` e `java-namespace-layout.md`.
 - Implementar `com.example.shared.Entity<ID>`.
-- Factory `create()` retornando `Result<Self>`.
+- Factory `create()` retornando `Result<Self>`; combinar VOs com `Result.mergeErrors` → lista de `DomainError`.
 - Comportamento via métodos de domínio (`deactivate`, etc.).
 - **Proibido** `domain.entity.customer.CustomerEntity` ou sufixo `Entity` no domínio.
 

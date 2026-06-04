@@ -13,8 +13,15 @@ impl ValueObject for Email {}
 impl Email {
     pub fn try_new(raw: &str) -> Result<Self> {
         let trimmed = raw.trim().to_lowercase();
-        if trimmed.is_empty() || !trimmed.contains('@') {
-            return Result::err(DomainError::new("invalid email"));
+        let mut errors = Vec::new();
+        if trimmed.is_empty() {
+            errors.push(DomainError::new("email must not be blank"));
+        }
+        if !trimmed.contains('@') {
+            errors.push(DomainError::new("invalid email format"));
+        }
+        if !errors.is_empty() {
+            return Result::Err(errors);
         }
         Ok(Self(trimmed))
     }

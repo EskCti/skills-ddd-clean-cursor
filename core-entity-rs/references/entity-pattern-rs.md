@@ -1,38 +1,44 @@
 # Entity — Rust
 
+Path: `modules/<bc>/domain/entity.rs`
+
+Failures: `Result::Err(Vec<DomainError>)`. Combine VOs before building the entity.
+
 ```rust
-// modules/customers/domain/entity.rs
 use shared_kernel::{Entity, EntityId, Result, DomainError};
+use shared_kernel::result::combine2;
 
 use super::value_objects::{Email, CustomerName};
 
-#[derive(Debug, Clone)]
 pub struct Customer {
     id: EntityId,
     name: CustomerName,
     email: Email,
-    active: bool,
-}
-
-impl Entity for Customer {
-    fn id(&self) -> &EntityId {
-        &self.id
-    }
 }
 
 impl Customer {
-    pub fn create(id: EntityId, name: CustomerName, email: Email) -> Result<Self> {
-        Ok(Self { id, name, email, active: true })
-    }
-
-    pub fn deactivate(&mut self) -> Result<()> {
-        if !self.active {
-            return Result::err(DomainError::new("already inactive"));
+    pub fn try_new(id: EntityId, raw_name: &str, raw_email: &str) -> Result<Self> {
+        let name = CustomerName::try_new(raw_name);
+        let email = Email::try_new(raw_email);
+        let mut errors = Vec::new();
+        let valid_name = match &name {
+            Ok(v) => Some(v.clone()),
+            Err(e) => { errors.extend(e.clone()); None }
+        };
+        let valid_email = match &email {
+            Ok(v) => Some(v.clone()),
+            Err(e) => { errors.extend(e.clone()); None }
+        };
+        if !errors.is_empty() {
+            return Result::Err(errors);
         }
-        self.active = false;
-        Result::ok(())
+        Ok(Self {
+            id,
+            name: valid_name.unwrap(),
+            email: valid_email.unwrap(),
+        })
     }
 }
 ```
 
-Import externo: `use crate::modules::customers::domain::Customer;`
+Import: `crate::modules::customers::domain::Customer`
