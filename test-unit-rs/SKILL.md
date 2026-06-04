@@ -12,6 +12,8 @@ Testes colocados em `#[cfg(test)] mod tests` no mesmo arquivo ou `crates/api/src
 
 ## Guidelines
 
+- Ao **fechar o épico**: `cargo test --workspace` + coverage; em seguida `bash config-cicd-rs/scripts/check-memory-rs.sh`.
+
 - Mock ports com `mockall` ou struct fake implementando trait Repository.
 - Sem Postgres real em unit tests de domínio.
 - `cargo test -p api` / `cargo llvm-cov`.

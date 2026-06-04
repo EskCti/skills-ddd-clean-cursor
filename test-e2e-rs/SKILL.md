@@ -15,6 +15,7 @@ Testes em `tests/integration/` ou crate `tests/` — sobem app Axum (ou usam `to
 - Fluxo: POST criar → GET buscar.
 - `docker compose` ou `testcontainers` para Postgres.
 - `cargo test --test integration`.
+- Parte do **fechamento de épico**: após E2E verde, rodar `check-memory-rs.sh` (LeakSanitizer nos mesmos testes de integração).
 
 ## Global Standards
 

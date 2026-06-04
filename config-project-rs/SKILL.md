@@ -45,6 +45,7 @@ Consultar `../config-shared-core-rs/references/rust-namespace-layout.md`:
 2. Validar crates `shared-kernel` e `api`.
 3. Configurar `.env`, `docker-compose.yml`, `migrations/`.
 4. `cargo build` e `cargo test -p shared-kernel`.
+5. Ao **fechar cada épico**: testes + CI + `config-cicd-rs/scripts/check-memory-rs.sh` (ver `skills-standards.md` Epic Definition of Done).
 
 ## Commands
 
