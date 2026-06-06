@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Shared Web (Leptos)'
+  short_description: 'Shell admin Leptos SSR com Tailwind — sidebar, topbar, rodapé'
+  default_prompt: 'Configure o shell admin Leptos SSR com Tailwind v4: sidebar colapsável, topbar, rodapé, dashboard vazio. Execute init-shared-web-leptos.mjs e integre rotas em app.rs com AdminShell.'
