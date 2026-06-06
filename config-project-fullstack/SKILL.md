@@ -1,7 +1,7 @@
 ---
 name: config-project-fullstack
 stack: agnostic
-description: Orquestrar a criação de um projeto full-stack completo com backend (NestJS/Spring Boot Kotlin/Spring Boot Java/ASP.NET Core/Axum Rust), frontend (Next.js/Angular/Vue com Tailwind CSS) e mobile opcional (Flutter/Android). Integrar OpenSpec para gerenciamento de mudanças ao longo do ciclo. Usar quando o pedido envolver criar um projeto do zero com múltiplas camadas, ou quando o usuário não sabe por onde começar.
+description: Orquestrar a criação de um projeto full-stack completo com backend (NestJS/Spring Boot Kotlin/Spring Boot Java/ASP.NET Core/Axum Rust), frontend (Next.js/Angular/Vue/Leptos SSR com Tailwind CSS) e mobile opcional (Flutter/Android). Integrar OpenSpec para gerenciamento de mudanças ao longo do ciclo. Usar quando o pedido envolver criar um projeto do zero com múltiplas camadas, ou quando o usuário não sabe por onde começar.
 ---
 
 # Config Project Full-Stack
@@ -21,7 +21,7 @@ Antes de iniciar, coletar as seguintes decisões:
 ```
 1. Nome do projeto: <kebab-case>
 2. Backend: [ ] NestJS (TypeScript)  [ ] Spring Boot (Kotlin)  [ ] Spring Boot (Java)  [ ] ASP.NET Core (C#)  [ ] Axum (Rust)
-3. Frontend: [ ] Next.js (+ Tailwind/Shadcn)  [ ] Angular (+ Tailwind)  [ ] Vue 3 (+ Tailwind)  [ ] Nenhum
+3. Frontend: [ ] Next.js (+ Tailwind/Shadcn)  [ ] Angular (+ Tailwind)  [ ] Vue 3 (+ Tailwind)  [ ] Leptos SSR (+ Tailwind)  [ ] Nenhum
 4. Mobile:   [ ] Flutter  [ ] Android (Kotlin + Compose)  [ ] Ambos  [ ] Nenhum
 5. Autenticação: [ ] Básica (JWT)  [ ] Completa (RBAC)  [ ] Nenhuma por agora
 6. OpenSpec: [ ] Sim, quero rastrear mudanças com openspec  [ ] Não (agents diretos)
@@ -48,6 +48,7 @@ Escolha o agent conforme a combinação:
 | ASP.NET Core (CS) | Vue 3 | `Config Project (C#)` + `Config Project (Vue)` → `Config Shared Web (Vue)` | Backend primeiro; depois frontend + shell. |
 | Axum (Rust) | Angular | `Config Project (Rust)` + `Config Project (Angular)` → `Config Shared Web (Angular)` | Cargo workspace na raiz ou `apps/backend/`; API em `:4000`; depois frontend + shell. |
 | Axum (Rust) | Vue 3 | `Config Project (Rust)` + `Config Project (Vue)` → `Config Shared Web (Vue)` | Idem; proxy Vite `/api` → `http://localhost:4000`. |
+| Axum (Rust) | Leptos SSR | `Config Project (Rust)` + `Config Project (Leptos)` → `Config Shared Web (Leptos)` | Workspace Cargo; API `:4000`, Leptos SSR `:3000`; `API_BASE_URL` no crate web-leptos. |
 | Axum (Rust) | Nenhum | `Config Project (Rust)` | API-only; mobile opcional apontando para `:4000`. |
 
 > **Java (Spring Boot)**: Gradle multi-module — `packages/<bc>/` (domain + application, pure Java) + `apps/backend-java/modules/<bc>/` (JPA + `@RestController`). Layout: `java-namespace-layout.md`. **Kotlin vs Java**: mesma stack Spring; Kotlin usa skills `-kt`, Java usa `-java`.
@@ -70,6 +71,7 @@ Após `config-project-*` do frontend:
 | Next.js | `Config Shared Web` | "Configure shell admin Tailwind + Shadcn: sidebar, topbar, rodapé, dashboard vazio." |
 | Angular | `Config Shared Web (Angular)` | "Execute init-shared-web-angular.mjs e mescle app.routes.shell.ts." |
 | Vue | `Config Shared Web (Vue)` | "Execute init-shared-web-vue.mjs, configure @tailwindcss/vite e mescle shell.routes.ts." |
+| Leptos | `Config Shared Web (Leptos)` | "Execute init-shared-web-leptos.mjs e integre AdminShell em app.rs." |
 
 ### 1C — Projeto mobile
 
@@ -157,6 +159,7 @@ Após o endpoint do backend estar pronto:
 | Next.js | `Frontend Form Schema` | `Frontend Form Schema` |
 | Angular | `Frontend Entity (Angular)` → `Frontend UseCase (Angular)` → `Frontend Repository (Angular)` | `Frontend Page (Angular)`, `Frontend Form (Angular)` |
 | Vue | `Frontend Entity (Vue)` → `Frontend UseCase (Vue)` → `Frontend Repository (Vue)` | `Frontend Page (Vue)`, `Frontend Form (Vue)` |
+| Leptos | `Frontend Entity (Leptos)` → `Frontend UseCase (Leptos)` → `Frontend Repository (Leptos)` | `Frontend Page (Leptos)`, `Frontend Form (Leptos)` |
 
 > **OpenSpec aqui**: Para features novas no frontend:
 > ```
@@ -222,7 +225,7 @@ Após a API estar pronta:
 7. Config Auth (se necessário)
 ```
 
-Tutoriais: [docs/tutorial/02-fullstack-project-setup.md](../docs/tutorial/02-fullstack-project-setup.md) · [docs/tutorial/stacks/](../docs/tutorial/stacks/) · [Rust + Vue + Flutter](../docs/tutorial/stacks/rust-vue-flutter.md) · [Java + Vue + Flutter](../docs/tutorial/stacks/java-vue-flutter.md)
+Tutoriais: [docs/tutorial/02-fullstack-project-setup.md](../docs/tutorial/02-fullstack-project-setup.md) · [docs/tutorial/stacks/](../docs/tutorial/stacks/) · [Rust + Vue + Flutter](../docs/tutorial/stacks/rust-vue-flutter.md) · [Rust + Leptos + Flutter](../docs/tutorial/stacks/rust-leptos-flutter.md) · [Java + Vue + Flutter](../docs/tutorial/stacks/java-vue-flutter.md)
 
 ---
 
