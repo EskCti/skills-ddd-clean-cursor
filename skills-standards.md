@@ -76,6 +76,7 @@ Exceptions are allowed when naming is imposed by framework/library:
 | **Next.js** | `config-project` | `config-shared-web` → `AdminShell` + rodapé | Tailwind v4 + Shadcn |
 | **Angular** | `config-project-angular` | `config-shared-web-angular` → sidebar + topbar + rodapé | Tailwind v4 + PrimeNG (widgets) |
 | **Vue** | `config-project-vue` | `config-shared-web-vue` → sidebar + topbar + rodapé | Tailwind v4 + PrimeVue (widgets) |
+| **Leptos** | `config-project-leptos` | `config-shared-web-leptos` → sidebar + topbar + rodapé | Tailwind v4 + HTML/componentes Leptos |
 
 Regras:
 
@@ -91,6 +92,7 @@ Consultar:
 - Next.js: `config-shared-web/SKILL.md`
 - Angular: `config-shared-web-angular/SKILL.md` + `config-project-angular/references/tailwind-setup.md`
 - Vue: `config-shared-web-vue/SKILL.md` + `config-project-vue/references/tailwind-setup.md`
+- Leptos: `config-shared-web-leptos/SKILL.md` + `config-project-leptos/references/tailwind-setup.md`
 
 ## 5. Skill Authoring Rules
 
@@ -106,10 +108,10 @@ When editing any skill (`*/SKILL.md`):
 | Category        | Prefix                     | Purpose                                                          | Stack                        |
 | --------------- | -------------------------- | ---------------------------------------------------------------- | ---------------------------- |
 | Orquestrador    | `config-project-fullstack` | **Ponto de entrada** para projetos completos — define agents em sequência e integra OpenSpec | Agnostic |
-| Config          | `config-*`                 | Bootstrap/scaffolding de projeto, módulo ou infra                | TS, KT, CS, RS, Angular, Vue, Flutter, Android |
+| Config          | `config-*`                 | Bootstrap/scaffolding de projeto, módulo ou infra                | TS, KT, CS, RS, Angular, Vue, Leptos, Flutter, Android |
 | Core       | `core-*`     | Padrões de domínio e aplicação (entity, VO, use case)            | TS, KT, CS, RS, Java             |
 | Backend    | `backend-*`  | Camada de infraestrutura/interface do backend                    | TS, KT, CS, RS, Java             |
-| Frontend   | `frontend-*` | Camada de interface web (Tailwind + Next.js/Angular/Vue) | TS, Angular, Vue             |
+| Frontend   | `frontend-*` | Camada de interface web (Tailwind + Next.js/Angular/Vue/Leptos) | TS, Angular, Vue, Leptos |
 | Mobile     | `mobile-*`   | Telas e formulários mobile (Flutter, Android Compose)            | Flutter, Android (Kotlin)    |
 | Requisitos | `req-*`      | Discovery, modelagem DDD, migração e planejamento                | Agnostic                     |
 | Qualidade  | `test-*`     | Testes unitários (≥95% domain/app) e E2E (fluxos críticos)       | TS, KT, CS, RS, Java             |
@@ -127,6 +129,7 @@ When editing any skill (`*/SKILL.md`):
 | **Rust**          | `-rs`       | Axum + sqlx + Cargo workspace     | Templates + scripts                                 |
 | Angular           | `-angular`  | Angular 17+ standalone + Tailwind + PrimeNG (widgets) | Templates                      |
 | Vue               | `-vue`      | Vue 3 + Tailwind + PrimeVue + Pinia | Templates                                        |
+| Leptos            | `-leptos`   | Leptos SSR + cargo-leptos + Tailwind | Templates + scripts                              |
 | Flutter           | `-flutter`  | Flutter + Riverpod + Dio          | Templates                                           |
 | Android           | `-android`  | Jetpack Compose + Hilt + Retrofit | Templates                                           |
 | Language-agnostic | (none)      | —                                 | `req-discovery`, `req-agile-planning`, `openspec-*` |
@@ -147,6 +150,7 @@ The `req-discovery` skill can **read** systems in any language (PHP, Go, Python,
 | Rust | `shared_kernel::Result<T>` | `Err(Vec<DomainError>)` | `combine2`, `combine_errors` |
 | Java | `Result<T>` | `getErrors(): List<DomainError>` | `Result.mergeErrors(...)` |
 | Angular / Vue (frontend) | `Result<T, E>` com `E = readonly string[]` | `error: string[]` em `Err` | acumular no `create()` + `err([...])` |
+| Leptos (frontend) | `shared_kernel::Result<T>` | `Err(Vec<DomainError>)` | acumular no `try_new()` + `combine2` |
 | Flutter (mobile) | `Result<T>` / `Failure` | `messages: List<String>` | `Failure(messages)` |
 | Android (mobile) | `kotlin.Result` + `sealed Failure` | mapear para `List<String>` na UI | helper `toErrorMessages()` |
 
