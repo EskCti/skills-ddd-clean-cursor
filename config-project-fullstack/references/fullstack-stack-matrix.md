@@ -12,6 +12,7 @@
 | Enterprise .NET / Azure | ASP.NET Core | Angular | Android | LINQ, Android nativo | [dotnet-angular-android](../../docs/tutorial/stacks/dotnet-angular-android.md) |
 | Performance / sistemas críticos | Axum (Rust) | Angular | Flutter | Backend async, memória segura, API `:4000` | [rust-vue-flutter](../../docs/tutorial/stacks/rust-vue-flutter.md) *(seção Variante Angular)* |
 | Performance + UI Vue | Axum (Rust) | Vue+PrimeVue | Flutter | Rust backend + produtividade Vue | [rust-vue-flutter](../../docs/tutorial/stacks/rust-vue-flutter.md) |
+| Full-stack Rust nativo | Axum (Rust) | Leptos SSR | Flutter | Backend + frontend no workspace Cargo | [rust-leptos-flutter](../../docs/tutorial/stacks/rust-leptos-flutter.md) |
 | Migração incremental | Qualquer | — | — | Strangler Fig | [backend-incremental](../../docs/tutorial/stacks/backend-incremental.md) |
 
 ---
@@ -196,6 +197,40 @@ Fase 4 — Mobile Flutter
   (igual Stack 4)
 ```
 
+### Stack 6: Axum (Rust) + Leptos SSR + Flutter
+
+**Tutorial**: [rust-leptos-flutter.md](../../docs/tutorial/stacks/rust-leptos-flutter.md)
+
+```
+Fase 1 — Setup (inclui Docker + CI/CD)
+  openspec-propose "bootstrap-<projeto>"  (se usando openspec)
+  openspec-apply-change "bootstrap-<projeto>"
+  ├── config-project-rs              → Cargo workspace (shared-kernel + api Axum)
+  ├── config-sqlx-rs                 → migrations sqlx
+  ├── config-project-leptos          → crates/web-leptos (cargo-leptos SSR :3000)
+  ├── config-shared-web-leptos       → shell Tailwind (sidebar, topbar, rodapé)
+  ├── config-project-flutter         → app Flutter → API http://localhost:4000
+  ├── config-docker-rs               → Dockerfile multi-stage Rust
+  ├── config-cicd-rs                 → GitHub Actions (clippy, test, coverage ≥95%)
+  └── config-shared-core-rs          → crates/shared-kernel
+
+Fase 2 — Domínio (por BC) — sufixo -rs
+  (igual Stack 4/5)
+
+Fase 3 — Frontend Leptos (por feature)
+  frontend-entity-leptos → frontend-usecase-leptos → frontend-repository-leptos
+  frontend-page-leptos → frontend-form-leptos
+  API_BASE_URL=http://localhost:4000 no crate web-leptos
+
+Fase 4 — Mobile Flutter
+  (igual Stack 4)
+```
+
+**Layout Leptos (obrigatório)**: `config-project-leptos/references/leptos-namespace-layout.md`
+
+- ✅ `features::customers::domain::Customer`
+- ❌ lógica HTTP em componentes Leptos
+
 ---
 
 ## Quando usar OpenSpec
@@ -222,6 +257,7 @@ Fase 4 — Mobile Flutter
 │   ├── web/                  # Next.js
 │   ├── web-angular/          # Angular 17+
 │   ├── web-vue/              # Vue 3 + PrimeVue
+│   ├── web-leptos/           # Leptos SSR (ou crates/web-leptos no workspace Rust)
 │   ├── mobile-flutter/       # Flutter app
 │   └── mobile-android/       # Android app
 ├── packages/

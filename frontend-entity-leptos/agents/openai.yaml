@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Frontend Entity (Leptos)'
+  short_description: 'Entidade de domínio Rust puro com shared_kernel::Result'
+  default_prompt: 'Crie a entidade de domínio Leptos para o BC indicado. Rust puro em features/<bc>/domain/entity.rs, sem deps Leptos, factory try_new() → Result com erros acumulados. Consultar references/leptos-entity-pattern.md.'

@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Frontend Repository (Leptos)'
+  short_description: 'HttpRepository reqwest + DTO + Result para API Axum'
+  default_prompt: 'Implemente CustomerHttpRepository em features/<bc>/infrastructure/ com reqwest apontando para API_BASE_URL. DTO serde separado, mapeamento para entidade via try_new(). Consultar references/leptos-repository-pattern.md.'

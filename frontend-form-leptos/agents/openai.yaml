@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Frontend Form (Leptos)'
+  short_description: 'Formulário Leptos SSR com signals + UseCase + erros de negócio'
+  default_prompt: 'Crie o formulário Leptos em features/<bc>/presentation/form_page.rs. Signals para campos, submit chama CreateCustomer UseCase, exibe lista completa de erros do Result. Tailwind para layout. Consultar references/leptos-form-pattern.md.'

@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Frontend Page (Leptos)'
+  short_description: 'Página de listagem Leptos SSR com Resource + UseCase + Tailwind'
+  default_prompt: 'Crie a página de listagem Leptos em features/<bc>/presentation/list_page.rs. Use Resource + ListCustomers UseCase, Tailwind para layout, exiba todos os erros do Result. Consultar references/leptos-page-pattern.md.'
