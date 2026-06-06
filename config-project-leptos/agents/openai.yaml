@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Project (Leptos)'
+  short_description: 'Bootstrap frontend Leptos SSR com Tailwind no workspace Cargo'
+  default_prompt: 'Inicialize o frontend Leptos SSR em crates/web-leptos no workspace Cargo existente. Execute project-init-leptos.mjs, configure cargo-leptos, Tailwind v4 e proxy para API Axum em :4000. Siga leptos-namespace-layout.md — domain/application sem deps Leptos.'

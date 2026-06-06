@@ -1,0 +1,13 @@
+[package]
+name = "web-leptos"
+site-root = "target/site"
+site-pkg-dir = "pkg"
+site-addr = "127.0.0.1:3000"
+reload-port = 3001
+
+[build]
+command = "cargo build --package web-leptos --features ssr"
+target-directory = "target"
+
+[serve]
+command = "cargo run --package web-leptos --features ssr --no-default-features"
