@@ -28,7 +28,7 @@ Guias em [`docs/tutorial/`](docs/tutorial/README.md):
 |---|----------|-------------|
 | [01](docs/tutorial/01-pipeline-discovery-planning.md) | Análise e Planejamento (`req-*`) | Sempre primeiro — gera `backlog.md` |
 | [02](docs/tutorial/02-fullstack-project-setup.md) | **Hub Full-Stack** | Escolher backend + frontend + mobile após análise |
-| — | [Stacks por combinação](docs/tutorial/README.md#fase-2--full-stack-escolher-combinação) | NestJS+Angular+Flutter, NestJS+Vue+Flutter, Spring+Vue, .NET+Angular+Android, etc. |
+| — | [Stacks por combinação](docs/tutorial/README.md#fase-2--full-stack-escolher-combinação) | NestJS+Angular+Flutter, NestJS+Vue+Flutter, Axum+Leptos+Flutter, Spring+Vue, .NET+Angular+Android, etc. |
 | [03](docs/tutorial/03-implementacao-modulo.md) | Backend incremental (atalho) | Strangler Fig / só API |
 | [04](docs/tutorial/04-ciclo-completo-openspec.md) | Ciclo OpenSpec | Legado → NestJS+Vue+Flutter (referência ou narrativa) |
 
@@ -145,6 +145,8 @@ Layout obrigatório: `config-shared-core-rs/references/rust-namespace-layout.md`
 
 **Tutorial full-stack (Rust + Vue + Flutter):** [docs/tutorial/stacks/rust-vue-flutter.md](docs/tutorial/stacks/rust-vue-flutter.md)
 
+**Tutorial full-stack (Rust + Leptos + Flutter):** [docs/tutorial/stacks/rust-leptos-flutter.md](docs/tutorial/stacks/rust-leptos-flutter.md)
+
 ### Skills Java (sufixo `-java`) — backend Spring Boot
 
 Layout obrigatório: `config-shared-core-java/references/java-namespace-layout.md` — domínio puro em `packages/<bc>/`, Spring em `apps/backend-java/modules/<bc>/`.
@@ -181,6 +183,21 @@ Skills para projetos Angular 17+ standalone + NestJS com **todas as camadas DDD*
 - `config-shared-web-angular`: shell admin Tailwind (sidebar colapsável, topbar, rodapé, dashboard vazio)
 - `frontend-page-angular`: listagem com DataTable PrimeNG, injeta UseCase (não Service HTTP direto)
 - `frontend-form-angular`: formulário Reactive Forms, injeta UseCase, exibe `result.error` da camada de negócio
+
+### Skills Frontend Leptos (sufixo `-leptos`) — Clean Architecture completa
+
+Skills para Leptos SSR + Axum (workspace Cargo) com **todas as camadas DDD** — domínio Rust puro reutilizando `shared_kernel::Result`:
+
+**Domínio e Aplicação:**
+- `frontend-entity-leptos`: entidade Rust puro com `shared_kernel::Result<T>` e factory `try_new()` — sem dependências Leptos
+- `frontend-usecase-leptos`: struct + `execute()` async retornando `Result<T>` — injeta `Arc<dyn Repository>`
+- `frontend-repository-leptos`: `HttpRepository` com reqwest, DTO serde, mapeamento para entidade
+
+**Apresentação:**
+- `config-project-leptos`: bootstrap crate `web-leptos` com cargo-leptos, Tailwind v4, API em `:4000`
+- `config-shared-web-leptos`: shell admin Tailwind (sidebar colapsável, topbar, rodapé, dashboard vazio)
+- `frontend-page-leptos`: listagem SSR com `Resource` + UseCase, erros completos na UI
+- `frontend-form-leptos`: formulário com signals, submit via UseCase, exibe `Result::Err` completo
 
 ### Skills Frontend Vue (sufixo `-vue`) — Clean Architecture completa
 

@@ -102,6 +102,7 @@ Marque **sim** em todos antes de abrir o [Tutorial 02](./02-fullstack-project-se
 | Spring Boot (Kotlin) | Vue 3 | Flutter | [stacks/spring-vue-flutter.md](./stacks/spring-vue-flutter.md) |
 | Spring Boot (Java) | Vue 3 | Flutter | [stacks/java-vue-flutter.md](./stacks/java-vue-flutter.md) |
 | Axum (Rust) | Vue 3 | Flutter | [stacks/rust-vue-flutter.md](./stacks/rust-vue-flutter.md) |
+| Axum (Rust) | Leptos SSR | Flutter | [stacks/rust-leptos-flutter.md](./stacks/rust-leptos-flutter.md) |
 | ASP.NET Core | Angular | Android | [stacks/dotnet-angular-android.md](./stacks/dotnet-angular-android.md) |
 | ASP.NET Core | Vue 3 | Android | [stacks/dotnet-cs-vue-android.md](./stacks/dotnet-cs-vue-android.md) |
 | Qualquer | — | — | [stacks/backend-incremental.md](./stacks/backend-incremental.md) |
