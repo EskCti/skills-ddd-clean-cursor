@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Frontend UseCase (Leptos)'
+  short_description: 'Caso de uso Rust puro async com Result e repository port'
+  default_prompt: 'Crie o caso de uso Leptos em features/<bc>/application/. Struct com execute() async → Result, injeta Arc<dyn Repository> do domain/ports. Sem deps Leptos. Consultar references/leptos-usecase-pattern.md.'
