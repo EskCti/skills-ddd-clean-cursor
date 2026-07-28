@@ -1,3 +1,4 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 # skills-ddd-clean
 
 Coleção de skills para agentes de IA com foco em **Domain-Driven Design (DDD)** e **Clean Architecture**, pensada para padronizar a arquitetura e a forma de implementação em múltiplos projetos.
@@ -360,3 +361,7 @@ Convenção global de nomenclatura e padrões gerais:
 - menor tempo de setup e implementação;
 - redução de divergências de naming e organização;
 - evolução centralizada das práticas de DDD + Clean Architecture.
+
+## 📄 Licença
+
+Este projeto está licenciado sob a [MIT License](LICENSE). Sinta-se livre para usar, modificar e distribuir.
