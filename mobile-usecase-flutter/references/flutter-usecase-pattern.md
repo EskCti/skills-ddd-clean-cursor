@@ -14,7 +14,7 @@ class NoParams {
 }
 ```
 
-## Params (lib/features/customers/domain/usecases/create_customer_use_case.dart)
+## Params (lib/features/customers/application/usecases/create_customer_use_case.dart)
 
 ```dart
 import '../../../../core/result/result.dart';

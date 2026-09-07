@@ -229,8 +229,8 @@ class CustomerRepositoryImpl implements ICustomerRepository {
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../domain/repositories/i_customer_repository.dart';
-import '../../domain/usecases/create_customer_use_case.dart';
-import '../../domain/usecases/get_customers_use_case.dart';
+import '../../application/usecases/create_customer_use_case.dart';
+import '../../application/usecases/get_customers_use_case.dart';
 import '../datasources/customer_remote_datasource.dart';
 import '../repositories/customer_repository_impl.dart';
 

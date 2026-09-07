@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/result/result.dart';
-import '../../domain/usecases/create_customer_use_case.dart';
+import '../../application/usecases/create_customer_use_case.dart';
 import '../providers/customers_notifier.dart';
 
 class CustomerFormPage extends ConsumerStatefulWidget {

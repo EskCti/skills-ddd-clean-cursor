@@ -6,8 +6,8 @@
 // features/customers/presentation/providers/customers_notifier.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/customer.dart';
-import '../../domain/usecases/create_customer_use_case.dart';
-import '../../domain/usecases/get_customers_use_case.dart';
+import '../../application/usecases/create_customer_use_case.dart';
+import '../../application/usecases/get_customers_use_case.dart';
 import '../../data/providers/customer_providers.dart';
 import '../../../../core/result/result.dart';
 

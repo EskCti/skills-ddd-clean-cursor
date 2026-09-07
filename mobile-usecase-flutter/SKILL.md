@@ -24,7 +24,7 @@ Criar casos de uso em Dart puro seguindo `abstract class UseCase<Type, Params>` 
 2. Criar `class <Nome>UseCase implements UseCase<OutputType, <Nome>Params>`.
 3. Receber repository no construtor.
 4. Implementar `call()` com lógica de negócio e retorno `Result<Type>`.
-5. Criar em `features/<bc>/domain/usecases/<nome>_use_case.dart`.
+5. Criar em `features/<bc>/application/usecases/<nome>_use_case.dart`.
 
 ## References
 

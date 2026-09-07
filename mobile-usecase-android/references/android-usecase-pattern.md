@@ -10,7 +10,7 @@ interface UseCase<in Params, out R> {
 object NoParams
 ```
 
-## CreateCustomerUseCase (features/customers/domain/usecase/CreateCustomerUseCase.kt)
+## CreateCustomerUseCase (features/customers/application/usecase/CreateCustomerUseCase.kt)
 
 ```kotlin
 import javax.inject.Inject

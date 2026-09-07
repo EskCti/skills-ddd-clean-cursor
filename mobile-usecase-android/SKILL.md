@@ -23,7 +23,7 @@ Criar casos de uso em Kotlin puro seguindo `interface UseCase<in Params, out R>`
 1. Criar `interface UseCase<in Params, out R>` em `core/usecase/UseCase.kt`.
 2. Criar `class <Nome>UseCase @Inject constructor(private val repo: IRepository)`.
 3. Implementar `invoke()` com lógica de negócio.
-4. Criar em `features/<bc>/domain/usecase/<Nome>UseCase.kt`.
+4. Criar em `features/<bc>/application/usecase/<Nome>UseCase.kt`.
 
 ## References
 
