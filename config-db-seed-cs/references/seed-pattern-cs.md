@@ -23,14 +23,22 @@ public static class UserSeed
     {
         if (await context.Users.AnyAsync()) return;
 
-        var user = User.Create(
+var user = User.Create(
             Name.Create("Admin").Value,
             Email.Create("admin@example.com").Value,
             true
         );
 
-        // Mapear para Dbo se necessário ou usar o context direto se as configurações permitirem
-        await context.Users.AddAsync(user);
+        // Mapear entidade de domínio → Dbo (EF Core mapeia o Dbo à tabela;
+        // nunca persiste a entidade de domínio direto no DbSet)
+        var userRow = new UserRow
+        {
+            Id = user.Id,
+            Name = user.Name.Value,
+            Email = user.Email.Value,
+            IsAdmin = true
+        };
+        await context.Users.AddAsync(userRow;
         await context.SaveChangesAsync();
     }
 }
@@ -41,4 +49,10 @@ public static class UserSeed
 - Esquecer o `SaveChangesAsync()`.
 - Criar dados duplicados por falta de checagem de existência.
 - Executar seeds pesados em Produção (use `app.Environment.IsDevelopment()`).
-- Tentar inserir dados com GUIDs fixos que colidem com migrações ou seeds anteriores.
+- Tentar inserir dados com GUIDs fixos que colidem com migrações ou seeds anteriores..
+- ❌ Persistir a **entidade de domínio** direto no `DbSet` — mapear para Dbo (`UserRow`) antes de `AddAsync` (mantém o ORM fora do domínio).
+
+## NÃO FAZER
+
+- Seed criando dados com chaves primárias fixas sem checar colisões em ambientes compartilhados..
+- Rodar seeds pesados em produção (use `app.Environment.IsDevelopment()`).
