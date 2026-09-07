@@ -1,11 +1,12 @@
 package com.example.auth.application.usecase
 
 import com.example.auth.application.query.UserExistsQuery
-import com.example.auth.password.entity.Password
-import com.example.auth.password.provider.PasswordCryptoProvider
-import com.example.auth.password.repository.PasswordRepository
-import com.example.auth.user.entity.User
-import com.example.auth.user.repository.UserRepository
+import com.example.auth.domain.entity.Password
+import com.example.auth.domain.entity.User
+import com.example.auth.domain.provider.PasswordCryptoProvider
+import com.example.auth.domain.repository.PasswordRepository
+import com.example.auth.domain.repository.UserRepository
+import com.example.shared.domain.result.DomainResult
 import com.example.shared.infrastructure.TransactionManager
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
@@ -14,13 +15,13 @@ import kotlin.test.assertTrue
 class CreateUserUseCaseTest {
 
     private val fakeUserRepo = object : UserRepository {
-        override suspend fun create(user: User) = Result.success(Unit)
-        override suspend fun update(user: User) = Result.success(Unit)
-        override suspend fun delete(id: String) = Result.success(Unit)
+        override suspend fun create(user: User) = DomainResult.success(Unit)
+        override suspend fun update(user: User) = DomainResult.success(Unit)
+        override suspend fun delete(id: String) = DomainResult.success(Unit)
     }
 
     private val fakePasswordRepo = object : PasswordRepository {
-        override suspend fun create(password: Password) = Result.success(Unit)
+        override suspend fun create(password: Password) = DomainResult.success(Unit)
         override suspend fun findByUserId(userId: String): Password? = null
         override suspend fun findRecentByUserId(userId: String, limit: Int) = emptyList<Password>()
     }

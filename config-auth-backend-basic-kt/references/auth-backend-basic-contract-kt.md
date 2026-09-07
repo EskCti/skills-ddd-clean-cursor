@@ -14,10 +14,10 @@ apps/backend/src/main/kotlin/<group>/modules/auth/
 ├── JwtTokenProvider.kt
 ├── JwtAuthenticationFilter.kt
 ├── RequireAdmin.kt
-├── adapter/
-│   ├── UserJpaEntity.kt
+├── infrastructure/persistence/
+│   ├── entity/UserJpaEntity.kt
+│   ├── entity/PasswordJpaEntity.kt
 │   ├── UserJpaRepository.kt
-│   ├── PasswordJpaEntity.kt
 │   ├── PasswordJpaRepository.kt
 │   └── BcryptPasswordCryptoAdapter.kt
 └── dto/
@@ -32,6 +32,11 @@ apps/backend/src/main/resources/
 │   └── V<N+1>__create_passwords.sql
 └── application.yml (jwt.secret, jwt.expiration)
 ```
+
+## Package Layout
+
+- Adaptadores JPA em `infrastructure/persistence` (entidades JPA em `infrastructure/persistence/entity`), alinhado ao padrão `infrastructure/persistence` de `core-repository-kt`/`backend-data-kt`.
+- Exceção documentada: o módulo mantém o prefixo `com.<group>.modules.auth` (módulo Spring), enquanto o padrão canônico do repositório usa `com.<group>.auth.infrastructure.persistence`; a estrutura interna `infrastructure/persistence` é idêntica.
 
 ## Endpoints
 
@@ -51,7 +56,7 @@ apps/backend/src/main/resources/
 
 - `@RestController` com `@RequestMapping("/auth")`
 - Injeta use cases do auth core Kotlin
-- Mapeia falhas de `Result` para HTTP status codes (400, 401, 404)
+- Mapeia falhas de `DomainResult` para HTTP status codes (400, 401, 404) com corpo `{ "errors": [...] }` — a lista completa de `result.errors`, nunca `{ "error": message }` de primeira falha
 
 ### SecurityConfig
 
@@ -77,7 +82,7 @@ apps/backend/src/main/resources/
 - Annotation `@RequireAdmin` para métodos de controller
 - `@Aspect` que verifica `user.admin == true` na request autenticada
 
-### JPA Adapters
+### JPA Adapters (`infrastructure/persistence`)
 
 - `UserJpaEntity` mapeia para tabela `users` com UUID, name, email, admin, avatar_url, timestamps
 - `PasswordJpaEntity` mapeia para tabela `passwords` com UUID, user_id (FK), hash, timestamps
@@ -85,7 +90,7 @@ apps/backend/src/main/resources/
 
 ### BcryptPasswordCryptoAdapter
 
-- Implementa `PasswordCryptoProvider` usando `BCryptPasswordEncoder` do Spring Security
+- Implementa `PasswordCryptoProvider` (domain provider) usando `BCryptPasswordEncoder` do Spring Security
 
 ### Flyway Migrations
 
@@ -112,3 +117,4 @@ runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.5")
 - JWT stateless, sem sessão server-side
 - `BCryptPasswordEncoder` para hashing
 - Flyway para migrations (auto-aplicadas no boot)
+- Erros HTTP sempre com `{ "errors": [...] }` (contrato §5.1), nunca mensagem única

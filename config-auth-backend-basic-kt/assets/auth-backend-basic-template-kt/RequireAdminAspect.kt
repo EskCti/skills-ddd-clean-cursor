@@ -1,6 +1,6 @@
 package com.example.modules.auth
 
-import com.example.auth.user.query.FindUserByIdQuery
+import com.example.auth.application.query.FindUserByIdQuery
 import kotlinx.coroutines.runBlocking
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around

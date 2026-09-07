@@ -1,5 +1,59 @@
 # CI/CD Pattern (Kotlin — Spring Boot + Gradle)
 
+## Gate de cobertura real (JaCoCo)
+
+`./gradlew jacocoTestCoverageVerification -PminCoverage=0.95` **não funciona**: o Gradle
+não possui uma propriedade `-PminCoverage` — o passo nunca falhava (gate decorativo).
+
+O gate real usa a task `jacocoTestCoverageVerification` com regras configuradas no
+`build.gradle.kts` do módulo (limite `minimum` + `classDirectories` filtrando
+`**/domain/**` e `**/application/**`):
+
+```kotlin
+// apps/backend/build.gradle.kts (ou módulo alvo)
+plugins {
+    jacoco
+}
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.test)
+    violationRules {
+        rule {
+            limit {
+                counter = "INSTRUCTION"
+                value = "COVEREDRATIO"
+                minimum = "0.95".toBigDecimal()
+            }
+            classDirectories.setFrom(
+                sourceSets.main.get().output.classesDirs.asFileTree.matching {
+                    include("**/domain/**", "**/application/**")
+                }
+            )
+        }
+    }
+}
+
+tasks.check {
+    dependsOn(tasks.jacocoTestCoverageVerification)
+}
+```
+
+A task falha (build com exit code != 0) quando a cobertura de `domain` + `application`
+ficar abaixo de 95%, derrubando o job de CI.
+
+Alternativa sem Gradle config: parsear `jacoco.xml` e falhar se < 95%:
+
+```bash
+COVERAGE=$(grep -o '<counter type="INSTRUCTION"[^>]*/>' apps/backend/build/reports/jacoco/test/jacocoTestReport.xml \
+  | grep -o 'missed="[0-9]*"' | cut -d'"' -f2 | paste -sd+ | bc)
+TOTAL=$(grep -o '<counter type="INSTRUCTION"[^>]*/>' apps/backend/build/reports/jacoco/test/jacocoTestReport.xml \
+  | grep -o 'covered="[0-9]*"' | cut -d'"' -f2 | paste -sd+ | bc)
+PCT=$(echo "scale=2; 100 * $TOTAL / ($TOTAL + $COVERAGE)" | bc)
+if [ "${PCT%%.*}" -lt 95 ]; then
+  echo "Coverage ${PCT}% below 95%"; exit 1
+fi
+```
+
 ## .github/workflows/ci.yml
 
 ```yaml
@@ -46,10 +100,8 @@ jobs:
           SPRING_DATASOURCE_USERNAME: test
           SPRING_DATASOURCE_PASSWORD: test
 
-      - name: Coverage gate (domain + application ≥95%)
-        run: |
-          PCT=$(./gradlew jacocoTestCoverageVerification -PminCoverage=0.95 --no-daemon -q 2>&1 | grep -oP 'coverage \K[\d.]+' || echo "0")
-          echo "Domain+Application coverage check completed"
+      - name: Coverage gate (domain + application >= 95%)
+        run: ./gradlew jacocoTestCoverageVerification --no-daemon
 
       - name: Upload test results
         if: always()
@@ -117,6 +169,8 @@ jobs:
 - [ ] `.github/workflows/ci.yml` criado
 - [ ] `.github/workflows/cd.yml` criado
 - [ ] `gradlew` com permissão de execução (`chmod +x gradlew`)
+- [ ] `jacocoTestCoverageVerification` configurado no `build.gradle.kts` com `minimum = 0.95` e `classDirectories` filtrando `**/domain/**` + `**/application/**`
+- [ ] CI executa `./gradlew jacocoTestCoverageVerification` (sem `-PminCoverage`, que é decorativo)
 - [ ] Secrets configurados no repositório
 - [ ] `config-docker-kt` executado antes (Dockerfile existe)
 - [ ] Branch `main` protegida com CI obrigatório
