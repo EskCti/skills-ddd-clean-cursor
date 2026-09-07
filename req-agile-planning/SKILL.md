@@ -52,9 +52,9 @@ Se nenhuma fonte for fornecida, pergunte:
 
 1. **Se `delivery-profile.md` não existir** em `<docsPath>/planning/<projeto>/`:
    - Perguntar ao usuário (ou inferir do pedido) a **matriz de stack**:
-     - Backend: NestJS | Spring Boot | **ASP.NET Core**
-     - Web: Nenhum | Next.js | Angular | **Vue 3**
-     - Mobile: Nenhum | Flutter | **Android**
+- Backend: NestJS | Spring Boot | **ASP.NET Core** | **Axum (Rust)**
+      - Web: Nenhum | Next.js | Angular | **Vue 3** | **Leptos (Rust)**
+      - Mobile: Nenhum | Flutter | **Android** | **Dioxus (Rust)**
    - Ler `screens.md` e `requirements.md` do discovery — listar telas web e apps mobile do legado.
    - Ler `ddd-tactical-model.md` — para cada BC do MVP, marcar colunas **API | Web admin | Mobile** e validar seções **Apresentação — Web/Mobile** (ver `references/delivery-profile.md` e `req-ddd-modeling/references/client-presentation-model.md`).
    - **Criar** `<docsPath>/planning/<projeto>/delivery-profile.md`.
@@ -187,11 +187,11 @@ Ordem de implementação (inside-out):
 10. interface:controller   → backend-controller
 
 ── FRONTEND WEB (Clean Architecture completa) ───────────────
-11. interface:entity       → frontend-entity-angular | frontend-entity-vue
-12. interface:usecase      → frontend-usecase-angular | frontend-usecase-vue
-13. interface:repository   → frontend-repository-angular | frontend-repository-vue
-14. interface:page         → frontend-page-angular | frontend-page-vue
-15. interface:form-web     → frontend-form-angular | frontend-form-vue
+11. interface:entity       → frontend-entity-angular | frontend-entity-vue | frontend-entity-leptos
+12. interface:usecase      → frontend-usecase-angular | frontend-usecase-vue | frontend-usecase-leptos
+13. interface:repository   → frontend-repository-angular | frontend-repository-vue | frontend-repository-leptos
+14. interface:page         → frontend-page-angular | frontend-page-vue | frontend-page-leptos
+15. interface:form-web     → frontend-form-angular | frontend-form-vue | frontend-form-leptos
 16. interface:form         → Frontend Form Schema (Next.js)
 
 ── MOBILE (Clean Architecture completa) ─────────────────────
@@ -200,6 +200,10 @@ Ordem de implementação (inside-out):
 19. interface:mobile-repository → mobile-repository-flutter | mobile-repository-android
 20. interface:mobile            → mobile-screen-flutter | mobile-screen-android
 21. interface:mobile-form       → mobile-form-flutter | mobile-form-android
+
+> **Leptos (Rust web)**: quando Web for **Leptos**, as tasks 11–15 usam `frontend-*-leptos` — mesmo chain entity → usecase → repository → page → form, no workspace Cargo do backend Axum.
+.
+> **Dioxus (Rust mobile)**: quando Mobile for **Dioxus**, a chain usa os skills Rust compartilhados `core-*-rs` (domain + application,) + `backend-dioxus-api-client-rs` (repository HTTP que preserva `{errors:[...]}`) + `core-dioxus-screen-rs`/`core-dioxus-widget-rs` (apresentação) + `core-dioxus-navigation-rs`/`core-dioxus-state-rs`; testes → `test-dioxus-unit-rs` (≥95%)/`test-dioxus-e2e-rs`. Bootstrap: `config-mobile-dioxus-rs` + `config-dioxus-cicd-rs`.
 
 ── QUALIDADE (meta: ≥95% domain + application) ──────────────
 22. test:unit              → testes unitários (entity, VO, use case)
