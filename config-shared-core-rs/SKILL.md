@@ -39,7 +39,7 @@ shared-kernel/
 
 - `references/rust-namespace-layout.md` — layout modular obrigatório
 - `references/shared-patterns-rs.md` — Result, Entity, VO
-- `assets/shared-template-rs/` — templates copiados pelo bootstrap
+- `../config-project-rs/assets/project-template-rs/crates/shared-kernel/` — template real do kernel copiado pelo bootstrap (`config-project-rs`)
 
 ## Global Standards
 

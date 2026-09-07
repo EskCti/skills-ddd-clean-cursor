@@ -6,6 +6,8 @@ pub enum Result<T> {
     Err(Vec<DomainError>),
 }
 
+const NO_ERRORS: &[DomainError] = &[];
+
 impl<T> Result<T> {
     pub fn ok(value: T) -> Self {
         Self::Ok(value)
@@ -29,7 +31,7 @@ impl<T> Result<T> {
 
     pub fn errors(&self) -> &[DomainError] {
         match self {
-            Self::Ok(_) => &[],
+            Self::Ok(_) => NO_ERRORS,
             Self::Err(errors) => errors.as_slice(),
         }
     }

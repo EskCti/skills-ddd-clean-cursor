@@ -1,12 +1,13 @@
 use std::net::SocketAddr;
 
+use anyhow::Error;
 use api::{router, AppState};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod config;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), Box<dyn Error>> {
     dotenvy::dotenv().ok();
 
     tracing_subscriber::registry()

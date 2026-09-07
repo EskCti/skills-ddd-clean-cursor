@@ -55,6 +55,8 @@ cp .env.example .env && docker compose up -d
 cargo run -p api
 ```
 
+> **Nomes de crates são fixos**: `api` e `shared-kernel` (referenciados por `-p api`, imports `use api::{...}` e CI). `--project-name` só afeta logs/display do script — não renombra crates.
+
 ## Resources
 
 - `agents/openai.yaml`
