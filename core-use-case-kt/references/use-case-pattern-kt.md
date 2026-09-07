@@ -15,8 +15,10 @@
 ```kotlin
 package com.example.shared.application
 
+import com.example.shared.domain.result.DomainResult
+
 interface UseCase<IN, OUT> {
-    suspend fun execute(data: IN): Result<OUT>
+    suspend fun execute(data: IN): DomainResult<OUT>
 }
 ```
 
@@ -37,6 +39,7 @@ package com.example.product.application.usecase
 import com.example.product.domain.entity.Product
 import com.example.product.domain.repository.ProductRepository
 import com.example.shared.application.UseCase
+import com.example.shared.domain.result.DomainResult
 
 data class CreateProductIn(val name: String)
 
@@ -44,22 +47,23 @@ class CreateProductUseCase(
     private val repository: ProductRepository
 ) : UseCase<CreateProductIn, Unit> {
 
-    override suspend fun execute(data: CreateProductIn): Result<Unit> {
+    override suspend fun execute(data: CreateProductIn): DomainResult<Unit> {
         val product = Product.tryCreate(name = data.name)
-            .getOrElse { return Result.failure(it) }
+            .getOrElse { return DomainResult.failure(it) }
 
-        return repository.save(product)
+        return repository.save(product
     }
+}
 }
 ```
 
 ## Checklist de implementação
 
 - [ ] `UseCase<IN, OUT>` implementado corretamente.
-- [ ] `execute` com `suspend` e retorno `Result`.
+- [ ] `execute` com `suspend` e retorno `DomainResult` (lista de erros — nunca `kotlin.Result`).
 - [ ] Dependências tipadas por interfaces (não acoplar em implementação).
 - [ ] Injetadas no construtor.
-- [ ] Falhas tratadas explicitamente com `getOrElse { return Result.failure(...) }`.
+- [ ] Falhas tratadas explicitamente com `getOrElse { return DomainResult.failure(...) }`.
 - [ ] Criação/atualização de entidades via `tryCreate`/`copy`.
 - [ ] Sem lógica de persistência direta (delega para repository).
 
@@ -67,7 +71,7 @@ class CreateProductUseCase(
 
 - Cenário feliz completo.
 - Pré-condições inválidas (input vazio, etc.).
-- Falhas de dependência (repository retornando `Result.failure`).
+- Falhas de dependência (repository retornando `DomainResult.failure`).
 - Comportamento condicional.
 - Efeito colateral esperado (mock de repository verificando chamada).
 
@@ -76,6 +80,6 @@ class CreateProductUseCase(
 - Misturar lógica de validação de entidade no use case sem reutilizar `tryCreate`.
 - Não mapear falhas de dependências para erro de domínio.
 - Atualizar parcialmente sem preservar estado existente.
-- Lançar exceção em vez de retornar `Result.failure` dentro do fluxo normal.
+- Lançar exceção em vez de retornar `DomainResult.failure` dentro do fluxo normal.
 
 ---

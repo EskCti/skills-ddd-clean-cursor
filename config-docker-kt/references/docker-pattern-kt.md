@@ -26,7 +26,7 @@ USER spring:spring
 
 COPY --from=builder /app/apps/backend-kt/build/libs/*.jar app.jar
 
-EXPOSE 8080
+EXPOSE 4000
 ENTRYPOINT ["java", "-jar", "app.jar"]
 ```
 
@@ -51,7 +51,7 @@ services:
       context: .
       dockerfile: apps/backend-kt/Dockerfile
     ports:
-      - "8080:8080"
+      - "4000:4000"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}

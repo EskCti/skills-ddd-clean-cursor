@@ -21,7 +21,7 @@ packages/<module>/src/test/kotlin/<pkg>/
 - **VO / value class**: criação válida, inválida, igualdade
 - **Entity**: `create()` / companion, invariantes, métodos de domínio
 - **UseCase**: `suspend invoke()` com repository mock (MockK ou manual fake)
-- **Result**: `isSuccess` / `isFailure` e mensagens de erro
+- **DomainResult**: `isSuccess` / `isFailure` e a **lista** de erros (`errors`) completa
 
 ## build.gradle.kts (JaCoCo gate)
 
@@ -85,18 +85,21 @@ tasks.jacocoTestReport {
 ## Exemplo UseCaseTest
 
 ```kotlin
+import com.example.shared.domain.result.DomainResult
+
 class CreateCustomerUseCaseTest {
     private val repository = mockk<CustomerRepository>()
     private val useCase = CreateCustomerUseCase(repository)
 
     @Test
     fun `should create customer when cpf is unique`() = runBlocking {
-        coEvery { repository.findByCpf(any()) } returns Result.success(null)
-        coEvery { repository.create(any()) } returns Result.success(customer)
+        coEvery { repository.findByCpf(any()) } returns DomainResult.success(null)
+        coEvery { repository.create(any()) } returns DomainResult.success(customer)
 
         val result = useCase(CreateCustomerInput("João", "a@b.com", "12345678901"))
 
         assertTrue(result.isSuccess)
+
         coVerify { repository.create(any()) }
     }
 }
@@ -105,6 +108,7 @@ class CreateCustomerUseCaseTest {
 ## Checklist
 
 - [ ] JUnit 5 + kotlin-test
+- [ ] Mocks retornam `DomainResult` (nunca `kotlin.Result` — domínio acumula `errors: List<String>`).
 - [ ] JaCoCo configurado com mínimo 95%
 - [ ] `./gradlew check` passa com coverage verification
 - [ ] CI (`config-cicd-kt`) executa build + jacoco

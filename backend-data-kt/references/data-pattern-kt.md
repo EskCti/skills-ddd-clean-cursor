@@ -63,6 +63,7 @@ package com.example.product.infrastructure.persistence
 
 import com.example.product.domain.entity.Product
 import com.example.product.domain.repository.ProductRepository
+import com.example.shared.domain.result.DomainResult
 import com.example.shared.domain.vo.Id
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
@@ -73,9 +74,19 @@ class ProductJpaRepository(
 ) : ProductRepository {
 
     @Transactional
-    override suspend fun save(product: Product): Result<Unit> = runCatching {
-        jpa.save(fromDomain(product))
-    }
+    override suspend fun save(product: Product): DomainResult<Unit> =
+        runCatching { jpa.save(fromDomain(product) }
+            .fold(
+                onSuccess = { DomainResult.success(Unit) },
+                onFailure = { DomainResult.failure(listOf(it.message ?: "Unexpected persistence error"))) }
+            )
+
+    override suspend fun findById(id: Id): DomainResult<Product?> =
+        runCatching { jpa.findById(id.value).orElse(null)?.let { toDomain(it) } }
+            .fold(
+                onSuccess = { DomainResult.success(it) },
+                onFailure = { DomainResult.failure(listOf(it.message ?: "Unexpected persistence error"))) }
+            )
 
     override suspend fun findById(id: Id): Result<Product?> = runCatching {
         jpa.findById(id.value).orElse(null)?.let { toDomain(it) }
@@ -125,7 +136,7 @@ CREATE TABLE products (
 - [ ] Implementa interface de domínio.
 - [ ] Mapeamento `toDomain`/`fromDomain` explícito.
 - [ ] `@Transactional` em operações de escrita compostas.
-- [ ] `runCatching` para encapsular erros em `Result`.
+- [ ] `runCatching` para encapsular erros em `DomainResult` (lista completa — nunca `kotlin.Result`).
 
 ### 4. Seed
 
@@ -138,6 +149,8 @@ CREATE TABLE products (
 - Esquecer `@Transactional` em operações multi-tabela.
 - Não regenerar migrations após mudanças de modelo.
 - Retornar DTO em método de repository de comando.
+- Deixar exceção vazar do `runCatching` — mapear para `DomainResult.failure(listOf(...))`.
+- Retornar `Result<Unit>` (kotlin.Result, primeira-falha) — usar `DomainResult` com `errors: List<String>`.
 - Usar `var` desnecessariamente nas entidades JPA.
 
 ---

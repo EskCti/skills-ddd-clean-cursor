@@ -17,13 +17,14 @@
 package com.example.product.domain.repository
 
 import com.example.product.domain.entity.Product
+import com.example.shared.domain.result.DomainResult
 import com.example.shared.domain.vo.Id
 
 interface ProductRepository {
-    suspend fun save(product: Product): Result<Unit>
-    suspend fun findById(id: Id): Result<Product?>
-    suspend fun findAll(): Result<List<Product>>
-    suspend fun delete(id: Id): Result<Unit>
+    suspend fun save(product: Product): DomainResult<Unit>
+    suspend fun findById(id: Id): DomainResult<Product?>
+    suspend fun findAll(): DomainResult<List<Product>>
+    suspend fun delete(id: Id): DomainResult<Unit>
 }
 ```
 
@@ -34,6 +35,7 @@ package com.example.product.infrastructure.persistence
 
 import com.example.product.domain.entity.Product
 import com.example.product.domain.repository.ProductRepository
+import com.example.shared.domain.result.DomainResult
 import com.example.shared.domain.vo.Id
 import org.springframework.stereotype.Repository
 
@@ -42,28 +44,40 @@ class ProductJpaRepository(
     private val jpa: SpringDataProductRepository
 ) : ProductRepository {
 
-    override suspend fun save(product: Product): Result<Unit> = runCatching {
-        jpa.save(fromDomain(product))
-    }
+    override suspend fun save(product: Product): DomainResult<Unit> =
+        runCatching { jpa.save(fromDomain(product) }
+            .fold(
+                onSuccess = { DomainResult.success(Unit) },
+                onFailure = { DomainResult.failure(listOf(it.message ?: "Unexpected persistence error"))) }
+            )
 
-    override suspend fun findById(id: Id): Result<Product?> = runCatching {
-        jpa.findById(id.value)?.let { toDomain(it) }
-    }
+    override suspend fun findById(id: Id): DomainResult<Product?> =
+        runCatching { jpa.findById(id.value)?.let { toDomain(it) } }
+            .fold(
+                onSuccess = { DomainResult.success(it) },
+                onFailure = { DomainResult.failure(listOf(it.message ?: "Unexpected persistence error"))) }
+            )
 
-    override suspend fun findAll(): Result<List<Product>> = runCatching {
-        jpa.findAll().map { toDomain(it) }
-    }
+    override suspend fun findAll(): DomainResult<List<Product>> =
+        runCatching { jpa.findAll().map { toDomain(it) } }
+            .fold(
+                onSuccess = { DomainResult.success(it) },
+                onFailure = { DomainResult.failure(listOf(it.message ?: "Unexpected persistence error"))) }
+            )
 
-    override suspend fun delete(id: Id): Result<Unit> = runCatching {
-        jpa.deleteById(id.value)
-    }
+    override suspend fun delete(id: Id): DomainResult<Unit> =
+        runCatching { jpa.deleteById(id.value) }
+            .fold(
+                onSuccess = { DomainResult.success(Unit) },
+                onFailure = { DomainResult.failure(listOf(it.message ?: "Unexpected persistence error"))) }
+            )
 
     private fun toDomain(entity: ProductJpaEntity): Product =
         Product.create(id = entity.id, name = entity.name)
 
     private fun fromDomain(product: Product): ProductJpaEntity =
-        ProductJpaEntity(id = product.id.value, name = product.name.value)
-}
+        ProductJpaEntity(id = product.id.value,name = product.name.value)
+
 ```
 
 ## Repository vs Query (CQRS)
@@ -73,7 +87,7 @@ class ProductJpaRepository(
 
 ## Checklist de implementação
 
-- [ ] Interface no pacote de domínio com `suspend fun` e retorno `Result`.
+- [ ] Interface no pacote de domínio com `suspend fun` e retorno `DomainResult` (lista de erros — nunca `kotlin.Result`).
 - [ ] Implementação não vaza tipo de ORM para o domínio.
 - [ ] Erro de not found tratado.
 - [ ] Operações compostas usam `@Transactional` quando necessário.
