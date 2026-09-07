@@ -36,6 +36,17 @@ describe('{{ModuleName}} (e2e)', () => {
       });
   });
 
+  it('POST /{{moduleName}} returns 400 with errors envelope when invalid', () => {
+    return request(app.getHttpServer())
+      .post('/{{moduleName}}')
+      .send({})
+      .expect(400)
+      .expect((res) => {
+        expect(Array.isArray(res.body.errors)).toBe(true);
+        expect(res.body.errors.length).toBeGreaterThan(0);
+      });
+  });
+
   it('GET /{{moduleName}}/:id returns 404 when not found', () => {
     return request(app.getHttpServer())
       .get('/{{moduleName}}/00000000-0000-0000-0000-000000000000')

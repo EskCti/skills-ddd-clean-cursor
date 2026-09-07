@@ -21,10 +21,11 @@ export class ChangePasswordUseCase implements UseCase<ChangePasswordIn, void> {
   async execute(input: ChangePasswordIn): Promise<Result<void>> {
     return Result.try(async () => {
       const tryUserExists = await this.userExistsQuery.execute({ id: input.userId });
-      tryUserExists.validator.throwsIfFailed().throwsIfFalse(PasswordErrors.INVALID_USER);
+      if (tryUserExists.isFailure) return Result.fail(tryUserExists.errors);
+      if (!tryUserExists.instance) return Result.fail(PasswordErrors.INVALID_USER);
 
       const tryRecentPasswords = await this.passRepo.findRecentByUserId(input.userId, 5);
-      tryRecentPasswords.validator.throwsIfFailed();
+      if (tryRecentPasswords.isFailure) return Result.fail(tryRecentPasswords.errors);
 
       const tryPasswordPolicy = await PasswordChangePolicyService.validate({
         newPassword: input.newPassword,
@@ -32,13 +33,13 @@ export class ChangePasswordUseCase implements UseCase<ChangePasswordIn, void> {
         recentPasswords: tryRecentPasswords.instance,
         passwordCryptoProvider: this.passwordCryptoProvider,
       });
-      tryPasswordPolicy.validator.throwsIfFailed();
+      if (tryPasswordPolicy.isFailure) return Result.fail(tryPasswordPolicy.errors);
 
       const hashedPassword = await this.passwordCryptoProvider.hash(input.newPassword);
       const newPass = Password.create({ content: hashedPassword });
 
       const tryCreateNewPass = await this.passRepo.create(newPass, input.userId);
-      tryCreateNewPass.validator.throwsIfFailed();
+      if (tryCreateNewPass.isFailure) return Result.fail(tryCreateNewPass.errors);
     });
 
     // const recentPasswordsResult = await this.passRepo.findRecentByUserId(

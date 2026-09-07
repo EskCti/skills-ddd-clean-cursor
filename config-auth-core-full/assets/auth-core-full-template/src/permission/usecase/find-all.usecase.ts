@@ -8,7 +8,7 @@ export class FindAllPermissions implements UseCase<void, PermissionDTO[]> {
   async execute(): Promise<Result<PermissionDTO[]>> {
     return Result.try(async () => {
       const permissions = await this.findAllQuery.execute();
-      permissions.validator.throwsIfFailed();
+      if (permissions.isFailure) return Result.fail(permissions.errors);
       return permissions.instance;
     });
   }

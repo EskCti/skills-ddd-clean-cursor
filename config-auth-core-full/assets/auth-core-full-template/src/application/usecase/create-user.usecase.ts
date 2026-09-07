@@ -28,9 +28,8 @@ export class CreateUserUseCase implements UseCase<CreateUserIn, void> {
             const tryUserExists = await this.userExistsQuery.execute({
                 email: data.email,
             });
-            tryUserExists.validator
-                .throwsIfFailed()
-                .throwsIfTrue(UserErrors.EMAIL_ALREADY_EXISTS);
+            if (tryUserExists.isFailure) return Result.fail(tryUserExists.errors);
+            if (tryUserExists.instance) return Result.fail(UserErrors.EMAIL_ALREADY_EXISTS);
 
             const tryHashedPassword = await this.passwordCryptoProvider.hash(
                 data.password,
@@ -39,12 +38,14 @@ export class CreateUserUseCase implements UseCase<CreateUserIn, void> {
                 content: tryHashedPassword,
             });
 
-            const user = User.tryCreate({
+            const userResult = User.tryCreate({
                 name: data.name,
                 email: data.email,
                 avatarUrl: data.avatarUrl?.trim() || undefined,
                 roleIds: [],
-            }).validator.throwsIfFailed().result.instance;
+            });
+            if (userResult.isFailure) return Result.fail(userResult.errors);
+            const user = userResult.instance;
 
             await this.transactionManager.runInTransaction(async (tx) => {
                 const tryCreateUser = await this.userRepo.create(user, tx);

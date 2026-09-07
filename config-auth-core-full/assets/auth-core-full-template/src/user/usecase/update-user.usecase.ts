@@ -16,7 +16,7 @@ export class UpdateUserUseCase implements UseCase<UpdateUserIn, void> {
   async execute(data: UpdateUserIn): Promise<Result<void>> {
     return Result.try(async () => {
       const tryHasUser = await this.userRepo.findById(data.id);
-      tryHasUser.validator.throwsIfFailed(UserErrors.NOT_FOUND);
+      if (tryHasUser.isFailure) return Result.fail(UserErrors.NOT_FOUND);
 
       const user = tryHasUser.instance;
 
@@ -25,10 +25,10 @@ export class UpdateUserUseCase implements UseCase<UpdateUserIn, void> {
         name: data.name ?? user.name,
         email: data.email ?? user.email,
       });
-      tryUpdatedUser.validator.throwsIfFailed();
+      if (tryUpdatedUser.isFailure) return Result.fail(tryUpdatedUser.errors);
 
       const tryUpdateResult = await this.userRepo.update(tryUpdatedUser.instance);
-      tryUpdateResult.validator.throwsIfFailed();
+      if (tryUpdateResult.isFailure) return Result.fail(tryUpdateResult.errors);
     });
   }
 }

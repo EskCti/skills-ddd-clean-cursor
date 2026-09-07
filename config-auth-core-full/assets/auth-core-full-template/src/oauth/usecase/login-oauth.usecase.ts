@@ -30,23 +30,17 @@ export class LoginOAuthUseCase implements UseCase<
 
     async execute(input: LoginOAuthInDTO): Promise<Result<LoginOAuthOutDTO>> {
         return Result.try(async () => {
-            Result.ok(Boolean(input.code)).validator.throwsIfFalse(
-                OAuthErrors.INVALID_CALLBACK_CODE,
-            );
+            if (!input.code) return Result.fail(OAuthErrors.INVALID_CALLBACK_CODE);
 
             const identityResult = await this.oauthProvider.getIdentityFromCode(
                 input.code,
             );
-            identityResult.validator.throwsIfFailed();
+            if (identityResult.isFailure) return Result.fail(identityResult.errors);
 
             const identity = identityResult.instance;
 
-            Result.ok(Boolean(identity.email)).validator.throwsIfFalse(
-                OAuthErrors.EMAIL_NOT_AVAILABLE,
-            );
-            Result.ok(identity.emailVerified).validator.throwsIfFalse(
-                OAuthErrors.EMAIL_NOT_VERIFIED,
-            );
+            if (!identity.email) return Result.fail(OAuthErrors.EMAIL_NOT_AVAILABLE);
+            if (!identity.emailVerified) return Result.fail(OAuthErrors.EMAIL_NOT_VERIFIED);
 
             const linkedAccountResult =
                 await this.oauthRepo.findByProviderAccount({
@@ -58,7 +52,7 @@ export class LoginOAuthUseCase implements UseCase<
                 const existingUser = await this.findUserByIdQuery.execute(
                     linkedAccountResult.instance.userId,
                 );
-                existingUser.validator.throwsIfFailed();
+                if (existingUser.isFailure) return Result.fail(existingUser.errors);
                 return existingUser.instance;
             }
 
@@ -66,16 +60,18 @@ export class LoginOAuthUseCase implements UseCase<
                 linkedAccountResult.errors?.includes(
                     OAuthErrors.ACCOUNT_NOT_FOUND,
                 ) ?? false;
-            Result.ok(accountNotFound).validator.throwsIfFalse(
-                linkedAccountResult.errors ?? OAuthErrors.ACCOUNT_NOT_FOUND,
-            );
+            if (!accountNotFound) {
+                return Result.fail(
+                    linkedAccountResult.errors ?? OAuthErrors.ACCOUNT_NOT_FOUND,
+                );
+            }
 
             const userResult = await this.resolveOrCreateUser(
                 identity.email,
                 identity.name,
                 identity.avatarUrl,
             );
-            userResult.validator.throwsIfFailed();
+            if (userResult.isFailure) return Result.fail(userResult.errors);
 
             const user = userResult.instance;
             const linkResult = await this.oauthRepo.create({
@@ -87,10 +83,10 @@ export class LoginOAuthUseCase implements UseCase<
                 name: identity.name,
                 avatarUrl: identity.avatarUrl,
             });
-            linkResult.validator.throwsIfFailed();
+            if (linkResult.isFailure) return Result.fail(linkResult.errors);
 
             const userDto = await this.findUserByIdQuery.execute(user.id);
-            userDto.validator.throwsIfFailed();
+            if (userDto.isFailure) return Result.fail(userDto.errors);
             return userDto.instance;
         });
     }
@@ -108,12 +104,12 @@ export class LoginOAuthUseCase implements UseCase<
 
             const notFound =
                 existingUser.errors?.includes(UserErrors.NOT_FOUND) ?? false;
-            Result.ok(notFound).validator.throwsIfFalse(
-                existingUser.errors ?? UserErrors.NOT_FOUND,
-            );
+            if (!notFound) {
+                return Result.fail(existingUser.errors ?? UserErrors.NOT_FOUND);
+            }
 
             const roleResult = await this.roleRepo.findByName("colaborador");
-            roleResult.validator.throwsIfFailed();
+            if (roleResult.isFailure) return Result.fail(roleResult.errors);
 
             const userToCreate = User.tryCreate({
                 email,
@@ -121,15 +117,15 @@ export class LoginOAuthUseCase implements UseCase<
                 avatarUrl,
                 roleIds: [roleResult.instance.id],
             });
-            userToCreate.validator.throwsIfFailed();
+            if (userToCreate.isFailure) return Result.fail(userToCreate.errors);
 
             const createResult = await this.userRepo.create(
                 userToCreate.instance,
             );
-            createResult.validator.throwsIfFailed();
+            if (createResult.isFailure) return Result.fail(createResult.errors);
 
             const createdUser = await this.userRepo.findByEmail(email);
-            createdUser.validator.throwsIfFailed();
+            if (createdUser.isFailure) return Result.fail(createdUser.errors);
             return createdUser.instance;
         });
     }

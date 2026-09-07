@@ -39,6 +39,9 @@ node test-e2e/scripts/create-e2e-spec.mjs customers \
 |----------|-------------|
 | `crud` | POST criar → GET buscar + 404 (fluxo MVP) |
 | `module-get` | Scaffold `config-new-module` (GET `/module` only) |
+| `feature` | Spec web-only (Playwright em `e2e/<module>.spec.ts`, sem spec de API) |
+
+O template `crud` inclui o cenário de **400 com envelope `{ errors: [...] }`** (contrato §5.1): POST inválido deve retornar a lista completa de erros, nunca só a primeira mensagem.
 
 `config-new-module` chama o gerador automaticamente (`module-get` + spec web).
 

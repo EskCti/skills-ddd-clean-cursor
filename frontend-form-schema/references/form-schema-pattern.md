@@ -3,17 +3,17 @@
 ## Paths de referência
 
 - Validator e componentes compartilhados:
-  - `packages/shared/web/src/components/form/validator/*`
-  - `packages/shared/web/src/components/form/form.component.tsx`
+  - `apps/web/src/shared/components/form/validator/*`
+  - `apps/web/src/shared/components/ui/form-error-message.tsx`
 - Schemas (exemplos):
-  - `packages/auth/web/src/data/schemas/auth/login.ts`
-  - `packages/auth/web/src/data/schemas/user/create-user.ts`
-  - `packages/product/web/src/data/schemas/product/create-product.ts`
-  - `packages/product/web/src/data/schemas/product/update-product.ts`
+  - `apps/web/src/modules/auth/data/schemas/auth/login.schema.ts`
+  - `apps/web/src/modules/auth/data/schemas/user/create-user.schema.ts`
+  - `apps/web/src/modules/product/data/schemas/product/create-product.schema.ts`
+  - `apps/web/src/modules/product/data/schemas/product/update-product.schema.ts`
 - Forms (exemplos):
-  - `packages/auth/web/src/components/pages/create-user.page.tsx`
-  - `packages/product/web/src/components/product/form/product-form.component.tsx`
-  - `packages/auth/web/src/components/profile/change-password-form.component.tsx`
+  - `apps/web/src/modules/auth/pages/sign-in.page.tsx`
+  - `apps/web/src/modules/auth/components/user-form-fields.component.tsx`
+  - `apps/web/src/modules/auth/pages/profile.page.tsx` (change-password/profile form)
 
 ## Padrão principal
 
@@ -48,13 +48,10 @@
 ## Composição de UI
 
 - Usar componentes compartilhados:
-  - `Form`
-  - `FormField`
-  - `FormItem`
-  - `FormControl`
-  - `FormMessage`
-  - `FormButtonSubmit`
-- Evitar renderizar erro manualmente quando `FormMessage` resolve o caso.
+  - `FormErrorMessage` — mensagens de erro de campo e de API (`{ errors: string[] }`)
+  - `Label`, `Input`, `Textarea`, `Button` (`apps/web/src/shared/components/ui/*`)
+- O validador compartilhado (`v`) fica em `apps/web/src/shared/components/form/validator`.
+- Evitar renderizar erro manualmente quando `FormErrorMessage` resolve o caso.
 
 ## Exceções e legado
 

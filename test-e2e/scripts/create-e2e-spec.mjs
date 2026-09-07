@@ -23,7 +23,7 @@ function usage() {
 Options:
   --root=<path>              Project root (default: cwd)
   --backend-path=<path>      Backend app (default: apps/backend)
-  --template=<name>          module-get | crud (default: crud)
+  --template=<name>          module-get | crud | feature (default: crud)
   --create-fields=<list>     Comma-separated POST body fields (crud template)
   --assert-field=<field>     Field to assert on GET response (default: first create field)
   --web                      Also create Playwright spec at e2e/<module>.spec.ts
@@ -104,8 +104,8 @@ function parseArgs(argv) {
     throw new Error('Module name must match /^[a-z][a-z0-9-]*$/.');
   }
 
-  if (!['module-get', 'crud'].includes(options.template)) {
-    throw new Error('Template must be module-get or crud.');
+  if (!['module-get', 'crud', 'feature'].includes(options.template)) {
+    throw new Error('Template must be module-get, crud or feature.');
   }
 
   if (options.template === 'crud' && options.createFields.length === 0) {
@@ -174,7 +174,7 @@ async function writeSpec({ filePath, content, force }) {
  * @param {string} params.rootDir
  * @param {string} params.moduleName
  * @param {string} [params.backendPath]
- * @param {'module-get'|'crud'} [params.template]
+ * @param {'module-get'|'crud'|'feature'} [params.template]
  * @param {string[]} [params.createFields]
  * @param {string} [params.assertField]
  * @param {boolean} [params.web]
@@ -196,31 +196,36 @@ export async function createE2eSpec({
 }) {
   const ModuleName = toPascalCase(moduleName);
   const label = moduleLabel || ModuleName;
-  const templateFile =
-    template === 'module-get'
+  const isFeature = template === 'feature';
+  const templateFile = isFeature
+    ? null
+    : template === 'module-get'
       ? 'templates/module-get.e2e-spec.ts.template'
       : 'templates/crud.e2e-spec.ts.template';
 
-  const apiTemplate = await readTemplate(templateFile);
-  const apiContent = applyTemplate(apiTemplate, {
-    ModuleName,
-    moduleName,
-    createPayload: buildCreatePayload(createFields),
-    createAssertions: buildCreateAssertions(createFields, assertField),
-  });
+  let apiResult = null;
+  if (!isFeature) {
+    const apiTemplate = await readTemplate(templateFile);
+    const apiContent = applyTemplate(apiTemplate, {
+      ModuleName,
+      moduleName,
+      createPayload: buildCreatePayload(createFields),
+      createAssertions: buildCreateAssertions(createFields, assertField),
+    });
 
-  const apiPath = path.join(rootDir, backendPath, 'test', `${moduleName}.e2e-spec.ts`);
-  const apiResult = await writeSpec({ filePath: apiPath, content: apiContent, force });
+    const apiPath = path.join(rootDir, backendPath, 'test', `${moduleName}.e2e-spec.ts`);
+    apiResult = await writeSpec({ filePath: apiPath, content: apiContent, force });
+
+    if (apiResult.written) {
+      logger.log(`Created API E2E spec: ${path.relative(rootDir, apiPath)}`);
+    } else {
+      logger.log(`Skipped API E2E spec (exists): ${path.relative(rootDir, apiPath)}`);
+    }
+  }
 
   const results = { api: apiResult, web: null };
 
-  if (apiResult.written) {
-    logger.log(`Created API E2E spec: ${path.relative(rootDir, apiPath)}`);
-  } else {
-    logger.log(`Skipped API E2E spec (exists): ${path.relative(rootDir, apiPath)}`);
-  }
-
-  if (web) {
+  if (isFeature || web) {
     const webTemplate = await readTemplate('templates/feature.spec.ts.template');
     const webContent = applyTemplate(webTemplate, {
       moduleName,

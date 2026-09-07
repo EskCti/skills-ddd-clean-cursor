@@ -34,6 +34,9 @@ node test-e2e/scripts/create-e2e-spec.mjs customers \
 
 # Módulo scaffold (só GET /module)
 node test-e2e/scripts/create-e2e-spec.mjs billing --template module-get
+
+# Feature web-only (Playwright, sem spec de API)
+node test-e2e/scripts/create-e2e-spec.mjs customers --template feature --module-label Clientes
 ```
 
 3. Ajustar payload/assertions se o contrato da API divergir do template.

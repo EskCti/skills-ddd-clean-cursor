@@ -9,10 +9,10 @@ WORKDIR /app
 
 COPY package*.json ./
 COPY apps/backend/package*.json ./apps/backend/
+COPY packages ./packages
 RUN npm ci --workspace=apps/backend
 
 COPY apps/backend ./apps/backend
-COPY packages ./packages
 RUN npm run build --workspace=apps/backend
 
 # Stage 2: Runner
@@ -25,6 +25,8 @@ COPY --from=builder /app/apps/backend/package*.json ./
 RUN npm ci --omit=dev
 
 EXPOSE 4000
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD wget -qO- http://127.0.0.1:4000/health || exit 1
 CMD ["node", "dist/main"]
 ```
 
@@ -37,10 +39,10 @@ WORKDIR /app
 
 COPY package*.json ./
 COPY apps/web/package*.json ./apps/web/
+COPY packages ./packages
 RUN npm ci --workspace=apps/web
 
 COPY apps/web ./apps/web
-COPY packages ./packages
 
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build --workspace=apps/web
@@ -64,6 +66,8 @@ CMD ["node", "server.js"]
 ```
 
 > Requer `output: 'standalone'` em `next.config.ts`.
+
+> `COPY packages ./packages` vem ANTES do `RUN npm ci --workspace=...`: npm workspaces exige que as dependências locais (`packages/*`) estejam presentes no contexto de build, de modo que `npm ci` possa resolver e linkar corretamente os workspaces.
 
 ## docker-compose.prod.yml
 

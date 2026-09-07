@@ -16,7 +16,7 @@ Aplicar o padrão de formulários do projeto com React Hook Form + validator `v`
 - Definir schema com `v.defineObject`, arrays com `v.defineArray` e validação cruzada com `.refine`.
 - Tipar payload de formulário com `v.infer<typeof schema>`.
 - Integrar com RHF via `resolver: v.resolver(schema)`.
-- Usar componentes compartilhados de form (`Form`, `FormField`, `FormControl`, `FormMessage`, `FormButtonSubmit`).
+- Usar componentes compartilhados de form (`FormErrorMessage`, `Label`, `Input`, `Button`).
 - Em update forms, tornar campos opcionais quando apropriado (`{ vo: X, optional: true }`).
 
 ## Workflow

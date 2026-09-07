@@ -16,16 +16,16 @@ export class AssignRolesToUserUseCase implements UseCase<AssignRolesToUserIn, vo
   async execute(data: AssignRolesToUserIn): Promise<Result<void>> {
     return Result.try(async () => {
       const tryHasUser = await this.userRepo.findById(data.userId);
-      tryHasUser.validator.throwsIfFailed(UserErrors.NOT_FOUND);
+      if (tryHasUser.isFailure) return Result.fail(UserErrors.NOT_FOUND);
 
       const tryRolesExists = await this.rolesChecker.exists(data.roleIds);
-      tryRolesExists.validator.throwsIfFailed();
+      if (tryRolesExists.isFailure) return Result.fail(tryRolesExists.errors);
 
       const tryUpdateResult = await this.userRepo.updateRoles(
         data.userId,
         data.roleIds,
       );
-      tryUpdateResult.validator.throwsIfFailed();
+      if (tryUpdateResult.isFailure) return Result.fail(tryUpdateResult.errors);
     });
   }
 }

@@ -28,7 +28,7 @@ project-root/
 ## Workflow
 
 1. Verificar se `apps/backend/` e `apps/web/` existem.
-2. Criar `apps/backend/Dockerfile` com estágio `builder` (build) e `runner` (produção).
+2. Criar `apps/backend/Dockerfile` com estágio `builder` (build) e `runner` (produção) + saúde: copiar `packages/` antes do `npm ci --workspace`, e adicionar `HEALTHCHECK` checando a porta 4000.
 3. Criar `apps/web/Dockerfile` com estágio `builder` (build Next.js) e `runner` (standalone).
 4. Criar `.dockerignore` na raiz cobrindo `node_modules`, `.next`, `dist`, `.env*`, logs.
 5. Criar `docker-compose.prod.yml` orquestrando backend, web e postgres.

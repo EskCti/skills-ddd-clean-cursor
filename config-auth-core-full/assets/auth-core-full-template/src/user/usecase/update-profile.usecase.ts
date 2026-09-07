@@ -13,17 +13,17 @@ export class UpdateProfileUseCase implements UseCase<UpdateProfileIn, void> {
   async execute(data: UpdateProfileIn): Promise<Result<void>> {
     return Result.try(async () => {
       const tryHasUser = await this.userRepo.findById(data.id);
-      tryHasUser.validator.throwsIfFailed(UserErrors.NOT_FOUND);
+      if (tryHasUser.isFailure) return Result.fail(UserErrors.NOT_FOUND);
 
       const user = tryHasUser.instance;
 
       const tryUpdatedUser = user.cloneWith({
         name: data.name ?? user.name,
       });
-      tryUpdatedUser.validator.throwsIfFailed();
+      if (tryUpdatedUser.isFailure) return Result.fail(tryUpdatedUser.errors);
 
       const tryUpdateResult = await this.userRepo.update(tryUpdatedUser.instance);
-      tryUpdateResult.validator.throwsIfFailed();
+      if (tryUpdateResult.isFailure) return Result.fail(tryUpdateResult.errors);
     });
   }
 }

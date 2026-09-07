@@ -22,24 +22,23 @@ export class CreateRole implements UseCase<CreateRoleIn, void> {
     }: CreateRoleIn): Promise<Result<void>> {
         return Result.try(async () => {
             const result = await this.repo.findByName(name);
-
-            Result.ok(result.isOk).validator.throwsIfTrue(
-                RoleErrors.NAME_ALREADY_EXISTS,
-            );
+            if (result.isOk) return Result.fail(RoleErrors.NAME_ALREADY_EXISTS);
 
             if (permissionIds.length > 0) {
                 const exists =
                     await this.permissionChecker.execute(permissionIds);
-                exists.validator.throwsIfFailed();
+                if (exists.isFailure) return Result.fail(exists.errors);
             }
-            const role = Role.create({
+            const roleResult = Role.tryCreate({
                 name,
                 description,
                 permissionIds: permissionIds,
             });
+            if (roleResult.isFailure) return Result.fail(roleResult.errors);
+            const role = roleResult.instance;
 
             const createResult = await this.repo.create(role);
-            createResult.validator.throwsIfFailed();
+            if (createResult.isFailure) return Result.fail(createResult.errors);
         });
     }
 }

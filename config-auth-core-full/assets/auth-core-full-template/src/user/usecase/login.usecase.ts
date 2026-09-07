@@ -20,18 +20,18 @@ export class LoginUseCase implements UseCase<LoginIn, LoginOut> {
     async execute(input: LoginIn): Promise<Result<LoginOut>> {
         return Result.try(async () => {
             const tryFindUser = await this.repo.findByEmail(input.email);
-            tryFindUser.validator.throwsIfFailed();
+            if (tryFindUser.isFailure) return Result.fail(tryFindUser.errors);
 
             const tryFindPass = await this.findPassHash.execute(
                 tryFindUser.instance.id,
             );
-            tryFindPass.validator.throwsIfFailed();
+            if (tryFindPass.isFailure) return Result.fail(tryFindPass.errors);
 
             const isSamePass = await this.passwordCryptoProvider.compare(
                 input.password,
                 tryFindPass.instance.hash,
             );
-            Result.ok(isSamePass).validator.throwsIfFalse(PasswordErrors.MISMATCH);
+            if (!isSamePass) return Result.fail(PasswordErrors.MISMATCH);
 
             return tryFindUser.instance.props;
         });

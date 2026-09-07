@@ -66,7 +66,13 @@ for (const [file, data] of Object.entries(entries)) {
   total += data.lines.total ?? 0;
 }
 
-const pct = total > 0 ? (covered / total) * 100 : 100;
+if (matched === 0) {
+  console.error('No coverage files matched the scope segments.');
+  console.error(`Scope segments: ${segments.join(', ')}`);
+  process.exit(1);
+}
+
+const pct = (covered / total) * 100;
 
 console.log(`Coverage gate: ${pct.toFixed(1)}% (${covered}/${total} lines)`);
 console.log(`Scope segments: ${segments.join(', ')}`);

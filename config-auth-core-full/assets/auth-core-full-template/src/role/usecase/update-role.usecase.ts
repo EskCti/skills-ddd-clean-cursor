@@ -23,7 +23,7 @@ export class UpdateRoleUseCase implements UseCase<UpdateRoleIn, void> {
     }: UpdateRoleIn): Promise<Result<void>> {
         return Result.try(async () => {
             const result = await this.repo.findById(id);
-            result.validator.throwsIfFailed();
+            if (result.isFailure) return Result.fail(result.errors);
 
             const role = result.instance;
             const updates: Partial<RoleProps> = {};
@@ -34,18 +34,17 @@ export class UpdateRoleUseCase implements UseCase<UpdateRoleIn, void> {
                 const exists = await this.permissionChecker.execute(
                     permissionIds ?? [],
                 );
-                if (exists.isOk) {
-                    updates.permissionIds = permissionIds;
-                }
+                if (exists.isFailure) return Result.fail(exists.errors);
+                updates.permissionIds = permissionIds;
             }
 
             const updatedRoleResult = role.cloneWith(updates);
-            updatedRoleResult.validator.throwsIfFailed();
+            if (updatedRoleResult.isFailure) return Result.fail(updatedRoleResult.errors);
 
             const updateResult = await this.repo.update(
                 updatedRoleResult.instance,
             );
-            updateResult.validator.throwsIfFailed();
+            if (updateResult.isFailure) return Result.fail(updateResult.errors);
         });
     }
 }

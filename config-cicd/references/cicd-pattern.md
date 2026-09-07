@@ -52,13 +52,83 @@ jobs:
           DATABASE_URL: postgresql://test:test@localhost:5432/test_db
 
       - name: Coverage gate (domain + application ≥95%)
-        run: node scripts/check-coverage.mjs 95 domain application entity vo use-case use-cases queries
+        run: |
+          for workspace in apps/backend packages/*; do
+            [ -d "$workspace" ] || continue
+            echo "==> Gate: $workspace"
+            (cd "$workspace" && node ../../scripts/check-coverage.mjs 95 domain application entity vo use-case use-cases queries)
+          done
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test_db
 
       - name: E2E tests
         run: npm run test:e2e
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/test_db
+
+  e2e-web:
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Start backend + web
+        run: |
+          npm run build
+          npm run start:backend & npm run start:web &
+          npx wait-on http://localhost:4000/health http://localhost:3000
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test_db
+
+      - name: E2E web (Playwright)
+        run: npm run test:e2e:web
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test_db
+          BASE_URL: http://localhost:3000
 ```
+
+## Coverage gate por workspace
+
+O Jest escreve `coverage/` dentro de cada package (e não na raiz do monorepo). Portanto o gate `check-coverage.mjs` deve rodar **dentro de cada workspace** — o passo "Coverage gate" acima itera `apps/backend` e `packages/*`, executando o script a partir do diretório de cada workspace (o script resolve `coverage/coverage-summary.json` em relação ao CWD).
+
+O gate **falha** (exit 1) quando:
+- nenhum `coverage-summary.json`/`coverage-final.json` existe (rode testes com `--coverage` primeiro); ou
+- nenhum arquivo de coverage casa com os segmentos de escopo (`matched === 0`) — evita falso-PASS com 100%.
+
+Alternativa: agregar os summaries de `packages/*` e rodar o gate uma única vez na raiz.
 
 ## .github/workflows/cd.yml (GHCR + Fly.io)
 
