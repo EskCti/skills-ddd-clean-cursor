@@ -5,7 +5,7 @@
 ```rust
 use std::sync::Arc;
 
-use shared_kernel::Result;
+use shared_kernel::{DomainError, Result};
 
 use crate::features::customers::domain::entity::Customer;
 use crate::features::customers::domain::ports::CustomerRepository;
@@ -26,17 +26,22 @@ impl CreateCustomer {
     }
 
     pub async fn execute(&self, input: CreateCustomerInput) -> Result<Customer> {
-        let entity = Customer::try_new(
+        let entity = match Customer::try_new(
             uuid::Uuid::new_v4().to_string(),
             input.name,
             input.email,
             input.cpf,
-        )?;
+        ) {
+            Result::Ok(entity) => entity,
+            Result::Err(errors) => return Result::Err(errors),
+        };
         // Regra: email único
-        if let Ok(Some(_)) = self.repository.find_by_email(entity.email()).await {
-            return Result::Err(vec![shared_kernel::DomainError::validation(
-                "Email já cadastrado",
-            )]);
+        match self.repository.find_by_email(entity.email()).await {
+            Result::Ok(Some(_)) => {
+                return Result::Err(vec![DomainError::validation("Email já cadastrado")]);
+            }
+            Result::Ok(None) => {}
+            Result::Err(errors) => return Result::Err(errors),
         }
         self.repository.create(&entity).await
     }

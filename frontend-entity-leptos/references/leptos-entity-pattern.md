@@ -16,7 +16,7 @@ pub struct Customer {
 
 impl Customer {
     pub fn try_new(id: String, name: String, email: String, cpf: String) -> Result<Self> {
-        let mut errors = Vec::<DomainError>::new();
+        let mut errors = Vec::new();
 
         let name = name.trim().to_string();
         if name.len() < 2 {
@@ -37,7 +37,7 @@ impl Customer {
             return Result::Err(errors);
         }
 
-        Ok(Self {
+        Result::Ok(Self {
             id,
             name,
             email,

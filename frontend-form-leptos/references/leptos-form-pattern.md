@@ -19,14 +19,14 @@ pub fn CustomerFormPage() -> impl IntoView {
     let name = RwSignal::new(String::new());
     let email = RwSignal::new(String::new());
     let cpf = RwSignal::new(String::new());
-    let errors = RwSignal::new(Vec::<String>::new());
+    let errors = RwSignal::new(Vec::new());
     let submitting = RwSignal::new(false);
     let navigate = use_navigate();
 
     let on_submit = move |ev: leptos::ev::SubmitEvent| {
         ev.prevent_default();
         submitting.set(true);
-        errors.set(vec![]);
+        errors.set(Vec::new());
 
         let repo: Arc<dyn CustomerRepository> = Arc::new(CustomerHttpRepository::new());
         let use_case = CreateCustomer::new(repo);
@@ -42,9 +42,9 @@ pub fn CustomerFormPage() -> impl IntoView {
 
             submitting.set(false);
             match result {
-                Ok(_) => navigate("/customers", Default::default()),
-                Err(errs) => {
-                    errors.set(errs.iter().map(|e| e.to_string()).collect());
+                shared_kernel::Result::Ok(_) => navigate("/customers", Default::default()),
+                shared_kernel::Result::Err(errs) => {
+                    errors.set(errs.iter().map(|e| e.to_string()).collect::<Vec<_>>());
                 }
             }
         });

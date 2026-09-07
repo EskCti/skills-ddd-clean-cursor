@@ -1,5 +1,9 @@
 # Leptos Page Pattern (SSR + Resource + UseCase)
 
+> **Leptos 0.7.** Este padrão usa a API de `Resource` 0.7 em que `get()` retorna
+> `Option<Result<T, E>>` — `None` enquanto carrega, `Some(Ok(..))` em sucesso e
+> `Some(Err(..))` em erro. (Em 0.6 `get()` era `Option<T>`; a forma abaixo é 0.7.)
+
 ## Listagem — presentation/list_page.rs
 
 ```rust
@@ -20,7 +24,17 @@ fn customer_services() -> ListCustomers {
 #[component]
 pub fn CustomerListPage() -> impl IntoView {
     let list = customer_services();
-    let customers_res = Resource::new(move || async move { list.execute().await });
+    let customers_res = Resource::new(move || async move {
+        match list.execute().await {
+            shared_kernel::Result::Ok(customers) => Ok(customers),
+            shared_kernel::Result::Err(errors) => Err(
+                errors
+                    .into_iter()
+                    .map(|e| e.to_string())
+                    .collect::<Vec<String>>(),
+            ),
+        }
+    });
 
     view! {
         <div class="space-y-4">
@@ -66,10 +80,10 @@ pub fn CustomerListPage() -> impl IntoView {
                         <div class="flex flex-col gap-2">
                             <For
                                 each=move || errors.clone()
-                                key=|e| e.to_string()
+                                key=|e| e.clone()
                                 children=move |e| view! {
                                     <p class="rounded-md bg-red-500/10 px-3 py-2 text-sm text-red-400">
-                                        {e.to_string()}
+                                        {e}
                                     </p>
                                 }
                             />
