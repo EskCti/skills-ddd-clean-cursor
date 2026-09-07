@@ -5,8 +5,8 @@
 ```rust
 #[async_trait]
 pub trait NotificationPort {
-    async fn request_permission(&self) -> Result<(), DomainError>;
-    async fn send(&self, title: &str, body: &str) -> Result<(), DomainError>;
+    async fn request_permission(&self) -> shared_kernel::Result<()>;
+    async fn send(&self, title: &str, body: &str) -> shared_kernel::Result<()>;
 }
 ```
 
@@ -24,7 +24,7 @@ pub struct MockNotification;
 #[cfg(test)]
 #[async_trait]
 impl NotificationPort for MockNotification {
-    async fn request_permission(&self) -> Result<(), DomainError> { Ok(()) }
+    async fn request_permission(&self) -> shared_kernel::Result<()> { Ok(()) }
     ...
 }
 ```

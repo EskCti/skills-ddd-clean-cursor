@@ -43,7 +43,7 @@ project-root/
 ├── android/                       # projeto Android (cargo-mobile)
 ├── ios/                           # projeto iOS (cargo-mobile)
 ├── package.json                  # scripts de apoio (opcional)
-└── .env.example                  # API_BASE_URL
+└── .env.example                  # DUX_API_BASE_URL
 ```
 
 ## Namespaces (obrigatório)
@@ -76,20 +76,20 @@ cargo mobile build --platform ios
 ```
 
 4. Adicionar `mobile-dioxus` ao `[workspace].members`.
-5. Configurar `.env`: `DUX_BASE_URL` (URL da API).
+5. Configurar `.env`: `DUX_API_BASE_URL` (URL da API; ver `config-fullstack-rust-rs`).
 6. **Recomendado**: executar `core-dioxus-state-rs` (stores) e `core-dioxus-navigation-rs` (rotas) para o shell base.
 7. Validar: `cargo dioxus run --platform android` (dev) e `cargo build --release`.
 
 ## Integração com API Axum
 
-- Repositories HTTP em `infrastructure/` usam `reqwest`/`dioxus-http` apontando para `DEFAULT_BASE_URL`.
+- Repositories HTTP em `infrastructure/` usam `reqwest`/`dioxus-http` apontando para a env `DUX_API_BASE_URL` (com fallback compile-time `DEFAULT_BASE_URL`).
 - CORS no crate `api`: liberar a origem/origem de app mobile se necessário.
-- Em produção: URL de produção configurada por `DEFAULT_BASE_URL`.
+- Em produção: URL de produção injetada por env/compile-time (`DEFAULT_BASE_URL`).
 
 ## Commands
 
 ```bash
-node config/dioxus-mobile/scripts/bootstrap.mjs --mobile-path crates/mobile-dioxus
+node config-mobile-dioxus-rs/scripts/project-init-dioxus.mjs --mobile-path crates/mobile-dioxus
 cargo install cargo-mobile
 cargo mobile init --platform android
 cargo run                        # desktop (dev)

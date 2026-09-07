@@ -12,7 +12,7 @@ Abstração de APIs nativas (câmera, GPS, storage local, notificações) via **
 
 ## Config
 
-- Ports em `features/<bc>/domain/ports/` (traits `async_trait`).
+- Ports em `features/<bc>/domain/ports/` (traits `async_trait`) — retornam `shared_kernel::Result<T>` (`Err(Vec<DomainError>)`, §5.1), nunca `Result<T, DomainError>` de erro único.
 - Adapters em `features/<bc>/infrastructure/` (impl usando `dioxus` quanto necessário, ou plugins).
 - **Mocks** para testes unitários em `#[cfg(test)]` (não compilar device code em testes).
 - Sujeitos a permissões de plataforma tratados no adapter, nunca no use case.
@@ -23,7 +23,7 @@ Abstração de APIs nativas (câmera, GPS, storage local, notificações) via **
 // domain/ports/camera.rs
 #[async_trait]
 pub trait CameraPort {
-    async fn capture(&self) -> Result<CameraPhoto, DomainError>;
+    async fn capture(&self) -> shared_kernel::Result<CameraPhoto>;
 }
 
 // infrastructure/camera_impl.rs
@@ -31,7 +31,7 @@ pub struct DioxusCamera;
 
 #[async_trait]
 impl CameraPort for DioxusCamera {
-    async fn capture(&self) -> Result<CameraPhoto, DomainError> {
+    async fn capture(&self) -> shared_kernel::Result<CameraPhoto> {
         // acionar câmera nativa via bridge/plugin
     }
 }
