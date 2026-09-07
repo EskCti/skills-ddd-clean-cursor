@@ -14,30 +14,41 @@
 3. Método estático `Create(Type value)` retornando `Result<Xxx>`.
 4. Validação de invariantes no `Create`.
 5. Acumular regras violadas em `List<string>` e `Result.Failure(errors)`; nunca só a primeira mensagem quando houver várias.
+6. Códigos de erro estáticos (ex.: `Error.InvalidEmail`) para mensagens reutilizáveis.
 
 ## Exemplo mínimo (C#)
 
 ```csharp
-using Project.Shared.Kernel.Domain;
-using Project.Shared.Kernel.Results;
+using Project.Shared.Kernel.Domain.Results;
 
 namespace Project.Core.Domain.ValueObjects;
 
 public record Email
 {
+    public static class Error
+    {
+        public const string Required = "Email is required";
+        public const string Invalid = "Invalid email format";
+    }
+
     private Email(string value) => Value = value;
 
     public string Value { get; init; }
 
     public static Result<Email> Create(string email)
     {
+        var errors = new List<string>();
+
         if (string.IsNullOrWhiteSpace(email))
-            return Result.Failure<Email>("Email is required");
+            errors.Add(Error.Required);
 
-        if (!email.Contains("@"))
-            return Result.Failure<Email>("Invalid email format");
+        if (!string.IsNullOrWhiteSpace(email) && !email.Contains("@"))
+            errors.Add(Error.Invalid);
 
-        return Result.Success(new Email(email.ToLower().Trim()));
+        if (errors.Count > 0)
+            return Result<Email>.Failure(errors);
+
+        return Result<Email>.Success(new Email(email.Trim().ToLower()));
     }
 
     public static implicit operator string(Email email) => email.Value;
@@ -47,5 +58,6 @@ public record Email
 ## Estratégia de testes
 
 - Validação de entrada (nulo, vazio, formato).
+- Acumulação: entrada com múltiplas violações retorna todas em `Errors` (nunca só a primeira).
 - Garantia de normalização (ex.: lowercase).
 - Verificação de igualdade estrutural (nativa no `record`).

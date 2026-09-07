@@ -1,15 +1,11 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using Project.Auth.Domain.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Project.Auth.Infrastructure.Identity;
-
-public interface ITokenProvider
-{
-    string Generate(Guid userId, string email, bool isAdmin);
-}
 
 public class JwtTokenProvider : ITokenProvider
 {
@@ -22,28 +18,26 @@ public class JwtTokenProvider : ITokenProvider
 
     public string Generate(Guid userId, string email, bool isAdmin)
     {
-        var secret = _configuration["Jwt:Secret"]
+        var secret = _configuration.GetValue<string>("Jwt:Secret")
             ?? throw new InvalidOperationException("Jwt:Secret not configured.");
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var claims = new List<Claim>
-        {
-            new("sub", userId.ToString()),
-            new("email", email),
-        };
-
+        var now = DateTime.UtcNow;
+        var claims = new List<Claim>();
+        claims.Add(new Claim(ClaimTypes.NameIdentifier, userId.ToString()));
+        claims.Add(new Claim(ClaimTypes.Email, email));
         if (isAdmin)
             claims.Add(new Claim(ClaimTypes.Role, "Admin"));
 
         var token = new JwtSecurityToken(
-            issuer: _configuration["Jwt:Issuer"] ?? "app",
-            audience: _configuration["Jwt:Audience"] ?? "app",
-            claims: claims,
-            expires: DateTime.UtcNow.AddHours(8),
-            signingCredentials: credentials
-        );
+            _configuration.GetValue<string>("Jwt:Issuer") ?? "app",
+            _configuration.GetValue<string>("Jwt:Audience") ?? "app",
+            claims,
+            now,
+            now.AddHours(8),
+            credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }

@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Project.Auth.Application.UseCases;
-using Project.Auth.Infrastructure.Identity;
+using Project.Auth.Application.UseCases.Auth;
+using Project.Auth.Domain.Services;
+using System.Security.Claims;
 
 namespace Project.Auth.Backend.Controllers;
 
@@ -28,17 +29,17 @@ public class AuthController : ControllerBase
     {
         var result = await _registerUseCase.ExecuteAsync(input);
         if (!result.IsSuccess)
-            return BadRequest(new { error = result.Error });
+            return BadRequest(new { errors = result.Errors });
 
-        return Created("", new { id = result.Value!.Id });
+        return Created("", new { id = result.Value.Id });
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginInput input)
     {
-        var result = await _loginUseCase.ExecuteAsync(input);
+        var result = await _loginUseCase.Execute(input);
         if (!result.IsSuccess)
-            return BadRequest(new { error = result.Error });
+            return Unauthorized(new { errors = result.Errors });
 
         return Ok(result.Value);
     }
@@ -47,8 +48,8 @@ public class AuthController : ControllerBase
     [HttpGet("me")]
     public IActionResult Me()
     {
-        var userId = User.FindFirst("sub")?.Value;
-        var email = User.FindFirst("email")?.Value;
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var email = User.FindFirst(ClaimTypes.Email)?.Value;
         var isAdmin = User.IsInRole("Admin");
 
         return Ok(new { userId, email, isAdmin });

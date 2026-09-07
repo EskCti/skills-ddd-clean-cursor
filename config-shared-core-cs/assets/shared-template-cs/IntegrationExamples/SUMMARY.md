@@ -7,8 +7,8 @@ Implementamos uma série de melhorias nos skills C# para tornar os exemplos mais
 ## 1. Classe Result Melhorada
 
 ### Arquivos Criados:
-- `ResultImproved.cs` - Nova implementação com suporte a múltiplos erros
-- `ResultUsageExample.cs` - Exemplos de uso da nova classe
+- `Result.cs` - Implementação canônica com suporte a múltiplos erros e `Combine`
+- `ResultUsageExample.cs` - Exemplos de uso da classe
 - `ResultTests.cs` - Testes unitários completos
 
 ### Melhorias Implementadas:

@@ -2,8 +2,9 @@
 
 ## 1. Dependências (Infrastructure)
 
-- [ ] Verificar `Npgsql.EntityFrameworkCore.PostgreSQL`.
-- [ ] Verificar `Microsoft.EntityFrameworkCore.Design` (necessário para ferramentas de CLI).
+- [ ] Verificar `Microsoft.EntityFrameworkCore`.
+- [ ] Verificar `Npgsql.EntityFrameworkCore.PostgreSQL` (provider Postgres).
+- [ ] Instalar o CLI `dotnet-ef`: `dotnet tool install --global dotnet-ef`.
 
 ## 2. DbContext Setup
 

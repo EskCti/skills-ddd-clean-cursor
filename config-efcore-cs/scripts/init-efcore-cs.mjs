@@ -65,7 +65,8 @@ if (!fs.existsSync(appsettingsPath)) {
 }
 
 console.log(`\n[next steps]`);
+console.log(`  dotnet tool install --global dotnet-ef`);
 console.log(`  cd src/${projectName}.Infrastructure`);
+console.log(`  dotnet add package Microsoft.EntityFrameworkCore`);
 console.log(`  dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL`);
-console.log(`  dotnet add package Microsoft.EntityFrameworkCore.Design`);
 console.log(`  dotnet ef migrations add InitialCreate --project src/${projectName}.Infrastructure --startup-project src/${projectName}.Backend\n`);

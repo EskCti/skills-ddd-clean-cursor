@@ -32,7 +32,7 @@ Executar setup idempotente do módulo de autenticação backend C#, cobrindo:
 - `assets/auth-backend-basic-template-cs/`: Template de infraestrutura (Controller, TokenProvider, PasswordHasher).
 - `references/auth-backend-contract-cs.md`: Contrato dos artefatos gerados.
 
-> **Dependências NuGet**: `BCrypt.Net-Next`, `Microsoft.AspNetCore.Authentication.JwtBearer`, `System.IdentityModel.Tokens.Jwt`.
+> **Dependências NuGet**: `BCrypt.Net-Next`, `Microsoft.AspNetCore.Authentication.JwtBearer`, `System.IdentityModel.Tokens.Jwt`, `Microsoft.IdentityModel.Tokens`.
 
 ## Global Standards
 

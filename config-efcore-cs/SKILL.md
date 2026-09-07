@@ -17,8 +17,7 @@ Equivalente ao `config-prisma` do stack TypeScript e `config-jpa-kt` do stack Ko
 1. Confirmar que o projeto contém `.csproj` no Backend e Infrastructure.
 2. Configurar dependências EF Core no Infrastructure:
    - `Microsoft.EntityFrameworkCore`
-   - `Microsoft.EntityFrameworkCore.Design`
-   - `Npgsql.EntityFrameworkCore.PostgreSQL` (ou outro provider)
+   - `Npgsql.EntityFrameworkCore.PostgreSQL` (provider Postgres)
 3. Criar/Ajustar `appsettings.json` com `ConnectionStrings`.
 4. Criar `docker-compose.yml` para Postgres compatível com as strings de conexão.
 5. Criar classe `AppDbContext` herdando de `DbContext`.
@@ -29,8 +28,8 @@ Equivalente ao `config-prisma` do stack TypeScript e `config-jpa-kt` do stack Ko
 ## O que o setup garante
 
 - Dependências no Infrastructure:
+  - `Microsoft.EntityFrameworkCore`
   - `Npgsql.EntityFrameworkCore.PostgreSQL`
-  - `Microsoft.EntityFrameworkCore.Relational`
 - `appsettings.json` com:
   - `ConnectionStrings:DefaultConnection` via env `DATABASE_URL` (se possível mapeado)
 - `docker-compose.yml` com Postgres alinhado às credenciais locais.
@@ -46,6 +45,12 @@ Equivalente ao `config-prisma` do stack TypeScript e `config-jpa-kt` do stack Ko
 - `.env` / `.env.example`
 
 ## Commands
+
+Instalar o CLI `dotnet-ef` (requerido para migrations):
+
+```bash
+dotnet tool install --global dotnet-ef
+```
 
 Gerar migration (no root):
 

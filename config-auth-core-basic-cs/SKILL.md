@@ -13,6 +13,9 @@ Manter as regras de negócio de autenticação no Core (Domínio e Aplicação) 
 ## Localização
 
 - `src/ProjectName.Core/Domain/Entities/User.cs`
+- `src/ProjectName.Core/Domain/Repositories/IUserRepository.cs`
+- `src/ProjectName.Core/Domain/Services/IPasswordHasher.cs`
+- `src/ProjectName.Core/Domain/Services/ITokenProvider.cs`
 - `src/ProjectName.Core/Application/UseCases/Auth/`
 
 ## Workflow

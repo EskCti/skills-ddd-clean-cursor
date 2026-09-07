@@ -20,7 +20,7 @@ const args = Object.fromEntries(
 const projectName = args['project-name'] || 'Project';
 const target = path.resolve(args['target'] || process.cwd());
 const assetsDir = path.resolve(new URL('.', import.meta.url).pathname, '..', 'assets', 'auth-core-basic-template-cs');
-const coreDir = path.join(target, 'src', `${projectName}.Core`, 'Auth');
+const coreDir = path.join(target, 'src', `${projectName}.Core`);
 
 function ensureDir(dir) {
   if (!fs.existsSync(dir)) {
@@ -35,6 +35,12 @@ function copyAndReplace(src, dest) {
     return;
   }
   let content = fs.readFileSync(src, 'utf-8');
+  content = content.replace(/Project\.Auth\.Domain\.Entities/g, `${projectName}.Core.Domain.Entities`);
+  content = content.replace(/Project\.Auth\.Domain\.ValueObjects/g, `${projectName}.Core.Domain.ValueObjects`);
+  content = content.replace(/Project\.Auth\.Domain\.Repositories/g, `${projectName}.Core.Domain.Repositories`);
+  content = content.replace(/Project\.Auth\.Domain\.Services/g, `${projectName}.Core.Domain.Services`);
+  content = content.replace(/Project\.Auth\.Application\.UseCases\.Auth/g, `${projectName}.Core.Application.UseCases.Auth`);
+  content = content.replace(/Project\.Auth\.Application/g, `${projectName}.Core.Application`);
   content = content.replace(/Project\.Auth/g, `${projectName}.Core.Auth`);
   content = content.replace(/Project\.Shared\.Kernel/g, `${projectName}.Shared.Kernel`);
   ensureDir(path.dirname(dest));

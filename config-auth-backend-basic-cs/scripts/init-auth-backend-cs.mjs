@@ -35,10 +35,13 @@ function copyAndReplace(src, dest) {
     return;
   }
   let content = fs.readFileSync(src, 'utf-8');
+  content = content.replace(/Project\.Auth\.Domain\.Services/g, `${projectName}.Core.Domain.Services`);
+  content = content.replace(/Project\.Auth\.Application\.UseCases\.Auth/g, `${projectName}.Core.Application.UseCases.Auth`);
   content = content.replace(/Project\.Auth\.Backend/g, `${projectName}.Backend.Modules.Auth`);
   content = content.replace(/Project\.Auth\.Infrastructure/g, `${projectName}.Infrastructure.Auth`);
-  content = content.replace(/Project\.Auth\.Application/g, `${projectName}.Core.Auth.Application`);
+  content = content.replace(/Project\.Auth\.Application/g, `${projectName}.Core.Application`);
   content = content.replace(/Project\.Auth/g, `${projectName}.Core.Auth`);
+  content = content.replace(/Project\.Shared\.Kernel/g, `${projectName}.Shared.Kernel`);
   ensureDir(path.dirname(dest));
   fs.writeFileSync(dest, content, 'utf-8');
   console.log(`  [created] ${path.relative(target, dest)}`);
@@ -67,5 +70,7 @@ for (const srcFile of walkDir(assetsDir)) {
 console.log(`\n[next steps]`);
 console.log(`  dotnet add src/${projectName}.Backend package BCrypt.Net-Next`);
 console.log(`  dotnet add src/${projectName}.Backend package Microsoft.AspNetCore.Authentication.JwtBearer`);
+console.log(`  dotnet add src/${projectName}.Backend package System.IdentityModel.Tokens.Jwt`);
+console.log(`  dotnet add src/${projectName}.Backend package Microsoft.IdentityModel.Tokens`);
 console.log(`  Configure JWT in Program.cs`);
 console.log(`  dotnet build\n`);
