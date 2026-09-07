@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Full-Stack Rust'
+  short_description: 'Orquestra Axum + Leptos + Dioxus com Shared Kernel e clientes gerados'
+  default_prompt: 'Configure o monorepo full-stack Rust: Axum (api) + Leptos (web-leptos) + Dioxus (mobile-dioxus) com shared-kernel compartilhado. Gere clientes HTTP tipados das rotas Axum. Consultar references/fullstack-pattern.md.'

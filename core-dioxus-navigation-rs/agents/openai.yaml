@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Dioxus Navigation (Rust)'
+  short_description: 'Roteamento tipado, guards de auth e deep linking do Dioxus'
+  default_prompt: 'Configure a navegação Dioxus com rotas tipadas (enum Route), guards de auth lendo o store e deep linking. Consultar references/dioxus-router-pattern.md.'

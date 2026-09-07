@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Dioxus Widget (Rust)'
+  short_description: 'Widgets reutilizáveis Dioxus com Props tipadas'
+  default_prompt: 'Crie um widget Dioxus reutilizável em widgets/, com Props tipadas (derive PartialEq) e estilização padrão. Sem acoplamento a use case/repository.'

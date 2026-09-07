@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Mobile Dioxus (Rust)'
+  short_description: 'Bootstrap app mobile Dioxus (iOS + Android) no workspace Cargo'
+  default_prompt: 'Bootstrape o crate mobile-dioxus (Dioxus) em crates/, com Clean Architecture por feature (domain/application/infrastructure/presentation) e integração com a API Axum. Consultar references/dioxus-namespace-layout.md.'

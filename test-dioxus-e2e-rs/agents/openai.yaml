@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Test Dioxus E2E (Rust)'
+  short_description: 'E2E de fluxos críticos com simulação de interação'
+  default_prompt: 'Escreva testes E2E do app Dioxus (login, listagem, CRUD) com dioxus-testing contra API real de teste. Verifique a exibição da lista completa de erros. Consultar references/dioxus-e2e-pattern.md.'

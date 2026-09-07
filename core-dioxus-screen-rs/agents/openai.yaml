@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Dioxus Screen (Rust)'
+  short_description: 'Telas Dioxus — UI (component) separada da lógica (hook/use case)'
+  default_prompt: 'Crie a tela Dioxus em features/<bc>/presentation/. Component separa UI de lógica via hook que usa o use case. Rendere todos os erros do Result (lista). Consultar references/dioxus-screen-pattern.md.'

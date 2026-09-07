@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Config Dioxus CI/CD (Rust)'
+  short_description: 'Pipeline mobile iOS+Android com assinatura e publicação em stores'
+  default_prompt: 'Configure o CI/CD do app Dioxus: CI (fmt/clippy/test/coverage ≥95%) + build Android AAB assinado e iOS IPA, publicação em Play/App Store via tag. Consultar references/cicd-dioxus-pattern.md.'

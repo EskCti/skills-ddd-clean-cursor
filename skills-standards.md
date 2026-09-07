@@ -113,6 +113,7 @@ When editing any skill (`*/SKILL.md`):
 | Backend    | `backend-*`  | Camada de infraestrutura/interface do backend                    | TS, KT, CS, RS, Java             |
 | Frontend   | `frontend-*` | Camada de interface web (Tailwind + Next.js/Angular/Vue/Leptos) | TS, Angular, Vue, Leptos |
 | Mobile     | `mobile-*`   | Telas e formulários mobile (Flutter, Android Compose)            | Flutter, Android (Kotlin)    |
+| Mobile Dioxus | `core-dioxus-*`, `backend-dioxus-*`, `test-dioxus-*`, `config-dioxus-*`, `config-mobile-dioxus-*` | Telas, widgets, navegação, state, API client e CI/CD mobile (iOS + Android) | Rust (Dioxus) |
 | Requisitos | `req-*`      | Discovery, modelagem DDD, migração e planejamento                | Agnostic                     |
 | Qualidade  | `test-*`     | Testes unitários (≥95% domain/app) e E2E (fluxos críticos)       | TS, KT, CS, RS, Java             |
 | OpenSpec   | `openspec-*` | Fluxo de proposta/exploração/implementação                       | Agnostic                     |
@@ -132,6 +133,7 @@ When editing any skill (`*/SKILL.md`):
 | Leptos            | `-leptos`   | Leptos SSR + cargo-leptos + Tailwind | Templates + scripts                              |
 | Flutter           | `-flutter`  | Flutter + Riverpod + Dio          | Templates                                           |
 | Android           | `-android`  | Jetpack Compose + Hilt + Retrofit | Templates                                           |
+| **Dioxus (mobile)** | `-dioxus-rs` | Dioxus Mobile (iOS + Android) + cargo-mobile + Tailwind/CSS | Templates + scripts |
 | Language-agnostic | (none)      | —                                 | `req-discovery`, `req-agile-planning`, `openspec-*` |
 
 ### Source vs Target
@@ -153,6 +155,7 @@ The `req-discovery` skill can **read** systems in any language (PHP, Go, Python,
 | Leptos (frontend) | `shared_kernel::Result<T>` | `Err(Vec<DomainError>)` | acumular no `try_new()` + `combine2` |
 | Flutter (mobile) | `Result<T>` / `Failure` | `messages: List<String>` | `Failure(messages)` |
 | Android (mobile) | `kotlin.Result` + `sealed Failure` | mapear para `List<String>` na UI | helper `toErrorMessages()` |
+| Dioxus (mobile) | `shared_kernel::Result<T>` | `Err(Vec<DomainError>)` | `combine2` / `combine_errors` |
 
 Rules for skills `core-entity*` and `core-value-object*`:
 
@@ -432,6 +435,17 @@ Infrastructure       →  backend-prisma-data (TS) / backend-data-kt (KT) / back
 | Mobile         | **Infra** (Repository + Dio/Retrofit) | `mobile-repository-flutter` | `mobile-repository-android` | — |
 | Mobile         | Tela Flutter        | `mobile-screen-flutter`  | —                      | —                        |
 | Mobile         | Tela Android        | `mobile-screen-android`  | —                      | —                        |
+| Mobile Dioxus  | Bootstrap mobile    | `config-mobile-dioxus-rs` | —                    | —                        |
+| Mobile Dioxus  | Screen              | `core-dioxus-screen-rs`   | —                    | —                        |
+| Mobile Dioxus  | Widget              | `core-dioxus-widget-rs`   | —                    | —                        |
+| Mobile Dioxus  | Navegação           | `core-dioxus-navigation-rs` | —                  | —                        |
+| Mobile Dioxus  | Native access       | `core-dioxus-native-access-rs` | —                | —                        |
+| Mobile Dioxus  | State               | `core-dioxus-state-rs`    | —                    | —                        |
+| Mobile Dioxus  | API client          | `backend-dioxus-api-client-rs` | —                | —                        |
+| Mobile Dioxus  | Testes unitários    | `test-dioxus-unit-rs`     | —                    | —                        |
+| Mobile Dioxus  | Testes E2E          | `test-dioxus-e2e-rs`      | —                    | —                        |
+| Mobile Dioxus  | CI/CD mobile        | `config-dioxus-cicd-rs`   | —                    | —                        |
+| Full-stack     | Orquestração Rust   | `config-fullstack-rust-rs` | —                   | —                        |
 | Mobile         | Formulário Flutter  | `mobile-form-flutter`    | —                      | —                        |
 | Mobile         | Formulário Android  | `mobile-form-android`    | —                      | —                        |
 

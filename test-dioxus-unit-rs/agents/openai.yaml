@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Test Dioxus Unit (Rust)'
+  short_description: 'Testes unitários domain+app (≥95%) e componentes com dioxus-testing'
+  default_prompt: 'Escreva testes unitários do app Dioxus: domain/application ≥95% e componentes com dioxus-testing. Mocks de ports (mockall/fake). Consultar references/dioxus-unit-pattern.md.'

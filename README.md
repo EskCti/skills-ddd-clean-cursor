@@ -148,6 +148,31 @@ Layout obrigatório: `config-shared-core-rs/references/rust-namespace-layout.md`
 
 **Tutorial full-stack (Rust + Leptos + Flutter):** [docs/tutorial/stacks/rust-leptos-flutter.md](docs/tutorial/stacks/rust-leptos-flutter.md)
 
+### Skills Mobile Dioxus (sufixo `-dioxus-rs`) — Rust mobile (iOS + Android)
+
+Skills para apps mobile **Dioxus** no mesmo workspace Cargo do backend Axum, com Clean Architecture por feature (`domain` / `application` / `infrastructure` / `presentation`) e `shared_kernel::Result` compartilhado:
+
+**Bootstrap e infra:**
+- `config-mobile-dioxus-rs`: bootstrap do crate `mobile-dioxus` (cargo-mobile, iOS + Android) + layout de namespaces
+- `config-dioxus-cicd-rs`: CI/CD mobile — build Android (AAB) e iOS (IPA), assinatura e publicação em stores
+
+**Apresentação:**
+- `core-dioxus-screen-rs`: telas com UI (component) separada da lógica (hook/use case), erros em lista completa
+- `core-dioxus-widget-rs`: widgets reutilizáveis com Props tipadas
+- `core-dioxus-navigation-rs`: dioxus-router com rotas tipadas, guards de auth e deep linking
+- `core-dioxus-state-rs`: stores globais com `use_signal` + `use_context` e persistência local
+
+**Domínio e integração:**
+- `core-dioxus-native-access-rs`: abstração de APIs nativas (câmera, GPS, storage, notificações) via ports com mocks
+- `backend-dioxus-api-client-rs`: cliente HTTP tipado (reqwest) com `Result<_, ApiError>` preservando `{ errors: [...] }`, retry e caching
+
+**Qualidade:**
+- `test-dioxus-unit-rs`: testes unitários (domain+app ≥95%) e de componentes com `dioxus-testing`
+- `test-dioxus-e2e-rs`: E2E de fluxos críticos (login, listagem, CRUD) com simulação de interação
+
+**Orquestração full-stack:**
+- `config-fullstack-rust-rs`: monorepo Axum + Leptos + Dioxus com Shared Kernel compartilhado e geração de clientes HTTP a partir das rotas Axum
+
 ### Skills Java (sufixo `-java`) — backend Spring Boot
 
 Layout obrigatório: `config-shared-core-java/references/java-namespace-layout.md` — domínio puro em `packages/<bc>/`, Spring em `apps/backend-java/modules/<bc>/`.

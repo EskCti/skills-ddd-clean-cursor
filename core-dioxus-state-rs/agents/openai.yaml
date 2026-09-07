@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Dioxus State (Rust)'
+  short_description: 'Estado global com use_signal + use_context e persistência local'
+  default_prompt: 'Implemente stores (auth, sessão, tema) com use_signal + use_context provider e persistência local. Consultar references/state-pattern.md.'

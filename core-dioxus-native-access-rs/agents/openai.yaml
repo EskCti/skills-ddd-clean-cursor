@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Core Dioxus Native Access (Rust)'
+  short_description: 'Abstração de APIs nativas via traits (ports) com mocks'
+  default_prompt: 'Crie um port (trait) em features/<bc>/domain/ports/ para acesso nativo (câmera/GPS/storage/notificações) com adapter em infrastructure/ e mock para testes. Sem hardware no domínio.'

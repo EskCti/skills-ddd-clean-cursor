@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Backend Dioxus API Client (Rust)'
+  short_description: 'Cliente HTTP tipado com Result<_, ApiError>, retry e caching'
+  default_prompt: 'Crie o cliente HTTP em features/<bc>/infrastructure/ usando reqwest, com DTOs serde e mapeando erros do backend ({ errors }) para ApiError listado. Retry 5xx/timeout, sem retry 4xx. Consultar references/model.md.'
