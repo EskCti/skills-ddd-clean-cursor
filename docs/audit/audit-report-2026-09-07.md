@@ -17,6 +17,8 @@
 
 ### Achados transversais prioritários
 
+> **Status pós-fix (mesmo dia:** todos os 5 achados acima foram corrigidos e verificados — ver §7.**
+
 1. **Contrato de erro "lista completa" (§5.1) não chega à fronteira HTTP/UI** em várias stacks — VOs com `throw`/early-return (TS `core-value-object`), templates auth Kotlin usando `kotlin.Result` de primeira falha, adaptadores HTTP colapsando `{errors:[...]}` em `message` único (Angular/Vue/Leptos/Flutter/Android).
 2. **Exemplos de código Rust (Lept e e-rs) não compilam** — pulso-do-`std` sem dependência declarada e sintaxe inválida (`if let Ok(...)`, `Result::Err(Vec<...>)`, etc.).
 3. **Gates de cobertura decorativos**: `config-cicd` (TS `check-coverage.mjs` passa com 0 arquivos), `config-cicd-kt` (`-PminCoverage` não efetivo).
@@ -245,4 +247,69 @@ Global: `core-entity`/`core-value-object`/`core-domain-service` OK nas 3. **Pior
 
 ---
 
-*Relatório gerado em 2026-09-07 como parte da auditoria completa do repositório de skills DDD/Clean Architecture.*
+
+## 7. Verificação pós-fix (2026-09-07, mesmo dia)
+
+Re-leitura de todos os itens ❌/⚠️ do relatório original após os 8 commits de correção (auth-kt, auth-cs, rust, ts, frontend-mobile, leptos, openspec-java):
+
+| Achado original | Status | Evidência verificada |
+|------------------|--------|----------------------|
+| `api/` resíduo C# | ✅ Removida | pasta inexistente |
+| `config-auth-*-kt` (kotlin.Result) | ✅ Migrado | `DomainResult` + `errors` acumulando em basic/full/backend |
+| `config-auth-*-cs` (não compila) | ✅ Corrigido | `Result<T>.Errors` + JWT .NET 8 real |
+| `mobile-repository-flutter` (stubs update/delete) | ✅ Corrigido | `_dio.put`/`_dio.delete` reais + checklist "sem stubs" |
+| `openspec-context-cache` (sem frontmatter) | ✅ Corrigido | frontmatter `name/stack/description` presente |
+| `config-docker-rs` (sem Dockerfile) | ✅ Corrigido | Dockerfile multi-stage + compose.prod + não-root + HEALTHCHECK |
+| `config-cicd` (coverage fake-pass) | ✅ Corrigido | `check-coverage.mjs` falha quando `matched === 0` |
+| `config-cicd-kt` (gate JaCoCo decorativo) | ✅ Corrigido | `jacocoTestCoverageVerification` real + fallback parse jacoco.xml |
+| `core-value-object` TS (throw early-return) | ✅ Corrigido | `errors.push(...)` + `Result.fail(errors)` no final |
+| Adapters HTTP Angular/Vue/Leptos/Flutter/Android (colapsam lista) | ✅ Corrigido | parse `{errors:[...]}` + fallback; testes unitários |
+| Leptos (exemplos não compilam) | ✅ Corrigido | `match`/`?` válidos; `parse_api_errors` preserva lista |
+| `core-query-cqrs-rs` (trait Query inexistente) | ✅ Corrigido | usa `shared_kernel::UseCase` (sem trait dedicado) |
+| `config-shared-core-rs` (`errors()` ref temporária) | ✅ Corrigido | `const NO_ERRORS: &[DomainError]` |
+| `config-new-module-rs` (código gerado não compila) | ✅ Corrigido | workflow valida com `cargo check -p api` |
+| `backend-controller-java`/`config-new-module-java` (sem 201/envelope) | ✅ Corrigido | `201 Created` + `{ "errors": [...] }` + DTO |
+| `openspec-apply-change` (sem DoD/Agents) | ✅ Corrigido | valida DoD de épico + delega Agents do backlog |
+| `config-efcore-cs` (pacotes inexistentes) | ✅ Corrigido | provider `Npgsql.EntityFrameworkCore.PostgreSQL` |
+| `config-docker` TS (npm ci antes de COPY) | ✅ Corrigido | `COPY package*.json` + `npm ci` após manifests |
+| E2E web no CI (`config-cicd`) | ✅ Já presente | job `e2e-web` (Playwright, cache browsers) |
+| `mobile-repository-android` (404 por contains) | ✅ Corrigido | map por status code + propaga `errors` como lista |
+| `config-docker-kt` (EXPOSE 8080 vs 4000) | ✅ Corrigido (nesta verificação) | `EXPOSE 4000` + porta 4000 |
+| Kotlin `core-*/backend-*` (kotlin.Result / mapOf("error")) | ✅ Corrigido (nesta verificação) | `DomainResult` + `{ "errors": result.errors }` + fold→DomainResult |
+| Use cases mobile em `domain/` (Flutter/Android) | ✅ Corrigido (nesta verificação) | `features/<bc>/application/usecase(s)/` |
+| `config-auth-core-full-cs` (SKILL 24 linhas) | ✅ Corrigido (nesta verificação) | Guidelines + Workflow 4 passos + NÃO FAZER |
+| `config-new-module-cs` (placeholder) | ✅ Corrigido (nesta verificação) | pastas apontam para `core-use-case-cs`/`core-dto-cs` + exemplo mínimo no scaffold |
+| `config-db-seed-cs` (entidade direto no DbSet) | ✅ Corrigido (nesta verificação) | `UserSeed.cs` completo com mapeamento domínio → `UserDbo` |
+| `req-agile-planning` (sem Leptos na tabela) | ✅ Corrigido (nesta verificação) | matriz de stack + tabela + notas Leptos/Dioxus |
+
+**Pendências conhecidas (não-bloqueantes):**
+- `config-project` (TS): `images.remotePatterns` com `hostname: "**"` — decisão de produto documentada no audit original (tradeoff: apps reais precisam de imagens remotas; restringir hosts exige manutenção por projeto).
+- Frontmatter `stack:` de mobile Flutter segue `agnostic` (cosmético; consumido por tooling sem impacto funcional).
+
+---
+
+## 8. Skills Dioxus (Rust mobile) — auditoria (lacuna do relatório original)
+
+O relatório original não cobria a família Dioxux (adicionada em `feat(dioxus)` no mesmo dia). Auditoria de 9 skills — Clean Architecture por feature (`domain`/`application`/`infrastructure`/`presentation`) com `shared_kernel::Result<T>` (`Err(Vec<DomainError>)`):
+
+| Skill | Status | Observação |
+|-------|--------|-----------|
+| `core-dioxus-screen-rs` | ✅ | UI (`#[component]`) separada de hooks/use cases; sem HTTP direto; renderiza **toda** a lista de erros (`<For>`) |
+| `core-dioxus-widget-rs` | ✅ | Props tipadas; presentation pura (sem conhecer use cases/repositories) |
+| `core-dioxux-navigation-rs` | ✅ | Rotas tipadas (enum `Route` + `Routable`), guards leem estado de auth (`core-dioxux-state-rs`); deep linking |
+| `core-dioxux-state-rs` | ✅ | `use_signal` + `use_context`; stores expõem `Result` (sem exceptions); persistência local |
+| `core-dioxux-native-access-rs` | ⚠️→✅ | Ports retornavam `Result<T, DomainError>` (erro único) — corrigido nesta auditoria para `shared_kernel::Result<T>` (`Err(Vec<DomainError>)`, §5.1); mocks em `#[cfg(test)]` |
+| `backend-dioxux-api-client-rs` | ✅ | Cliente tipado (reqwest); preserva `{ errors: [...] }` como `ApiError::External(Vec<String>)`; retry + caching |
+| `config-mobile-dioxux-rs` | ⚠️→✅ | Env var inconsistente (`DUX_BASE_URL`/`API_BASE_URL`/`DEFAULT_BASE_URL`) e comando stale (`config/dioxux-mobile/...`) — corrigidos: `DUX_API_BASE_URL` (runtime) + `DEFAULT_BASE_URL` (compile-time) + `project-init-dioxux.mjs` |
+| `config-dioxux-cicd-rs` | ✅ | fmt/clippy/test/`llvm-cov` ≥95% domain+application; build Android (AAB) e iOS (IPA); assinatura via secrets; release só em tag; herda memory-check de `config-cicd-rs` |
+| `test-dioxux-unit-rs` | ✅ | domain+application ≥95% + componentes (`dioxux-testing`); mocks `mockall`/fake — nunca device code |
+| `test-dioxux-e2e-rs` | ✅ | Fluxos críticos (login, listagem, CRUD, guard de rota) contra API real/stub; verifica contrato `{ errors: [...] }` na UI |
+| `config-fullstack-rust-rs` | ✅ | Monorepo Axum + Leptos + Dioxux; Shared Kernel compartilhado; clientes HTTP gerados das rotas; **nunca** duplicar tipos de domínio no cliente |
+
+**Pontos fortes da família Dioxux:** contrato de erros único (`shared_kernel`), camadas isoladas, ports & adapters com mocks, DoD completo (unit ≥95% + E2E + CI + memory-check).
+
+**Achados corrigidos nesta auditoria:** `core-dioxux-native-access-rs` (Result com lista) e `config-mobile-dioxux-rs` (env var + comando stale) — ambos já verificados como resolvidos.
+
+
+
+*Relatório gerado em 2026-09-07 como parte da auditoria completa do repositório de skills DDD/Clean Architecture; verificação pós-fix e auditoria Dioxux adicionadas no mesmo dia.*
