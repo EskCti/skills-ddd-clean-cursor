@@ -69,6 +69,8 @@ abstract class ICustomerRemoteDataSource {
   Future<List<CustomerModel>> findAll();
   Future<CustomerModel> findById(String id);
   Future<CustomerModel> create(CustomerModel model);
+  Future<CustomerModel> update(String id, CustomerModel model);
+  Future<void> delete(String id);
 }
 
 class CustomerRemoteDataSourceImpl implements ICustomerRemoteDataSource {
@@ -95,6 +97,17 @@ class CustomerRemoteDataSourceImpl implements ICustomerRemoteDataSource {
   Future<CustomerModel> create(CustomerModel model) async {
     final response = await _dio.post(_path, data: model.toJson());
     return CustomerModel.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<CustomerModel> update(String id, CustomerModel model) async {
+    final response = await _dio.put('$_path/$id', data: model.toJson());
+    return CustomerModel.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<void> delete(String id) async {
+    await _dio.delete('$_path/$id');
   }
 }
 ```
@@ -125,7 +138,7 @@ class CustomerRepositoryImpl implements ICustomerRepository {
       }
       return Success(entities);
     } on DioException catch (e) {
-      return Failure('Erro ao buscar clientes', exception: e);
+      return Failure(_errorMessages(e, fallback: 'Erro ao buscar clientes'), exception: e);
     }
   }
 
@@ -136,9 +149,9 @@ class CustomerRepositoryImpl implements ICustomerRepository {
       return model.toDomain();
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) {
-        return Failure('Cliente não encontrado');
+        return const Failure(['Cliente não encontrado']);
       }
-      return Failure('Erro ao buscar cliente', exception: e);
+      return Failure(_errorMessages(e, fallback: 'Erro ao buscar cliente'), exception: e);
     }
   }
 
@@ -149,9 +162,9 @@ class CustomerRepositoryImpl implements ICustomerRepository {
       return model.toDomain();
     } on DioException catch (e) {
       if (e.response?.statusCode == 409) {
-        return Failure('Email já cadastrado');
+        return const Failure(['Email já cadastrado']);
       }
-      return Failure('Erro ao criar cliente', exception: e);
+      return Failure(_errorMessages(e, fallback: 'Erro ao criar cliente'), exception: e);
     }
   }
 
@@ -166,28 +179,46 @@ class CustomerRepositoryImpl implements ICustomerRepository {
         failure: (msg, ex) => Failure(msg, exception: ex),
       );
     } on DioException catch (e) {
-      return Failure('Erro de rede', exception: e);
+      return Failure(_errorMessages(e, fallback: 'Erro de rede'), exception: e);
     }
   }
 
   @override
   Future<Result<void>> update(Customer customer) async {
     try {
-      await _dataSource.create(CustomerModel.fromDomain(customer)); // PUT impl
+      await _dataSource.update(customer.id, CustomerModel.fromDomain(customer));
       return const Success(null);
     } on DioException catch (e) {
-      return Failure('Erro ao atualizar', exception: e);
+      if (e.response?.statusCode == 409) {
+        return const Failure(['Email já cadastrado']);
+      }
+      return Failure(_errorMessages(e, fallback: 'Erro ao atualizar'), exception: e);
     }
   }
 
   @override
   Future<Result<void>> delete(String id) async {
     try {
-      await _dataSource.findById(id); // DELETE impl
+      await _dataSource.delete(id);
       return const Success(null);
     } on DioException catch (e) {
-      return Failure('Erro ao deletar', exception: e);
+      if (e.response?.statusCode == 404) {
+        return const Failure(['Cliente não encontrado']);
+      }
+      return Failure(_errorMessages(e, fallback: 'Erro ao deletar'), exception: e);
     }
+  }
+
+  List<String> _errorMessages(DioException e, {required String fallback}) {
+    final data = e.response?.data;
+    if (data is Map<String, dynamic>) {
+      final errors = data['errors'];
+      if (errors is List) {
+        final messages = errors.whereType<String>().toList();
+        if (messages.isNotEmpty) return messages;
+      }
+    }
+    return [fallback];
   }
 }
 ```
@@ -222,7 +253,7 @@ final getCustomersUseCaseProvider = Provider<GetCustomersUseCase>((ref) {
 
 - [ ] `ICustomerRepository` em domain/ (Dart puro, sem Dio)
 - [ ] `CustomerModel` com `fromJson/toJson` e `toDomain()/fromDomain()`
-- [ ] `ICustomerRemoteDataSource` + `Impl` com Dio
-- [ ] `CustomerRepositoryImpl` captura `DioException` → retorna `Failure`
+- [ ] `ICustomerRemoteDataSource` + `Impl` com Dio (inclui `update` via `put` e `delete` via HTTP DELETE — sem stubs)
+- [ ] `CustomerRepositoryImpl` captura `DioException` → `Failure(messages)` parseando `{ errors: [...] }` do body
 - [ ] Providers Riverpod injetam datasource → repo → use case
 - [ ] `build_runner` executado para gerar `.g.dart`

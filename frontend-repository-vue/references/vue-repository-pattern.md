@@ -34,7 +34,11 @@ async function apiRequest<T>(url: string, options?: RequestInit): Promise<T> {
   })
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
-    throw { status: res.status, message: body.message ?? `HTTP ${res.status}` }
+    const errors: string[] =
+      Array.isArray(body.errors) && body.errors.length > 0
+        ? body.errors
+        : [body.message ?? `HTTP ${res.status}`]
+    throw { status: res.status, errors }
   }
   return res.json()
 }
@@ -43,13 +47,17 @@ export class CustomerHttpRepository implements ICustomerRepository {
   async findAll(): Promise<Result<CustomerEntity[]>> {
     try {
       const dtos = await apiRequest<CustomerApiDto[]>(BASE)
-      const entities = dtos.flatMap(dto => {
+      const entities: CustomerEntity[] = []
+      const validationErrors: string[] = []
+      for (const dto of dtos) {
         const r = dtoToEntity(dto)
-        return r.ok ? [r.data] : []
-      })
+        if (r.ok) entities.push(r.data)
+        else validationErrors.push(...r.error)
+      }
+      if (validationErrors.length > 0) return err(validationErrors)
       return ok(entities)
     } catch (e: any) {
-      return err(e.message ?? 'Erro ao buscar clientes')
+      return err(e.errors ?? ['Erro ao buscar clientes'])
     }
   }
 
@@ -60,7 +68,7 @@ export class CustomerHttpRepository implements ICustomerRepository {
       return result.ok ? ok(result.data) : err(result.error)
     } catch (e: any) {
       if (e.status === 404) return err('Cliente não encontrado')
-      return err(e.message ?? 'Erro ao buscar cliente')
+      return err(e.errors ?? ['Erro ao buscar cliente'])
     }
   }
 
@@ -72,7 +80,7 @@ export class CustomerHttpRepository implements ICustomerRepository {
       const r = dtoToEntity(found)
       return r.ok ? ok(r.data) : ok(null)
     } catch (e: any) {
-      return err(e.message ?? 'Erro de rede')
+      return err(e.errors ?? ['Erro de rede'])
     }
   }
 
@@ -86,7 +94,7 @@ export class CustomerHttpRepository implements ICustomerRepository {
       return result.ok ? ok(result.data) : err(result.error)
     } catch (e: any) {
       if (e.status === 409) return err('Email já cadastrado')
-      return err(e.message ?? 'Erro ao criar cliente')
+      return err(e.errors ?? ['Erro ao criar cliente'])
     }
   }
 
@@ -99,7 +107,7 @@ export class CustomerHttpRepository implements ICustomerRepository {
       const result = dtoToEntity(dto)
       return result.ok ? ok(result.data) : err(result.error)
     } catch (e: any) {
-      return err(e.message ?? 'Erro ao atualizar')
+      return err(e.errors ?? ['Erro ao atualizar'])
     }
   }
 
@@ -108,7 +116,7 @@ export class CustomerHttpRepository implements ICustomerRepository {
       await apiRequest<void>(`${BASE}/${id}`, { method: 'DELETE' })
       return ok(undefined)
     } catch (e: any) {
-      return err(e.message ?? 'Erro ao deletar')
+      return err(e.errors ?? ['Erro ao deletar'])
     }
   }
 }
@@ -161,7 +169,9 @@ export const useCustomerStore = defineStore('customer', () => {
 
 - [ ] DTO interface `CustomerApiDto` separado da entidade
 - [ ] `CustomerHttpRepository implements ICustomerRepository`
-- [ ] `try/catch` em todos os métodos → `err(message)`
+- [ ] `apiRequest` propaga `errors: string[]` do body `{ errors: [...] }` (nunca `message` única)
+- [ ] `try/catch` em todos os métodos → `err(errors)` (lista completa)
+- [ ] DTOs inválidos NÃO são descartados silenciosamente — acumulam `err(errors)`
 - [ ] Mapeamento DTO → entidade via `CustomerEntity.create()`
 - [ ] Pinia store instancia `UseCase(repository)` — não chama repositório diretamente
 - [ ] `store.create()` retorna `Result` para o componente exibir erros de negócio

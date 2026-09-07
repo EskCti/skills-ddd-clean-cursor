@@ -56,12 +56,15 @@ export class CustomerHttpRepository implements ICustomerRepository {
 
   async findByEmail(email: string): Promise<Result<CustomerEntity | null>> {
     try {
-      const dtos = await firstValueFrom(this.http.get<CustomerApiDto[]>(this.base))
-      const found = dtos.find(d => d.email === email)
-      if (!found) return ok(null)
-      const result = CustomerEntity.create({ id: found.id, name: found.name, email: found.email, cpf: found.cpf })
+      const dto = await firstValueFrom(
+        this.http.get<CustomerApiDto | null>(this.base, { params: { email } })
+      )
+      if (!dto) return ok(null)
+      const result = CustomerEntity.create({ id: dto.id, name: dto.name, email: dto.email, cpf: dto.cpf })
       return result.ok ? ok(result.data) : ok(null)
     } catch (e) {
+      const error = e as HttpErrorResponse
+      if (error.status === 404) return ok(null)
       return err(this.handleError(e))
     }
   }
@@ -105,11 +108,15 @@ export class CustomerHttpRepository implements ICustomerRepository {
     }
   }
 
-  private handleError(e: unknown): string {
+  private handleError(e: unknown): string[] {
     if (e instanceof HttpErrorResponse) {
-      return e.error?.message ?? `Erro HTTP ${e.status}`
+      const errors = e.error?.errors
+      if (Array.isArray(errors) && errors.length > 0) {
+        return errors as string[]
+      }
+      return [e.error?.message ?? `Erro HTTP ${e.status}`]
     }
-    return 'Erro de conexão'
+    return ['Erro de conexão']
   }
 }
 ```
@@ -133,6 +140,8 @@ export const appConfig: ApplicationConfig = {
 - [ ] DTO interface `CustomerApiDto` separado da entidade de domínio
 - [ ] `CustomerHttpRepository implements ICustomerRepository`
 - [ ] `firstValueFrom()` para converter Observable → Promise
-- [ ] `try/catch` em todos os métodos → `err(message)`
+- [ ] `try/catch` em todos os métodos → `err(string[])`
 - [ ] Mapeamento DTO → entidade via `CustomerEntity.create()`
+- [ ] `handleError` devolve `string[]` parseando `{ errors: [...] }` do backend (nunca `message` única)
+- [ ] `findByEmail` usa query param `?email=` no GET (nunca GET-all + filtro em memória)
 - [ ] `{ provide: CUSTOMER_REPOSITORY, useClass: CustomerHttpRepository }` no app.config.ts

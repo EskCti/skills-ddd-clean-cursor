@@ -44,7 +44,6 @@ data class CustomerDto(
 ## ApiService (data) — features/customers/data/remote/CustomerApiService.kt
 
 ```kotlin
-import retrofit2.Response
 import retrofit2.http.*
 
 interface CustomerApiService {
@@ -61,7 +60,7 @@ interface CustomerApiService {
     suspend fun update(@Path("id") id: String, @Body dto: CustomerDto): CustomerDto
 
     @DELETE("customers/{id}")
-    suspend fun delete(@Path("id") id: String): Response<Unit>
+    suspend fun delete(@Path("id") id: String)
 }
 ```
 
@@ -70,6 +69,8 @@ interface CustomerApiService {
 ```kotlin
 import javax.inject.Inject
 import java.io.IOException
+import retrofit2.HttpException
+import com.google.gson.JsonParser
 
 class CustomerRepositoryImpl @Inject constructor(
     private val api: CustomerApiService,
@@ -80,16 +81,21 @@ class CustomerRepositoryImpl @Inject constructor(
             dto.toDomain().getOrNull()
         }
     }.recoverWith { e ->
-        Result.failure(CustomerFailure.InvalidData("network", e.message ?: "Unknown error"))
+        when (e) {
+            is HttpException -> mapHttpError(e)
+            is IOException ->
+                Result.failure(CustomerFailure.InvalidData("network", "No internet connection"))
+            else ->
+                Result.failure(CustomerFailure.InvalidData("server", e.message ?: "Unknown error"))
+        }
     }
 
     override suspend fun findById(id: String): Result<Customer> = runCatching {
         api.findById(id).toDomain().getOrThrow()
     }.recoverWith { e ->
-        when {
-            e.message?.contains("404") == true ->
-                Result.failure(CustomerFailure.NotFound(id))
-            e is IOException ->
+        when (e) {
+            is HttpException -> mapHttpError(e, id = id)
+            is IOException ->
                 Result.failure(CustomerFailure.InvalidData("network", "No internet connection"))
             else ->
                 Result.failure(CustomerFailure.InvalidData("server", e.message ?: "Unknown"))
@@ -103,22 +109,56 @@ class CustomerRepositoryImpl @Inject constructor(
     override suspend fun create(customer: Customer): Result<Customer> = runCatching {
         api.create(CustomerDto.fromDomain(customer)).toDomain().getOrThrow()
     }.recoverWith { e ->
-        when {
-            e.message?.contains("409") == true ->
-                Result.failure(CustomerFailure.DuplicateEmail(customer.email))
-            else ->
-                Result.failure(CustomerFailure.InvalidData("server", e.message ?: "Unknown"))
+        when (e) {
+            is HttpException -> mapHttpError(e, email = customer.email)
+            else -> Result.failure(CustomerFailure.InvalidData("server", e.message ?: "Unknown"))
         }
     }
 
     override suspend fun update(customer: Customer): Result<Customer> = runCatching {
         api.update(customer.id, CustomerDto.fromDomain(customer)).toDomain().getOrThrow()
+    }.recoverWith { e ->
+        when (e) {
+            is HttpException -> mapHttpError(e, email = customer.email)
+            else -> Result.failure(CustomerFailure.InvalidData("server", e.message ?: "Unknown"))
+        }
     }
 
     override suspend fun delete(id: String): Result<Unit> = runCatching {
         api.delete(id)
         Unit
+    }.recoverWith { e ->
+        when (e) {
+            is HttpException -> mapHttpError(e, id = id)
+            else -> Result.failure(CustomerFailure.InvalidData("server", e.message ?: "Unknown"))
+        }
     }
+}
+
+// Lê o status code + `{ errors: [...] }` do corpo de erro, preservando a lista completa
+private fun <T> mapHttpError(e: HttpException, id: String? = null, email: String? = null): Result<T> {
+    val messages = parseErrorMessages(e)
+    return when (e.code()) {
+        404 -> Result.failure(CustomerFailure.NotFound(id ?: "", messages))
+        409 -> Result.failure(CustomerFailure.DuplicateEmail(email ?: "", messages))
+        else -> Result.failure(CustomerFailure.InvalidData("server", "HTTP ${e.code()}", messages))
+    }
+}
+
+private fun parseErrorMessages(e: HttpException): List<String> {
+    val status = e.code()
+    val raw = e.response()?.errorBody()?.string()
+    if (raw.isNullOrBlank()) return listOf("HTTP $status")
+    return runCatching {
+        val json = JsonParser.parseString(raw).asJsonObject
+        val errors = json.get("errors")
+        if (errors != null && errors.isJsonArray) {
+            errors.asJsonArray.map { it.asString }
+        } else {
+            val message = json.get("message")
+            listOf(message?.asString ?: "HTTP $status")
+        }
+    }.getOrDefault(listOf("HTTP $status"))
 }
 
 // Extension para encadear recuperação
@@ -146,5 +186,5 @@ abstract class RepositoryModule {
 - [ ] `CustomerDto` com `toDomain()` e `fromDomain()` (mapeamento ↔ entidade)
 - [ ] `CustomerApiService` (Retrofit @GET/@POST/@PUT/@DELETE)
 - [ ] `CustomerRepositoryImpl @Inject` com `runCatching {}` em todos os métodos
-- [ ] `recoverWith {}` para mapear exceções em Failure específicos
+- [ ] `recoverWith {}` mapeia `HttpException` via status code (404→NotFound, 409→DuplicateEmail) e propaga `errors` do body como `List<String>`
 - [ ] `RepositoryModule` com `@Binds` para Hilt
