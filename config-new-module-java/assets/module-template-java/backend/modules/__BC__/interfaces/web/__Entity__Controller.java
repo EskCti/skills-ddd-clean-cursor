@@ -1,9 +1,10 @@
 package __GROUP__.modules.__BC__.interfaces.web;
 
 import __GROUP__.__BC__.application.dto.Create__Entity__Input;
+import __GROUP__.__BC__.application.dto.Create__Entity__Output;
 import __GROUP__.__BC__.application.usecase.Create__Entity__UseCase;
-import __GROUP__.__BC__.domain.entity.__Entity__;
-import java.util.UUID;
+import java.util.Map;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,11 +22,11 @@ public class __Entity__Controller {
     }
 
     @PostMapping
-    public ResponseEntity<__Entity__> create(@RequestBody Create__Entity__Input input) {
+    public ResponseEntity<?> create(@RequestBody Create__Entity__Input input) {
         var result = createUseCase.execute(input);
         if (result.isFailure()) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(Map.of("errors", result.getErrorMessages()));
         }
-        return ResponseEntity.ok(result.getOrNull());
+        return ResponseEntity.status(HttpStatus.CREATED).body(result.getOrNull());
     }
 }

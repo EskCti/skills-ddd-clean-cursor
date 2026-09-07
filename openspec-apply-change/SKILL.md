@@ -186,3 +186,19 @@ This skill supports the "actions on a change" model:
 
 - **Can be invoked anytime**: Before all artifacts are done (if tasks exist), after partial implementation, interleaved with other actions
 - **Allows artifact updates**: If implementation reveals design issues, suggest updating artifacts - not phase-locked, work fluidly
+
+**Integração com o backlog DDD**
+
+Changes geradas por `req-agile-planning` carregam tasks no formato:
+
+```
+- [ ] `domain:entity` Criar entidade Customer com VOs CustomerName, Email, CPF (~2h)
+  - **Agent:** `Core Entity (Java)`
+  - **Prompt:** "Crie a entidade Customer em Java com os VOs CustomerName, Email e CPF. Aggregate root com método Create() retornando Result<T>."
+```
+
+- Reconhecer tasks nesse formato (`**Agent:** <nome>` / `**Prompt:** <texto>`) e **delegar a implementação ao Agent correspondente**, seguindo o mapeamento Agent → skill em `../req-agile-planning/SKILL.md` (tabela "Mapeamento: Prefixo de Task → Agent Cursor").
+- Respeitar a ordem inside-out definida pelo prefixo da task (`domain:vo` → `domain:entity` → `app:dto` → `app:usecase` → `infra:persistence` → `interface:controller` → `test:*`).
+- **Antes de permitir `openspec-archive-change`** de um épico funcional, validar o **bloco de fechamento de épico**: tasks `test:unit`, `test:coverage` (≥95% em domain + application), `test:e2e` e pipeline CI verde (`quality:ci-verify`); em Rust, também `quality:memory-leak` — conforme `skills-standards.md` § **Epic Definition of Done**.
+- Não marcar `- [x]` parcial: concluir a task somente quando o comportamento especificado estiver totalmente implementado (comportamento existente).
+- Pausar em ambiguidade, erros ou agent/stack incompatível e aguardar orientação (comportamento existente) — não contornar o DoD nem arquivar épico incompleto.

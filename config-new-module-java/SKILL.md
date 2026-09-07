@@ -37,6 +37,15 @@ apps/backend-java/.../modules/customers/
 node config-new-module-java/scripts/create-module-java.mjs customers --entity=Customer --group=com.example
 ```
 
+## Stubs de implementação
+
+O template gera use case e adapter como **stubs** (`UnsupportedOperationException("implement via ...")`), completados pelos skills de implementação da camada:
+
+- `application/usecase/Create__Entity__UseCase.java` → `core-use-case-java`
+- `infrastructure/persistence/__Entity__RepositoryAdapter.java` → `backend-data-java`
+
+O controller já segue o contrato §5.1: devolve DTO (`Create__Entity__Output`), `201 Created` e `400 { "errors": [...] }` via `getErrorMessages()` quando o `Result` falhar.
+
 ## Resources
 
 - `agents/openai.yaml`
