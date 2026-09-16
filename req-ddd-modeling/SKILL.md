@@ -301,6 +301,51 @@ Cada artefato identificado nas fases anteriores mapeia para um skill de implemen
 | Persistence adapter | `backend-prisma-data` | `backend-data-kt` | `backend-data-cs` |
 | Controller | `backend-controller` | `backend-controller-kt` | `backend-controller-cs` |
 
+### 3.3 — Análise das 4 Dimensões (Checklist de Viabilidade Holística)
+
+Antes de recomendar a topologia (monólito modular vs microsserviços), avalie brevemente as 4 dimensões para evitar pontos cegos:
+
+#### 1. Organizações e Pessoas
+- Quem irá operar e dar manutenção? (Equipe atual / Novos membros / Terceiros)
+- A complexidade da solução está adequada à competência da equipe?
+- Há necessidade de treinamento, mudança cultural ou gestão de mudança?
+- Existe risco de dependência de pessoas-chave (bus factor)?
+
+#### 2. Informação e Tecnologia
+- Há riscos de LGPD, segurança de dados ou conformidade regulatória?
+- A arquitetura proposta é sustentável com os recursos disponíveis?
+- Existem dependências de tecnologias proprietárias ou com custo oculto?
+- Como a solução lida com dados sensíveis e auditoria?
+
+#### 3. Parceiros e Fornecedores
+- O sistema depende de APIs externas, serviços gratuitos (ex: Google/Microsoft Nonprofit) ou gateways de pagamento?
+- Qual o SLA e o plano de contingência se o fornecedor cair ou mudar as regras?
+- Existe risco de dependência excessiva de um único fornecedor?
+- Como a solução lida com integrações de terceiros (contratos, custos, riscos)?
+
+#### 4. Fluxos de Valor e Processos
+- Esta funcionalidade elimina um gargalo real ou apenas o digitaliza (criando um "gargalo digital")?
+- O fluxo de valor ponta a ponta foi mapeado e otimizado antes da automação?
+- Existem etapas manuais que deveriam ser automatizadas (ou vice-versa)?
+- Como a solução impacta a experiência do usuário final e a cocriação de valor?
+
+#### Saída da Análise
+
+Gere um bloco resumido no arquivo `ddd-operational-notes.md`:
+
+```markdown
+## Análise das 4 Dimensões
+
+### Riscos e Recomendações
+
+**Pessoas:** [Ex: Equipe de 2 pessoas pode ter dificuldade com microsserviços. Recomendação: começar com monólito modular.]
+
+**Tecnologia:** [Ex: Dependência de API gratuita do Google. Risco: mudança de regras sem aviso. Mitigação: criar camada de abstração.]
+
+**Parceiros:** [Ex: Gateway de pagamento com SLA de 99,5%. Risco: indisponibilidade impacta receita. Mitigação: ter fornecedor alternativo.]
+
+**Processos:** [Ex: Fluxo de aprovação manual pode virar gargalo. Recomendação: automatizar notificações e alçadas.]
+
 ---
 
 ## Saída

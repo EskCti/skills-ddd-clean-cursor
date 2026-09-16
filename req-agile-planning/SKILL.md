@@ -320,7 +320,43 @@ Regras para Tasks:
 
 > **Nota**: o sistema fonte analisado pode ser qualquer linguagem (PHP, Go, Python, etc.). As tasks sempre referenciam os skills deste repositório (TS, KT, CS, RS ou Java) porque o objetivo é **reimplementar** usando DDD/Clean Architecture. Em Rust: `rust-namespace-layout.md`. Em Java: `java-namespace-layout.md` — domínio puro em `packages/<bc>/`, Spring em `apps/backend-java`.
 
-### Fase 5 — Priorização e Roadmap
+### Fase 5 — Gate de Qualidade e Validação
+
+Antes de finalizar o `backlog.md`, avalie cada Épico/User Story principal contra o checklist de prontidão e gere uma matriz de validação:
+
+#### Checklist de Prontidão (Definition of Ready)
+
+Para cada Épico/Story, avalie:
+
+- [ ] Necessidade e benefício claros? (Sim/Não)
+- [ ] Descrição clara e sem termos vagos? (Sim/Não)
+- [ ] Critérios de aceite Given/When/Then definidos? (Sim/Não)
+- [ ] Regras de negócio e exceções mapeadas? (Sim/Não)
+- [ ] Dependências críticas identificadas? (Sim/Não)
+- [ ] Dúvidas críticas resolvidas ou com plano de ação? (Sim/Não)
+- [ ] Viabilidade técnica conhecida? (Sim/Não/N/A)
+- [ ] Dados/integrações definidos? (Sim/Não/N/A)
+- [ ] Prioridade confirmada (MoSCoW)? (Sim/Não)
+- [ ] Validador identificado? (Sim/Não)
+
+**Veredito Final:** [ PRONTO PARA DESENVOLVIMENTO | NÃO PRONTO (Motivo: ______) ]
+
+#### Matriz de Validação
+
+Gere uma tabela resumida para o Coordenador de TI:
+
+| Épico/Story | Validador | Status (Validado/Com Ressalva/Pendente) | Pendência/Ressalva | Próxima Ação Concreta |
+|---|---|---|---|---|
+| EP-001 | Financeiro | Com Ressalva | Limite para 3 cotações não confirmado | Confirmar regra até [data] |
+| EP-001-US-03 | TI | Pendente | Viabilidade técnica da integração | Realizar análise de integração |
+
+**Regras de preenchimento:**
+- "Com ressalva" deve explicar exatamente o que falta
+- Não confunda validação da necessidade com confirmação de viabilidade técnica
+- Itens pendentes precisam de próxima ação clara, não apenas de status
+- Identifique quem tem conhecimento e autoridade sobre cada requisito
+
+### Fase 6 — Priorização e Roadmap
 
 1. **Ordenar épicos** por valor de negócio e dependência
 2. **Sugerir agrupamento em sprints/releases** (se o usuário quiser)
