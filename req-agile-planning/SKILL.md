@@ -729,3 +729,33 @@ gh issue create --title "US-001: <título>" --body "<corpo>" --label "epic:<nome
 ## Global Standards
 
 - Consultar `../skills-standards.md` para padroes globais de nomenclatura e convencoes gerais entre skills.
+
+## References
+
+### Templates de Análise de Requisitos (Luiza Silva)
+Consultar `../references/templates-luiza-silva.md` para os formatos exatos dos seguintes templates:
+
+- **T04: User Story e Critérios de Aceite** → Usar para cada User Story no backlog, garantindo formato "Como [perfil], quero [necessidade], para [benefício]" com critérios Given/When/Then.
+- **T05: Registro de Regra de Negócio** → Usar quando User Stories referenciam regras de negócio, políticas ou condições que influenciam o comportamento do sistema.
+- **T06: Registro de Decisões** → Usar SEMPRE que houver decisão de priorização, escopo, corte de funcionalidade ou mudança de direção no backlog.
+- **T07: Registro de Dúvidas e Pendências** → Usar para controlar bloqueios, dependências não resolvidas ou validações pendentes que impedem o desenvolvimento.
+- **T08: Solicitação de Mudança de Requisito** → Usar QUANDO um requisito aprovado ou em desenvolvimento precisar ser alterado, removido ou ampliado (pós-baseline).
+- **T09: Análise de Impacto** → Usar ANTES de aprovar mudanças significativas no backlog, avaliando consequências em escopo, prazo, custo e risco.
+- **T10: Termo de Validação de Requisitos** → Usar AO FINAL do planejamento, antes de iniciar o desenvolvimento, para registrar concordância formal com o escopo.
+- **T11: Checklist de Prontidão para Desenvolvimento (DoR)** → Usar como Gate obrigatório antes de cada User Story entrar na sprint, avaliando clareza, critérios, dependências e viabilidade.
+- **T12: Registro de Lições Aprendidas** → Usar AO FINAL de cada sprint ou release, transformando experiência em melhorias concretas para o próximo ciclo.
+
+### Instruções de Uso
+Ao gerar documentação de saída (`backlog.md`, `epics-summary.md`, `sprint-plan.md`):
+1. Utilize o formato **T04** para cada User Story, incluindo critérios de aceite no formato Given/When/Then.
+2. Utilize o formato **T05** para regras de negócio identificadas durante o planejamento.
+3. Utilize o formato **T06** para toda decisão de priorização ou escopo (ex: "Adiar funcionalidade X para próxima sprint").
+4. Utilize o formato **T07** para toda pendência ou bloqueio que impeça o desenvolvimento.
+5. Utilize o formato **T08** quando houver solicitação de mudança após o baseline do backlog.
+6. Utilize o formato **T09** para avaliar impacto de mudanças significativas antes de aprovar.
+7. Utilize o formato **T10** como termo de validação final antes de iniciar o desenvolvimento.
+8. Utilize o formato **T11** como Gate de Qualidade (Definition of Ready) para cada User Story.
+9. Utilize o formato **T12** ao final de cada sprint ou release para registrar lições aprendidas.
+
+### Regra Prática
+Backlog sem gate de qualidade vira caos. Toda User Story deve passar pelo checklist de prontidão (T11) antes de entrar na sprint. Decisões sem registro (T06) viram rediscussões. Pendências sem responsável (T07) nunca são resolvidas.

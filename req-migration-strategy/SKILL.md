@@ -275,3 +275,20 @@ Ao finalizar, oferecer:
 ## Global Standards
 
 - Consultar `../skills-standards.md` para padrões globais de nomenclatura e convenções gerais entre skills.
+
+## References
+
+### Templates de Análise de Requisitos (Luiza Silva)
+Consultar `../references/templates-luiza-silva.md` para os formatos exatos dos seguintes templates:
+
+- **T07: Registro de Dúvidas e Pendências** → Usar para controlar riscos, dependências e validações pendentes durante o planejamento da migração.
+- **T09: Análise de Impacto** → Usar ANTES de aprovar cada fase da migração ou mudança relevante, avaliando consequências em processos, sistemas, dados, testes, prazo e risco.
+
+### Instruções de Uso
+Ao gerar documentação de saída (`migration-strategy.md`, `acl-design.md`):
+1. Utilize o formato **T07** para toda pendência, risco ou dependência identificada durante a estratégia de migração.
+2. Utilize o formato **T09** para avaliar o impacto de cada fase da migração (Strangler Fig, sequência por Bounded Context, Anti-Corruption Layer).
+3. Considere impactos em: processos de negócio, requisitos e regras, sistemas e integrações, dados e migrações, segurança e conformidade, testes, prazo e esforço, riscos e dependências.
+
+### Regra Prática
+Migração sem análise de impacto vira crise. Antes de aprovar qualquer fase, avalie consequências diretas e indiretas usando o template T09. Registre incertezas em vez de transformá-las em certezas.

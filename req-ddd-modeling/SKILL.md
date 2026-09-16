@@ -463,3 +463,23 @@ Ofereça essas opções ao finalizar:
 ## Global Standards
 
 - Consultar `../skills-standards.md` para padrões globais de nomenclatura e convenções gerais entre skills.
+
+## References
+
+### Templates de Análise de Requisitos (Luiza Silva)
+Consultar `../references/templates-luiza-silva.md` para os formatos exatos dos seguintes templates:
+
+- **T03: Ficha Individual de Requisito** → Usar para detalhar entidades, aggregates ou comportamentos complexos identificados durante a modelagem tática.
+- **T05: Registro de Regra de Negócio** → Usar para documentar invariantes de domínio, políticas e regras que influenciam o comportamento das entidades e aggregates.
+- **T06: Registro de Decisões** → Usar SEMPRE que houver escolha arquitetural (ex: monólito vs microsserviços, cardinalidade de Bounded Contexts, padrão de integração como ACL/OHS).
+- **T07: Registro de Dúvidas e Pendências** → Usar para controlar lacunas na modelagem, dependências não mapeadas ou validações pendentes com stakeholders de domínio.
+
+### Instruções de Uso
+Ao gerar documentação de saída (`ddd-strategic-model.md`, `ddd-tactical-model.md`, `ddd-operational-notes.md`):
+1. Utilize o formato **T03** para requisitos complexos que impactam a modelagem de domínio.
+2. Utilize o formato **T05** para cada regra de negócio ou invariante de domínio identificado.
+3. Utilize o formato **T06** para toda decisão arquitetural relevante (topologia, cardinalidade, padrões de integração).
+4. Utilize o formato **T07** para toda dúvida ou pendência que impeça a conclusão da modelagem.
+
+### Regra Prática
+Decisões sem registro viram rediscussões. Sempre que houver escolha entre alternativas, registre a decisão, a motivação e os impactos usando o template T06.
